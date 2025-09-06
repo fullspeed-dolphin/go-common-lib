@@ -1,0 +1,191 @@
+<template>
+  <view class="page1" style="padding-top:30rpx;">
+    <view class="panel p0">
+      <van-cell title="手机号" title-width="80px" center>
+        <uni-easyinput v-model="phone" :inputBorder="false" :trim="true" :clearable="false" maxlength="11" placeholder="请输入" />
+      </van-cell>
+
+      <van-cell class="verify-cell" title="验证码" title-width="80px" center>
+        <uni-easyinput v-model="verifyCode" type="number" :inputBorder="false" :trim="true" :clearable="false" maxlength="50" placeholder="请输入" />
+        <van-button slot="right-icon" :disabled="isSendCode" type="default" @click="getCode">
+          <view class="flex-start" style="color: #323232" v-if="isSendCode">
+            <van-count-down :time="seconds * 1000" format="ss" @finish="finishTime" /> s
+          </view>
+          <block v-else>获取验证码</block>
+        </van-button>
+      </van-cell>
+
+      <van-cell title="新密码" title-width="80px" center>
+        <uni-easyinput v-model="password" type="password" :inputBorder="false" :trim="true" :clearable="false" maxlength="20" placeholder="请输入" />
+      </van-cell>
+      <van-cell title="确认密码" title-width="80px" center>
+        <uni-easyinput v-model="password1" type="password" :inputBorder="false" :trim="true" :clearable="false" placeholder="请输入" maxlength="30" />
+      </van-cell>
+    </view>
+    <view style="padding:45rpx 60rpx;">
+      <van-button type="primary" round block class="submit-btn" @click="submit">提交</van-button>
+      <!-- <van-button v-if="pageIndex===2" type="primary" round block class="submit-btn" @click="submit">下一步</van-button> -->
+    </view>
+  </view>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      pageIndex: 1,
+      checked: true,
+      curAreaCode: '+65',
+
+      phone: '',
+      verifyCode: '',
+      password: '',
+      password1: '',
+
+      isShowCodePop: false,
+
+      isSendCode: false,
+      seconds: 60,
+      smsPhone: '',
+      smsCode: '',
+      actions: [
+        {
+          name: '+86'
+        },
+        {
+          name: '+65'
+        }
+      ]
+    }
+  },
+  onLoad() {
+    // const phone = this.$route.query.phone
+    // if (phone) {
+    // 	this.parentPhone = phone
+    // }
+  },
+  methods: {
+    onSelectCode({ detail }) {
+      console.log(detail)
+      this.curAreaCode = detail.name
+    },
+    changeCheckBox({ detail }) {
+      this.checked = detail
+    },
+    finishTime() {
+      this.isSendCode = false
+    },
+    onChangeInput({ currentTarget, detail }) {
+      this[currentTarget.dataset.type] = detail.trim()
+    },
+    getCode() {
+      const { isSendCode, phone } = this
+      if (isSendCode) return
+
+      if (!phone.length) {
+        return this.$toast('请输入手机号')
+      }
+      // if (!(/^1[3456789]\d{9}$/.test(phone))) {
+      //   return this.$toast('手机号码格式有误')
+      // }
+      const data = {
+        telPhone: phone
+      }
+      this.$axios({ url: `api/user/sendCode`, data }).then(res => {
+        this.$toast('短信验证码已经发送')
+        this.isSendCode = true
+        this.seconds = 60
+      })
+    },
+    async submit() {
+      const { phone, verifyCode, password, password1 } = this
+
+      if (!phone.length) {
+        return this.$toast('请输入手机号')
+      }
+
+      // if (!(/^1[3456789]\d{9}$/.test(phone))) {
+      //   return this.$toast('手机号码格式有误')
+      // }
+
+      if (!verifyCode.length) {
+        return this.$toast('请输入验证码')
+      }
+      if (!password.length) {
+        return this.$toast('请输入新密码')
+      }
+      // if (password.length < 6) {
+      //   return this.$toast('密码长度应该为6位')
+      // }
+
+      if (!password1.length) {
+        return this.$toast('请输入确认密码')
+      }
+
+      const data = {
+        telPhone: this.phone,
+        code: this.verifyCode,
+        password1: this.password,
+        password2: this.password1
+      }
+
+      this.$axios({ url: 'api/user/findPassword', data }).then(res => {
+        this.$toast('重置成功，请重新登录')
+        setTimeout(() => {
+          uni.redirectTo({
+            url: '/pagesSub/login'
+          })
+        }, 300)
+      })
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.page {
+  height: 100vh;
+  padding-top: 44rpx;
+  background: #fff;
+}
+.c0 {
+  color: rgba(51, 51, 51, 1);
+}
+.panel {
+  padding-right: 62rpx;
+  padding-left: 30rpx;
+}
+::v-deep {
+  .van-cell__title {
+    font-size: 28rpx;
+    color: rgba(51, 51, 51, 1);
+  }
+  .verify-cell {
+    .van-button {
+      border: 0;
+      font-size: 28rpx;
+      padding-right: 0;
+      padding: 0 !important;
+      height: auto;
+      &:before {
+        display: none;
+      }
+      &:after {
+        display: none;
+      }
+    }
+  }
+  .van-cell {
+    background: transparent;
+    &:after {
+      left: 16px;
+    }
+  }
+}
+
+.page {
+  padding: 0px 40rpx;
+  min-height: 100vh;
+  line-height: 1.4;
+  --count-down-text-color: #fff;
+}
+</style>

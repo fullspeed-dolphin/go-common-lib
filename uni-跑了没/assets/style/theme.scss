@@ -1,0 +1,157 @@
+@import './hair.scss';
+
+.color{
+	color: #1989fa;
+}
+
+.u-primary { color : #3c9cff};
+.u-warning { color: #f9ae3d; }
+.u-success { color: #5ac725; }
+.u-error { color: #f56c6c; }
+.u-info { color: #909399; }
+
+.status_bar {
+    height: var(--status-bar-height);
+    width: 100%;
+}
+
+swiper-item {
+    overflow: visible;
+}
+
+.uni-tabbar-bottom {
+    display: none;
+}
+
+.uni-modal{
+	border-radius: 20rpx!important;
+	top: 45%!important;
+	.uni-modal__title{
+		font-size: 16px;
+	}
+	.uni-modal__hd{
+		margin-top:14rpx;
+	}
+	.uni-modal__bd{
+		padding-top:0.8em;
+		color: #646566;
+		font-size: 14px;
+	}
+}
+
+.uni-popup__wrapper{
+    border-radius: 20rpx;
+    .popup-close{
+        position:absolute;
+        top:50%;
+        right:-10rpx;
+        padding: 20rpx;
+        transform: translateY( -50%);
+    }
+}
+
+uni-page-head{
+	display:none;
+}
+
+uni-page-body{
+	height: 100%!important;
+}
+
+uni-page-wrapper{
+	height: 100%!important;
+	&:after{
+		display: none!important;
+	}
+}
+
+// 重新定义 modal 样式
+.uni-modal{
+	border-radius: 20rpx!important;
+	top: 45%!important;
+	// width: 640rpx!important;
+	.uni-modal__title{
+		font-size: 16px;
+	}
+	.uni-modal__hd{
+		padding-top: 26px;
+		padding-bottom: 0px;
+		font-weight: 500;
+		line-height: 24px;
+		text-align: center;
+	}
+	.uni-modal__bd{
+		padding-top:8px;
+		color: #646566;
+		max-height: 60vh;
+		padding: 8px 24px 26px;
+		overflow-y: auto;
+		font-size: 14px;
+		line-height: 20px;
+		white-space: pre-wrap;
+		text-align: center;
+		word-wrap: break-word;
+	}
+	.uni-modal__btn{
+		font-size: 16px!important;
+	}
+}
+
+.add-goods-btn{
+	width: 100rpx;
+	height: 100rpx;
+	position: fixed;
+	right: 30rpx;
+	bottom: 250rpx;
+	background: $color;
+	box-shadow: 1px 1px 10px rgba(255,255,255,.7);
+	z-index: 50;
+	color: #fff;
+	border-radius: 100rpx;
+}
+
+.zIndex1000{
+		position: relative;
+		z-index: 1000;
+	}
+	
+	.uni-toast{
+		width: 272rpx!important;
+		// height: 272rpx!important;
+		border-radius: 24rpx!important;
+	}
+	.uni-icon_toast{
+		width: 80rpx;
+		height: 80rpx;
+		margin-top: 56rpx!important;
+		margin-bottom: 32rpx!important;
+		&:before{
+			font-size: 80rpx!important;
+		}
+	}
+	
+	.parentActive{
+		position: relative;
+		&:before{
+			position: absolute;
+			top: 44rpx;
+			left:0;
+			transform: translateY(-50%);
+			content: "";
+			width: 6rpx;
+			height: 32rpx;
+			z-index: 1;
+			background: #F1FD53;
+		}
+	}
+	
+	.panel-info{
+		padding: 20rpx;
+		min-height: 300rpx;
+		width: 690rpx;
+		margin: 25rpx auto;
+		background: #fff;
+		border-radius: 14rpx;
+		overflow: hidden;
+		box-shadow: 0rpx 4rpx 8rpx rgba(102,102,102, .1);
+	}
