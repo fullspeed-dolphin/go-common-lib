@@ -1,87 +1,147 @@
 <template>
-  <view class="rel">
-		<van-cell class="textarea-box">
-			<uni-easyinput v-model="decsription" type="textarea" :inputBorder="false" :trim="true" maxlength="200" :clearable="false" placeholder="请写下您的宝贵建议或咨询问题"/>
-			<view class="counter">
-				{{decsription.length}} / 200
-			</view>
-		</van-cell>
-		<van-cell class="title-cell" title="联系方式" title-width="80px" center :border="false">
-			<uni-easyinput v-model="contact" :inputBorder="false" :trim="true" :clearable="false" maxlength="50" placeholder="请留下您的邮箱或QQ"/>
-		</van-cell>
-		
-		<view style="padding:0rpx 62rpx;margin-top:55rpx;">
-		  <van-button round type="primary" block @click="submit()">提交</van-button>
-		</view>
+  <view class="page">
+    <u-navbar title="意见反馈"></u-navbar>
+    <view style="padding: 20rpx 34rpx">
+      <u--form :model="form" ref="uForm" :rules="rules" labelWidth="auto" labelPosition="top">
+        <u-form-item label="反馈类型（必填）" prop="checked">
+          <u-checkbox-group v-model="form.checked" iconPlacement="right" activeColor="#FF8C00" inactiveColor="#000" placement="column">
+            <u-checkbox labelColor="#000" :label="item.text" :name="item.value" v-for="(item, index) in issueTypeOptions" :key="index"></u-checkbox>
+          </u-checkbox-group>
+        </u-form-item>
+
+				<view class="van-hairline--top mt20" style="opacity:0.3;"></view>
+
+        <view class="u--textarea">
+          <u-form-item label="请补充详细问题和意见（必填）" prop="description" >
+            <u--textarea v-model="form.description" height="300" border="none" maxlength="240" autoHeight placeholder="请输入不少于10字的描述" count></u--textarea>
+          </u-form-item>
+        </view>
+      </u--form>
+     
+      <view class="" style="padding: 26rpx 120rpx 0">
+        <u-button type="primary" shape="circle" @click="submitForm()">提交</u-button>
+      </view>
+    </view>
   </view>
 </template>
 <script>
+import FileUploader from '@/components/common/fileUploader.vue'
 export default {
-  data () {
+  components: {
+    FileUploader
+  },
+  data() {
     return {
-			decsription: "",
-			contact: ""
-		};
+      form: {
+        checked: [],
+        description: ''
+      },
+      issueTypeOptions: [
+        { text: '功能异常：功能故障或不可用', value: 1 },
+        { text: '产品建议：我有新创意/想法/意见', value: 2 },
+        { text: '安全问题：密码/隐私/欺诈等', value: 3 },
+        { text: '流程问题：加载慢/提示错误/页面卡顿等', value: 4 },
+        { text: '其他', value: 5 }
+      ],
+      rules: {
+        checked: [
+          {
+						type: 'array',
+						min: 1,
+            required: true,
+            message: '必填项',
+            trigger: ['blur', 'change']
+          }
+        ],
+        description: [
+          {
+            required: true,
+            message: '必填项',
+            trigger: ['blur', 'change']
+          }
+        ]
+      }
+    }
   },
   methods: {
-		submit () {
-		  if (!this.decsription.length) { return this.$toast('请写下您的宝贵建议或咨询问题')}
-		  if (!this.contact.length) { return this.$toast('请留下您的邮箱或QQ')}
-		
-		  uni.showLoading({
-		    title: '提交中...',
-		    mask: true
-		  })
-		
-		  const data = {
-		    content: this.decsription,
-		    email: this.contact,
-		  };
-			
-		  this.$axios({ url: "api/page/add_feedback", data, method: 'post' }).then(res => {
-				uni.hideLoading()
-		    this.$toast("提交成功");
-				
-				this.decsription = ""
-				this.contact = ""
-				
-				uni.navigateBack({
-					delta: 1
-				})
-		  })
-		},
-	}
-};
+    submitForm() {
+      this.$refs.uForm.validate().then((res) => {
+        const token = uni.getStorageSync('token')
+        if (!token) {
+          this.$toast('请先登录~')
+          setTimeout(() => {
+            this.$goUrl('/pagesSub/login')
+          }, 1000)
+          return
+        }
+
+        if (!this.isAgree.length) return this.$toast('请勾选同意协议')
+
+        const data = {
+          Account: this.form.name,
+          Password: this.form.password
+        }
+        uni.showLoading({
+          mask: true
+        })
+        this.$axios.post(`/api/store/login`, data).then((res) => {
+          console.log(res)
+
+          uni.$u.toast('提交成功')
+					
+					setTimeout(res => {
+						uni.navigateBack()
+					}, 300)
+        })
+      })
+    }
+  }
+}
 </script>
 
 <style lang="less" scoped>
-	::v-deep{
-		.van-cell{
-			padding-top:0;
-			padding-bottom:0;
-		}
-		.van-cell__title{
-			font-size: 28rpx;
-			color: rgba(102, 102, 102, 1);
-		}
-		.title-cell{
-			.uni-easyinput{
-				text-align: right;
-			}
-		}
-		.textarea-box{
-			position: relative;
-			padding-bottom: 30rpx;
-			.uni-easyinput__content-textarea{
-				height: 585rpx;
-			}
-			.counter{
-				position: absolute;
-				bottom:0px;
-				right: 16px;
-				color: rgba(51, 51, 51, 1);
-				font-size: 20rpx;
-			}
-		}
+.submit-btn {
+  width: 682rpx;
+  height: 72rpx;
+  margin: 48rpx auto;
+  border-radius: 16rpx;
+  font-weight: bold;
+  font-size: 30rpx;
+  color: #ff8c00;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+::v-deep {
+	.u-form-item__body__left__content__label{
+		font-size: 24rpx;
+		color: #4c4c4c;
+		margin-bottom: 20rpx;
 	}
+	.u-checkbox-group{
+		width: 100%;
+	}
+	.u-checkbox{
+				margin-bottom: 30rpx;
+			}
+	.u-form-item__body{
+		padding-bottom:0;
+	}
+
+  .u-form-item__body__right__message {
+    margin-left: 0 !important;
+    margin-top: 6rpx;
+  }
+  
+  .u-textarea {
+		border:0;
+		min-height: 450rpx;
+		box-shadow: 0rpx 6rpx 10rpx 2rpx rgba(0,0,0,0.16);
+		border-radius: 16rpx 16rpx 16rpx 16rpx;
+  }
+
+  .input-placeholder {
+    font-size: 24rpx;
+    color: rgb(192, 196, 204);
+  }
+}
 </style>

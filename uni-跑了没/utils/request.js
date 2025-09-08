@@ -78,6 +78,7 @@ function fetch(options) {
 				}
 		
 				if (response?.Code == 200) {
+					uni.hideLoading();
 					resolve(response.Data)
 				}
 			},

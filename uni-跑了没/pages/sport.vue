@@ -1,6 +1,6 @@
 <template>
   <view class="index-page">
-		<u-navbar title="运动"></u-navbar>
+		<u-navbar title="运动" leftIcon=""></u-navbar>
 		
 		<view class="flex-center" style="height: 80vh; font-weight: 500;
 font-size: 34rpx;

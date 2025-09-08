@@ -1,6 +1,6 @@
 <template>
   <view class="index-page">
-		<u-navbar title="跑了没"></u-navbar>
+		<u-navbar title="跑了没"  leftIcon=""></u-navbar>
 		
 		<view class="" style="position:relative;z-index: 10;">
 			<view class="section-search">

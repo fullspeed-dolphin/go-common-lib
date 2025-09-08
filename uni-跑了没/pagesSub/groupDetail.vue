@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<u-navbar title="跑团详情"></u-navbar>
+		<u-navbar :title="pageTitle"></u-navbar>
 		<section class="section-card flex-row">
 			<image class="img" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
 			<view class="" style="width:500rpx;">
@@ -60,6 +60,11 @@
 				detail: {},
 			};
 		},
+		computed: {
+			pageTitle() {
+				return this.routeParams.from === 'mine' ? '我的跑团' : '跑团详情';
+			}
+		},
 		onLoad(option) {
 			console.log("option", option);
 			this.routeParams = option
@@ -77,6 +82,7 @@
 					})
 			},
 			joinGroup() {
+				// 一个人能创建5个，每个20人起，一个队百人封顶
 			  uni.showModal({
 			    title: "提示",
 			    content: "是否确认加入该跑团？",

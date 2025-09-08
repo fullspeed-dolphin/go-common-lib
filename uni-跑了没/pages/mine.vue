@@ -1,8 +1,9 @@
 <template>
   <view class="mine-page">
+		<u-navbar title="个人中心" leftIcon=""></u-navbar>
     <view class="page-content">
     	<view class="rel section-user">
-    		<view class="user-box" @click="$goUrl(userInfo.Id ? '/pagesSub/settings/profile1' : '/pagesSub/login')">
+    		<view class="user-box" @click="$u.route(userInfo.Id ? '/pagesSub/settings/profile1' : '/pagesSub/login')">
     			<view class="flex-start">
 						<image class="avatar" :src="userInfo.Avatar || '../static/img/默认头像@2x.png'" mode="aspectFill"></image>
     				<view class="text">
@@ -13,13 +14,13 @@
     		</view>
     	</view>
 			<view class="section-box">
-				<u-cell title="我的跑团" class="nav-cell" @click="goLink('/pagesSub/historyList')" :border="false" isLink>
+				<u-cell title="我的跑团" class="nav-cell" @click="$u.route('/pagesSub/groupDetail?from=mine')" :border="false" isLink>
 					<view slot="icon" class="iconfont icon-liulanjilu"></view>
 				</u-cell>
-				<u-cell title="我的消息" class="nav-cell" @click="goLink('/pagesSub/orderList')" :border="false" isLink>
+				<u-cell title="我的消息" class="nav-cell" @click="$u.route('/pagesSub/myMessages')" :border="false" isLink>
 					<view slot="icon" class="iconfont icon-dingdan-copy"></view>
 				</u-cell>
-				<u-cell title="我的赛事" class="nav-cell" @click="$goUrl('/pagesSub/settings/agreement')" :border="false" isLink>
+				<u-cell title="我的赛事" class="nav-cell" @click="$u.route('/pagesSub/myEvent')" :border="false" isLink>
 					<view slot="icon" class="iconfont icon-duiwaichuzuguanli"></view>
 				</u-cell>
 				<u-cell title="意见反馈" class="nav-cell" @click="$u.route('/pagesSub/settings/feedback')" :border="false" isLink>

@@ -1,15 +1,2 @@
-UI: [](https://lanhuapp.com/web/#/item/project/stage?tid=13701d3f-3f03-46cd-b13d-7eae4312bc44&pid=1b14e8ef-af34-49ce-9b11-bc73eea29088)
 
-疑问：
-
-1，登录方式： 手机授权，普通授权，账号密码
-2，手机信息： 
-*所有的字段都要吗，用户耐心不够
-*哪些字段是必须的，必填项
-*性别弄成单选方式
-*位置字段是针对什么场景的收集的，用户所在城市吗？
-*位置字段不够展示
-*血型弄成 select 选项卡的方式
-
-3，代码创建 git 吗？
-4，有后台管理页面吗？如何加活动，管理订单，人员等
+ui [](https://lanhuapp.com/web/#/item/project/stage?tid=13701d3f-3f03-46cd-b13d-7eae4312bc44&pid=71a96ba5-cc56-4b2f-8bc1-a8e6bdc842c3)

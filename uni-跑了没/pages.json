@@ -17,13 +17,15 @@
 					{ "path": "groupDetail", "style": { "navigationStyle": "custom","navigationBarTitleText": "跑团详情", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					{ "path": "groupForm", "style": { "navigationStyle": "custom","navigationBarTitleText": "创建跑团", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					{ "path": "groupMemberList", "style": { "navigationStyle": "custom","navigationBarTitleText": "跑团成员", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
+					{ "path": "myEvent", "style": { "navigationStyle": "custom","navigationBarTitleText": "我的赛事", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
+					{ "path": "myMessages", "style": { "navigationStyle": "custom","navigationBarTitleText": "我的消息", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					// { "path": "settings/profile", "style": { "navigationBarTitleText": "完善信息", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "settings/agreement", "style": { "navigationBarTitleText": "跑了没", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
+					{ "path": "settings/agreement", "style": { "navigationStyle": "custom", "navigationBarTitleText": "协议", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					// { "path": "settings/forgetPassword", "style": { "navigationBarTitleText": "忘记密码", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					// { "path": "settings/findPassword", "style": { "navigationBarTitleText": "重置密码", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					{ "path": "settings/editPassword", "style": { "navigationBarTitleText": "修改密码", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					// { "path": "settings/settings", "style": { "navigationBarTitleText": "设置", "app-plus": { "titleNView": false, "backgroundcolor": "#ffffff" } } },
-					{ "path": "settings/feedback", "style": { "navigationBarTitleText": "意见反馈", "app-plus": { "titleNView": false, "backgroundcolor": "#ffffff" } } }
+					{ "path": "settings/feedback", "style": { "navigationStyle": "custom", "navigationBarTitleText": "意见反馈", "app-plus": { "titleNView": false, "backgroundcolor": "#ffffff" } } }
 				]
 			}
 		],
