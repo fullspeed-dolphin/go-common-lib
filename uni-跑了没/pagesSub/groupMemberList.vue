@@ -1,7 +1,7 @@
 <template>
   <div class="">
 		<u-navbar title="跑团成员"></u-navbar>
-		<mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="88">
+		<mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="190">
       <view class="member-item flex-start" v-for="(item,index) in 5" :key="index">
       	<image class="img" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
       	<view class="flex-start">
@@ -64,6 +64,7 @@ export default {
 		padding: 11rpx 34rpx;
 		color: #666;
 		.img{
+			display: block;
 			width: 106rpx;
 			height: 106rpx;
 			border-radius: 999px;

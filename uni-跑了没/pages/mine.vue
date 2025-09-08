@@ -1,11 +1,11 @@
 <template>
   <view class="mine-page">
-		<u-navbar title="个人中心" leftIcon=""></u-navbar>
+		<u-navbar title="个人中心" :leftIcon="false"></u-navbar>
     <view class="page-content">
     	<view class="rel section-user">
     		<view class="user-box" @click="$u.route(userInfo.Id ? '/pagesSub/settings/profile1' : '/pagesSub/login')">
     			<view class="flex-start">
-						<image class="avatar" :src="userInfo.Avatar || '../static/img/默认头像@2x.png'" mode="aspectFill"></image>
+						<image class="avatar" :src="userInfo.Avatar || '../static/basicprofile.jpeg'" mode="aspectFill"></image>
     				<view class="text">
     					<view class="name" v-if="userInfo.Id">{{userInfo.NickName}}</view>
     					<view class="name" v-else>登录/注册</view>
@@ -15,16 +15,16 @@
     	</view>
 			<view class="section-box">
 				<u-cell title="我的跑团" class="nav-cell" @click="$u.route('/pagesSub/groupDetail?from=mine')" :border="false" isLink>
-					<view slot="icon" class="iconfont icon-liulanjilu"></view>
+					<image slot="icon" class="nav-icon" src="/static/images/个人信息Icon@2x.png"></image>
 				</u-cell>
 				<u-cell title="我的消息" class="nav-cell" @click="$u.route('/pagesSub/myMessages')" :border="false" isLink>
-					<view slot="icon" class="iconfont icon-dingdan-copy"></view>
+					<image slot="icon" class="nav-icon" src="/static/images/我的消息Icon@2x.png"></image>
 				</u-cell>
 				<u-cell title="我的赛事" class="nav-cell" @click="$u.route('/pagesSub/myEvent')" :border="false" isLink>
-					<view slot="icon" class="iconfont icon-duiwaichuzuguanli"></view>
+					<image slot="icon" class="nav-icon" src="/static/images/WX20250908-193754.png"></image>
 				</u-cell>
 				<u-cell title="意见反馈" class="nav-cell" @click="$u.route('/pagesSub/settings/feedback')" :border="false" isLink>
-					<view slot="icon" class="iconfont icon-duiwaichuzuguanli"></view>
+					<image slot="icon" class="nav-icon" src="/static/images/帮助反馈Icon@2x.png"></image>
 				</u-cell>
 			</view>
 			
@@ -111,6 +111,21 @@ export default {
 </script>
 
 <style lang="less" scoped>
+	::v-deep{
+		.u-cell__left-icon-wrap{
+			width: 52rpx;
+			height: 52rpx;
+			border-radius: 53rpx;
+			background: rgba(0,0,0,0.06);
+			justify-content: center;
+			margin-right:22rpx;
+		}
+	}
+	.nav-icon{
+		width: 34rpx;
+		height: 34rpx;
+		display: block;
+	}
 	.user-box{
 		height: 210rpx;
 		padding: 56rpx 0 0rpx 48rpx;
@@ -126,7 +141,7 @@ export default {
 			text-align: center;
 			font-size: 60rpx;
 			color: #ccc;
-			border: 1rpx solid #999;
+			border: 1rpx solid rgba(0,0,0,0.06);
 		}
 		.name {
 			font-weight: 500;
@@ -136,9 +151,6 @@ export default {
 	
 	::v-deep{
 			.u-cell{
-				padding-left:24rpx;
-				padding-right:20rpx;
-				background: #F6F6F6;
 				margin-bottom: 8rpx;
 				border-radius: 10rpx;
 				width: 680rpx;

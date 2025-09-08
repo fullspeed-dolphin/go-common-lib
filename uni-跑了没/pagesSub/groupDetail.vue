@@ -139,6 +139,7 @@
 		padding: 11rpx 34rpx;
 		color: #666;
 		.img{
+			display: block;
 			width: 106rpx;
 			height: 106rpx;
 			border-radius: 999px;
@@ -150,6 +151,7 @@
 	.section-card{
 		padding: 34rpx;
 		.img{
+			display: block;
 			width: 154rpx;
 			height: 154rpx;
 			margin-right: 30rpx;

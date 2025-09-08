@@ -15,12 +15,9 @@ $u-button-plain-u-button-error-color: $u-error;
 $u-button-plain-u-button-warning-color: $u-error;
 
 
-uni-button {
+.u-button {
 	margin-left: 0rpx;
 	margin-right: 0rpx;
-}
-
-.u-button {
 	&__text {
 		white-space: nowrap;
 		line-height: 1;

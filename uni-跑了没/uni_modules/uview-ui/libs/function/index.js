@@ -52,7 +52,12 @@ function os() {
  * @link 获取系统信息同步接口 https://uniapp.dcloud.io/api/system/info?id=getsysteminfosync
  */
 function sys() {
-	return uni.getSystemInfoSync()
+	const DeviceInfo = uni.getDeviceInfo()
+	const WindowInfo = uni.getWindowInfo()
+	return {
+		...WindowInfo,
+		...DeviceInfo,
+	}
 }
 
 /**

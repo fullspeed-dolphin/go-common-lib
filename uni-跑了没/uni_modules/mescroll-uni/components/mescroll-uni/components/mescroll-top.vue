@@ -15,7 +15,7 @@
 export default {
 	props: {
 		// up.toTop的配置项
-		option: Object,
+		option: Object | null,
 		// 是否显示
 		value: false
 	},

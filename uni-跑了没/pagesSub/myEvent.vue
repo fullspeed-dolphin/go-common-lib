@@ -1,44 +1,18 @@
 <template>
   <view class="" >
 		<u-navbar title="我的赛事"></u-navbar>
-		<section class="panel">
-			<view class="h2 van-hairline--bottom">
-				<view class="ellipsis2">
-					奔跑吧！广州·喜迎十五运 奔跑环两山·增城站奔跑吧！广州·喜迎十五运 奔跑环两山·增城站
+		<section class="panel" @click="$u.route('pagesSub/offlineEvents')">
+			<image class="poster" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
+			<view class="p20">
+				<view class="h2">
+					<view class="ellipsis2">
+						奔跑吧！广州·喜迎十五运 奔跑环两山·增城站奔跑吧！广州·喜迎十五运 奔跑环两山·增城站
+					</view>
 				</view>
-			</view>
-			<view class="cell flex-row">
-				<view class="label">报名时间：</view>
-				<view class="value">2025.09.20 9:00 - 2025.09.30 9:00</view>
-			</view>
-			<view class="cell flex-row">
-				<view class="label">活动时间：</view>
-				<view class="value">2025.10.26 8:00 </view>
-			</view>
-			<view class="cell flex-row">
-				<view class="label">活动地点：</view>
-				<view class="value flex">广州增城区xxxxxxxxx广州增城区xxxxxxxxx广州增城区xxxxxxxxx广州增城区xxxxxxxxx</view>
-			</view>
-			<view class="cell flex-row">
-				<view class="label">活动项目：</view>
-				<view class="value">5KM / 10KM / 半程马拉松</view>
-			</view>
-			<view class="cell flex-row">
-				活动规模：1000人
-			</view>
-			<view class="cell flex-start">
-				客服微信：
-				<view class="mr20">
-					15864205324
-				</view>  
-				<u-button @click="copyText(15864205324)" type="primary" shape="circle" color="#3A8443" size="mini" text="复制"></u-button>
-			</view>
-		</section>
-		
-		<section class="panel">
-			<view class="cell" style="margin-top:0;">
-				<view class="label">活动说明：</view>
-				<view class="value">5KM / 10KM / 半程马拉松5KM / 10KM / 半程马拉松5KM / 10KM / 半程马拉松5KM / 10KM / 半程马拉松</view>
+				<view class="cell flex-row">
+					<view class="label">活动时间：2025.10.26 8:00</view>
+					<view class="value"> </view>
+				</view>
 			</view>
 		</section>
   </view>
@@ -83,21 +57,23 @@ export default {
 </script>
 
 <style lang="less">
-	.offlineEvents{
-		padding: 34rpx;
-	}
 	.panel{
 		width: 682rpx;
 		margin: 30rpx 34rpx 30rpx;
-		padding: 20rpx;
+		padding: 0rpx;
 		border-radius: 16rpx;
 		box-shadow: 0rpx 4rpx 10rpx 2rpx rgba(0,0,0,0.16);
+		.poster{
+			width: 682rpx;
+			height: 304rpx;
+			border-radius: 16rpx 16rpx 16rpx 16rpx;
+			// border: 2rpx solid #707070;
+		}
 	}
 	.h2{
 		font-weight: 500;
 		font-size: 30rpx;
 		line-height: 42rpx;
-		padding: 22rpx 0;
 	}
 	.cell{
 		margin-top: 20rpx;

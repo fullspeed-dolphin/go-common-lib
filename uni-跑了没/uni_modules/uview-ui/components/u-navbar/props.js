@@ -22,7 +22,7 @@ export default {
 		},
 		// 左边的图标
 		leftIcon: {
-			type: String,
+			type: [String, Boolean],
 			default: uni.$u.props.navbar.leftIcon
 		},
 		// 左边的提示文字

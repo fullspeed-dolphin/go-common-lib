@@ -3,8 +3,8 @@
 		<u-popup v-if="isShowPop" :show="isShowPop" mode="bottom" round="15" @close="isShowPop = false">
 			<view class="p20">
 				<view class="section-box mt10 flex-box">
-					<image class="logo mr10" src="../../static/img/basicprofile.jpeg"
-						style="width: 40rpx;height:40rpx;border-radius: 999rpx;" mode="aspectFill"></image>
+					<!-- <image class="logo mr10" src="../../static/img/basicprofile.jpeg"
+						style="width: 40rpx;height:40rpx;border-radius: 999rpx;" mode="aspectFill"></image> -->
 					<view class="title flex-center">汕居租房申请</view>
 				</view>
 				<view class="">

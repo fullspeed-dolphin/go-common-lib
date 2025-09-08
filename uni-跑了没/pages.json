@@ -53,11 +53,10 @@
 			]
 		},
     "globalStyle": {
-        "rpxCalcMaxDeviceWidth": "640",
         "navigationBarTextStyle": "black",
         "navigationBarTitleText": "uni-app",
         "navigationBarBackgroundColor": "#fff",
-        "backgroundColor": "#1a1c4b"
+        "backgroundColor": "#fff"
     },
 	"condition" : { //模式配置，仅开发期间生效
 		"current": 0, //当前激活的模式(list 的索引项)

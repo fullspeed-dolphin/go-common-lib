@@ -1,24 +1,19 @@
 <template>
   <view class="page">
+		<u-navbar title="用户登录"></u-navbar>
 		<view class="section-box flex-col-center">
-    </view>
+		  <image class="logo" src="../static/basicprofile.jpeg" mode="aspectFill"></image>
+		  <view class="title flex-center">欢迎使用跑了没</view>
+		</view>
 		<view style="padding:100rpx 104rpx 0;">
-			<u--form :model="form" ref="uForm" :rules="rules">
-				<u-form-item label="" prop="name">
-					<u-input v-model="form.name"  prefixIcon="account" placeholder="输入账号"/>
-				</u-form-item>
-				<u-form-item label="" prop="password">
-					<u-input v-model="form.password" type="password" prefixIcon="lock" placeholder="输入密码"/>
-				</u-form-item>
-			</u--form>
-			
-			<view class="submit-btn flex-center" @click="submit">登录</view>
-			
+			<PhoneLogin @success="successLogin" />
 		</view>
   </view>
 </template>
 <script>
+	import PhoneLogin from "@/components/common/PhoneLogin.vue";
 export default {
+	components: { PhoneLogin },
   data () {
     return {
 			form: {
@@ -45,84 +40,44 @@ export default {
 			}
 		};
   },
-	onLoad() {
-		if (location.href.includes('localhost')) {
-			this.form.name = '13670443751'
-			this.form.password = '123456'
-		}
+	onLoad(options) {
+		this.options = this.options;
 	},
   methods: {
-		submit() {
-			this.$refs.uForm.validate().then(res => {
-				const data = {
-					"Account": this.form.name,
-					"Password": this.form.password,
-				}
-				uni.showLoading({
-					mask: true
-				})
-				this.$axios.post(`/api/store/login`, data).then(res => {
-					console.log(res)
-					uni.hideLoading()
-					
-					localStorage.token = res.Token
-					
-					this.$store.dispatch('getUserInfo')
-					
-					uni.$u.toast('登录成功')
-					
-					this.$goUrl("/pages/index")
-				})
-			}).catch(errors => {
-				// uni.$u.toast('校验失败')
-			})
-		}
+		successLogin() {
+		  // 存在订单分享的情况下，跳转订单分享
+		  if (this.options?.direct) {
+		    uni.navigateBack()
+		
+		    return false;
+		  }
+		
+		  uni.switchTab({
+		    url: "/pages/index",
+		    success() {
+		      uni.hideLoading();
+		    },
+		  });
+		},
   }
 };
 </script>
 
 <style lang="less" scoped>
-	.logo{
-		width: 300rpx;
-		height: 60rpx;
+	.logo {
+	  width: 160rpx;
+	  height: 160rpx;
+	  border-radius: 24rpx;
+	  background: #f5f5f5;
+		outline: 1px solid #f5f5f5;
 	}
-	.page{
-		height: 100vh;
-		padding-top:180rpx;
-		background: #fff;
+	.title {
+	  margin-top: 50rpx;
+	  font-size: 40rpx;
+	  font-weight: 500;
 	}
-	.title{
-		margin-top: 30rpx;
-		font-size: 48rpx;
-		font-weight: 500;
-	}
-	
-	.submit-btn{
-		width: 542rpx;
-		height: 96rpx;
-		margin: 48rpx auto;
-		border-radius: 16rpx;
-		background: #2E2F30;
-		font-size: 32rpx;
-		font-weight: 500;
-		color: #F1FD53;
-	}
-	
-	::v-deep{
-		.u-form-item{
-			justify-content: center;
-			align-items: center;
-		}
-		.u-form-item__body{
-			width: 542rpx;
-		}
-		.u-form-item__body__right__message{
-			margin:0!important;
-		}
-		.u-input{
-			height: 96rpx;
-			border-radius: 16rpx;
-			background: #F5F5F5;
-		}
+	.section-box {
+	  padding-top: 140rpx;
+	  margin-bottom: 105rpx;
 	}
 </style>

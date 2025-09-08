@@ -1,7 +1,7 @@
 <template>
   <div class="">
 		<u-navbar title="跑团招募"></u-navbar>
-    <view class="section-filter">
+    <section class="section-filter bgf">
 			<view class="section-search">
 				<u-search v-model="searchTxt" @search="confirmSearch" placeholder="搜索跑团" shape="round" bgColor="#fff" borderColor="#FF8C00" :showAction="false"></u-search>
 			</view>
@@ -10,8 +10,8 @@
 			:inactiveStyle="{color: '#000'}"
 			:activeStyle="{color: '#FF8C00'}"
 			:list="tabList" @change="changeTab" :scrollable="false" keyName="label" lineColor="#FF8C00" />
-    </view>
-    <mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="280rpx">
+    </section>
+    <mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="340">
 			<view class="" style="height:40rpx"></view>
 			<view class="group-item flex-start" v-for="(item,index) in 3" :key="index" @click="$u.route(`pagesSub/groupDetail?id=${item}`)">
 				<image class="poster" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
@@ -183,7 +183,6 @@ export default {
 }
 .section-filter {
   position: fixed;
-  top: 44px;
   width: 100%;
   z-index: 10;
 }
