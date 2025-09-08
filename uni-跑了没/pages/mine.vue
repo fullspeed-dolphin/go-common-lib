@@ -13,13 +13,16 @@
     		</view>
     	</view>
 			<view class="section-box">
-				<u-cell title="浏览记录" icon="order" class="nav-cell" @click="goLink('/pagesSub/historyList')" isLink>
+				<u-cell title="我的跑团" class="nav-cell" @click="goLink('/pagesSub/historyList')" :border="false" isLink>
 					<view slot="icon" class="iconfont icon-liulanjilu"></view>
 				</u-cell>
-				<u-cell title="订单列表" icon="order" class="nav-cell" @click="goLink('/pagesSub/orderList')" isLink>
+				<u-cell title="我的消息" class="nav-cell" @click="goLink('/pagesSub/orderList')" :border="false" isLink>
 					<view slot="icon" class="iconfont icon-dingdan-copy"></view>
 				</u-cell>
-				<u-cell title="出租服务" icon="order" class="nav-cell" @click="$goUrl('/pagesSub/settings/agreement')" :border="false" isLink>
+				<u-cell title="我的赛事" class="nav-cell" @click="$goUrl('/pagesSub/settings/agreement')" :border="false" isLink>
+					<view slot="icon" class="iconfont icon-duiwaichuzuguanli"></view>
+				</u-cell>
+				<u-cell title="意见反馈" class="nav-cell" @click="$u.route('/pagesSub/settings/feedback')" :border="false" isLink>
 					<view slot="icon" class="iconfont icon-duiwaichuzuguanli"></view>
 				</u-cell>
 			</view>
@@ -107,52 +110,49 @@ export default {
 </script>
 
 <style lang="less" scoped>
-	.vip{
-		position: relative;
-		width: 700rpx;
-		height: 80rpx;
-		margin: 0 auto;
-	}
 	.user-box{
 		height: 210rpx;
 		padding: 56rpx 0 0rpx 48rpx;
 		overflow: hidden;
 		z-index: 10;
-		background: #4cacd6;
 		.avatar{
 			display: block;
-			width: 88rpx;
-			height: 88rpx;
-			margin-right: 20rpx;
+			width: 108rpx;
+			height: 108rpx;
+			margin-right: 30rpx;
 			background: #f5f5f5;
-			border-radius: 88rpx;
+			border-radius: 108rpx;
 			text-align: center;
-			line-height: 120rpx;
 			font-size: 60rpx;
 			color: #ccc;
 			border: 1rpx solid #999;
 		}
 		.name {
-			color: #fff;
-			font-weight: 600;
-			font-size: 28rpx;
+			font-weight: 500;
+			font-size: 30rpx;
 		}
 	}
 	
 	::v-deep{
-		.nav-cell{
-			.van-cell{
+			.u-cell{
 				padding-left:24rpx;
 				padding-right:20rpx;
 				background: #F6F6F6;
 				margin-bottom: 8rpx;
 				border-radius: 10rpx;
+				width: 680rpx;
+				margin: 26rpx auto;
+				height: 122rpx;
+				border-radius: 24rpx 24rpx 24rpx 24rpx;
+				border: 2rpx solid rgba(0,0,0,0.06);
+				.u-cell__body{
+					height: 100%;
+				}
 			}
 			.van-cell__title{
 				font-size: 34rpx;
 				font-weight: 600;
 			}
-		}
 	}
 	.section-box{
 		position: relative;

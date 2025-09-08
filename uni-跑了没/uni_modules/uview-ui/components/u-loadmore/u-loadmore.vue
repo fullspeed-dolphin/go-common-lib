@@ -12,7 +12,7 @@
 		]"
 	>
 		<u-line
-		    length="140rpx"
+		    length="257rpx"
 		    :color="lineColor"
 		    :hairline="false"
 			:dashed="dashed"
@@ -42,7 +42,7 @@
 			>{{ showText }}</text>
 		</view>
 		<u-line
-		    length="140rpx"
+		    length="257rpx"
 		    :color="lineColor"
 			:hairline="false"
 			:dashed="dashed"

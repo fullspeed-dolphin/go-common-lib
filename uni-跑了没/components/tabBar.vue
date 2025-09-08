@@ -3,12 +3,13 @@
 		<u-tabbar
 			:value="active"
 			@change="onChange"
-			activeColor="#4b788d"
-			inactiveColor="#999"
+			activeColor="#FF8C00"
+			inactiveColor="#000"
 			fixed
 			placeholder
 			zIndex="100"
 			safeAreaInsetBottom
+			:border="false"
 		>
 			<u-tabbar-item :text="item.text" v-for="(item, index) in tabList" :key="index" :name="item.name" >
 				<view slot="active-icon" class="iconfont active" :class="item.icon"></view>
@@ -34,8 +35,8 @@ export default {
 				},
 				{
 					"text": "运动",
-					name: 'artList',
-					"pagePath": "/pages/artList",
+					name: 'sport',
+					"pagePath": "/pages/sport",
 					icon: "icon-huabi-",
 					normal: '../static/tab_00.png',
 					active: '../static/tab_01.png',
@@ -81,9 +82,10 @@ export default {
 .active{
 	color: #FF8C00;
 }
-.txt {
-  font-size: 18rpx;
-  font-weight: 400;
-  // text-shadow: 0 -2px 0 rgba(111, 117, 146, 0.09);
+::v-deep{
+	.u-tabbar-item__text {
+	  font-size: 36rpx;
+	  font-weight: 500;
+	}
 }
 </style>

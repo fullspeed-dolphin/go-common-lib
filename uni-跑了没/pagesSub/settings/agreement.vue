@@ -5,6 +5,7 @@
 </template>
 <script>
 	import agree_signUp from "@/utils/agree_signUp.js"
+	import agree_privy from "@/utils/agree_privy.js"
 export default {
   data() {
     return {
@@ -16,6 +17,7 @@ export default {
 	onLoad(options) {
 		if (options.type === 'signUp') {
 			this.detail.Content = agree_signUp
+			this.detail.Content = agree_privy
 		}
 	},
   methods: {

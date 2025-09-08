@@ -91,6 +91,10 @@ export default {
 			
 			if (!this.isAgree.length) return this.$toast("请勾选同意协议");
 			
+			uni.$u.route('pagesSub/signUpStatus');
+			
+			return 
+			
 			const data = {
 				"OrderDetails": [
 					{

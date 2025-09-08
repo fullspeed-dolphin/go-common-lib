@@ -1,0 +1,191 @@
+<template>
+	<view>
+		<u-navbar title="跑团详情"></u-navbar>
+		<section class="section-card flex-row">
+			<image class="img" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
+			<view class="" style="width:500rpx;">
+				<view class="name ellipsis2">广州XXXX跑团广州XXXX跑团</view>
+				<view class="flex-between-center text">
+					<view class="">
+						<view class="mb20">成立时间：2025.10.23</view>
+						<view class="">成立地点：广东广州</view>
+					</view>
+					<view class="">
+						<view class="mb20">跑团ID：12792</view>
+						<view class="">跑团人数：5人</view>
+					</view>
+				</view>
+			</view>
+		</section>
+		
+		<view class="" style="padding: 0rpx 34rpx;">
+			<u-divider text="跑团介绍" textColor="#000" lineColor="#707070"></u-divider>
+		</view>
+		
+		<section style="font-weight: 500;
+			padding: 10rpx 34rpx 20rpx;
+			line-height: 1.4;
+			color: #000000;">
+			   广州xxxxxx跑团是一群热爱生活、崇尚健康的跑步爱好者自发组成的 非营利性、开放式跑步社群。我们扎根于 [凤凰城/或具体区域，如：凤凰城XX区]，以“快乐奔跑、健康生活、互帮互助、共同进步”为核心理念，致力于为本地跑友打造一个 温暖、专业、充满活力 的跑步交流平台。
+		</section>
+		
+		<view class="" style="padding: 0rpx 34rpx;">
+			<u-divider text="跑团成员" textColor="#000" lineColor="#707070"></u-divider>
+		</view>
+		
+		<view class="member-item flex-start" v-for="(item,index) in 5" :key="index">
+			<image class="img" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
+			<view class="flex-start">
+				昵称
+			</view>
+		</view>
+		<view class="flex-center" style="margin-top: -20rpx;" @click="$u.route(`pagesSub/groupMemberList`)">
+			<text style="color:#FF8C00;margin-right:5rpx;">查看更多</text> 
+			<u-icon name="arrow-down" color="#FF8C00"></u-icon>
+		</view>
+		
+		<view class="" style="height: 120rpx;"></view>
+		<section class="section-bottom">
+			<view style="padding: 0rpx 156rpx 20rpx">
+				<u-button type="primary" shape="circle" @click="joinGroup()">加入跑团</u-button>
+			</view>
+		</section>
+	</view>
+</template>
+<script>
+	export default {
+		components: {},
+		data() {
+			return {
+				detail: {},
+			};
+		},
+		onLoad(option) {
+			console.log("option", option);
+			this.routeParams = option
+		},
+		methods: {
+			getDetail(page) {
+			  uni.showLoading({ mask: true });
+				const data = {
+					ID: this.options.ID
+				}
+				
+				this.$axios.post(`/api/store/outStock/record/list?page=1`)
+					.then((res) => {
+						this.detail = res
+					})
+			},
+			joinGroup() {
+			  uni.showModal({
+			    title: "提示",
+			    content: "是否确认加入该跑团？",
+			    success: (res) => {
+			      if (res.confirm) {
+			        const data = {
+			          orderNo: this.orderNo,
+			        };
+			
+			        uni.showLoading({ mask: true });
+			        this.$axios
+			          .post(`/order/admin/orders/cancelOrder `, data)
+			          .then((res) => {
+			            uni.hideLoading();
+			            this.getDetail();
+			            this.$toast("加入成功！");
+			          });
+			      } else if (res.cancel) {
+			        console.log("用户点击取消");
+			      }
+			    },
+			  });
+			},
+			leaveGroup() {
+			  uni.showModal({
+			    title: "提示",
+			    content: "是否确认退出该跑团？",
+			    success: (res) => {
+			      if (res.confirm) {
+			        const data = {
+			          orderNo: this.orderNo,
+			        };
+			
+			        uni.showLoading({ mask: true });
+			        this.$axios
+			          .post(`/order/admin/orders/cancelOrder `, data)
+			          .then((res) => {
+			            uni.hideLoading();
+			            this.getDetail();
+			            this.$toast("退出成功！");
+			          });
+			      } else if (res.cancel) {
+			        console.log("用户点击取消");
+			      }
+			    },
+			  });
+			},
+		}
+	};
+</script>
+
+<style lang="less" scoped>
+	.member-item{
+		padding: 11rpx 34rpx;
+		color: #666;
+		.img{
+			width: 106rpx;
+			height: 106rpx;
+			border-radius: 999px;
+			background: #FFFFFF;
+			border: 2rpx solid #707070;
+			margin-right: 30rpx;
+		}
+	}
+	.section-card{
+		padding: 34rpx;
+		.img{
+			width: 154rpx;
+			height: 154rpx;
+			margin-right: 30rpx;
+			background: #D8D8D8;
+			border-radius: 16rpx 16rpx 16rpx 16rpx;
+		}
+		.name{
+			font-weight: 500;
+			font-size: 32rpx;
+			color: #000000;
+			line-height: 44rpx;
+			margin-bottom: 22rpx;
+		}
+		.text{
+			font-weight: 500;
+			font-size: 24rpx;
+			line-height: 32rpx;
+		}
+	}
+
+	.h2 {
+		font-size: 32rpx;
+		font-weight: 600;
+	}
+
+	.cell{
+		line-height: 47rpx;
+		.label{
+			width: 174rpx;
+			color: #66768a;
+		}
+		.value{
+			color: #212121;
+			line-height: 36rpx;
+			width: 450rpx;
+		}
+	}
+	
+	.section-bottom {
+	  position: fixed;
+	  bottom: 0px;
+	  width: 100%;
+	  z-index: 10;
+	}
+</style>

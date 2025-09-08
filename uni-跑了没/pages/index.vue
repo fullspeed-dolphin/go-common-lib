@@ -15,7 +15,7 @@
 			</view>
 			
 			<view class="section-title">线下活动</view>
-			<section class="section-offline" @click="routeTo('pagesSub/offlineEvents')">
+			<section class="section-offline" @click="$u.route('pagesSub/offlineEvents')">
 				<image class="poster" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
 				<view class="flex-start">
 					<view class="text">
@@ -27,7 +27,7 @@
 			</section>
 			
 			<view class="section-title">线上赛事</view>
-			<section class="section-offline"  @click="routeTo('pagesSub/offlineEvents')">
+			<section class="section-offline"  @click="$u.route('pagesSub/offlineEvents')">
 				<image class="poster" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
 				<view class="flex-start">
 					<view class="text">
@@ -38,8 +38,8 @@
 				</view>
 			</section>
 			
-			<view class="section-title flex-between-center">
-				跑团
+			<view class="section-title flex-between-center" @click="$u.route('pagesSub/groupList')">
+				跑团招募
 				<view class="flex-start">
 					<view class="txt">更多</view>
 					<u-icon name="arrow-right" size="34rpx" color="rgba(0,0,0,.9)"></u-icon>
@@ -191,7 +191,7 @@ export default {
 	}
 	
 	.group-item{
-		padding: 20rpx 34rpx;
+		padding: 10rpx 34rpx;
 		.poster{
 			width: 124rpx;
 			height: 124rpx;
