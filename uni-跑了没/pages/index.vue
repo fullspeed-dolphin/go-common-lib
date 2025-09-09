@@ -104,6 +104,15 @@ export default {
 			],
 		};
   },
+	onLoad(options) {
+		// #ifdef MP-WEIXIN
+		wx.showShareMenu({
+			// withShareTicket: true,
+			success: function () {},
+			fail: function () {}
+		})
+		// #endif
+	},
   methods: {
 		confirmSearch() {
 			const searchTxt = this.searchTxt.trim()

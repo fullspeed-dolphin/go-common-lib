@@ -34,7 +34,9 @@
 		</view>
 		
 		<view class="member-item flex-start" v-for="(item,index) in 5" :key="index">
-			<image class="img" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
+			<view class="img-box">
+				<image class="img" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
+			</view>
 			<view class="flex-start">
 				昵称
 			</view>
@@ -58,6 +60,7 @@
 		data() {
 			return {
 				detail: {},
+				routeParams: {},
 			};
 		},
 		computed: {
@@ -138,14 +141,17 @@
 	.member-item{
 		padding: 11rpx 34rpx;
 		color: #666;
-		.img{
-			display: block;
-			width: 106rpx;
-			height: 106rpx;
+		.img-box{
 			border-radius: 999px;
 			background: #FFFFFF;
 			border: 2rpx solid #707070;
 			margin-right: 30rpx;
+			overflow: hidden;
+		}
+		.img{
+			display: block;
+			width: 106rpx;
+			height: 106rpx;
 		}
 	}
 	.section-card{

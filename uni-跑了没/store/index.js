@@ -9,7 +9,6 @@ export default new Vuex.Store({
 	state: {
 		shopInfo: uni.getStorageSync('shopInfo') || {},
 		userInfo: uni.getStorageSync('userInfo') || {},
-		shopCartData: uni.getStorageSync('shopCartData') || [],
 	},
 	mutations: {
 		set(state, payload) {
@@ -23,38 +22,6 @@ export default new Vuex.Store({
 		userInfo: state => state.userInfo,
 	},
 	actions: {
-		changeShopCart({commit, state}, payload) {
-			const shopCartData = JSON.parse(JSON.stringify(state.shopCartData))
-			const data = [];
-			
-			if (payload.type === 'add') {
-				const curGoods = shopCartData.find(i => i.ID === payload.data.ID);
-				if (!curGoods?.ID) {
-					shopCartData.push({
-						...payload.data,
-						number: 1
-					})
-				} else {
-					curGoods.number ++
-				}
-			} else {
-				const curGoods = shopCartData.find(i => i.ID === payload.data.ID);
-				if (curGoods?.ID) {
-					curGoods.number --
-					if (!curGoods.number) {
-						const index = shopCartData.findIndex(i => i.ID === payload.data.ID);
-						shopCartData.splice(index, 1)
-					}
-				}
-			}
-			
-			// console.log("shopCartData=====>", shopCartData)
-			
-			commit('set', {
-				type: 'shopCartData',
-				data: shopCartData,
-			})
-		},
 		getUserInfo({commit}, payload) {
 			// if (!uni.getStorageSync('token')) return{};
 			return new Promise((resolve, reject) => {

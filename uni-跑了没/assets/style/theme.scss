@@ -10,11 +10,6 @@
 .u-error { color: #f56c6c; }
 .u-info { color: #909399; }
 
-.status_bar {
-    height: var(--status-bar-height);
-    width: 100%;
-}
-
 swiper-item {
     overflow: visible;
 }
@@ -96,24 +91,6 @@ uni-page-wrapper{
 		font-size: 16px!important;
 	}
 }
-
-.add-goods-btn{
-	width: 100rpx;
-	height: 100rpx;
-	position: fixed;
-	right: 30rpx;
-	bottom: 250rpx;
-	background: $color;
-	box-shadow: 1px 1px 10px rgba(255,255,255,.7);
-	z-index: 50;
-	color: #fff;
-	border-radius: 100rpx;
-}
-
-.zIndex1000{
-		position: relative;
-		z-index: 1000;
-	}
 	
 	.uni-toast{
 		width: 272rpx!important;
@@ -127,21 +104,6 @@ uni-page-wrapper{
 		margin-bottom: 32rpx!important;
 		&:before{
 			font-size: 80rpx!important;
-		}
-	}
-	
-	.parentActive{
-		position: relative;
-		&:before{
-			position: absolute;
-			top: 44rpx;
-			left:0;
-			transform: translateY(-50%);
-			content: "";
-			width: 6rpx;
-			height: 32rpx;
-			z-index: 1;
-			background: #F1FD53;
 		}
 	}
 	
