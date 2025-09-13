@@ -21,19 +21,19 @@
 			</block>
 			
 			<block v-if="isSuccess">
-				<view class="cell flex-between-center van-hairline--bottom">
+				<view class="cell flex-between-center u-border-bottom">
 					<view class="label">订单金额</view>
 					<view class="value">￥62.1</view>
 				</view>
-				<view class="cell flex-between-center van-hairline--bottom">
+				<view class="cell flex-between-center u-border-bottom">
 					<view class="label">订单编号</view>
 					<view class="value">xxxxxxxxxxxx</view>
 				</view>
-				<view class="cell flex-between-center van-hairline--bottom">
+				<view class="cell flex-between-center u-border-bottom">
 					<view class="label">下单时间</view>
 					<view class="value">2025-10-15 20:07:38</view>
 				</view>
-				<view class="cell flex-between-center van-hairline--bottom">
+				<view class="cell flex-between-center u-border-bottom">
 					<view class="label">支付方式</view>
 					<view class="value">微信</view>
 				</view>
@@ -81,9 +81,6 @@ export default {
 	.cell{
 		font-size: 24rpx;
 		line-height: 72rpx;
-	}
-	.van-hairline--bottom::after{
-		border-color: rgba(241,241,241);
 	}
 	.status-icon{
 		width: 196rpx;

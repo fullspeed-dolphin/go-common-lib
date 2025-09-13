@@ -2,7 +2,7 @@
   <view class="" >
 		<u-navbar title="线下活动"></u-navbar>
 		<section class="panel">
-			<view class="h2 van-hairline--bottom">
+			<view class="h2 u-border-bottom">
 				<view class="ellipsis2">
 					奔跑吧！广州·喜迎十五运 奔跑环两山·增城站奔跑吧！广州·喜迎十五运 奔跑环两山·增城站
 				</view>
@@ -47,7 +47,7 @@
 			<view class="txt">
 				{{isSignUp ? '取消' : ''}}报名截止：2025.09.30 9:00
 			</view>
-			<view class="van-hairline--top" :class="{isSignUp: isSignUp}" style="padding: 26rpx 8rpx 0">
+			<view class="u-border-top" :class="{isSignUp: isSignUp}" style="padding: 26rpx 8rpx 0">
 				<u-button type="primary" shape="circle" @click="routeTo()">{{isSignUp ? '取消报名' : '活动报名'}} </u-button>
 			</view>
 		</view>

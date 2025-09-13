@@ -45,7 +45,6 @@ export default {
 	},
   methods: {
 		successLogin() {
-		  // 存在订单分享的情况下，跳转订单分享
 		  if (this.options?.direct) {
 		    uni.navigateBack()
 		

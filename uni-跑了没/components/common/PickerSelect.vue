@@ -3,7 +3,7 @@
   <view>
     <u-cell :title="title" :required="required" :value="selectedLbaels ? selectedLbaels : placeholder" @click="isShowPop = true" isLink />
     <u-popup :show="isShowPop" mode="bottom" round="15">
-      <view class="van-picker__toolbar van-hairline--top-bottom">
+      <view class="van-picker__toolbar u-border-bottom u-border-top">
         <view class="van-picker__cancel" @click="isShowPop = false, selectedList = []">取消</view>
         <view class="van-picker__title">{{title}}</view>
         <view class="van-picker__confirm" @click="confirm">确认</view>

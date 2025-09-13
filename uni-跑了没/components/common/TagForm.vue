@@ -15,7 +15,7 @@
     <u-popup :show="isShowPop" mode="center" @close="isShowPop = false" z-index="120" closeable>
       <view class="flex-center" style="height: 80rpx;">添加标签</view>
       <view class="popup-con">
-        <view class="input-box flex-start van-hairline--bottom">
+        <view class="input-box flex-start u-border-bottom">
           <uni-easyinput v-model="inputValue" type="text" :maxlength="10" placeholder="请输入标签" :clearable="false"></uni-easyinput>
         </view>
         <view style="padding:20rpx;margin-top:10rpx;">

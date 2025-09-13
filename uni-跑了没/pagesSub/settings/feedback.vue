@@ -9,7 +9,7 @@
           </u-checkbox-group>
         </u-form-item>
 
-				<view class="van-hairline--top mt20" style="opacity:0.3;"></view>
+				<view class="u-border-top mt20" style="opacity:0.3;"></view>
 
         <view class="u--textarea">
           <u-form-item label="请补充详细问题和意见（必填）" prop="description" >

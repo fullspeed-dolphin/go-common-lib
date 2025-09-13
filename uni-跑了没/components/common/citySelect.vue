@@ -12,7 +12,7 @@
           <view v-if="item.isLoading" class="flex-center c9 pt30">
             加载中...
           </view>
-          <view class="flex-between-center van-hairline--top p20" v-for="(address, addressindex) in item.addressList" :key="addressindex" @click="getList(index + 1, address)">
+          <view class="flex-between-center u-border-top p20" v-for="(address, addressindex) in item.addressList" :key="addressindex" @click="getList(index + 1, address)">
             {{address.name}}
             <uni-icons size="30" :type="address.name == item.currentValue.name ?'checkbox-filled' : 'circle'" :color="address.name == item.currentValue.name ?'rgba(86,188,174, 1)' : '#ccc'" />
           </view>
