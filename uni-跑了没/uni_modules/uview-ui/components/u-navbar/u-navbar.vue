@@ -29,8 +29,8 @@
 					<slot name="left">
 						<u-icon
 							v-if="leftIcon"
-							:name="leftIcon"
-							:size="leftIconSize"
+							:name="isFirstPage ? 'home' : leftIcon"
+							:size="isFirstPage ? '30' : leftIconSize"
 							:color="leftIconColor"
 						></u-icon>
 						<text
@@ -106,11 +106,25 @@
 
 			}
 		},
+		computed: {
+			isFirstPage() {
+				return uni.$u.pages().length === 1
+			}
+		},
 		methods: {
 			// 点击左侧区域
 			leftClick() {
 				// 如果配置了autoBack，自动返回上一页
 				this.$emit('leftClick')
+				
+				if (this.isFirstPage) {
+					uni.switchTab({
+						url: '/pages/index'
+					});
+					
+					return false;
+				}
+				
 				if(this.autoBack) {
 					uni.navigateBack()
 				}

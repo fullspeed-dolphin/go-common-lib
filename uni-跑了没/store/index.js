@@ -7,7 +7,6 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
 	state: {
-		shopInfo: uni.getStorageSync('shopInfo') || {},
 		userInfo: uni.getStorageSync('userInfo') || {},
 	},
 	mutations: {
@@ -18,14 +17,13 @@ export default new Vuex.Store({
 		},
 	},
 	getters: {
-		shopInfo: state => state.shopInfo,
 		userInfo: state => state.userInfo,
 	},
 	actions: {
 		getUserInfo({commit}, payload) {
-			// if (!uni.getStorageSync('token')) return{};
+			if (!uni.getStorageSync('token')) return{};
 			return new Promise((resolve, reject) => {
-				axios.get('/api/store/account/info').then(res => {
+				axios.get('/user-api/user').then(res => {
 					uni.setStorageSync('userInfo', res)
 
 					commit('set', {

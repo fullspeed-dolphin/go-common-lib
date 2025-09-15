@@ -2,11 +2,11 @@
 	<view class="page">
 		<u-navbar title="创建跑团"></u-navbar>
 		<view style="padding:20rpx 34rpx;">
-			<u--form :model="form" ref="uForm" :rules="rules" labelWidth="auto">
+			<u--form :model="form" ref="uForm" :rules="rules"  labelPosition="top" labelWidth="auto">
 				
 				<view class="u--FileUploader">
-					<u-form-item label="" prop="poster">
-						<FileUploader v-model="form.poster"/>
+					<u-form-item :label="null" prop="poster">
+						<FileUploader v-model="form.poster" />
 					</u-form-item>
 				</view>
 				
@@ -15,17 +15,26 @@
 				</u-form-item>
 				<view class="u--textarea">
 					<u-form-item label="跑团详情" prop="description" labelPosition="top" required>
-						<u--textarea v-model="form.description" maxlength="150" autoHeight placeholder="请填写跑团详情" count ></u--textarea>
+						<u--textarea v-model="form.description" :height="110" maxlength="150" placeholder="请填写跑团详情" count ></u--textarea>
 					</u-form-item>
 				</view>
+				<!-- <u-form-item label="跑团地址" prop="location" required>
+					<u-input v-model="form.location" placeholder="请选择地址" />
+				</u-form-item> -->
+				<u-form-item label="跑团地址" prop="location" required>
+					<PickerMap :title="null" v-model="form.location" placeholder="请选择地址" />
+				</u-form-item>
+				<u-form-item label="创建时间" prop="establish_time">
+					<u-input v-model="form.establish_time" placeholder="请输入创建时间" />
+				</u-form-item>
+				<u-form-item label="成员数量" prop="amount" required>
+					<u-input v-model="form.amount" type="digit" placeholder="请输入成员数量" />
+				</u-form-item>
 				<u-form-item label="真实姓名" prop="fullName" required>
 					<u-input v-model="form.fullName" placeholder="请输入您的真实姓名" />
 				</u-form-item>
 				<u-form-item label="联系电话" prop="phone" required>
 					<u-input v-model="form.phone" placeholder="请输入您的联系电话" />
-				</u-form-item>
-				<u-form-item label="电子邮箱" prop="email">
-					<u-input v-model="form.email" placeholder="请输入您的电子邮箱" />
 				</u-form-item>
 			</u--form>
 			
@@ -43,28 +52,40 @@
 </template>
 <script>
 	import FileUploader from "@/components/common/fileUploader.vue"
+	import PickerMap from "@/components/common/PickerMap.vue"
 	export default {
 		components: {
-			FileUploader
+			FileUploader, PickerMap
 		},
 		data() {
 			return {
 				form: {
 					poster: '',
 					name: '',
+					location: '',
 					description: "",
 					fullName: '',
 					phone: '',
-					email: '',
+					establish_time: '2025-10-02T15:04:05Z',
 				},
 				isAgree: [],
 				rules: {
-					poster: [{
+					// poster: [{
+					// 	required: true,
+					// 	message: '必填项',
+					// 	trigger: ['blur', 'change']
+					// }],
+					name: [{
 						required: true,
 						message: '必填项',
 						trigger: ['blur', 'change']
 					}],
-					name: [{
+					location: [{
+						required: true,
+						message: '必填项',
+						trigger: ['blur', 'change']
+					}],
+					amount: [{
 						required: true,
 						message: '必填项',
 						trigger: ['blur', 'change']
@@ -103,19 +124,21 @@
 					if (!this.isAgree.length) return this.$toast("请勾选同意协议");
 					
 					const data = {
-						"Account": this.form.name,
-						"Password": this.form.password,
+						"avatar_url": this.form.poster,
+						"name": this.form.name,
+						"establish_location": this.form.location,
+						"creator_real_name": this.form.fullName,
+						"total_members": this.form.amount,
+						"introduction": this.form.description,
+						"creator_phone": this.form.phone,
+						"establish_time": this.form.establish_time,
 					}
 					uni.showLoading({
 						mask: true
 					})
-					this.$axios.post(`/api/store/login`, data).then(res => {
+					this.$axios.post(`/running-group/api/v1/groups`, data).then(res => {
 						console.log(res)
 						uni.hideLoading()
-
-						this.$store.dispatch('getUserInfo')
-
-						uni.$u.toast('登录成功')
 
 						this.$goUrl("/pages/index")
 					})
@@ -138,14 +161,30 @@
 	}
 
 	::v-deep {
-		.u--textarea{
-			.u-form-item__body{
-				padding: 20rpx 16rpx;
+		.pickermap{
+			overflow: hidden;
+			.u-cell__body{
+				padding-right:20rpx;
+			}
+			.u-cell__body__content{
+				flex: none;
+			}
+			.u-cell__value{
+				flex:1!important;
+				max-width: 100%!important;
 			}
 		}
-		.u-form-item__body__left__content__label{
-			flex:none;
+		.u-form-item__body__left__content__required{
+			top:0!important;
 		}
+		.u-textarea__count{
+			right: 20rpx!important;
+			bottom: 14rpx!important;
+		}
+		.u-cell__right-icon-wrap{
+			margin-left:0!important;
+		}
+		
 		.u-form-item__body__left__content__required{
 			position: static;
 		}
@@ -162,17 +201,26 @@
 			padding-left:0;
 			padding-right:0;
 		}
-		.u-form-item{
-			margin: 40rpx 0;
-		}
-		.u-form-item__body{
+		
+		.pickermap,
+		.u-textarea,
+		.u-input{
 			border:0;
-			padding:0 16rpx;
+			min-height: 88rpx;
 			background: rgba(255,255,255);
 			border-radius: 16rpx;
 			background: #FFFFFF;
 			box-shadow: 0rpx 4rpx 10rpx 2rpx rgba(0,0,0,0.16);
 		}
+		
+		// .u-form-item__body{
+		// 	border:0;
+		// 	padding:10rpx 16rpx!important;
+		// 	background: rgba(255,255,255);
+		// 	border-radius: 16rpx;
+		// 	background: #FFFFFF;
+		// 	box-shadow: 0rpx 4rpx 10rpx 2rpx rgba(0,0,0,0.16);
+		// }
 		.u--FileUploader{
 			.u-form-item__body{
 				box-shadow: none;

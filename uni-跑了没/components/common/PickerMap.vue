@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <u-cell :title="title" titleStyle="min-width:100px;" isLink :required="required" :value="valueString ? valueString : placeholder" @click="chooseLocation" />
+  <div class="pickermap">
+    <u-cell :title="title" titleStyle="min-width:100px;" :border="false" isLink :required="required" :value="valueString ? valueString : placeholder" @click="chooseLocation" />
   </div>
 </template>
 <script>

@@ -3,8 +3,8 @@
 		<u-navbar title="跑了没" :leftIcon="false"></u-navbar>
 		
 		<view class="" style="position:relative;z-index: 10;">
-			<view class="section-search">
-				<u-search v-model="searchTxt" @search="confirmSearch" placeholder="搜索赛事或跑团 ..." shape="round" bgColor="#fff" borderColor="#FF8C00" :showAction="false"></u-search>
+			<view class="section-search" @click="$u.route('pagesSub/groupList')">
+				<u-search :disabled="true" placeholder="搜索赛事或跑团" shape="round" bgColor="#fff" borderColor="#FF8C00" :showAction="false"></u-search>
 			</view>
 			<view class="section-banner">
 				<u-swiper :list="bannerList" height="270rpx" 
@@ -46,7 +46,7 @@
 				</view>
 			</view>
 			<section class="section-group">
-				<view class="group-item flex-start" v-for="(item,index) in 3" :key="index">
+				<view class="group-item flex-start" v-for="(item,index) in 5" :key="index">
 					<image class="poster" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
 					<view class="text">
 						<view class="flex-between-center" style="width: 520rpx;">
@@ -61,8 +61,7 @@
 				</view>
 			</section>
 			
-			
-			<view class="section-title flex-between-center">
+			<!-- <view class="section-title flex-between-center">
 				名人达人
 				<view class="flex-start">
 					<view class="txt">更多</view>
@@ -83,7 +82,7 @@
 						<view class="desc ellipsis" style="color:#333;">全国跑友一家亲，SEA跑团来相聚。生命不息，跑···</view>
 					</view>
 				</view>
-			</section>
+			</section> -->
 		</view>
 		
 		<tabbar type="index"/>
@@ -102,6 +101,7 @@ export default {
 				"https://cdn.uviewui.com/uview/album/1.jpg",
 				"https://cdn.uviewui.com/uview/album/1.jpg",
 			],
+			GroupList: []
 		};
   },
 	onLoad(options) {
@@ -112,6 +112,9 @@ export default {
 			fail: function () {}
 		})
 		// #endif
+	},
+	onShow() {
+		this.getGroupList()
 	},
   methods: {
 		confirmSearch() {
@@ -132,6 +135,15 @@ export default {
 			this.$axios.post(`/Advertisement/Search/List`, data).then(res => {
 				this.bannerList = res.List;
 				uni.hideLoading()
+			})
+		},
+		getGroupList() {
+			const data = {
+				name: "",
+				establish_location: "广州",
+			}
+			this.$axios.get(`/running-group/api/v1/groups`, data).then(res => {
+				this.GroupList = res;
 			})
 		},
 	}
@@ -226,7 +238,17 @@ export default {
 	
 	::v-deep{
 		.section-search{
+			position: relative;
 			height: 130rpx;
+			&:before{
+				position: absolute;
+				content: "";
+				width: 100%;
+				height: 100%;
+				top:0;
+				left:0;
+				z-index: 12;
+			}
 		}
 		.u-search{
 			position: fixed;

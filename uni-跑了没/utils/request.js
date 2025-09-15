@@ -16,17 +16,17 @@ function fetch(options) {
 				url = window.$appLink + url
 			}
 		//  #endif
-		 
+		
 		var requestTask = uni.request({
 			url: url,
 			sslVerify: false,
 			header: {
-				'Authorization': `Bearer ${uni.getStorageSync('token')}`,
+				Authorization: uni.getStorageSync('token'),
 				'content-type': 'application/json',
 			},
 			method: options.method || 'post',
-			data: options.data,
-			success(data) {
+			data: options.data || {},
+			success(res) {
 				const response = res.data;
 				
 				if (process.env.NODE_ENV !== "development") {
@@ -37,10 +37,12 @@ function fetch(options) {
 				
 				// 登录过期
 				if (response?.code != 200 || res.statusCode != 200) {
-					uni.showToast({
-						icon: 'error',
-						title: response.msg || '请求失败'
-					})
+					if (response?.code !== 400) {
+						uni.showToast({
+							icon: 'error',
+							title: response.msg || '请求失败'
+						})
+					}
 					
 					// 没有权限，清除 token，重定向登录页
 					if (response?.code == 401 || res.statusCode == 401) {

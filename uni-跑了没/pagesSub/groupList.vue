@@ -102,17 +102,12 @@ export default {
       } = this.taleParams;
       
       const data = {
-        orderNo,
-        orderStatus: orderStatus || "",
-        linkTelPhone,
-        storeId,
-        payChannel,
-        thirdPayOrderNo,
+        name: "",
+        establish_location: "广州",
       };
 			
-			
       this.$axios
-        .get(`/order/admin/orders/list?page=${page.num}&pageSize=10`, data)
+        .get(`/running-group/api/v1/groups`, data)
         .then(({ items, total }) => {
           uni.hideLoading();
 

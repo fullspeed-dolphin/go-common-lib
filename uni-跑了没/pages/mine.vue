@@ -3,11 +3,14 @@
 		<u-navbar title="个人中心" :leftIcon="false"></u-navbar>
     <view class="page-content">
     	<view class="rel section-user">
-    		<view class="user-box" @click="$u.route(userInfo.Id ? '/pagesSub/settings/profile1' : '/pagesSub/login')">
+    		<view class="user-box" @click="$u.route(userInfo.id ? '' : '/pagesSub/login')">
     			<view class="flex-start">
-						<image class="avatar" :src="userInfo.Avatar || '../static/basicprofile.jpeg'" mode="aspectFill"></image>
+						<image class="avatar" :src="userInfo.avatar_url || '../static/images/run.png'" mode="aspectFill"></image>
     				<view class="text">
-    					<view class="name" v-if="userInfo.Id">{{userInfo.NickName}}</view>
+							<block v-if="userInfo.id">
+								<view class="name" >{{userInfo.nickname || '微信用户'}}</view>
+								<view class="name" style="color: #666;margin-top:20rpx;">{{userInfo.phone || ''}}</view>
+							</block>
     					<view class="name" v-else>登录/注册</view>
     				</view>
     			</view>
@@ -28,7 +31,7 @@
 				</u-cell>
 			</view>
 			
-	   <view v-if="userInfo.Id" class="logout c9 flex-center">
+	   <view v-if="userInfo.id" class="logout c9 flex-center">
 				<text @click="logout()">-- 退出登录 --</text>
 			</view>
 			
@@ -86,20 +89,6 @@ export default {
 								url: '/pagesSub/login'
 							})
 						}, 200)
-						
-						return false;
-						
-						this.$axios({url: "api/index/logout"}).then(res => {
-							this.$toast('已退出登录')
-							
-							uni.removeStorageSync('token')
-							
-							setTimeout(() => {
-								uni.redirectTo({
-									url: '/pages/login'
-								})
-							}, 200)
-						})
           } else if (res.cancel) {
             console.log('用户点击取消');
           }

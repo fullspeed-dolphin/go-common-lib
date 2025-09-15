@@ -46,7 +46,7 @@ export default {
 				const res = await this.$axios.post("/wechat-login/login", data);
 				
 				console.log(res);
-				uni.setStorageSync("token", res.access_token);
+				uni.setStorageSync("token", res.sessionToken);
 				
 				this.$toast("登录成功");
 				
@@ -54,7 +54,7 @@ export default {
 				setTimeout(() => {
 					this.isDisabled = false;
 					this.$emit("success");
-				}, 800)
+				}, 1300)
 			} catch (error) {
 				console.error(error)
 				this.isDisabled = false;

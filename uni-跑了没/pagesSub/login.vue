@@ -16,28 +16,6 @@ export default {
 	components: { PhoneLogin },
   data () {
     return {
-			form: {
-				// name: '13670443751',
-				// password: '123456',
-				name: '',
-				password: '',
-			},
-			rules: {
-				name: [
-					{
-						required: true,
-						message: '请输入账号',
-						trigger: ['blur', 'change']
-					}
-				],
-				password: [
-					{
-						required: true,
-						message: '请输入密码',
-						trigger: ['blur', 'change']
-					}
-				],
-			}
 		};
   },
 	onLoad(options) {
