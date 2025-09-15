@@ -25,7 +25,8 @@
 					<PickerMap :title="null" v-model="form.location" placeholder="请选择地址" />
 				</u-form-item>
 				<u-form-item label="创建时间" prop="establish_time">
-					<u-input v-model="form.establish_time" placeholder="请输入创建时间" />
+					<PickerTime v-model="form.establish_time" placeholder="请输入创建时间" />
+					<!-- <u-input v-model="form.establish_time" placeholder="请输入创建时间" /> -->
 				</u-form-item>
 				<u-form-item label="成员数量" prop="amount" required>
 					<u-input v-model="form.amount" type="digit" placeholder="请输入成员数量" />
@@ -53,9 +54,10 @@
 <script>
 	import FileUploader from "@/components/common/fileUploader.vue"
 	import PickerMap from "@/components/common/PickerMap.vue"
+	import PickerTime from "@/components/common/PickerTime.vue"
 	export default {
 		components: {
-			FileUploader, PickerMap
+			FileUploader, PickerMap, PickerTime
 		},
 		data() {
 			return {
@@ -66,7 +68,7 @@
 					description: "",
 					fullName: '',
 					phone: '',
-					establish_time: '2025-10-02T15:04:05Z',
+					establish_time: '',
 				},
 				isAgree: [],
 				rules: {
@@ -161,7 +163,22 @@
 	}
 
 	::v-deep {
+		.pickerTime{
+			width: 100%;
+			.u-cell{
+				border:0;
+				min-height: 88rpx;
+				background: rgba(255,255,255);
+				border-radius: 16rpx;
+				background: #FFFFFF;
+				box-shadow: 0rpx 4rpx 10rpx 2rpx rgba(0,0,0,0.16);
+			}
+			.u-cell__body{
+				padding-right:20rpx;
+			}
+		}
 		.pickermap{
+			width: 100%;
 			overflow: hidden;
 			.u-cell__body{
 				padding-right:20rpx;
@@ -198,8 +215,8 @@
 		}
 		.u-textarea{
 			padding-bottom: 40rpx;
-			padding-left:0;
-			padding-right:0;
+			// padding-left:0;
+			// padding-right:0;
 		}
 		
 		.pickermap,
@@ -221,6 +238,10 @@
 		// 	background: #FFFFFF;
 		// 	box-shadow: 0rpx 4rpx 10rpx 2rpx rgba(0,0,0,0.16);
 		// }
+		
+		.u-form-item__body {
+		    padding: 10px 0 5px!important;
+		}
 		.u--FileUploader{
 			.u-form-item__body{
 				box-shadow: none;

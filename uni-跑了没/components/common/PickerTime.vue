@@ -1,10 +1,12 @@
 <template>
-  <view class="">
-    <u-cell :title="title" :required="required" :value="timeValue ? timeValue : placeholder" @click="isShowPop = true" isLink />
-    <u-datetime-picker mode="time" :show="isShowPop" title="选择时间" v-model="timeValue" @cancel="isShowPop = false" @confirm="confrimTime" />
+  <view class="pickerTime">
+    <u-cell :title="title" :required="required" :border="false"
+			:value="displayTime ? displayTime : placeholder" @click="isShowPop = true" isLink />
+    <u-datetime-picker mode="date" :show="isShowPop" title="选择时间" v-model="timeValue" @cancel="isShowPop = false" @confirm="confrimTime" />
   </view>
 </template>
 <script>
+import dayjs from "@/uni_modules/uview-ui/libs/util/dayjs.js"
 export default {
   options: {
     styleIsolation: "shared",
@@ -27,8 +29,8 @@ export default {
       default: "",
     },
     value: {
-      type: String,
-      default: "12:00",
+      type: [String, Number],
+      default: "",
     },
   },
   data() {
@@ -37,13 +39,20 @@ export default {
       timeValue: "",
     };
   },
+	computed: {
+		displayTime () {
+			return dayjs(this.timeValue).format('YYYY-MM-DD');
+		}
+	},
   watch: {
     value: {
       handler(val) {
         // 初始化回显UI值
         if (val) {
-          this.timeValue = val.slice(0, 5);
-        }
+          this.timeValue = dayjs(val).valueOf();
+        } else {
+					this.timeValue = dayjs().valueOf();
+				}
       },
       deep: true,
       immediate: true,
@@ -56,8 +65,8 @@ export default {
     confrimTime(detail) {
       this.isShowPop = false;
       this.timeValue = detail.value;
-      console.log("time=======>", detail.value);
-      this.$emit("input", detail.value + ":00");
+      console.log("time=======>", detail);
+      this.$emit("input", detail.value);
     },
   },
 };

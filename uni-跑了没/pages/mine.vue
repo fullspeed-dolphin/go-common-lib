@@ -5,7 +5,7 @@
     	<view class="rel section-user">
     		<view class="user-box" @click="$u.route(userInfo.id ? '' : '/pagesSub/login')">
     			<view class="flex-start">
-						<image class="avatar" :src="userInfo.avatar_url || '../static/images/run.png'" mode="aspectFill"></image>
+						<image class="avatar" :src="userInfo.avatar_url || '../static/run.png'" mode="aspectFill"></image>
     				<view class="text">
 							<block v-if="userInfo.id">
 								<view class="name" >{{userInfo.nickname || '微信用户'}}</view>

@@ -2,7 +2,7 @@
   <view class="page">
 		<u-navbar title="用户登录"></u-navbar>
 		<view class="section-box flex-col-center">
-		  <image class="logo" src="../static/basicprofile.jpeg" mode="aspectFill"></image>
+		  <image class="logo" src="../static/run.png" mode="aspectFill"></image>
 		  <view class="title flex-center">欢迎使用跑了没</view>
 		</view>
 		<view style="padding:100rpx 104rpx 0;">
