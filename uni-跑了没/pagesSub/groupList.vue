@@ -13,22 +13,22 @@
     </section>
     <mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="340">
 			<view class="" style="height:40rpx"></view>
-			<view class="group-item flex-start" v-for="(item,index) in 3" :key="index" @click="$u.route(`pagesSub/groupDetail?id=${item}`)">
+			<view class="group-item flex-start" v-for="(item,index) in dataList" :key="index" @click="$u.route({url: `pagesSub/groupDetail`, params: item})">
 				<image class="poster" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
 				<view class="text">
 					<view class="flex-between-center" style="width: 520rpx;">
 						<view class="">
-							<view class="name ellipsis">SEA跑团</view>
-							<view class="city ellipsis">广东广州 738人</view>
+							<view class="name ellipsis">{{item.name}}</view>
+							<view class="city ellipsis">{{item.establish_location}} {{item.total_members}}人</view>
 						</view>
 						<u-button type="primary" size="small" shape="circle" text="加入"></u-button>
 					</view>
-					<view class="desc ellipsis">全国跑友一家亲，SEA跑团来相聚。生命不息，跑···</view>
+					<view class="desc ellipsis">{{item.introduction}}</view>
 				</view>
 			</view>
     </mescroll-uni>
 		
-		<section class="section-bottom">
+		<section v-if="!userInfo.running_group" class="section-bottom">
 			<view style="padding: 0rpx 156rpx 20rpx">
 				<u-button type="primary" shape="circle" @click="$u.route(`pagesSub/groupForm`)">创建跑团</u-button>
 			</view>
@@ -68,6 +68,11 @@ export default {
       dataList: [],
     };
   },
+	computed: {
+		userInfo() {
+			return this.$store.state.userInfo
+		}
+	},
   methods: {
     changeTab(detail) {
       this.curTab = detail;
@@ -92,34 +97,27 @@ export default {
       uni.showLoading({ mask: true });
       const {
         orderNo,
-        orderStatus,
-        dateRange,
-        linkTelPhone,
-        storeId,
-        payChannel,
-        isAddOrder,
-        thirdPayOrderNo,
       } = this.taleParams;
       
       const data = {
-        name: "",
-        establish_location: "广州",
+        name: "广州",
+        establish_location: "",
       };
 			
       this.$axios
         .get(`/running-group/api/v1/groups`, data)
-        .then(({ items, total }) => {
+        .then((res) => {
           uni.hideLoading();
 
           //联网成功的回调,隐藏下拉刷新和上拉加载的状态;
-          this.mescroll.endBySize(items.length, total);
+          this.mescroll.endBySize(res.length, 8);
 
           //如果是第一页需手动制空列表
           if (page.num == 1) {
             this.dataList = [];
           }
 
-          this.dataList = this.dataList.concat(items); //追加新数据
+          this.dataList = this.dataList.concat(res); //追加新数据
         })
         .catch((error) => {
           uni.hideLoading();

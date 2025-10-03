@@ -180,7 +180,7 @@
 					uni.showLoading({
 						mask: true
 					})
-					this.$axios.post(`/api/store/login`, data).then(res => {
+					this.$axios.post(`/registration`, data).then(res => {
 						console.log(res)
 						uni.hideLoading()
 

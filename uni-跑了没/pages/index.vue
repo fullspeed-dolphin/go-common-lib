@@ -16,11 +16,11 @@
 			
 			<view class="section-title">线下活动</view>
 			<section class="section-offline" @click="$u.route('pagesSub/offlineEvents')">
-				<image class="poster" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
+				<image class="poster" :src="eventData.poster" mode="aspectFill"></image>
 				<view class="flex-start">
 					<view class="text">
-						<view class="name ellipsis">奔跑吧！广州·增城站奔跑吧！广州·增城站广州·增城站</view>
-						<view class="time">2025.10.26 8:00</view>
+						<view class="name ellipsis">{{eventData.title}}</view>
+						<view class="time">{{eventData.eventTime}}</view>
 					</view>
 					<u-button type="primary" size="small" shape="circle" text="报名"></u-button>
 				</view>
@@ -46,17 +46,17 @@
 				</view>
 			</view>
 			<section class="section-group">
-				<view class="group-item flex-start" v-for="(item,index) in 5" :key="index">
+				<view class="group-item flex-start" v-for="(item,index) in GroupList" :key="index">
 					<image class="poster" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
 					<view class="text">
 						<view class="flex-between-center" style="width: 520rpx;">
 							<view class="">
-								<view class="name ellipsis">SEA跑团</view>
-								<view class="city ellipsis">广东广州 738人</view>
+								<view class="name ellipsis">{{item.name}}</view>
+								<view class="city ellipsis">{{item.establish_location}} {{item.total_members}}人</view>
 							</view>
 							<u-button type="primary" size="small" shape="circle" text="加入"></u-button>
 						</view>
-						<view class="desc ellipsis">全国跑友一家亲，SEA跑团来相聚。生命不息，跑···</view>
+						<view class="desc ellipsis">{{item.introduction}}</view>
 					</view>
 				</view>
 			</section>
@@ -90,16 +90,15 @@
 </template>
 <script>
 	import tabbar from "@/components/tabBar.vue"
-
+import eventData from "@/utils/eventData.js"
 export default {
 	components: { tabbar },
   data () {
     return {
 			searchTxt: "",
+			eventData: eventData,
 			bannerList: [
-				"https://cdn.uviewui.com/uview/album/1.jpg",
-				"https://cdn.uviewui.com/uview/album/1.jpg",
-				"https://cdn.uviewui.com/uview/album/1.jpg",
+				eventData.poster,
 			],
 			GroupList: []
 		};
@@ -139,8 +138,8 @@ export default {
 		},
 		getGroupList() {
 			const data = {
-				name: "",
-				establish_location: "广州",
+				name: "广州",
+				establish_location: "",
 			}
 			this.$axios.get(`/running-group/api/v1/groups`, data).then(res => {
 				this.GroupList = res;

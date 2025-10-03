@@ -4,15 +4,15 @@
 		<section class="section-card flex-row">
 			<image class="img" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
 			<view class="" style="width:500rpx;">
-				<view class="name ellipsis2">广州XXXX跑团广州XXXX跑团</view>
+				<view class="name ellipsis2">{{detail.name}}</view>
 				<view class="flex-between-center text">
 					<view class="">
-						<view class="mb20">成立时间：2025.10.23</view>
-						<view class="">成立地点：广东广州</view>
+						<view class="mb20">成立时间：{{detail.establish_time.slice(0, 10)}}</view>
+						<view class="">成立地点：{{detail.establish_location}}</view>
 					</view>
 					<view class="">
-						<view class="mb20">跑团ID：12792</view>
-						<view class="">跑团人数：5人</view>
+						<view class="mb20">跑团ID：{{detail.group_id}}</view>
+						<view class="">跑团人数：{{detail.total_members}}人</view>
 					</view>
 				</view>
 			</view>
@@ -26,7 +26,7 @@
 			padding: 10rpx 34rpx 20rpx;
 			line-height: 1.4;
 			color: #000000;">
-			   广州xxxxxx跑团是一群热爱生活、崇尚健康的跑步爱好者自发组成的 非营利性、开放式跑步社群。我们扎根于 [凤凰城/或具体区域，如：凤凰城XX区]，以“快乐奔跑、健康生活、互帮互助、共同进步”为核心理念，致力于为本地跑友打造一个 温暖、专业、充满活力 的跑步交流平台。
+				 {{detail.introduction}}
 		</section>
 		
 		<view class="" style="padding: 0rpx 34rpx;">
@@ -68,9 +68,11 @@
 				return this.routeParams.from === 'mine' ? '我的跑团' : '跑团详情';
 			}
 		},
-		onLoad(option) {
-			console.log("option", option);
-			this.routeParams = option
+		onLoad(options) {
+			console.log("option", options);
+			this.routeParams = options;
+			// this.detail = options
+			this.getDetail()
 		},
 		methods: {
 			getDetail(page) {
@@ -79,7 +81,7 @@
 					ID: this.options.ID
 				}
 				
-				this.$axios.post(`/api/store/outStock/record/list?page=1`)
+				this.$axios.post(`/user-api/user/getUserGroup`)
 					.then((res) => {
 						this.detail = res
 					})

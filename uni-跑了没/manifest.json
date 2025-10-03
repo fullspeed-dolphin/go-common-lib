@@ -93,6 +93,7 @@
             "ignoreDevUnusedFiles" : true,
             "minified" : true,
             "es6" : true,
+						"ignoreUploadUnusedFiles": false,
             "postcss" : true
         },
         "lazyCodeLoading" : "requiredComponents",

@@ -91,23 +91,17 @@ export default {
 			
 			if (!this.isAgree.length) return this.$toast("请勾选同意协议");
 			
-			uni.$u.route('pagesSub/signUpStatus');
 			
-			return 
 			
 			const data = {
-				"OrderDetails": [
-					{
-						"RelationID": this.activeType
-					}
-				]
+				
 			}
 			if (this.isSubmitting) return;
 			this.isSubmitting = true;
 			uni.showLoading({
 				mask: true
 			})
-			this.$axios.post(`/Trade/Save`, data).then(res => {
+			this.$axios.post(`/booking-api/registration/SignInEvent`, data).then(res => {
 				this.creatOrder(res.Number)
 			}).catch(err => {
 				uni.hideLoading();
@@ -120,27 +114,14 @@ export default {
 		async creatOrder(Number) {
 			const data = {
 				Number,
-				Code: await this.getCode()
+				openid: await this.getCode()
 			}
 			
-			return this.testPay(data);
-			
-			this.$axios.post(`/Payment/Wechat/Pay`, data).then(res => {
+			this.$axios.post(`/pay/wechat/payment`, data).then(res => {
 				console.log("res", res)
 				uni.hideLoading();
 				this.isSubmitting = false;
 				this.wxPay(res);
-			})
-		},
-		testPay(data) {
-			this.$axios.post(`/Trade/TestPay`, data).then(res => {
-				console.log("res", res)
-				uni.hideLoading();
-				this.isSubmitting = false;
-				this.$toast('支付成功')
-				setTimeout(() => {
-					uni.navigateBack()
-				}, 300)
 			})
 		},
 		wxPay(respay) {
@@ -155,7 +136,8 @@ export default {
 					uni.hideLoading();
 					this.$toast('支付成功')
 					setTimeout(() => {
-						uni.navigateBack()
+						// uni.navigateBack()
+						uni.$u.route('pagesSub/signUpStatus');
 					}, 300)
 				},
 				'fail': (res) => {
@@ -163,7 +145,8 @@ export default {
 					console.log("res======>", res)
 					this.$toast('支付未完成')
 					setTimeout(() => {
-						uni.navigateBack()
+						// uni.navigateBack()
+						uni.$u.route('pagesSub/signUpStatus');
 					}, 300)
 				}
 			})
