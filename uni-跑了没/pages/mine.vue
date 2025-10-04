@@ -15,6 +15,10 @@
     				</view>
     			</view>
     		</view>
+				
+				<view class="setting" @click="$u.route('pagesSub/signUp')">
+					<u-icon name="setting-fill" size="20"></u-icon>
+				</view>
     	</view>
 			<view class="section-box">
 				<u-cell title="我的跑团" class="nav-cell" @click="$u.route('/pagesSub/groupDetail?from=mine')" :border="false" isLink>
@@ -100,6 +104,12 @@ export default {
 </script>
 
 <style lang="less" scoped>
+	.setting{
+		position: absolute;
+		right: 20rpx;
+		top:20rpx;
+		padding: 20rpx;
+	}
 	::v-deep{
 		.u-cell__left-icon-wrap{
 			width: 52rpx;
@@ -174,6 +184,7 @@ export default {
 }
 .section-user{
 	overflow: hidden;
+	position: relative;
 	.user-bg{
 		width: 100%;
 		height: 286rpx;

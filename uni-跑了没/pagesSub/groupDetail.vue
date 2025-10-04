@@ -47,7 +47,8 @@
 		</view>
 		
 		<view class="" style="height: 120rpx;"></view>
-		<section class="section-bottom">
+		<!-- 未加入跑团，才可加入跑团 -->
+		<section v-if="userInfo.running_group" class="section-bottom">
 			<view style="padding: 0rpx 156rpx 20rpx">
 				<u-button type="primary" shape="circle" @click="joinGroup()">加入跑团</u-button>
 			</view>
@@ -66,8 +67,12 @@
 		computed: {
 			pageTitle() {
 				return this.routeParams.from === 'mine' ? '我的跑团' : '跑团详情';
+			},
+			userInfo() {
+				return this.$store.state.userInfo
 			}
 		},
+		
 		onLoad(options) {
 			console.log("option", options);
 			this.routeParams = options;
@@ -78,7 +83,7 @@
 			getDetail(page) {
 			  uni.showLoading({ mask: true });
 				const data = {
-					ID: this.options.ID
+					ID: this.options
 				}
 				
 				this.$axios.post(`/user-api/user/getUserGroup`)
@@ -94,12 +99,12 @@
 			    success: (res) => {
 			      if (res.confirm) {
 			        const data = {
-			          orderNo: this.orderNo,
+			          running_group: this.orderNo,
 			        };
 			
 			        uni.showLoading({ mask: true });
 			        this.$axios
-			          .post(`/order/admin/orders/cancelOrder `, data)
+			          .post(`/user-api/user/joinRunningGroup`, data)
 			          .then((res) => {
 			            uni.hideLoading();
 			            this.getDetail();

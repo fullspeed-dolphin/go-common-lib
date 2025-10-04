@@ -23,15 +23,15 @@
 			<block v-if="isSuccess">
 				<view class="cell flex-between-center u-border-bottom">
 					<view class="label">订单金额</view>
-					<view class="value">￥62.1</view>
+					<view class="value">￥{{orderDetail.amount}}</view>
 				</view>
 				<view class="cell flex-between-center u-border-bottom">
 					<view class="label">订单编号</view>
-					<view class="value">xxxxxxxxxxxx</view>
+					<view class="value">{{orderDetail.order_no}}</view>
 				</view>
 				<view class="cell flex-between-center u-border-bottom">
 					<view class="label">下单时间</view>
-					<view class="value">2025-10-15 20:07:38</view>
+					<view class="value">{orderDetail.created_at}}</view>
 				</view>
 				<view class="cell flex-between-center u-border-bottom">
 					<view class="label">支付方式</view>
@@ -46,9 +46,24 @@ export default {
   data () {
 		return {
 			isSuccess: false,
+			orderDetail: {}
 		}
   },
+	onLoad(order_no) {
+		this.order_no = options.order_no
+	},
   methods: {
+		creatOrder(reg_no) {
+			const data = {
+				order_no: this.order_no
+			}
+			
+			this.$axios.post(`/pay/order/status`, data).then(res => {
+				console.log("res", res)
+				this.orderDetail = res;
+				this.isSuccess = res.status === 'SUCC';
+			})
+		},
 		goBack() {
 			uni.navigateBack()
 		},

@@ -27,16 +27,16 @@ function fetch(options) {
 			method: options.method || 'post',
 			data: options.data || {},
 			success(res) {
-				const response = res.data;
+				const response = res?.data;
 				
-				if (process.env.NODE_ENV !== "development") {
+				// if (process.env.NODE_ENV !== "development") {
 					console.log("接口 url======>", options.url)
 					console.log("接口 reqParams======>", options.data)
 					console.log("接口 res======>", response)
-				}
+				// }
 				
 				// 登录过期
-				if (response?.code != 200 || res.statusCode != 200) {
+				if (response?.code != 200) {
 					if (response?.code !== 400) {
 						uni.showToast({
 							icon: 'error',
@@ -58,6 +58,8 @@ function fetch(options) {
 					}
 					return reject(response)
 				}
+				
+				console.log('response?.code====>', response?.code)
 		
 				if (response?.code == 200) {
 					uni.hideLoading();

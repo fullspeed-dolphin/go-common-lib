@@ -13,7 +13,7 @@
 						<u-form-item label="性别" prop="gender" required>
 							<view class="u-input flex-center" style="width:200rpx;" @click="openActionSheet('gender')">
 								<view v-if="form.gender" class="mr10">
-									{{form.gender}}
+									{{calcuValue('gender')}}
 								</view>
 								<view v-if="!form.gender" class="input-placeholder">
 									请选择性别
@@ -33,7 +33,7 @@
 						<u-form-item label="T恤尺码" prop="colthSize" required>
 							<view class="u-input flex-center" style="width:200rpx;" @click="openActionSheet('colthSize')">
 								<view v-if="form.colthSize" class="mr10">
-									{{form.colthSize}}
+									{{calcuValue('colthSize')}}
 								</view>
 								<view v-if="!form.colthSize" class="input-placeholder">
 									请选择尺码
@@ -54,7 +54,7 @@
 						<u-form-item label="血型" prop="bloodType">
 							<view class="u-input flex-center" style="width:200rpx;" @click="openActionSheet('bloodType')">
 								<view v-if="form.bloodType" class="mr10">
-									{{form.bloodType}}
+									{{calcuValue('bloodType')}}
 								</view>
 								<view v-if="!form.bloodType" class="input-placeholder">
 									请选择血型
@@ -136,28 +136,68 @@
 				isShowSheet: false,
 				options_sheet: [],
 				options_gender: [
-					{name: "男", value: '0'},
-					{name: "女", value: '1'},
+					{name: "男", value: '1'},
+					{name: "女", value: '0'},
+					{name: "未知", value: '2'},
 				],
 				options_bloodType: [
-					{name: "A型", value: '0'},
-					{name: "B型", value: '1'},
-					{name: "AB型", value: '2'},
-					{name: "O型", value: '3'},
+					{name: "A型", value: 'A'},
+					{name: "B型", value: 'B'},
+					{name: "AB型", value: 'AB'},
+					{name: "O型", value: 'O'},
 				],
 				options_colthSize: [
-					{name: "XS", value: '0'},
-					{name: "S", value: '1'},
-					{name: "M", value: '2'},
-					{name: "L", value: '3'},
-					{name: "XL", value: '4'},
-					{name: "2XL", value: '5'},
-					{name: "3XL", value: '6'},
-					{name: "4XL", value: '7'},
+					{name: "120", value: '120'},
+					{name: "130", value: '130'},
+					{name: "140", value: '140'},
+					{name: "XS", value: 'XS'},
+					{name: "S", value: 'S'},
+					{name: "M", value: 'M'},
+					{name: "L", value: 'L'},
+					{name: "XL", value: 'XL'},
+					{name: "2XL", value: '2XL'},
+					{name: "3XL", value: '3XL'},
+					{name: "4XL", value: '4XL'},
 				],
 			};
 		},
+		computed: {
+			userInfo() {
+				return this.$store.state.userInfo
+			}
+		},
+		onLoad() {
+			this.getInfo()
+		},
 		methods: {
+			calcuValue(type) {
+				const value = this.form[type];
+				
+				const option = this['options_' + type].find(i => i.value === value)
+				console.log(value)
+				
+				return option?.name || ''
+			},
+			getInfo() {
+				const data = {
+					phone_number: this.userInfo.phone
+				}
+				this.$axios.post('/booking-api/registration/getSignerInfo', data).then(res => {
+					console.log(res)
+					this.form =	{
+						fullName: res.full_name || '',
+						gender: res.gender || '',
+						phone: res.phone_number || '',
+						colthSize: res.tshirt_size || '',
+						idNumber: res.id_card || '',
+						email: res.email || '',
+						bloodType: res.blood_type || '',
+						job: res.occupation || '',
+						sportPurpose: res.running_goal || '',
+						strengths: res.good_at_sports || '',
+					}
+				})
+			},
 			openActionSheet(type) {
 				this.sheetType = type;
 				this.options_sheet = this['options_' + type];
@@ -165,30 +205,43 @@
 			},
 			selectActionSheet(e) {
 				console.log(e)
-				this.form[this.sheetType] = e.name
+				this.form[this.sheetType] = e.value
 				this.isShowSheet = false;
 			},
 			closeActionSheet() {
 				this.isShowSheet = false;
 			},
 			submit() {
-				this.$refs.uForm.validate().then(res => {
+				this.$refs.uForm.validate().then(() => {
+					const res = this.form
 					const data = {
-						"Account": this.form.name,
-						"Password": this.form.password,
+						full_name: res.fullName || '',
+						gender: res.gender || '',
+						phone_number: res.phone || '',
+						tshirt_size: res.colthSize || '',
+						id_card: res.idNumber || '',
+						email: res.email || '',
+						blood_type: res.bloodType || '',
+						occupation: res.job || '',
+						running_goal: res.sportPurpose || '',
+						good_at_sports: res.strengths || '',
 					}
 					uni.showLoading({
 						mask: true
 					})
-					this.$axios.post(`/registration`, data).then(res => {
+					this.$axios.post(`/booking-api/registration/updateSignerInfo`, data).then(res => {
 						console.log(res)
-						uni.hideLoading()
+						// uni.hideLoading()
+						
+						this.$toast('保存成功')
 
-						this.$store.dispatch('getUserInfo')
-
-						uni.$u.toast('登录成功')
-
-						this.$goUrl("/pages/index")
+						setTimeout(() => {
+							uni.navigateBack()
+							// uni.$u.route({
+							// 	url: 'pages/mine',
+							// 	type: 'switchTab'
+							// })
+						}, 300)
 					})
 				})
 			}

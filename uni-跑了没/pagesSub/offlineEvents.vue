@@ -1,6 +1,6 @@
 <template>
-  <view class="" >
-		<!-- <u-navbar title="线下活动"></u-navbar> -->
+  <view class="" :class="{isFixedNavbar: isFixedNavbar}">
+		<u-navbar :title="isFixedNavbar ? '' : '线下活动'" :placeholder="false"></u-navbar>
 		
 		<section style="padding:0;overflow: hidden;">
 			<image :src="eventData.poster" mode="aspectFill" style="width:100%;display: block;height:300rpx;"></image>
@@ -65,9 +65,13 @@ export default {
   data () {
 		return {
 			isSignUp: false,
-			eventData: eventData
+			eventData: eventData,
+			isFixedNavbar: true
 		}
   },
+	onPageScroll(e) {
+		this.isFixedNavbar = parseInt(e.scrollTop) < 30
+	},
   methods: {
 		routeTo() {
 			if (this.isSignUp) {
@@ -145,6 +149,12 @@ export default {
 				color: #FF8C00;
 				background: #F2F2F2;
 				border-color: #f2f2f2;
+			}
+		}
+		
+		.isFixedNavbar{
+			.u-navbar--fixed{
+				background: none!important;
 			}
 		}
 	}

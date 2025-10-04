@@ -5,12 +5,12 @@
 		<section class="section-assign">
 			<view class="cell flex-between-center" @click="selectSigner()">
 				<view class="">
-					参赛者
+					<u-icon name="star-fill" color="#E53935" size="8"></u-icon> 参赛者 
 				</view>
 				<view class="flex-start">
 					<view class="txt flex-row">
-						请完善参赛者信息
-						<u-icon name="star-fill" color="#E53935" size="8"></u-icon>
+						{{SignerInfo.id_card ? SignerInfo.full_name : '请完善参赛者信息'}}
+						
 					</view>
 					<u-icon name="arrow-right" size="34rpx" color="rgba(0,0,0,.9)"></u-icon>
 				</view>
@@ -19,7 +19,7 @@
 				<view class="">跑团</view>
 				<view class="flex-start">
 					<view class="txt">
-						加入跑团可享九折优惠
+						{{eventInfo.running_group || '加入跑团可享九折优惠'}}
 					</view>
 					<u-icon name="arrow-right" size="34rpx" color="rgba(0,0,0,.9)"></u-icon>
 				</view>
@@ -27,18 +27,18 @@
 		</section>
 		
 		<section class="scroll-view">
-			<view class="item" @click="changeTab(item)" v-for="(item,index) in typeList" :key="index">
-				<view class="type-item flex-center" :class="{active: activeType === item}">
-					{{item}}
+			<view class="item" @click="changeTab(item)" v-for="(item,index) in priceList" :key="index">
+				<view class="type-item flex-center" :class="{active: activeType.label === item.label}">
+					{{item.label}}
 				</view>
 			</view>
 		</section>
 		
 		<section class="section-payment panel">
 			<view class="money flex-row" style="align-items: baseline;">
-				￥69 
+				￥{{activeType.price}}
 				<view class="txt">
-					({{activeType}})
+					({{activeType.label}})
 				</view>
 			</view>
 			<view class="" style="line-height: 34rpx;margin-bottom:34rpx;">
@@ -58,7 +58,7 @@
 				<text style="color:#FF8C00" @click="$u.route('pagesSub/settings/agreement?type=signUp')">《用户协议以及用户承诺书》</text>
 			</view>
 			<view class="" style="padding: 26rpx 120rpx 0">
-				<u-button type="primary" shape="circle" @click="submitOrder()">￥69 支付</u-button>
+				<u-button type="primary" shape="circle" @click="submitOrder()">￥{{activeType.price}} 支付</u-button>
 			</view>
 		</section>
   </view>
@@ -67,12 +67,51 @@
 export default {
   data () {
 		return {
-			typeList: ['5KM','10KM','半程马拉松'],
-			activeType: '5KM',
+			activeType: {},
 			isAgree: [],
+			SignerInfo: {},
+			eventInfo: {},
+			priceList: []
 		}
   },
+	computed: {
+		userInfo() {
+			return this.$store.state.userInfo
+		}
+	},
+	onShow() {
+		this.getSignerInfo()
+		this.getEventPrice()
+	},
   methods: {
+		getSignerInfo() {
+			const data = {
+				phone_number: this.userInfo.phone
+			}
+			this.$axios.post('/booking-api/registration/getSignerInfo', data).then(res => {
+				this.SignerInfo = res;
+			})
+		},
+		getEventPrice() {
+			const data = {
+				
+			}
+			this.$axios.post('/booking-api/user/price', data).then(res => {
+				this.eventInfo = res;
+				let priceList = []
+				Object.keys(res).forEach(i => {
+					if (String(i).includes('km')) {
+						priceList.push({
+							price: res[i],
+							label: i
+						})
+					}
+				})
+				
+				this.activeType = priceList[0]
+				this.priceList = priceList;
+			})
+		},
 		selectSigner() {
 			uni.$u.route('pagesSub/signUp')
 		},
@@ -91,19 +130,28 @@ export default {
 			
 			if (!this.isAgree.length) return this.$toast("请勾选同意协议");
 			
-			
-			
 			const data = {
-				
+				...this.SignerInfo,
+				// "running_group": "GROUP_ID",
+				"running_km": parseFloat(this.activeType.label),
+				"payment_method": "wechat",
+				"payment_amount": this.activeType.price,
+				running_group: String(this.userInfo.running_group)
 			}
+			
+			delete data.updated_at;
+			delete data.status;
+			delete data.created_at;
+			
 			if (this.isSubmitting) return;
 			this.isSubmitting = true;
 			uni.showLoading({
 				mask: true
 			})
 			this.$axios.post(`/booking-api/registration/SignInEvent`, data).then(res => {
-				this.creatOrder(res.Number)
+				this.creatOrder(res.reg_no)
 			}).catch(err => {
+				console.error(err)
 				uni.hideLoading();
 				this.isSubmitting = false;
 			})
@@ -111,10 +159,10 @@ export default {
 		async getCode() {
 			return (await new Promise(resolve => uni.login({success: e => resolve(e) }))).code
 		},
-		async creatOrder(Number) {
+		async creatOrder(reg_no) {
 			const data = {
-				Number,
-				openid: await this.getCode()
+				reg_no,
+				openid: this.userInfo.openid
 			}
 			
 			this.$axios.post(`/pay/wechat/payment`, data).then(res => {
@@ -127,17 +175,17 @@ export default {
 		wxPay(respay) {
 			// 触发微信支付
 			wx.requestPayment({
-				'timeStamp': respay.TimeStamp,
-				'nonceStr': respay.NonceStr,
-				'package': respay.Package,
-				'signType': respay.SignType,
-				'paySign': respay.PaySign,
+				'timeStamp': respay.timeStamp,
+				'nonceStr': respay.nonceStr,
+				'package': respay.package,
+				'signType': respay.signType,
+				'paySign': respay.paySign,
 				'success': (res) => {
 					uni.hideLoading();
 					this.$toast('支付成功')
 					setTimeout(() => {
 						// uni.navigateBack()
-						uni.$u.route('pagesSub/signUpStatus');
+						uni.$u.route('pagesSub/signUpStatus?order_no=' + respay.order_no);
 					}, 300)
 				},
 				'fail': (res) => {
@@ -146,7 +194,7 @@ export default {
 					this.$toast('支付未完成')
 					setTimeout(() => {
 						// uni.navigateBack()
-						uni.$u.route('pagesSub/signUpStatus');
+						uni.$u.route('pagesSub/signUpStatus?order_no=' + respay.order_no);
 					}, 300)
 				}
 			})
