@@ -1,10 +1,4 @@
 const text = `
-<p style=";text-align: center;font-family: Calibri;font-size: 14px">
-    <strong>2025<span style="font-family:宋体">广州增城·云顶健康欢乐跑</span></strong><strong></strong>
-</p>
-<p style=";text-align: justify;font-family: Calibri;font-size: 14px">
-    <strong>活动详情</strong><strong></strong>
-</p>
 <p style=";text-align: justify;font-family: Calibri;font-size: 14px">
     &nbsp;
 </p>

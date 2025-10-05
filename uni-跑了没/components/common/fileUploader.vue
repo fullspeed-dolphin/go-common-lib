@@ -127,25 +127,32 @@
 					this.uploadFile(item.file)
 				);
 
-				const tempFile = await asyncAlls(promiseList);
-
-				const temp = tempFile.filter((i) => !!i);
-				if (!temp.length) {
-					this.fileList = [];
+				try {
+					
+					const tempFile = await asyncAlls(promiseList);
+					
+					console.log("promiseList=====>", tempFile)
+					
+					const temp = tempFile.filter((i) => !!i);
+					if (!temp.length) {
+						this.fileList = [];
+						uni.hideLoading();
+						return;
+					}
+					const tempList = tempFile.map((item) => ({
+						name: item,
+						url: item,
+						extname: "png",
+					}));
+					
+					this.fileList = [...this.fileList, ...tempList];
+					
+					console.log("this.fileList===========>", this.fileList);
 					uni.hideLoading();
-					return;
+					this.$emit("input", this.listToString(this.fileList));
+				} catch (e) {
+					console.error(e)
 				}
-				const tempList = tempFile.map((item) => ({
-					name: item,
-					url: item,
-					extname: "png",
-				}));
-
-				this.fileList = [...this.fileList, ...tempList];
-
-				console.log("this.fileList===========>", this.fileList);
-				uni.hideLoading();
-				this.$emit("input", this.listToString(this.fileList));
 			},
 			// 对象转成指定字符串分隔
 			listToString(list, separator) {
@@ -169,26 +176,29 @@
 							resolve(res.tempFilePath);
 							console.log(res.tempFilePath);
 						},
+						fail(e) {
+							console.error(e)
+						}
 					});
 				});
 			},
 			async uploadFile(file) {
-				const filePath = await this.compressImage(file.path);
-
+				console.log("file=====>", file)
+				const filePath = await this.compressImage(file.url);
+				console.log("file=====>", filePath)
 				return new Promise((resolve, reject) => {
 					uni.uploadFile({
-						url: baseLink + `/file/upload`,
+						url: baseLink + `/basic-service/image/upload`,
 						filePath: filePath,
-						name: "file",
+						name: "image",
 						header: {
-							Authorization: uni.getStorageSync("token_admin"),
-							"content-type": "application/json",
+							Authorization: uni.getStorageSync('token'),
+							'content-type': 'application/json',
 						},
 						success(res) {
 							res = JSON.parse(res.data);
-							console.log("res ======>", res);
-							if (res.url) {
-								return resolve(res.url);
+							if (res.data.url) {
+								return resolve(res.data.url);
 							} else {
 								uni.showToast({
 									icon: "none",

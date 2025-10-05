@@ -55,6 +55,7 @@
 	import FileUploader from "@/components/common/fileUploader.vue"
 	import PickerMap from "@/components/common/PickerMap.vue"
 	import PickerTime from "@/components/common/PickerTime.vue"
+	import dayjs from "../uni_modules/uview-ui/libs/util/dayjs";
 	export default {
 		components: {
 			FileUploader, PickerMap, PickerTime
@@ -68,7 +69,7 @@
 					description: "",
 					fullName: '',
 					phone: '',
-					establish_time: '',
+					establish_time: dayjs().valueOf(),
 				},
 				isAgree: [],
 				rules: {
@@ -140,9 +141,14 @@
 					})
 					this.$axios.post(`/running-group/api/v1/groups`, data).then(res => {
 						console.log(res)
-						uni.hideLoading()
-
-						this.$goUrl("/pages/index")
+						
+						this.$toast('创建成功')
+						
+						this.$store.dispatch('getUserInfo')
+						
+						setTimeout(() => {
+							uni.navigateBack()
+						}, 300)
 					})
 				})
 			}
@@ -191,8 +197,8 @@
 				max-width: 100%!important;
 			}
 		}
-		.u-form-item__body__left__content__required{
-			top:0!important;
+		.u-form-item__body__left__content__label{
+			flex: unset!important;
 		}
 		.u-textarea__count{
 			right: 20rpx!important;
@@ -203,7 +209,8 @@
 		}
 		
 		.u-form-item__body__left__content__required{
-			position: static;
+			position: static!important;
+			top:0!important;
 		}
 		.u-form-item__body__right__message{
 			margin-left: 0!important;

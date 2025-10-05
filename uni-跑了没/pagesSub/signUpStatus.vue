@@ -50,10 +50,18 @@ export default {
 		}
   },
 	onLoad(order_no) {
-		this.order_no = options.order_no
+		this.order_no = options.order_no;
+		
+		uni.showLoading({
+			mask: true
+		})
+		
+		setTimeout(() => {
+			this.getOrder()
+		}, 2000)
 	},
   methods: {
-		creatOrder(reg_no) {
+		getOrder() {
 			const data = {
 				order_no: this.order_no
 			}

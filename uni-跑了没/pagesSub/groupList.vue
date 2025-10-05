@@ -3,18 +3,18 @@
 		<u-navbar title="跑团招募"></u-navbar>
     <section class="section-filter bgf">
 			<view class="section-search">
-				<u-search v-model="searchTxt" @search="confirmSearch" placeholder="搜索跑团" shape="round" bgColor="#fff" borderColor="#FF8C00" :showAction="false"></u-search>
+				<u-search v-model="searchTxt" @search="refreshList" placeholder="搜索跑团" shape="round" bgColor="#fff" borderColor="#FF8C00" :showAction="false"></u-search>
 			</view>
 			
-      <u-tabs lineWidth="375rpx" lineHeight="2" :duration="0" 
+      <!-- <u-tabs lineWidth="375rpx" lineHeight="2" :duration="0" 
 			:inactiveStyle="{color: '#000'}"
 			:activeStyle="{color: '#FF8C00'}"
-			:list="tabList" @change="changeTab" :scrollable="false" keyName="label" lineColor="#FF8C00" />
+			:list="tabList" @change="changeTab" :scrollable="false" keyName="label" lineColor="#FF8C00" /> -->
     </section>
-    <mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="340">
+    <mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="240">
 			<view class="" style="height:40rpx"></view>
 			<view class="group-item flex-start" v-for="(item,index) in dataList" :key="index" @click="$u.route({url: `pagesSub/groupDetail`, params: item})">
-				<image class="poster" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
+				<image class="poster" :src="item.avatar_url || '../static/run.png'" mode="aspectFill"></image>
 				<view class="text">
 					<view class="flex-between-center" style="width: 520rpx;">
 						<view class="">
@@ -100,24 +100,22 @@ export default {
       } = this.taleParams;
       
       const data = {
-        name: "广州",
-        establish_location: "",
-      };
-			
-      this.$axios
-        .get(`/running-group/api/v1/groups`, data)
-        .then((res) => {
+      	"pageIndex": 0,
+      	"pageSize": 10,
+      	"keyword": this.searchTxt
+      }
+      this.$axios.get(`/running-group/api/v1/groups/list`, data).then(res => {
           uni.hideLoading();
 
           //联网成功的回调,隐藏下拉刷新和上拉加载的状态;
-          this.mescroll.endBySize(res.length, 8);
+          this.mescroll.endBySize(res.data.length, 8);
 
           //如果是第一页需手动制空列表
           if (page.num == 1) {
             this.dataList = [];
           }
 
-          this.dataList = this.dataList.concat(res); //追加新数据
+          this.dataList = this.dataList.concat(res.data); //追加新数据
         })
         .catch((error) => {
           uni.hideLoading();

@@ -26,7 +26,7 @@
 				</view>
 			</section>
 			
-			<view class="section-title">线上赛事</view>
+			<!-- <view class="section-title">线上赛事</view>
 			<section class="section-offline"  @click="$u.route('pagesSub/offlineEvents')">
 				<image class="poster" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
 				<view class="flex-start">
@@ -36,7 +36,7 @@
 					</view>
 					<u-button type="primary" size="small" shape="circle" disabled color="#f4f4f4" text="未开始"></u-button>
 				</view>
-			</section>
+			</section> -->
 			
 			<view class="section-title flex-between-center" @click="$u.route('pagesSub/groupList')">
 				跑团招募
@@ -46,8 +46,8 @@
 				</view>
 			</view>
 			<section class="section-group">
-				<view class="group-item flex-start" v-for="(item,index) in GroupList" :key="index">
-					<image class="poster" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
+				<view class="group-item flex-start" @click="$u.route(`pagesSub/groupDetail?group_id=${item.group_id}`)" v-for="(item,index) in GroupList" :key="index">
+					<image class="poster" :src="item.avatar_url || '../static/run.png'" mode="aspectFill"></image>
 					<view class="text">
 						<view class="flex-between-center" style="width: 520rpx;">
 							<view class="">
@@ -138,11 +138,12 @@ export default {
 		},
 		getGroupList() {
 			const data = {
-				name: "广州",
-				establish_location: "",
+				"pageIndex": 0,
+				"pageSize": 5,
+				"keyword": ""
 			}
-			this.$axios.get(`/running-group/api/v1/groups`, data).then(res => {
-				this.GroupList = res;
+			this.$axios.get(`/running-group/api/v1/groups/list`, data).then(res => {
+				this.GroupList = res.data;
 			})
 		},
 	}

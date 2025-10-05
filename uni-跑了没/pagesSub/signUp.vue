@@ -168,6 +168,11 @@
 		},
 		onLoad() {
 			this.getInfo()
+			
+			this.form = {
+				...this.form,
+				...(uni.getStorageSync('SignerInfo') || {})
+			}
 		},
 		methods: {
 			calcuValue(type) {
@@ -226,6 +231,16 @@
 						running_goal: res.sportPurpose || '',
 						good_at_sports: res.strengths || '',
 					}
+					
+					uni.setStorageSync('SignerInfo', data);
+					
+					this.$toast('保存成功')
+					
+					setTimeout(() => {
+						uni.navigateBack()
+					}, 300)
+					
+					return 
 					uni.showLoading({
 						mask: true
 					})
@@ -237,10 +252,6 @@
 
 						setTimeout(() => {
 							uni.navigateBack()
-							// uni.$u.route({
-							// 	url: 'pages/mine',
-							// 	type: 'switchTab'
-							// })
 						}, 300)
 					})
 				})

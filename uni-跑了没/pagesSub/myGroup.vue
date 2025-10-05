@@ -1,9 +1,8 @@
 <template>
 	<view>
-		<u-navbar :title="pageTitle"></u-navbar>
-		<!-- <u-empty v-if="!userInfo.running_group" mode="data" /> -->
-		
-		<block>
+		<u-navbar title="我的跑团"></u-navbar>
+		<u-empty v-if="!detail.name" mode="data" />
+		<block v-if="detail.name">
 			<section  class="section-card flex-row">
 				<image class="img" :src="detail.avatar_url || '../static/run.png'" mode="aspectFill"></image>
 				<view class="" style="width:500rpx;">
@@ -33,11 +32,11 @@
 					 {{detail.introduction}}
 			</section>
 			
-			<view class="" style="padding: 0rpx 34rpx;">
+			<!-- <view class="" style="padding: 0rpx 34rpx;">
 				<u-divider text="跑团成员" textColor="#000" lineColor="#707070"></u-divider>
-			</view>
+			</view> -->
 			
-			<view class="member-item flex-start" v-for="(item,index) in 5" :key="index">
+			<!-- <view class="member-item flex-start" v-for="(item,index) in 5" :key="index">
 				<view class="img-box">
 					<image class="img" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
 				</view>
@@ -48,15 +47,7 @@
 			<view class="flex-center" style="margin-top: -20rpx;" @click="$u.route(`pagesSub/groupMemberList`)">
 				<text style="color:#FF8C00;margin-right:5rpx;">查看更多</text> 
 				<u-icon name="arrow-down" color="#FF8C00"></u-icon>
-			</view>
-			
-			<view class="" style="height: 120rpx;"></view>
-			<!-- 未加入跑团，才可加入跑团 -->
-			<section v-if="!userInfo.running_group" class="section-bottom">
-				<view style="padding: 0rpx 156rpx 20rpx">
-					<u-button type="primary" shape="circle" @click="joinGroup()">加入跑团</u-button>
-				</view>
-			</section>
+			</view> -->
 		</block>
 	</view>
 </template>
@@ -70,9 +61,6 @@
 			};
 		},
 		computed: {
-			pageTitle() {
-				return this.routeParams.from === 'mine' ? '我的跑团' : '跑团详情';
-			},
 			userInfo() {
 				return this.$store.state.userInfo
 			}
@@ -80,55 +68,16 @@
 		onLoad(options) {
 			console.log("option", options);
 			this.routeParams = options;
-			// this.detail = options
 			this.getUserGroup()
-			this.getDetail()
 		},
 		methods: {
 			getUserGroup(page) {
-				if (this.routeParams.from !== 'mine') return;
-				
 			  uni.showLoading({ mask: true });
 				
-				this.$axios.get(`/user-api/user/getUserGroup`)
+				this.$axios.post(`/user-api/user/getCreatedGroup`)
 					.then((res) => {
 						this.detail = res
 					})
-			},
-			getDetail(page) {
-				if (this.routeParams.from === 'mine') return;
-				
-			  uni.showLoading({ mask: true });
-				
-				this.$axios.get(`/running-group/api/v1/groups/info?group_id=${this.routeParams.group_id}`)
-					.then((res) => {
-						this.detail = res
-					})
-			},
-			joinGroup() {
-				// 一个人能创建5个，每个20人起，一个队百人封顶
-			  uni.showModal({
-			    title: "提示",
-			    content: "是否确认加入该跑团？",
-			    success: (res) => {
-			      if (res.confirm) {
-			        const data = {
-			          running_group: this.orderNo,
-			        };
-			
-			        uni.showLoading({ mask: true });
-			        this.$axios
-			          .post(`/user-api/user/joinRunningGroup`, data)
-			          .then((res) => {
-			            uni.hideLoading();
-			            this.getDetail();
-			            this.$toast("加入成功！");
-			          });
-			      } else if (res.cancel) {
-			        console.log("用户点击取消");
-			      }
-			    },
-			  });
 			},
 			leaveGroup() {
 			  uni.showModal({

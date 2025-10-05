@@ -85,17 +85,21 @@ export default {
 	},
   methods: {
 		getSignerInfo() {
+			this.SignerInfo = uni.getStorageSync('SignerInfo') || {}
+			
+			return false;
 			const data = {
 				phone_number: this.userInfo.phone
 			}
 			this.$axios.post('/booking-api/registration/getSignerInfo', data).then(res => {
-				this.SignerInfo = res;
+				this.SignerInfo = {
+					...res,
+					...(uni.getStorageSync('SignerInfo') || {})
+				};
 			})
 		},
 		getEventPrice() {
-			const data = {
-				
-			}
+			const data = {}
 			this.$axios.post('/booking-api/user/price', data).then(res => {
 				this.eventInfo = res;
 				let priceList = []
@@ -164,6 +168,10 @@ export default {
 				reg_no,
 				openid: this.userInfo.openid
 			}
+			
+			uni.showLoading({
+				mask: true
+			})
 			
 			this.$axios.post(`/pay/wechat/payment`, data).then(res => {
 				console.log("res", res)
