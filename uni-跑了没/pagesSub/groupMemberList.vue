@@ -2,12 +2,13 @@
   <div class="">
 		<u-navbar title="跑团成员"></u-navbar>
 		<mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="190">
-      <view class="member-item flex-start" v-for="(item,index) in 5" :key="index">
+      <view class="member-item flex-start" v-for="(item,index) in dataList" :key="index">
       	<view class="img-box">
       		<image class="img" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
       	</view>
-      	<view class="flex-start">
-      		昵称
+      	<view class="">
+      		<view class="mb10" style="color: #222;">成员</view>
+      		{{item.user_phone}}
       	</view>
       </view>
     </mescroll-uni>
@@ -23,7 +24,10 @@ export default {
       dataList: [],
     };
   },
-  onLoad() {},
+  onLoad(options) {
+		console.log(options)
+		this.group_id = options.group_id
+	},
   methods: {
     refreshList() {
       this.$nextTick(() => {
@@ -34,23 +38,24 @@ export default {
     getList(page) {
       uni.showLoading({ mask: true });
 			const data = {
-				"Page": page.num,
-				"Size": "10",
+				"pageIndex": page.num,
+				"pageSize": 10,
+				groupId: Number(this.group_id)
 			}
 			
-      this.$axios.post(`/api/store/purchase/order/list?page=${page.num}`, data)
+      this.$axios.post(`/running-group/api/v1/groups/members`, data)
         .then(async (res) => {
           uni.hideLoading();
 					
 					//联网成功的回调,隐藏下拉刷新和上拉加载的状态;
-					this.mescroll.endSuccess(res.List.length);
+					this.mescroll.endSuccess(res.memberships.length);
 
           //如果是第一页需手动制空列表
           if (page.num == 1) {
             this.dataList = [];
           }
 
-          this.dataList = this.dataList.concat(res.List); //追加新数据
+          this.dataList = this.dataList.concat(res.memberships); //追加新数据
         })
         .catch((error) => {
           uni.hideLoading();

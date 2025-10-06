@@ -13,6 +13,7 @@
 					{ "path": "signUpStatus", "style": { "navigationStyle": "custom","navigationBarTitleText": "", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					{ "path": "offlineEvents", "style": { "navigationStyle": "custom","navigationBarTitleText": "线下活动", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					{ "path": "orderIn", "style": { "navigationStyle": "custom","navigationBarTitleText": "活动报名", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
+					{ "path": "myOrder", "style": { "navigationStyle": "custom","navigationBarTitleText": "活动报名", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					{ "path": "groupList", "style": { "navigationStyle": "custom","navigationBarTitleText": "跑团招募", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					{ "path": "myGroup", "style": { "navigationStyle": "custom","navigationBarTitleText": "跑团详情", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					{ "path": "groupDetail", "style": { "navigationStyle": "custom","navigationBarTitleText": "跑团详情", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },

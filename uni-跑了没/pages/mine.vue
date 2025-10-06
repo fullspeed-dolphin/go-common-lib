@@ -24,15 +24,15 @@
 				<u-cell title="我的跑团" class="nav-cell" @click="$u.route('/pagesSub/myGroup?from=mine')" :border="false" isLink>
 					<image slot="icon" class="nav-icon" src="/static/images/个人信息Icon@2x.png"></image>
 				</u-cell>
-				<u-cell title="我的消息" class="nav-cell" @click="$u.route('/pagesSub/myMessages')" :border="false" isLink>
+				<!-- <u-cell title="我的消息" class="nav-cell" @click="$u.route('/pagesSub/myMessages')" :border="false" isLink>
 					<image slot="icon" class="nav-icon" src="/static/images/我的消息Icon@2x.png"></image>
-				</u-cell>
-				<u-cell title="我的赛事" class="nav-cell" @click="$u.route('/pagesSub/myEvent')" :border="false" isLink>
+				</u-cell> -->
+				<u-cell title="我的订单" class="nav-cell" @click="$u.route('/pagesSub/myOrder')" :border="false" isLink>
 					<image slot="icon" class="nav-icon" src="/static/images/WX20250908-193754.png"></image>
 				</u-cell>
-				<u-cell title="意见反馈" class="nav-cell" @click="$u.route('/pagesSub/settings/feedback')" :border="false" isLink>
+				<!-- <u-cell title="意见反馈" class="nav-cell" @click="$u.route('/pagesSub/settings/feedback')" :border="false" isLink>
 					<image slot="icon" class="nav-icon" src="/static/images/帮助反馈Icon@2x.png"></image>
-				</u-cell>
+				</u-cell> -->
 			</view>
 			
 	   <view v-if="userInfo.id" class="logout c9 flex-center">

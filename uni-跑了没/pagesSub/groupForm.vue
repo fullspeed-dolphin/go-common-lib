@@ -46,7 +46,7 @@
 				<text style="color:#FF8C00" @click="$u.route('pagesSub/settings/agreement?type=signUp')">《用户隐私协议 》</text>
 			</view>
 			<view class="" style="padding: 26rpx 120rpx 0">
-				<u-button type="primary" shape="circle" @click="submitForm()">创建跑团</u-button>
+				<u-button type="primary" shape="circle" @click="submitForm()">{{group_id ? '更新跑团' : '创建跑团'}} </u-button>
 			</view>
 		</view>
 	</view>
@@ -62,6 +62,7 @@
 		},
 		data() {
 			return {
+				group_id: "",
 				form: {
 					poster: '',
 					name: '',
@@ -69,6 +70,7 @@
 					description: "",
 					fullName: '',
 					phone: '',
+					amount: '',
 					establish_time: dayjs().valueOf(),
 				},
 				isAgree: [],
@@ -112,7 +114,29 @@
 				},
 			};
 		},
+		onLoad(options) {
+			console.log("option", options);
+			this.group_id = options.group_id;
+			this.getDetail()
+		},
 		methods: {
+			getDetail(page) {
+				this.$axios.get(`/running-group/api/v1/groups/info?group_id=${this.group_id}`)
+					.then((res) => {
+						this.form = {
+							poster: res.avatar_url,
+							name: res.name,
+							location: res.establish_location,
+							description: res.introduction,
+							fullName: res.creator_real_name,
+							phone: res.creator_phone,
+							amount: String(res.total_members),
+							establish_time: dayjs(res.establish_time).valueOf(),
+						}
+						
+						this.isAgree = ['agree']
+					})
+			},
 			submitForm() {
 				this.$refs.uForm.validate().then(res => {
 					const token = uni.getStorageSync("token");
@@ -139,16 +163,26 @@
 					uni.showLoading({
 						mask: true
 					})
-					this.$axios.post(`/running-group/api/v1/groups`, data).then(res => {
+					
+					let url = '/running-group/api/v1/groups'
+					
+					// 更新跑团
+					if (this.group_id) {
+						url = '/running-group/api/v1/groups/update'
+					}
+					this.$axios.post(url, data).then(res => {
 						console.log(res)
 						
-						this.$toast('创建成功')
+						this.$toast(this.group_id ? '更新成功' : '创建成功')
 						
 						this.$store.dispatch('getUserInfo')
 						
 						setTimeout(() => {
 							uni.navigateBack()
-						}, 300)
+						}, 1000)
+						
+						// 跳转回上一级页面，返回上一页并传递参数
+						uni.$emit("updateList", { isChange: true });
 					})
 				})
 			}

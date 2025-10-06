@@ -40,6 +40,7 @@ export default {
     value: {
       handler(val) {
         if (String(val)) {
+					this.valueString = val
         } else {
         }
       },

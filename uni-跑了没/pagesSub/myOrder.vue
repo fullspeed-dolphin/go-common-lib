@@ -1,19 +1,9 @@
 <template>
   <div class="">
-		<u-navbar title="跑团招募"></u-navbar>
-    <section class="section-filter bgf">
-			<view class="section-search">
-				<u-search v-model="searchTxt" @search="refreshList" placeholder="搜索跑团" shape="round" bgColor="#fff" borderColor="#FF8C00" :showAction="false"></u-search>
-			</view>
-			
-      <!-- <u-tabs lineWidth="375rpx" lineHeight="2" :duration="0" 
-			:inactiveStyle="{color: '#000'}"
-			:activeStyle="{color: '#FF8C00'}"
-			:list="tabList" @change="changeTab" :scrollable="false" keyName="label" lineColor="#FF8C00" /> -->
-    </section>
-    <mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="240">
+		<u-navbar title="我的订单"></u-navbar>
+    <mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="140">
 			<view class="" style="height:40rpx"></view>
-			<view class="group-item flex-start" v-for="(item,index) in dataList" :key="index" @click="$u.route({url: `pagesSub/groupDetail`, params: item})">
+			<view class="group-item flex-start" v-for="(item,index) in dataList" :key="index">
 				<image class="poster" :src="item.avatar_url || '../static/run.png'" mode="aspectFill"></image>
 				<view class="text">
 					<view class="flex-between-center" style="width: 520rpx;">
@@ -21,18 +11,11 @@
 							<view class="name ellipsis">{{item.name}}</view>
 							<view class="city ellipsis">{{item.establish_location}} {{item.total_members}}人</view>
 						</view>
-						<u-button type="primary" size="small" shape="circle" text="加入"></u-button>
 					</view>
 					<view class="desc ellipsis">{{item.introduction}}</view>
 				</view>
 			</view>
     </mescroll-uni>
-		
-		<section v-if="!userInfo.running_group" class="section-bottom">
-			<view style="padding: 0rpx 156rpx 20rpx">
-				<u-button type="primary" shape="circle" @click="$u.route(`pagesSub/groupForm`)">创建跑团</u-button>
-			</view>
-		</section>
   </div>
 </template>
 
@@ -73,18 +56,6 @@ export default {
 			return this.$store.state.userInfo
 		}
 	},
-	onShow() {
-	  // 移除全局自定义事件监听器
-	  uni.$off("updateList");
-	
-	  // 监听全局的自定义事件
-	  uni.$once("updateList", (data) => {
-	    // 判断二级页面是否修改过数据，如果修改过，需要刷新首页，保持信息一致
-	    if (data.isChange) {
-	      this.refreshList();
-	    }
-	  });
-	},
   methods: {
     changeTab(detail) {
       this.curTab = detail;
@@ -116,18 +87,18 @@ export default {
       	"pageSize": 10,
       	"keyword": this.searchTxt
       }
-      this.$axios.get(`/running-group/api/v1/groups/list`, data).then(res => {
+      this.$axios.get(`/pay/order/list`, data).then(res => {
           uni.hideLoading();
 
           //联网成功的回调,隐藏下拉刷新和上拉加载的状态;
-          this.mescroll.endBySize(res.data.length, 8);
+          this.mescroll.endBySize(res.orders.length, 8);
 
           //如果是第一页需手动制空列表
           if (page.num == 1) {
             this.dataList = [];
           }
 
-          this.dataList = this.dataList.concat(res.data); //追加新数据
+          this.dataList = this.dataList.concat(res.orders); //追加新数据
         })
         .catch((error) => {
           uni.hideLoading();

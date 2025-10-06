@@ -27,6 +27,8 @@ function fetch(options) {
 			method: options.method || 'post',
 			data: options.data || {},
 			success(res) {
+				uni.hideLoading();
+				
 				const response = res?.data;
 				
 				// if (process.env.NODE_ENV !== "development") {
@@ -59,10 +61,7 @@ function fetch(options) {
 					return reject(response)
 				}
 				
-				console.log('response?.code====>', response?.code)
-		
 				if (response?.code == 200) {
-					uni.hideLoading();
 					resolve(response.data)
 				}
 			},

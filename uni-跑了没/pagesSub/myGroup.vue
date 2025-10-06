@@ -8,12 +8,16 @@
 				<view class="" style="width:500rpx;">
 					<view class="name ellipsis2">{{detail.name}}</view>
 					<view class="text flex-wrap flex-row flex-between-center">
-						<view class="cell-item">成立时间：{{detail.establish_time.slice(0, 10)}}</view>
+						<view class="cell-item">成立时间：{{detail.establish_time}}</view>
 						<view class="cell-item">跑团ID：{{detail.group_id}}</view>
-						<view class="cell-item">成立地点：{{detail.establish_location}}</view>
 						<view class="cell-item">跑团人数：{{detail.total_members}}人</view>
 						<view class="cell-item">创建人：{{detail.creator_real_name}}</view>
 						<view class="cell-item">手机号：{{detail.creator_phone}}</view>
+						<view class="cell-item flex-row">成立地点：
+							<view class="flex-1">
+							{{detail.establish_location}}
+							</view> 
+						</view>
 						<!-- <view class="">
 							<view class="mb20">创建人：{{detail.creator_real_name}}</view>
 						</view> -->
@@ -32,22 +36,34 @@
 					 {{detail.introduction}}
 			</section>
 			
-			<!-- <view class="" style="padding: 0rpx 34rpx;">
+			<view class="" style="padding: 0rpx 34rpx;">
 				<u-divider text="跑团成员" textColor="#000" lineColor="#707070"></u-divider>
-			</view> -->
+			</view>
 			
-			<!-- <view class="member-item flex-start" v-for="(item,index) in 5" :key="index">
+			<view class="member-item flex-start" v-for="(item,index) in memberList" :key="index">
 				<view class="img-box">
-					<image class="img" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
+					<image class="img" :src="item.avatar_url || '../static/run.png'" mode="aspectFill"></image>
 				</view>
-				<view class="flex-start">
-					昵称
+				<view class="">
+					<view class="mb10" style="color: #222;">{{item.nickname || '成员'}}</view>
+					{{item.user_phone}}
 				</view>
 			</view>
-			<view class="flex-center" style="margin-top: -20rpx;" @click="$u.route(`pagesSub/groupMemberList`)">
+			<view v-if="memberList.length > 10" class="flex-center" style="margin-top: -20rpx;" @click="viewMoreMembers()">
 				<text style="color:#FF8C00;margin-right:5rpx;">查看更多</text> 
 				<u-icon name="arrow-down" color="#FF8C00"></u-icon>
-			</view> -->
+			</view>
+			
+			<u-empty v-if="!memberList.length" mode="search" text="暂无跑团成员"/>
+			
+			<view class="" style="height: 120rpx;"></view>
+			<!-- 未加入跑团，才可加入跑团 -->
+			<section class="section-bottom">
+				<view style="padding: 0rpx 156rpx 20rpx" class="flex-between-center">
+					<u-button type="error" shape="circle" @click="deleteGroup()">删除跑团</u-button>
+					<u-button type="primary" shape="circle" @click="updateGroup()">更新跑团</u-button>
+				</view>
+			</section>
 		</block>
 	</view>
 </template>
@@ -57,7 +73,7 @@
 		data() {
 			return {
 				detail: {},
-				routeParams: {},
+				memberList: []
 			};
 		},
 		computed: {
@@ -70,32 +86,66 @@
 			this.routeParams = options;
 			this.getUserGroup()
 		},
+		onShow() {
+		  // 移除全局自定义事件监听器
+		  uni.$off("updateList");
+		
+		  // 监听全局的自定义事件
+		  uni.$once("updateList", (data) => {
+		    // 判断二级页面是否修改过数据，如果修改过，需要刷新首页，保持信息一致
+		    if (data.isChange) {
+		      this.getUserGroup();
+		    }
+		  });
+		},
 		methods: {
+			updateGroup() {
+				uni.$u.route(`pagesSub/groupForm?group_id=${this.detail.group_id}`)
+			},
 			getUserGroup(page) {
 			  uni.showLoading({ mask: true });
 				
-				this.$axios.post(`/user-api/user/getCreatedGroup`)
+				this.$axios.post(`/user-api/user/getCreatedGroup`).then((res) => {
+					res.establish_time = res.establish_time.slice(0, 10)
+					this.detail = res
+					
+					this.getMemberList()
+				})
+				this.$axios.post(`/user-api/user/getUserGroup`).then((res) => {
+					res.establish_time = res.establish_time.slice(0, 10)
+					this.detail = res
+					
+					this.getMemberList()
+				})
+			},
+			getMemberList() {
+				const data = {
+					"pageIndex": 0,
+					"pageSize": 10,
+					groupId: Number(this.detail.group_id)
+				}
+				this.$axios.post(`/running-group/api/v1/groups/members`, data)
 					.then((res) => {
-						this.detail = res
+						this.memberList = res.memberships
 					})
 			},
-			leaveGroup() {
+			deleteGroup() {
 			  uni.showModal({
 			    title: "提示",
-			    content: "是否确认退出该跑团？",
+			    content: "是否确认删除该跑团？",
 			    success: (res) => {
 			      if (res.confirm) {
-			        const data = {
-			          orderNo: this.orderNo,
-			        };
-			
 			        uni.showLoading({ mask: true });
-			        this.$axios
-			          .post(`/order/admin/orders/cancelOrder `, data)
+			        this.$axios.delete(`/running-group/api/v1/groups?group_id=${this.detail.group_id}`)
 			          .then((res) => {
-			            uni.hideLoading();
-			            this.getDetail();
-			            this.$toast("退出成功！");
+			            this.$toast("删除成功！");
+									
+									// 调用用户数据，检查参加或创建跑团标记
+									this.$store.dispatch('getUserInfo')
+									
+									setTimeout(() => {
+										uni.navigateBack()
+									}, 300)
 			          });
 			      } else if (res.cancel) {
 			        console.log("用户点击取消");
@@ -110,7 +160,7 @@
 <style lang="less" scoped>
 	.cell-item{
 		min-width: 120rpx;
-		padding: 10rpx;
+		padding: 6rpx 10rpx 10rpx 0;
 	}
 	.member-item{
 		padding: 11rpx 34rpx;
@@ -143,7 +193,7 @@
 			font-size: 32rpx;
 			color: #000000;
 			line-height: 44rpx;
-			margin-bottom: 22rpx;
+			margin-bottom: 10rpx;
 		}
 		.text{
 			font-weight: 500;

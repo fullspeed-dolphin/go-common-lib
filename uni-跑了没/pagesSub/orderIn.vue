@@ -132,6 +132,7 @@ export default {
 				return 
 			}
 			
+			if (!this.SignerInfo.id_card) return this.$toast("请完善参赛者信息");
 			if (!this.isAgree.length) return this.$toast("请勾选同意协议");
 			
 			const data = {
@@ -140,7 +141,7 @@ export default {
 				"running_km": parseFloat(this.activeType.label),
 				"payment_method": "wechat",
 				"payment_amount": this.activeType.price,
-				running_group: String(this.userInfo.running_group)
+				running_group: String(this.userInfo.running_group || '')
 			}
 			
 			delete data.updated_at;
@@ -156,7 +157,12 @@ export default {
 				this.creatOrder(res.reg_no)
 			}).catch(err => {
 				console.error(err)
-				uni.hideLoading();
+				uni.hideLoading()
+				uni.showModal({
+					title: '提示',
+					content: err.msg,
+					showCancel: false,
+				})
 				this.isSubmitting = false;
 			})
 		},
