@@ -57,11 +57,15 @@
 				<u-button type="primary" shape="circle" @click="routeTo()">{{isSignUp ? '取消报名' : '活动报名'}} </u-button>
 			</view>
 		</view>
+		
+		<PhoneLogin ref="refPhoneLogin" />
   </view>
 </template>
 <script>
 	import eventData from "@/utils/eventData.js"
+	import PhoneLogin from "@/components/common/PhoneLogin.vue";
 export default {
+	components: { PhoneLogin },
   data () {
 		return {
 			isSignUp: false,
@@ -69,11 +73,20 @@ export default {
 			isFixedNavbar: true
 		}
   },
+	computed: {
+		userInfo() {
+			return this.$store.state.userInfo
+		}
+	},
 	onPageScroll(e) {
 		this.isFixedNavbar = parseInt(e.scrollTop) < 30
 	},
   methods: {
 		routeTo() {
+			if (!this.userInfo.id) {
+				return this.$refs.refPhoneLogin.open()
+			}
+			
 			if (this.isSignUp) {
 				this.cancelSignUp()
 				return false;

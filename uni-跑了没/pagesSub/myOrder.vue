@@ -1,18 +1,27 @@
 <template>
   <div class="">
 		<u-navbar title="我的订单"></u-navbar>
-    <mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="140">
+		<u-tabs lineHeight="2" :duration="0"
+		:inactiveStyle="{color: '#000'}"
+		:activeStyle="{color: '#FF8C00'}"
+		:list="tabList" @change="changeTab" :scrollable="false" keyName="label" lineColor="#FF8C00" />
+    <mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="240">
 			<view class="" style="height:40rpx"></view>
-			<view class="group-item flex-start" v-for="(item,index) in dataList" :key="index">
-				<image class="poster" :src="item.avatar_url || '../static/run.png'" mode="aspectFill"></image>
-				<view class="text">
-					<view class="flex-between-center" style="width: 520rpx;">
-						<view class="">
-							<view class="name ellipsis">{{item.name}}</view>
-							<view class="city ellipsis">{{item.establish_location}} {{item.total_members}}人</view>
+			<view class="group-item" v-for="(item,index) in dataList" :key="index">
+				<view class="pb20">
+					订单编号：{{item.order_no}} 
+				</view>
+				<view class="flex-start">
+					<image class="poster" :src="item.avatar_url || '../static/run.png'" mode="aspectFill"></image>
+					<view class="text">
+						<view class="flex-between-center" style="width: 420rpx;">
+							<view class="">
+								<view class="name ellipsis">{{item.name}}</view>
+								<view class="city ellipsis">{{item.establish_location}} {{item.total_members}}人</view>
+							</view>
 						</view>
+						<view class="ellipsis" style="color:red;">￥{{item.amount_yuan}}</view>
 					</view>
-					<view class="desc ellipsis">{{item.introduction}}</view>
 				</view>
 			</view>
     </mescroll-uni>
@@ -44,8 +53,9 @@ export default {
       taleParams: taleParams,
       tabActive: 0,
       tabList: [
-				{ label: "同城", value: 0 },
-				{ label: "热门", value: 1 },
+				{ label: "代付款", value: 0 },
+				{ label: "已付款", value: 1 },
+				{ label: "已过期", value: 1 },
 			],
       curTab: {},
       dataList: [],
@@ -114,7 +124,9 @@ export default {
 
 <style lang="scss" scoped>
 	.group-item{
-		padding: 10rpx 34rpx;
+		padding: 20rpx;
+		box-shadow: 1px 1px 10rpx rgba(0,0,0, .1);
+		margin: 30rpx;
 		.poster{
 			width: 124rpx;
 			height: 124rpx;

@@ -1,11 +1,11 @@
 <template>
 	<view class="filter">
-		<u-popup v-if="isShowPop" :show="isShowPop" mode="bottom" round="15" @close="isShowPop = false">
+		<u-popup v-if="isShowPop" :show="isShowPop" mode="bottom" closeable round="15" @close="isShowPop = false">
 			<view class="p20">
 				<view class="section-box mt10 flex-box">
 					<!-- <image class="logo mr10" src="../../static/img/basicprofile.jpeg"
 						style="width: 40rpx;height:40rpx;border-radius: 999rpx;" mode="aspectFill"></image> -->
-					<view class="title flex-center">汕居租房申请</view>
+					<view class="title flex-center">跑了没小程序申请</view>
 				</view>
 				<view class="">
 					<view class="mt20 mb10">
@@ -32,8 +32,8 @@
 					</view>
 				</view>
 				<view class="mt20 pt30" style="margin-top:50rpx;">
-					<u-button type="primary" shape="circle" block class="submit-btn" @click="submit">
-						确认
+					<u-button type="primary" color="#19be6b" shape="circle" block class="submit-btn" @click="submit">
+						确认更改
 					</u-button>
 				</view>
 			</view>
@@ -65,8 +65,8 @@
 				this.isShowPop = false;
 			},
 			async submit() {
-				if (!this.formData.avatarUrl) this.$toast('请上传头像')
-				if (!this.formData.nickName) this.$toast('请输入昵称')
+				if (!this.formData.avatarUrl.length) this.$toast('请上传头像')
+				if (!this.formData.nickName.length) this.$toast('请输入昵称')
 				
 				uni.showLoading({
 					mask: true
@@ -74,17 +74,13 @@
 				const link = await this.uploadFile(this.formData.avatarUrl);
 				
 				const data = {
-					"Avatar": link,
-					"NickName": this.formData.nickName
+					"avatar_url": link,
+					"nickname": this.formData.nickName
 				}
-				this.$axios.post(`/account/member/info`, data).then(res => {
-					uni.switchTab({
-						url: "/pages/mine"
-					})
-					uni.hideLoading()
+				this.$axios.post(`/user-api/user/updateUserInfo`, data).then(res => {
+					this.$store.dispatch('getUserInfo')
+					this.close()
 				})
-				
-				// uni.setStorageSync('userInfo', this.formData);
 				
 				// uni.switchTab({
 				// 	url: "/pages/mine"
@@ -110,21 +106,17 @@
 			
 				return new Promise((resolve, reject) => {
 					uni.uploadFile({
-						url: baseLink + `/api/upload/file/avatar`,
+						url: baseLink + `/basic-service/image/upload`,
 						filePath: filePath,
-						name: "file",
-						formData: {
-							directory: "avatar"
-						},
+						name: "image",
 						header: {
-							'Authorization': `Bearer ${uni.getStorageSync('token')}`,
-							"content-type": "application/json",
+							Authorization: uni.getStorageSync('token'),
+							'content-type': 'application/json',
 						},
 						success(res) {
 							res = JSON.parse(res.data);
-							console.log("res ======>", res);
-							if (res.Code === 200 && res.Data.List?.[0].FullFilePath) {
-								return resolve(res.Data.List?.[0].FullFilePath);
+							if (res.data.url) {
+								return resolve(res.data.url);
 							} else {
 								uni.showToast({
 									icon: "none",
@@ -151,6 +143,11 @@
 </script>
 
 <style lang="scss" scoped>
+	.title {
+	  font-size: 34rpx;
+	  font-weight: 500;
+	  margin-bottom: 42rpx;
+	}
 	.flex{
 		flex:1;
 	}

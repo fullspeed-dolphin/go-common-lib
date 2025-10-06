@@ -100,7 +100,8 @@ export default {
 		},
 		getEventPrice() {
 			const data = {}
-			this.$axios.post('/booking-api/user/price', data).then(res => {
+			// this.$axios.post('/booking-api/user/price', data).then(res => {
+			this.$axios.post('/booking-api/user/price?test_for_fullspeed', data).then(res => {
 				this.eventInfo = res;
 				let priceList = []
 				Object.keys(res).forEach(i => {

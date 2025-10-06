@@ -26,7 +26,7 @@
 			</section>
 			
 			<view class="" style="padding: 0rpx 34rpx;">
-				<u-divider text="跑团介绍" textColor="#000" lineColor="#707070"></u-divider>
+				<u-divider text="跑团介绍" textColor="#000" lineColor="#ccc"></u-divider>
 			</view>
 			
 			<section style="font-weight: 500;
@@ -37,7 +37,7 @@
 			</section>
 			
 			<view class="" style="padding: 0rpx 34rpx;">
-				<u-divider text="跑团成员" textColor="#000" lineColor="#707070"></u-divider>
+				<u-divider text="跑团成员" textColor="#000" lineColor="#ccc"></u-divider>
 			</view>
 			
 			<view class="member-item flex-start" v-for="(item,index) in memberList" :key="index">
@@ -57,8 +57,8 @@
 			<u-empty v-if="!memberList.length" mode="search" text="暂无跑团成员"/>
 			
 			<view class="" style="height: 120rpx;"></view>
-			<!-- 未加入跑团，才可加入跑团 -->
-			<section class="section-bottom">
+			<!-- 团长才可修改 -->
+			<section v-if="isTeamLeader" class="section-bottom">
 				<view style="padding: 0rpx 156rpx 20rpx" class="flex-between-center">
 					<u-button type="error" shape="circle" @click="deleteGroup()">删除跑团</u-button>
 					<u-button type="primary" shape="circle" @click="updateGroup()">更新跑团</u-button>
@@ -72,6 +72,7 @@
 		components: {},
 		data() {
 			return {
+				isTeamLeader: false,
 				detail: {},
 				memberList: []
 			};
@@ -102,21 +103,32 @@
 			updateGroup() {
 				uni.$u.route(`pagesSub/groupForm?group_id=${this.detail.group_id}`)
 			},
-			getUserGroup(page) {
+			async getUserGroup(page) {
 			  uni.showLoading({ mask: true });
 				
-				this.$axios.post(`/user-api/user/getCreatedGroup`).then((res) => {
+				try {
+					let res = await this.$axios.post(`/user-api/user/getCreatedGroup`)
+					if (res) {
+						this.isTeamLeader = true;
+					}
+					
+					let temp = await this.$axios.post(`/user-api/user/getUserGroup`)
+					
+					if (!temp) {
+						res = temp
+					}
+					
 					res.establish_time = res.establish_time.slice(0, 10)
 					this.detail = res
 					
 					this.getMemberList()
-				})
-				this.$axios.post(`/user-api/user/getUserGroup`).then((res) => {
-					res.establish_time = res.establish_time.slice(0, 10)
-					this.detail = res
 					
-					this.getMemberList()
-				})
+				} catch (error) {
+					console.error(error)
+					//TODO handle the exception
+				}
+				
+				uni.hideLoading()
 			},
 			getMemberList() {
 				const data = {

@@ -13,7 +13,7 @@
     </section>
     <mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="240">
 			<view class="" style="height:40rpx"></view>
-			<view class="group-item flex-start" v-for="(item,index) in dataList" :key="index" @click="$u.route({url: `pagesSub/groupDetail`, params: item})">
+			<view class="group-item flex-start" v-for="(item,index) in dataList" :key="index" @click="$u.route(`pagesSub/groupDetail?group_id=${item.group_id}`)">
 				<image class="poster" :src="item.avatar_url || '../static/run.png'" mode="aspectFill"></image>
 				<view class="text">
 					<view class="flex-between-center" style="width: 520rpx;">

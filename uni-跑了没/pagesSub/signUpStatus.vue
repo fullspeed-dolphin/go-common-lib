@@ -1,7 +1,7 @@
 <template>
   <view class="" style="padding-top:166rpx;">
 		<u-navbar title="支付状态" @leftClick="rightClick" :autoBack="false"></u-navbar>
-		<section class="panel">
+		<section v-if="orderDetail.order_no" class="panel">
 			<view class="status-icon flex-center" :class="{error: !isSuccess}">
 				<u-icon 
 					:name="isSuccess ? 'checkmark-circle-fill' : 'close-circle-fill'" 
@@ -23,7 +23,7 @@
 			<block v-if="isSuccess">
 				<view class="cell flex-between-center u-border-bottom">
 					<view class="label">订单金额</view>
-					<view class="value">￥{{orderDetail.amount}}</view>
+					<view class="value">￥{{orderDetail.amount_yuan}}</view>
 				</view>
 				<view class="cell flex-between-center u-border-bottom">
 					<view class="label">订单编号</view>
@@ -31,7 +31,7 @@
 				</view>
 				<view class="cell flex-between-center u-border-bottom">
 					<view class="label">下单时间</view>
-					<view class="value">{orderDetail.created_at}}</view>
+					<view class="value">{{orderDetail.created_at}}</view>
 				</view>
 				<view class="cell flex-between-center u-border-bottom">
 					<view class="label">支付方式</view>
@@ -49,7 +49,7 @@ export default {
 			orderDetail: {}
 		}
   },
-	onLoad(order_no) {
+	onLoad(options) {
 		this.order_no = options.order_no;
 		
 		uni.showLoading({

@@ -27,7 +27,7 @@
 			</section>
 			
 			<view class="" style="padding: 0rpx 34rpx;">
-				<u-divider text="跑团介绍" textColor="#000" lineColor="#707070"></u-divider>
+				<u-divider text="跑团介绍" textColor="#000" lineColor="#ccc"></u-divider>
 			</view>
 			
 			<section style="font-weight: 500;
@@ -38,7 +38,7 @@
 			</section>
 			
 			<view class="" style="padding: 0rpx 34rpx;">
-				<u-divider text="跑团成员" textColor="#000" lineColor="#707070"></u-divider>
+				<u-divider text="跑团成员" textColor="#000" lineColor="#ccc"></u-divider>
 			</view>
 			
 			<view class="member-item flex-start" v-for="(item,index) in memberList" :key="index">
@@ -66,11 +66,14 @@
 				</view>
 			</section>
 		</block>
+		
+		<PhoneLogin ref="refPhoneLogin" />
 	</view>
 </template>
 <script>
+	import PhoneLogin from "@/components/common/PhoneLogin.vue";
 	export default {
-		components: {},
+		components: { PhoneLogin },
 		data() {
 			return {
 				detail: {},
@@ -132,14 +135,16 @@
 					})
 			},
 			joinGroup() {
-				// 一个人能创建5个，每个20人起，一个队百人封顶
+				if (!this.$store.state.userInfo.id) {
+					return this.$refs.refPhoneLogin.open()
+				}
 			  uni.showModal({
 			    title: "提示",
 			    content: "是否确认加入该跑团？",
 			    success: (res) => {
 			      if (res.confirm) {
 			        const data = {
-			          running_group: this.orderNo,
+			          running_group: Number(this.detail.group_id)
 			        };
 			
 			        uni.showLoading({ mask: true });

@@ -3,7 +3,7 @@
 		<u-navbar title="个人中心" :leftIcon="false"></u-navbar>
     <view class="page-content">
     	<view class="rel section-user">
-    		<view class="user-box" @click="$u.route(userInfo.id ? '' : '/pagesSub/login')">
+    		<view class="user-box" @click="handleUserClick">
     			<view class="flex-start">
 						<image class="avatar" :src="userInfo.avatar_url || '../static/run.png'" mode="aspectFill"></image>
     				<view class="text">
@@ -16,21 +16,21 @@
     			</view>
     		</view>
 				
-				<view class="setting" @click="$u.route('pagesSub/signUp')">
+				<view class="setting" @click="routeTo('pagesSub/signUp')">
 					<u-icon name="setting-fill" size="20"></u-icon>
 				</view>
     	</view>
 			<view class="section-box">
-				<u-cell title="我的跑团" class="nav-cell" @click="$u.route('/pagesSub/myGroup?from=mine')" :border="false" isLink>
+				<u-cell title="我的跑团" class="nav-cell" @click="routeTo('/pagesSub/myGroup?from=mine')" :border="false" isLink>
 					<image slot="icon" class="nav-icon" src="/static/images/个人信息Icon@2x.png"></image>
 				</u-cell>
-				<!-- <u-cell title="我的消息" class="nav-cell" @click="$u.route('/pagesSub/myMessages')" :border="false" isLink>
+				<!-- <u-cell title="我的消息" class="nav-cell" @click="routeTo('/pagesSub/myMessages')" :border="false" isLink>
 					<image slot="icon" class="nav-icon" src="/static/images/我的消息Icon@2x.png"></image>
 				</u-cell> -->
-				<u-cell title="我的订单" class="nav-cell" @click="$u.route('/pagesSub/myOrder')" :border="false" isLink>
+				<u-cell title="我的订单" class="nav-cell" @click="routeTo('/pagesSub/myOrder')" :border="false" isLink>
 					<image slot="icon" class="nav-icon" src="/static/images/WX20250908-193754.png"></image>
 				</u-cell>
-				<!-- <u-cell title="意见反馈" class="nav-cell" @click="$u.route('/pagesSub/settings/feedback')" :border="false" isLink>
+				<!-- <u-cell title="意见反馈" class="nav-cell" @click="routeTo('/pagesSub/settings/feedback')" :border="false" isLink>
 					<image slot="icon" class="nav-icon" src="/static/images/帮助反馈Icon@2x.png"></image>
 				</u-cell> -->
 			</view>
@@ -41,19 +41,23 @@
 			
     </view>
 		<tabbar type="mine"/>
+		
+		<AccessUser ref="refAccessUser"/>
+		
+		<PhoneLogin ref="refPhoneLogin" />
   </view>
 </template>
 <script>
 	import { clearUserInfo } from "@/utils/util.js"
 	import tabbar from "@/components/tabBar.vue"
+	import AccessUser from "@/components/common/AccessUser.vue"
+	import PhoneLogin from "@/components/common/PhoneLogin.vue";
 export default {
 	components: {
-		tabbar,
+		tabbar, AccessUser, PhoneLogin
 	},
   data () {
-    return {
-			// userInfo: {}
-    };
+    return {};
   },
 	computed: {
 		userInfo() {
@@ -62,24 +66,21 @@ export default {
 	},
 	onShow() {
 		this.$store.dispatch('getUserInfo')
-		// this.userInfo = uni.getStorageSync('userInfo') || {}
-		// if (uni.getStorageSync('token')) {
-		// 	// this.$store.dispatch('getUserInfo');
-		// } else {
-		// 	uni.removeStorageSync('userInfo')
-		// }
 	},
   methods: {
-		goLink(link) {
-			if (!this.userInfo.Id) {
-				this.$toast('请登录');
-				setTimeout(() => {
-					this.$goUrl("/pagesSub/login")
-				}, 300)
-				
-				return
+		routeTo(link) {
+			if (!this.userInfo.id) {
+				return this.$refs.refPhoneLogin.open()
 			}
-			this.$goUrl(link)
+			
+			uni.$u.route(link)
+		},
+		handleUserClick() {
+			if (!this.userInfo.id) {
+				return this.$refs.refPhoneLogin.open()
+			}
+			
+			this.$refs.refAccessUser.open()
 		},
     logout () {
       uni.showModal({
@@ -88,11 +89,11 @@ export default {
         success: (res) => {
           if (res.confirm) {
 						clearUserInfo();
-						setTimeout(() => {
-							uni.redirectTo({
-								url: '/pagesSub/login'
-							})
-						}, 200)
+						// setTimeout(() => {
+						// 	uni.redirectTo({
+						// 		url: '/pagesSub/login'
+						// 	})
+						// }, 200)
           } else if (res.cancel) {
             console.log('用户点击取消');
           }

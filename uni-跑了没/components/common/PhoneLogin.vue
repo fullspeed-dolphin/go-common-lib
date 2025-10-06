@@ -1,17 +1,42 @@
 <template>
-  <view>
-    <u-button :disabled="isDisabled" type="primary" shape="circle" block open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">授权手机号登录</u-button>
-  </view>
+  <u-popup v-if="isShowPop" :show="isShowPop" mode="bottom" closeable round="15" @close="isShowPop = false">
+		<view class="p20">
+			<view class="section-box">
+				<view class="title flex-center">跑了没小程序申请</view>
+			</view>
+			<view class="">
+				<view class="mt20 mb10">
+					获取你的手机号
+				</view>
+				<view class="c9 fs24 lh36">
+					登录小程序，查看用户信息，开发者将在获取你的明示同意后，
+					收集你的手机号
+				</view>
+			</view>
+			<view style="margin-top:60rpx;">
+				<u-button :disabled="isDisabled" type="primary" color="#19be6b" shape="circle" block open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">
+					授权手机号登录
+				</u-button>
+			</view>
+		</view>
+  </u-popup>
 </template>
 <script>
 export default {
   options: { styleIsolation: "shared" },
   data() {
     return {
+			isShowPop: false,
 			isDisabled: false
 		};
   },
   methods: {
+		open() {
+			this.isShowPop = true;
+		},
+		close() {
+			this.isShowPop = false;
+		},
     async getCode() {
       return (
         await new Promise((resolve) =>
@@ -50,11 +75,12 @@ export default {
 				
 				this.$toast("登录成功");
 				
-				// 延迟跳转，toast 可见
-				setTimeout(() => {
-					this.isDisabled = false;
-					this.$emit("success");
-				}, 1300)
+				this.close()
+				
+				this.$store.dispatch('getUserInfo')
+				
+				this.isDisabled = false;
+				this.$emit("success");
 			} catch (error) {
 				console.error(error)
 				this.isDisabled = false;
@@ -66,28 +92,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.page {
-  height: 100vh;
-  padding-top: 44rpx;
-  background: #fff;
-}
-.banner {
-  position: absolute;
-  bottom: 0;
-  display: block;
-  width: 100%;
-  height: 220rpx;
-}
 .section-link {
   padding: 0 60rpx;
 }
 .section-box {
-  padding-left: 60rpx;
-  padding-top: 120rpx;
-  margin-bottom: 105rpx;
+  padding-top: 30rpx;
+  margin-bottom: 55rpx;
 }
 .title {
-  font-size: 50rpx;
+  font-size: 34rpx;
   font-weight: 500;
   margin-bottom: 42rpx;
 }
@@ -97,9 +110,4 @@ export default {
   color: rgba(68, 68, 68, 1);
 }
 
-.login-view {
-  // padding-top:100rpx;
-  padding-right: 62rpx;
-  padding-left: 30rpx;
-}
 </style>
