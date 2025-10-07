@@ -3,13 +3,13 @@
 		<u-navbar :title="isFixedNavbar ? '' : '线下活动'" :placeholder="false"></u-navbar>
 		
 		<section style="padding:0;overflow: hidden;">
-			<image :src="eventData.poster" mode="aspectFill" style="width:100%;display: block;height:300rpx;"></image>
+			<image :src="eventData.background_image_url" mode="aspectFill" style="width:100%;display: block;height:300rpx;"></image>
 		</section>
 		
-		<section class="panel bgf" style="margin-top: -90rpx;position: relative;z-index: 10;">
+		<!-- <section class="panel bgf" style="margin-top: -90rpx;position: relative;z-index: 10;">
 			<view class="h2 u-border-bottom">
 				<view class="ellipsis2">
-					{{eventData.title}}
+					{{eventData.name}}
 				</view>
 			</view>
 			<view class="cell flex-row">
@@ -31,24 +31,18 @@
 			<view class="cell flex-row">
 				活动规模：{{eventData.signAmount}}
 			</view>
-			<!-- <view class="cell flex-start">
-				客服微信：
-				<view class="mr20">
-					15864205324
-				</view>  
-				<u-button @click="copyText(15864205324)" type="primary" shape="circle" color="#3A8443" size="mini" text="复制"></u-button>
-			</view> -->
-		</section>
+		</section> -->
 		
-		<section class="panel">
+		<!-- <section class="panel">
 			<view class="cell" style="margin-top:0;">
 				<view class="label">活动说明：</view>
-				<!-- <view class="value">{{eventData.text}}</view> -->
-				<rich-text :nodes="eventData.text"></rich-text>
 			</view>
-		</section>
+		</section> -->
 		
-		<view class="" style="height:200rpx;"></view>
+		<view class="">
+			<rich-text :nodes="eventData.text"></rich-text>
+		</view>
+		
 		<view class="section-bottom">
 			<!-- <view class="txt">
 				{{isSignUp ? '取消' : ''}}报名截止：2025.09.30 9:00
@@ -69,7 +63,7 @@ export default {
   data () {
 		return {
 			isSignUp: false,
-			eventData: eventData,
+			eventData: {},
 			isFixedNavbar: true
 		}
   },
@@ -78,10 +72,20 @@ export default {
 			return this.$store.state.userInfo
 		}
 	},
+	onLoad(options) {
+		this.routerParams = options
+		this.getDetail()
+	},
 	onPageScroll(e) {
 		this.isFixedNavbar = parseInt(e.scrollTop) < 30
 	},
   methods: {
+		getDetail() {
+			this.$axios.get(`/event-api/api/v1/events/${this.routerParams.id}`).then(res => {
+				res.text = `<img src="${res.long_image_url}" style="max-width:100%;" />`
+				this.eventData = res;
+			})
+		},
 		routeTo() {
 			if (!this.userInfo.id) {
 				return this.$refs.refPhoneLogin.open()
@@ -91,7 +95,7 @@ export default {
 				this.cancelSignUp()
 				return false;
 			}
-			uni.$u.route('pagesSub/orderIn')
+			uni.$u.route('pagesSub/orderIn?event_id=' + this.routerParams.id)
 		},
 		cancelSignUp() {
 			uni.showModal({

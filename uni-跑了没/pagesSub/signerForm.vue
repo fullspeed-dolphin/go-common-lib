@@ -184,6 +184,9 @@
 				return option?.name || ''
 			},
 			getInfo() {
+				uni.showLoading({
+					mask: true
+				})
 				const data = {
 					phone_number: this.userInfo.phone
 				}

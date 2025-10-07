@@ -31,11 +31,11 @@ function fetch(options) {
 				
 				const response = res?.data;
 				
-				// if (process.env.NODE_ENV !== "development") {
+				// #ifdef MP-WEIXIN
 					console.log("接口 url======>", options.url)
 					console.log("接口 reqParams======>", options.data)
 					console.log("接口 res======>", response)
-				// }
+				// #endif
 				
 				// 登录过期
 				if (response?.code != 200) {

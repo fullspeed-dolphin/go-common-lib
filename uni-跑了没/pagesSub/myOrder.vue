@@ -1,26 +1,33 @@
 <template>
   <div class="">
 		<u-navbar title="我的订单"></u-navbar>
+		
 		<u-tabs lineHeight="2" :duration="0"
 		:inactiveStyle="{color: '#000'}"
 		:activeStyle="{color: '#FF8C00'}"
 		:list="tabList" @change="changeTab" :scrollable="false" keyName="label" lineColor="#FF8C00" />
+		
     <mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="240">
 			<view class="" style="height:40rpx"></view>
 			<view class="group-item" v-for="(item,index) in dataList" :key="index">
 				<view class="pb20">
-					订单编号：{{item.order_no}} 
+					订单编号:{{item.order_no}} 
 				</view>
 				<view class="flex-start">
 					<image class="poster" :src="item.avatar_url || '../static/run.png'" mode="aspectFill"></image>
 					<view class="text">
 						<view class="flex-between-center" style="width: 420rpx;">
 							<view class="">
-								<view class="name ellipsis">{{item.name}}</view>
-								<view class="city ellipsis">{{item.establish_location}} {{item.total_members}}人</view>
+								<view class="name ellipsis">{{item.name || '活动'}}</view>
+								<view class="city ellipsis">创建时间: {{item.created_at}}</view>
 							</view>
 						</view>
-						<view class="ellipsis" style="color:red;">￥{{item.amount_yuan}}</view>
+						<view class="flex-between-center">
+							<view class="ellipsis" style="color:red;">￥{{item.amount_yuan}}</view>
+							<u-button v-if="item.status === 'PND'" type="primary" color="#19be6b" shape="circle" size="mini" @click="payOrder(item)">
+								微信支付
+							</u-button>
+						</view>
 					</view>
 				</view>
 			</view>
@@ -34,14 +41,7 @@ import MescrollMixin from "@/uni_modules/mescroll-uni/components/mescroll-uni/me
 import dayjs from '@/uni_modules/uview-ui/libs/util/dayjs.js';
 
 const taleParams = {
-  orderNo: "",
-  orderStatus: "",
-  linkTelPhone: "",
-  storeId: "",
-  payChannel: "",
-  isAddOrder: "",
-  thirdPayOrderNo: "",
-  dateRange: [],
+  orderStatus: "PND",
 };
 
 export default {
@@ -53,9 +53,9 @@ export default {
       taleParams: taleParams,
       tabActive: 0,
       tabList: [
-				{ label: "代付款", value: 0 },
-				{ label: "已付款", value: 1 },
-				{ label: "已过期", value: 1 },
+				{ label: "待付款", value: 'PND' },
+				{ label: "已付款", value: 'SUCC' },
+				{ label: "已过期", value: 'EXP' },
 			],
       curTab: {},
       dataList: [],
@@ -95,9 +95,9 @@ export default {
       const data = {
       	"pageIndex": 0,
       	"pageSize": 10,
-      	"keyword": this.searchTxt
+      	"orderStatus": this.taleParams.orderStatus
       }
-      this.$axios.get(`/pay/order/list`, data).then(res => {
+      this.$axios.post(`/pay/order/statusByUser`, data).then(res => {
           uni.hideLoading();
 
           //联网成功的回调,隐藏下拉刷新和上拉加载的状态;
@@ -115,8 +115,33 @@ export default {
           this.mescroll.endSuccess(6);
         });
     },
-    goPage(item) {
-      
+    payOrder(item) {
+			const respay = item.payment_params
+      // 触发微信支付
+      wx.requestPayment({
+      	'timeStamp': respay.timeStamp,
+      	'nonceStr': respay.nonceStr,
+      	'package': respay.package,
+      	'signType': respay.signType,
+      	'paySign': respay.paySign,
+      	'success': (res) => {
+      		uni.hideLoading();
+      		this.$toast('支付成功')
+      		setTimeout(() => {
+      			// uni.navigateBack()
+      			uni.$u.route('pagesSub/signUpStatus?order_no=' + item.order_no);
+      		}, 300)
+      	},
+      	'fail': (res) => {
+      		uni.hideLoading();
+      		console.log("res======>", res)
+      		this.$toast('支付未完成')
+      		setTimeout(() => {
+      			// uni.navigateBack()
+      			uni.$u.route('pagesSub/signUpStatus?order_no=' + item.order_no);
+      		}, 300)
+      	}
+      })
     },
   },
 };

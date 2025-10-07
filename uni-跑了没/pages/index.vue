@@ -15,12 +15,12 @@
 			</view>
 			
 			<view class="section-title">线下活动</view>
-			<section class="section-offline" @click="$u.route('pagesSub/offlineEvents')">
-				<image class="poster" :src="eventData.poster" mode="aspectFill"></image>
+			<section class="section-offline" v-for="(item, index) in eventList" :key="index" @click="$u.route(`pagesSub/offlineEvents?id=${item.id}`)">
+				<image class="poster" :src="item.background_image_url" mode="aspectFill"></image>
 				<view class="flex-start">
 					<view class="text">
-						<view class="name ellipsis">{{eventData.title}}</view>
-						<view class="time">{{eventData.eventTime}}</view>
+						<view class="name ellipsis">{{item.name}}</view>
+						<view class="time">{{item.eventTime}}</view>
 					</view>
 					<u-button type="primary" size="small" shape="circle" text="报名"></u-button>
 				</view>
@@ -96,7 +96,7 @@ export default {
   data () {
     return {
 			searchTxt: "",
-			eventData: eventData,
+			eventList: [],
 			bannerList: [
 				eventData.poster,
 			],
@@ -114,15 +114,20 @@ export default {
 	},
 	onShow() {
 		this.getGroupList()
+		this.getEvents()
 	},
   methods: {
 		confirmSearch() {
 			const searchTxt = this.searchTxt.trim()
-			
 		},
 		routeTo(link) {
 			console.log(link)
 			uni.$u.route(link);
+		},
+		getEvents() {
+			this.$axios.get(`/event-api/api/v1/events`).then(res => {
+				this.eventList = res.events;
+			})
 		},
 		getBannerList() {
 			if(!this.bannerList.length) {
@@ -216,7 +221,7 @@ export default {
 		.poster{
 			width: 124rpx;
 			height: 124rpx;
-			background: #C1C5C6;
+			background: #f5f5f5;
 			margin-right: 40rpx;
 			border-radius: 16rpx 16rpx 16rpx 16rpx;
 		}

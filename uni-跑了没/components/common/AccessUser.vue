@@ -58,15 +58,26 @@
 				this.formData.avatarUrl = e.detail.avatarUrl;
 				console.log("eeee", e.detail);
 			},
-			open(userInfo) {
+			open() {
+				const userInfo = this.$store.state.userInfo;
+				
+				if (!this.formData.avatarUrl) {
+					this.formData.avatarUrl = userInfo.avatar_url
+				}
+				if (!this.formData.nickName) {
+					this.formData.nickName = userInfo.nickname
+				}
+				
 				this.isShowPop = true;
 			},
 			close() {
 				this.isShowPop = false;
 			},
 			async submit() {
-				if (!this.formData.avatarUrl.length) this.$toast('请上传头像')
-				if (!this.formData.nickName.length) this.$toast('请输入昵称')
+				console.log('this.formData=====>', this.formData);
+				
+				if (!this.formData.avatarUrl.length) return this.$toast('请上传头像')
+				if (!this.formData.nickName.length) return this.$toast('请输入昵称')
 				
 				uni.showLoading({
 					mask: true

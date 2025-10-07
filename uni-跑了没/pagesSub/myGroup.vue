@@ -39,6 +39,10 @@
 			<view class="" style="padding: 0rpx 34rpx;">
 				<u-divider text="跑团成员" textColor="#000" lineColor="#ccc"></u-divider>
 			</view>
+			<view v-if="memberList.length > 10" class="flex-center" style="margin-top: -20rpx;" @click="viewMoreMembers()">
+				<text style="color:#FF8C00;margin-right:5rpx;">查看更多</text> 
+				<u-icon name="arrow-down" color="#FF8C00"></u-icon>
+			</view>
 			
 			<view class="member-item flex-start" v-for="(item,index) in memberList" :key="index">
 				<view class="img-box">
@@ -49,19 +53,16 @@
 					{{item.user_phone}}
 				</view>
 			</view>
-			<view v-if="memberList.length > 10" class="flex-center" style="margin-top: -20rpx;" @click="viewMoreMembers()">
-				<text style="color:#FF8C00;margin-right:5rpx;">查看更多</text> 
-				<u-icon name="arrow-down" color="#FF8C00"></u-icon>
-			</view>
+			
 			
 			<u-empty v-if="!memberList.length" mode="search" text="暂无跑团成员"/>
 			
 			<view class="" style="height: 120rpx;"></view>
 			<!-- 团长才可修改 -->
 			<section v-if="isTeamLeader" class="section-bottom">
-				<view style="padding: 0rpx 156rpx 20rpx" class="flex-between-center">
-					<u-button type="error" shape="circle" @click="deleteGroup()">删除跑团</u-button>
-					<u-button type="primary" shape="circle" @click="updateGroup()">更新跑团</u-button>
+				<view style="padding: 0rpx 156rpx 40rpx" class="flex-between-center">
+					<u-button type="error" block shape="circle" @click="deleteGroup()">删除跑团</u-button>
+					<u-button type="primary" block shape="circle" @click="updateGroup()">更新跑团</u-button>
 				</view>
 			</section>
 		</block>
@@ -114,7 +115,7 @@
 					
 					let temp = await this.$axios.post(`/user-api/user/getUserGroup`)
 					
-					if (!temp) {
+					if (temp) {
 						res = temp
 					}
 					

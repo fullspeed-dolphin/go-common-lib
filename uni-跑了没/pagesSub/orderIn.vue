@@ -79,6 +79,9 @@ export default {
 			return this.$store.state.userInfo
 		}
 	},
+	onLoad(options) {
+		this.event_id = options.event_id
+	},
 	onShow() {
 		this.getSignerInfo()
 		this.getEventPrice()
@@ -100,6 +103,7 @@ export default {
 		},
 		getEventPrice() {
 			const data = {}
+			
 			// this.$axios.post('/booking-api/user/price', data).then(res => {
 			this.$axios.post('/booking-api/user/price?test_for_fullspeed', data).then(res => {
 				this.eventInfo = res;
@@ -118,7 +122,7 @@ export default {
 			})
 		},
 		selectSigner() {
-			uni.$u.route('pagesSub/signUp')
+			uni.$u.route('pagesSub/signerForm')
 		},
 		changeTab(item) {
 			this.activeType = item
@@ -138,9 +142,9 @@ export default {
 			
 			const data = {
 				...this.SignerInfo,
-				// "running_group": "GROUP_ID",
 				"running_km": parseFloat(this.activeType.label),
 				"payment_method": "wechat",
+				"event_id": this.event_id,
 				"payment_amount": this.activeType.price,
 				running_group: String(this.userInfo.running_group || '')
 			}
@@ -173,6 +177,7 @@ export default {
 		async creatOrder(reg_no) {
 			const data = {
 				reg_no,
+				event_id: this.event_id,
 				openid: this.userInfo.openid
 			}
 			

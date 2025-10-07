@@ -9,7 +9,7 @@
 				"root": "pagesSub",
 				"pages": [
 					{ "path": "login", "style": { "navigationStyle": "custom","navigationBarTitleText": "登录", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "signUp", "style": { "navigationStyle": "custom","navigationBarTitleText": "收集信息", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
+					{ "path": "signerForm", "style": { "navigationStyle": "custom","navigationBarTitleText": "收集信息", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					{ "path": "signUpStatus", "style": { "navigationStyle": "custom","navigationBarTitleText": "", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					{ "path": "offlineEvents", "style": { "navigationStyle": "custom","navigationBarTitleText": "线下活动", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					{ "path": "orderIn", "style": { "navigationStyle": "custom","navigationBarTitleText": "活动报名", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },

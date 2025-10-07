@@ -72,7 +72,7 @@
 			},
 			deletable: {
 				type: Boolean,
-				default: false,
+				default: true,
 			},
 		},
 
@@ -227,5 +227,11 @@
 <style lang="scss">
 	.flex1{
 		flex:1;
+	}
+	::v-deep{
+		.u-upload__deletable{
+			width: 18px!important;
+			height: 18px!important;
+		}
 	}
 </style>
