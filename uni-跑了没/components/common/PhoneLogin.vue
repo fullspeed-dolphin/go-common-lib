@@ -1,5 +1,5 @@
 <template>
-  <u-popup v-if="isShowPop" :show="isShowPop" mode="bottom" closeable round="15" @close="isShowPop = false">
+  <u-popup :show="isShowPop" mode="bottom" closeable round="15" @close="isShowPop = false">
 		<view class="p20">
 			<view class="section-box">
 				<view class="title flex-center">跑了没小程序申请</view>

@@ -3,46 +3,52 @@
 		<u-navbar :title="isFixedNavbar ? '' : '线下活动'" :placeholder="false"></u-navbar>
 		
 		<section style="padding:0;overflow: hidden;">
-			<image :src="eventData.background_image_url" mode="aspectFill" style="width:100%;display: block;height:300rpx;"></image>
+			<image :src="eventData.background_image_url" mode="aspectFill" style="width:100%;display: block;height:500rpx;"></image>
 		</section>
 		
-		<!-- <section class="panel bgf" style="margin-top: -90rpx;position: relative;z-index: 10;">
+		<section class="panel bgf" style="margin-top: -90rpx;position: relative;z-index: 10;">
 			<view class="h2 u-border-bottom">
 				<view class="ellipsis2">
 					{{eventData.name}}
 				</view>
 			</view>
+			<view class="cell flex-start">
+				<view class="label">客服电话：</view>
+				<view class="value flex-start">
+					<view style="color: #1989fa;margin-right:10rpx;" @click="callPhone(19927709895)">19927709895</view>
+					<u-button type="primary" color="#19be6b" shape="circle" size="mini" @click="copyText('Qsty2025')">
+						复制微信号 Qsty2025
+					</u-button>
+				</view>
+			</view>
 			<view class="cell flex-row">
 				<view class="label">报名时间：</view>
-				<view class="value">{{eventData.signTime}}</view>
+				<view class="value">{{eventData.registration_time}}</view>
 			</view>
 			<view class="cell flex-row">
 				<view class="label">活动时间：</view>
-				<view class="value">{{eventData.eventTime}}</view>
+				<view class="value">{{eventData.event_time}}</view>
 			</view>
 			<view class="cell flex-row">
 				<view class="label">活动地点：</view>
-				<view class="value flex">{{eventData.eventAddress}}</view>
+				<view class="value flex">{{eventData.event_location}}</view>
 			</view>
 			<view class="cell flex-row">
 				<view class="label">活动项目：</view>
-				<view class="value">{{eventData.eventItems}}</view>
+				<view class="value">{{eventData.event_projects}}</view>
 			</view>
-			<view class="cell flex-row">
-				活动规模：{{eventData.signAmount}}
-			</view>
-		</section> -->
+			<!-- <view class="cell flex-row">
+				活动规模：{{eventData.capacity}}
+			</view> -->
+		</section>
 		
-		<!-- <section class="panel">
+		<section class="panel" style="padding: 20rpx 0 0;">
 			<view class="cell" style="margin-top:0;">
-				<view class="label">活动说明：</view>
+				<view class="label pl20 pb20">活动说明：</view>
 			</view>
-		</section> -->
-		
-		<view class="">
 			<rich-text :nodes="eventData.text"></rich-text>
-		</view>
-		
+		</section>
+
 		<view class="section-bottom">
 			<!-- <view class="txt">
 				{{isSignUp ? '取消' : ''}}报名截止：2025.09.30 9:00
@@ -56,7 +62,6 @@
   </view>
 </template>
 <script>
-	import eventData from "@/utils/eventData.js"
 	import PhoneLogin from "@/components/common/PhoneLogin.vue";
 export default {
 	components: { PhoneLogin },
@@ -115,6 +120,11 @@ export default {
 		copyText(txt) {
 			uni.setClipboardData({
 				data: String(txt)
+			})
+		},
+		callPhone(phoneNumber) {
+			uni.makePhoneCall({
+				phoneNumber
 			})
 		}
 	}

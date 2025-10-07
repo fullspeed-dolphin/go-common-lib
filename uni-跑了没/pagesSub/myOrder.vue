@@ -13,12 +13,12 @@
 				<view class="pb20">
 					订单编号:{{item.order_no}} 
 				</view>
-				<view class="flex-start">
-					<image class="poster" :src="item.avatar_url || '../static/run.png'" mode="aspectFill"></image>
+				<view class="flex-row">
+					<image class="poster" :src="item.event_info.background_image_url || '../static/run.png'" mode="aspectFill"></image>
 					<view class="text">
 						<view class="flex-between-center" style="width: 420rpx;">
 							<view class="">
-								<view class="name ellipsis">{{item.name || '活动'}}</view>
+								<view class="name ellipsis2">{{item.event_info.name || '活动'}}</view>
 								<view class="city ellipsis">创建时间: {{item.created_at}}</view>
 							</view>
 						</view>
@@ -156,12 +156,13 @@ export default {
 			width: 124rpx;
 			height: 124rpx;
 			background: #C1C5C6;
-			margin-right: 40rpx;
+			margin-right: 30rpx;
 			border-radius: 16rpx 16rpx 16rpx 16rpx;
 		}
 		.name{
 			line-height: 40rpx;
 			margin-bottom: 12rpx;
+			width:480rpx;
 		}
 		.city{
 			line-height: 28rpx;
@@ -174,33 +175,4 @@ export default {
 			font-size: 18rpx;
 		}
 	}
-.filter-btns {
-  margin: 30rpx;
-  border-radius: 40px;
-  color: $color;
-  &:after {
-    border-color: $color;
-    border-radius: 100px;
-  }
-  .flex-item {
-    height: 80rpx;
-    &:last-child {
-      color: #fff;
-      background: $color;
-      overflow: hidden;
-      border-radius: 0 40px 40px 0;
-    }
-  }
-}
-.section-filter {
-  position: fixed;
-  width: 100%;
-  z-index: 10;
-}
-.section-bottom {
-  position: fixed;
-  bottom: 0px;
-  width: 100%;
-  z-index: 10;
-}
 </style>

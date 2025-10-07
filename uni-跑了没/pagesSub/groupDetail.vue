@@ -1,7 +1,6 @@
 <template>
 	<view>
 		<u-navbar :title="pageTitle"></u-navbar>
-		<!-- <u-empty v-if="!userInfo.running_group" mode="data" /> -->
 		
 		<block>
 			<section  class="section-card flex-row">
@@ -55,8 +54,7 @@
 				</view>
 			</view>
 			
-			<u-empty v-if="!memberList.length" mode="search" text="暂无跑团成员"/>
-			
+			<mescroll-empty v-if="!memberList.length" :option="{ tip: '暂无跑团成员~',}"/>
 			
 			<view class="" style="height: 120rpx;"></view>
 			<!-- 未加入跑团，才可加入跑团 -->
@@ -131,7 +129,7 @@
 				}
 				this.$axios.post(`/running-group/api/v1/groups/members`, data)
 					.then((res) => {
-						this.memberList = res.memberships
+						this.memberList = res.memberships || []
 					})
 			},
 			joinGroup() {

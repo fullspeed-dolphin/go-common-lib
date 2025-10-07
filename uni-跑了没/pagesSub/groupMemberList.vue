@@ -4,10 +4,10 @@
 		<mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="190">
       <view class="member-item flex-start" v-for="(item,index) in dataList" :key="index">
       	<view class="img-box">
-      		<image class="img" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
+      		<image class="img" :src="item.avatar_url || '../static/run.png'" mode="aspectFill"></image>
       	</view>
       	<view class="">
-      		<view class="mb10" style="color: #222;">成员</view>
+      		<view class="mb10" style="color: #222;">{{item.nickname || '成员'}}</view>
       		{{item.user_phone}}
       	</view>
       </view>

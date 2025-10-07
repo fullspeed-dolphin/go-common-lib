@@ -183,9 +183,7 @@
 				});
 			},
 			async uploadFile(file) {
-				console.log("file=====>", file)
 				const filePath = await this.compressImage(file.url);
-				console.log("file=====>", filePath)
 				return new Promise((resolve, reject) => {
 					uni.uploadFile({
 						url: baseLink + `/basic-service/image/upload`,
@@ -207,8 +205,6 @@
 							}
 						},
 						fail(e) {
-							return resolve("");
-
 							uni.showToast({
 								icon: "none",
 								title: "上传失败",

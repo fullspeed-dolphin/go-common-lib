@@ -1,6 +1,6 @@
 <template>
 	<view class="filter">
-		<u-popup v-if="isShowPop" :show="isShowPop" mode="bottom" closeable round="15" @close="isShowPop = false">
+		<u-popup :show="isShowPop" mode="bottom" closeable round="15" @close="isShowPop = false">
 			<view class="p20">
 				<view class="section-box mt10 flex-box">
 					<!-- <image class="logo mr10" src="../../static/img/basicprofile.jpeg"
@@ -74,15 +74,20 @@
 				this.isShowPop = false;
 			},
 			async submit() {
-				console.log('this.formData=====>', this.formData);
-				
 				if (!this.formData.avatarUrl.length) return this.$toast('请上传头像')
 				if (!this.formData.nickName.length) return this.$toast('请输入昵称')
 				
 				uni.showLoading({
 					mask: true
 				})
-				const link = await this.uploadFile(this.formData.avatarUrl);
+				
+				const userInfo = this.$store.state.userInfo;
+				
+				let link = this.formData.avatarUrl;
+				
+				if (this.formData.avatarUrl.includes('http://tmp')) {
+					link = await this.uploadFile(this.formData.avatarUrl);
+				}
 				
 				const data = {
 					"avatar_url": link,
@@ -92,10 +97,6 @@
 					this.$store.dispatch('getUserInfo')
 					this.close()
 				})
-				
-				// uni.switchTab({
-				// 	url: "/pages/mine"
-				// })
 			},
 			compressImage(src) {
 				return new Promise((resolve) => {

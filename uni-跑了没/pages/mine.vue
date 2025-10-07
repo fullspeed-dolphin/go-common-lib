@@ -8,7 +8,13 @@
 						<image class="avatar" :src="userInfo.avatar_url || '../static/run.png'" mode="aspectFill"></image>
     				<view class="text">
 							<block v-if="userInfo.id">
-								<view class="name" >{{userInfo.nickname || '微信用户'}}</view>
+								<view class="name flex-start" >
+									{{userInfo.nickname || '微信用户'}}
+									
+									<view class="ml10">
+										<u-icon name="edit-pen-fill" size="17" ></u-icon>
+									</view>
+								</view>
 								<view class="name" style="color: #666;margin-top:20rpx;">{{userInfo.phone || ''}}</view>
 							</block>
     					<view class="name" v-else>登录/注册</view>
@@ -30,6 +36,15 @@
 				<u-cell title="我的订单" class="nav-cell" @click="routeTo('/pagesSub/myOrder')" :border="false" isLink>
 					<image slot="icon" class="nav-icon" src="/static/images/WX20250908-193754.png"></image>
 				</u-cell>
+				<view class="service-cell">
+					<u-cell :title="null" class=" nav-cell" isLink>
+						<image slot="icon" class="nav-icon" src="/static/images/我的消息Icon@2x.png"></image>
+						<button class="u-reset-button" open-type="contact">
+						      联系客服
+						</button>
+					</u-cell>
+				</view>
+				
 				<!-- <u-cell title="意见反馈" class="nav-cell" @click="routeTo('/pagesSub/settings/feedback')" :border="false" isLink>
 					<image slot="icon" class="nav-icon" src="/static/images/帮助反馈Icon@2x.png"></image>
 				</u-cell> -->
@@ -105,6 +120,25 @@ export default {
 </script>
 
 <style lang="less" scoped>
+	::v-deep{
+		.service-cell{
+			.u-cell__body__content{
+				flex: unset;
+			}
+			.u-cell__value{
+				flex:1;
+				text-align: left;
+				max-width: 100%;
+			}
+			.u-reset-button{
+				text-align: left;
+				font-size: 15px;
+				line-height: 22px;
+				color: #303133;
+			}
+		}
+	}
+	
 	.setting{
 		position: absolute;
 		right: 20rpx;

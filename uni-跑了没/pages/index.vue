@@ -20,7 +20,7 @@
 				<view class="flex-start">
 					<view class="text">
 						<view class="name ellipsis">{{item.name}}</view>
-						<view class="time">{{item.eventTime}}</view>
+						<view class="time">{{item.event_time}}</view>
 					</view>
 					<u-button type="primary" size="small" shape="circle" text="报名"></u-button>
 				</view>
@@ -52,7 +52,12 @@
 						<view class="flex-between-center" style="width: 520rpx;">
 							<view class="">
 								<view class="name ellipsis">{{item.name}}</view>
-								<view class="city ellipsis">{{item.establish_location}} {{item.total_members}}人</view>
+								<view class="city flex-row">
+									<view class="ellipsis mr10" style="max-width:350rpx;">
+										{{item.establish_location}}
+									</view>
+									{{item.total_members}}人
+								</view>
 							</view>
 							<u-button type="primary" size="small" shape="circle" text="加入"></u-button>
 						</view>
@@ -97,9 +102,7 @@ export default {
     return {
 			searchTxt: "",
 			eventList: [],
-			bannerList: [
-				eventData.poster,
-			],
+			bannerList: [],
 			GroupList: []
 		};
   },
@@ -127,6 +130,8 @@ export default {
 		getEvents() {
 			this.$axios.get(`/event-api/api/v1/events`).then(res => {
 				this.eventList = res.events;
+				
+				this.bannerList = res.events.map(i => i.background_image_url)
 			})
 		},
 		getBannerList() {
@@ -165,7 +170,7 @@ export default {
 			display: block;
 			width: 682rpx;
 			height: 270rpx;
-			background: #C1C5C6;
+			background: #f5f5f5;
 			border-radius: 16rpx 16rpx 16rpx 16rpx;
 		}
 		.text{

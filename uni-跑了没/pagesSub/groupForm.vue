@@ -121,6 +121,7 @@
 		},
 		methods: {
 			getDetail(page) {
+				if (!this.group_id) return;
 				this.$axios.get(`/running-group/api/v1/groups/info?group_id=${this.group_id}`)
 					.then((res) => {
 						this.form = {

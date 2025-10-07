@@ -1,6 +1,6 @@
 <template>
   <view class="u-popup">
-    <u-overlay :show="show" @click="overlayClick" v-if="overlay" :duration="overlayDuration" :customStyle="overlayStyle" :opacity="overlayOpacity"></u-overlay>
+    <u-overlay :show="show" @click="overlayClick" v-if="overlay" :zIndex="zIndex" :duration="overlayDuration" :customStyle="overlayStyle" :opacity="overlayOpacity"></u-overlay>
     <u-transition :show="show" :customStyle="transitionStyle" :mode="position" :duration="duration" @afterEnter="afterEnter" @click="clickHandler">
       <view class="u-popup__content" :style="[contentStyle]" @tap.stop="noop">
         <u-status-bar v-if="safeAreaInsetTop"></u-status-bar>

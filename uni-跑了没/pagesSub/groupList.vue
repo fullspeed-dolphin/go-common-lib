@@ -19,7 +19,12 @@
 					<view class="flex-between-center" style="width: 520rpx;">
 						<view class="">
 							<view class="name ellipsis">{{item.name}}</view>
-							<view class="city ellipsis">{{item.establish_location}} {{item.total_members}}人</view>
+							<view class="city flex-row">
+								<view class="ellipsis mr10" style="max-width:350rpx;">
+									{{item.establish_location}}
+								</view>
+								{{item.total_members}}人
+							</view>
 						</view>
 						<u-button type="primary" size="small" shape="circle" text="加入"></u-button>
 					</view>
@@ -30,14 +35,16 @@
 		
 		<section v-if="!userInfo.running_group" class="section-bottom">
 			<view style="padding: 0rpx 156rpx 20rpx">
-				<u-button type="primary" shape="circle" @click="$u.route(`pagesSub/groupForm`)">创建跑团</u-button>
+				<u-button type="primary" shape="circle" @click="openForm()">创建跑团</u-button>
 			</view>
 		</section>
+		
+		<PhoneLogin ref="refPhoneLogin" />
   </div>
 </template>
 
 <script>
-import tabbar from "@/components/tabBar.vue";
+	import PhoneLogin from "@/components/common/PhoneLogin.vue";
 import MescrollMixin from "@/uni_modules/mescroll-uni/components/mescroll-uni/mescroll-mixins.js";
 import dayjs from '@/uni_modules/uview-ui/libs/util/dayjs.js';
 
@@ -54,7 +61,7 @@ const taleParams = {
 
 export default {
   mixins: [MescrollMixin],
-  components: {},
+  components: { PhoneLogin },
   data() {
     return {
 			searchTxt: "",
@@ -86,17 +93,19 @@ export default {
 	  });
 	},
   methods: {
+		openForm() {
+			if (!this.$store.state.userInfo.id) {
+				return this.$refs.refPhoneLogin.open()
+			}
+			
+			uni.$u.route(`pagesSub/groupForm`)
+		},
     changeTab(detail) {
       this.curTab = detail;
       console.log(detail);
 
       this.taleParams.orderStatus = detail.value;
 
-      this.refreshList();
-    },
-    changeDropdown(e) {
-      console.log(e);
-      this.taleParams.orderStatus = e;
       this.refreshList();
     },
     refreshList() {
@@ -133,9 +142,6 @@ export default {
           uni.hideLoading();
           this.mescroll.endSuccess(6);
         });
-    },
-    goPage(item) {
-      
     },
   },
 };

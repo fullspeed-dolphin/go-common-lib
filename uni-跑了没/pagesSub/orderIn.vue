@@ -10,18 +10,17 @@
 				<view class="flex-start">
 					<view class="txt flex-row">
 						{{SignerInfo.id_card ? SignerInfo.full_name : '请完善参赛者信息'}}
-						
 					</view>
 					<u-icon name="arrow-right" size="34rpx" color="rgba(0,0,0,.9)"></u-icon>
 				</view>
 			</view>
 			<view class="cell flex-between-center">
 				<view class="">跑团</view>
-				<view class="flex-start">
+				<view class="flex-start" @click="openGroupPop()">
 					<view class="txt">
-						{{eventInfo.running_group || '加入跑团可享九折优惠'}}
+						{{myGroup.name || '加入跑团可享九折优惠'}}
 					</view>
-					<u-icon name="arrow-right" size="34rpx" color="rgba(0,0,0,.9)"></u-icon>
+					<u-icon v-if="!myGroup.group_id" name="arrow-right" size="34rpx" color="rgba(0,0,0,.9)"></u-icon>
 				</view>
 			</view>
 		</section>
@@ -61,12 +60,17 @@
 				<u-button type="primary" shape="circle" @click="submitOrder()">￥{{activeType.price}} 支付</u-button>
 			</view>
 		</section>
+		
+		<GroupList ref="refGroupList" @success="getUserGroup()"/>
   </view>
 </template>
 <script>
+	import GroupList from "./components/groupList.vue"
 export default {
+	components: { GroupList },
   data () {
 		return {
+			myGroup: {},
 			activeType: {},
 			isAgree: [],
 			SignerInfo: {},
@@ -85,8 +89,34 @@ export default {
 	onShow() {
 		this.getSignerInfo()
 		this.getEventPrice()
+		this.getUserGroup()
 	},
   methods: {
+		openGroupPop() {
+			if (this.myGroup.group_id) return;
+			
+			this.$refs.refGroupList.open()
+		},
+		async getUserGroup() {
+		  uni.showLoading({ mask: true });
+			
+			try {
+				let res = await this.$axios.post(`/user-api/user/getCreatedGroup`)
+				if (res) {
+					this.myGroup = res;
+				}
+				let temp = await this.$axios.post(`/user-api/user/getUserGroup`)
+				if (temp) {
+					this.myGroup = temp;
+				}
+				
+			} catch (error) {
+				console.error(error)
+				//TODO handle the exception
+			}
+			
+			uni.hideLoading()
+		},
 		getSignerInfo() {
 			this.SignerInfo = uni.getStorageSync('SignerInfo') || {}
 			
@@ -102,10 +132,12 @@ export default {
 			})
 		},
 		getEventPrice() {
+			uni.showLoading({
+				mask: true
+			})
 			const data = {}
-			
-			// this.$axios.post('/booking-api/user/price', data).then(res => {
-			this.$axios.post('/booking-api/user/price?test_for_fullspeed', data).then(res => {
+			this.$axios.post('/booking-api/user/price', data).then(res => {
+			// this.$axios.post('/booking-api/user/price?test_for_fullspeed', data).then(res => {
 				this.eventInfo = res;
 				let priceList = []
 				Object.keys(res).forEach(i => {

@@ -1,7 +1,9 @@
 <template>
 	<view>
 		<u-navbar title="我的跑团"></u-navbar>
-		<u-empty v-if="!detail.name" mode="data" />
+		<mescroll-empty v-if="!detail.name" mode="data" :option="{
+			btnText: '创建跑团',
+		}" @emptyclick="$u.route(`pagesSub/groupForm`)"/>
 		<block v-if="detail.name">
 			<section  class="section-card flex-row">
 				<image class="img" :src="detail.avatar_url || '../static/run.png'" mode="aspectFill"></image>
@@ -55,7 +57,7 @@
 			</view>
 			
 			
-			<u-empty v-if="!memberList.length" mode="search" text="暂无跑团成员"/>
+			<mescroll-empty v-if="!memberList.length" :option="{ tip: '暂无跑团成员~',}"/>
 			
 			<view class="" style="height: 120rpx;"></view>
 			<!-- 团长才可修改 -->
@@ -63,6 +65,12 @@
 				<view style="padding: 0rpx 156rpx 40rpx" class="flex-between-center">
 					<u-button type="error" block shape="circle" @click="deleteGroup()">删除跑团</u-button>
 					<u-button type="primary" block shape="circle" @click="updateGroup()">更新跑团</u-button>
+				</view>
+			</section>
+			
+			<section v-if="!isTeamLeader" class="section-bottom">
+				<view style="padding: 0rpx 156rpx 40rpx" class="flex-center">
+					<u-button type="error" block shape="circle" @click="leaveGroup()">退出跑团</u-button>
 				</view>
 			</section>
 		</block>
@@ -92,7 +100,7 @@
 		  // 移除全局自定义事件监听器
 		  uni.$off("updateList");
 		
-		  // 监听全局的自定义事件
+		  // 监听全局的自定义事件,团长修改了跑团
 		  uni.$once("updateList", (data) => {
 		    // 判断二级页面是否修改过数据，如果修改过，需要刷新首页，保持信息一致
 		    if (data.isChange) {
@@ -119,8 +127,11 @@
 						res = temp
 					}
 					
-					res.establish_time = res.establish_time.slice(0, 10)
-					this.detail = res
+					if (res?.establish_time) {
+						res.establish_time = res?.establish_time?.slice?.(0, 10)
+					}
+					
+					this.detail = res || {}
 					
 					this.getMemberList()
 					
@@ -132,6 +143,8 @@
 				uni.hideLoading()
 			},
 			getMemberList() {
+				if (!this.detail.group_id) return;
+				
 				const data = {
 					"pageIndex": 0,
 					"pageSize": 10,
@@ -152,6 +165,30 @@
 			        this.$axios.delete(`/running-group/api/v1/groups?group_id=${this.detail.group_id}`)
 			          .then((res) => {
 			            this.$toast("删除成功！");
+									
+									// 调用用户数据，检查参加或创建跑团标记
+									this.$store.dispatch('getUserInfo')
+									
+									setTimeout(() => {
+										uni.navigateBack()
+									}, 300)
+			          });
+			      } else if (res.cancel) {
+			        console.log("用户点击取消");
+			      }
+			    },
+			  });
+			},
+			leaveGroup() {
+			  uni.showModal({
+			    title: "提示",
+			    content: "是否确认退出该跑团？",
+			    success: (res) => {
+			      if (res.confirm) {
+			        uni.showLoading({ mask: true });
+			        this.$axios.post(`/user-api/user/quitRunningGroup`)
+			          .then((res) => {
+			            this.$toast("操作成功！");
 									
 									// 调用用户数据，检查参加或创建跑团标记
 									this.$store.dispatch('getUserInfo')

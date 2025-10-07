@@ -22,7 +22,7 @@
 					{ "path": "myEvent", "style": { "navigationStyle": "custom","navigationBarTitleText": "我的赛事", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					{ "path": "myMessages", "style": { "navigationStyle": "custom","navigationBarTitleText": "我的消息", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					// { "path": "settings/profile", "style": { "navigationBarTitleText": "完善信息", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "settings/agreement", "style": { "navigationStyle": "custom", "navigationBarTitleText": "协议", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
+					{ "path": "settings/agreement", "style": { "navigationBarTitleText": "协议", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					// { "path": "settings/forgetPassword", "style": { "navigationBarTitleText": "忘记密码", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					// { "path": "settings/findPassword", "style": { "navigationBarTitleText": "重置密码", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					{ "path": "settings/editPassword", "style": { "navigationBarTitleText": "修改密码", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },

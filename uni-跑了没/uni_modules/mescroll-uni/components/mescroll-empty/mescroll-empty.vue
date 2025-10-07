@@ -78,7 +78,7 @@ export default {
 .mescroll-empty {
 	box-sizing: border-box;
 	width: 100%;
-	padding: 100rpx 50rpx;
+	padding: 20rpx 50rpx;
 	text-align: center;
 }
 
@@ -106,9 +106,9 @@ export default {
 	min-width: 200rpx;
 	padding: 18rpx 40rpx;
 	font-size: 28rpx;
-	border: 1rpx solid #56bcae;
+	border: 1rpx solid #FF8C00;
 	border-radius: 60rpx;
-	color: #56bcae;
+	color: #FF8C00;
 }
 
 .mescroll-empty .empty-btn:active {
