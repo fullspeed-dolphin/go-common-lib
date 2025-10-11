@@ -22,7 +22,7 @@ const text = `<h2 style="margin-top: 10px;margin-bottom: 17px;break-after: avoid
     <span style="font-family:宋体">特别提示:</span>
 </p>
 <p style=";text-align: justify;font-family: Calibri;font-size: 14px">
-    跑了没小程序(<span style="font-family:宋体">以下统称</span>“产品”或“本软件”)<span style="font-family:宋体">是</span>由广州全速科技服务有限公司提供的互联网产品和服务。<span style="font-family:宋体">在您注册成为用户(使用</span>跑了没小程序<span style="font-family:宋体">服务的用户，以下简称“用户”或“您”)之前，请认真阅读本协议，特别是免除或者限制责任的条款、法律适用和争议解决条款等以粗体划线重点标识的条款。如果您对本协议的内容有任何疑问，请向</span>跑了没小程序客服咨询。
+    跑了没小程序(<span style="font-family:宋体">以下统称</span>“产品”或“本软件”)<span style="font-family:宋体">是</span>由广州全速体育发展有限公司提供的互联网产品和服务。<span style="font-family:宋体">在您注册成为用户(使用</span>跑了没小程序<span style="font-family:宋体">服务的用户，以下简称“用户”或“您”)之前，请认真阅读本协议，特别是免除或者限制责任的条款、法律适用和争议解决条款等以粗体划线重点标识的条款。如果您对本协议的内容有任何疑问，请向</span>跑了没小程序客服咨询。
 </p>
 <p style=";text-align: justify;font-family: Calibri;font-size: 14px">
     &nbsp;
@@ -571,7 +571,7 @@ const text = `<h2 style="margin-top: 10px;margin-bottom: 17px;break-after: avoid
     &nbsp;
 </p>
 <p style=";text-align: justify;font-family: Calibri;font-size: 14px">
-    12.2 <span style="font-family:宋体">本协议的效力、解释及纠纷的解决，适用于中华人民共和国法律。若用户和跑了没之间发生任何纠纷或争议，首先应友好协商解决，协商不成的，用户同意将纠纷或争议提交</span>广州全速科技服务有限公司住所地有管辖权的人民法院管辖。
+    12.2 <span style="font-family:宋体">本协议的效力、解释及纠纷的解决，适用于中华人民共和国法律。若用户和跑了没之间发生任何纠纷或争议，首先应友好协商解决，协商不成的，用户同意将纠纷或争议提交</span>广州全速体育发展有限公司住所地有管辖权的人民法院管辖。
 </p>
 <p style=";text-align: justify;font-family: Calibri;font-size: 14px">
     12.3<span style="font-family:宋体">通知与送达：本协议项下所有通知可通过小程序系统消息、站内信、短信或电子邮件形式送达。采用电子形式的，在发送成功时视为送达；通过公告方式的，在首次公告发布满24小时视为送达。</span>

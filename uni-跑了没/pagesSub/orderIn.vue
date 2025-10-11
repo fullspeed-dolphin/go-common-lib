@@ -147,10 +147,14 @@ export default {
 					if (String(i).includes('km')) {
 						priceList.push({
 							price: res[i],
-							label: i
+							label: i,
+							km: parseFloat(i)
 						})
 					}
 				})
+				
+				// 小距离在前
+				priceList.sort((a,b) => a.km - b.km)
 				
 				this.activeType = priceList[0]
 				this.priceList = priceList;

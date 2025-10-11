@@ -1,15 +1,15 @@
 <template>
-  <view class="" :class="{isFixedNavbar: isFixedNavbar}">
+  <view class="pb30" :class="{isFixedNavbar: isFixedNavbar}">
 		<u-navbar :title="isFixedNavbar ? '' : '线下活动'" :placeholder="false"></u-navbar>
 		
 		<section style="padding:0;overflow: hidden;">
-			<image :src="eventData.background_image_url" mode="aspectFill" style="width:100%;display: block;height:500rpx;"></image>
+			<image :src="detail.background_image_url" mode="aspectFill" style="width:100%;display: block;height:500rpx;"></image>
 		</section>
 		
 		<section class="panel bgf" style="margin-top: -90rpx;position: relative;z-index: 10;">
 			<view class="h2 u-border-bottom">
 				<view class="ellipsis2">
-					{{eventData.name}}
+					{{detail.name}}
 				</view>
 			</view>
 			<view class="cell flex-start">
@@ -23,22 +23,22 @@
 			</view>
 			<view class="cell flex-row">
 				<view class="label">报名时间：</view>
-				<view class="value">{{eventData.registration_time}}</view>
+				<view class="value">{{detail.registration_time}}</view>
 			</view>
 			<view class="cell flex-row">
 				<view class="label">活动时间：</view>
-				<view class="value">{{eventData.event_time}}</view>
+				<view class="value">{{detail.event_time}}</view>
 			</view>
 			<view class="cell flex-row">
 				<view class="label">活动地点：</view>
-				<view class="value flex">{{eventData.event_location}}</view>
+				<view class="value flex">{{detail.event_location}}</view>
 			</view>
 			<view class="cell flex-row">
 				<view class="label">活动项目：</view>
-				<view class="value">{{eventData.event_projects}}</view>
+				<view class="value">{{detail.event_projects}}</view>
 			</view>
 			<!-- <view class="cell flex-row">
-				活动规模：{{eventData.capacity}}
+				活动规模：{{detail.capacity}}
 			</view> -->
 		</section>
 		
@@ -46,7 +46,7 @@
 			<view class="cell" style="margin-top:0;">
 				<view class="label pl20 pb20">活动说明：</view>
 			</view>
-			<rich-text :nodes="eventData.text"></rich-text>
+			<rich-text :nodes="detail.text"></rich-text>
 		</section>
 
 		<view class="section-bottom">
@@ -54,7 +54,10 @@
 				{{isSignUp ? '取消' : ''}}报名截止：2025.09.30 9:00
 			</view> -->
 			<view class="u-border-top1" :class="{isSignUp: isSignUp}" style="padding: 26rpx 8rpx 0">
-				<u-button type="primary" shape="circle" @click="routeTo()">{{isSignUp ? '取消报名' : '活动报名'}} </u-button>
+				<u-button type="primary" :disabled="detail.status === 'PND'" shape="circle" @click="routeTo()">
+					<block v-if="detail.status === 'ACT'">{{isSignUp ? '取消报名' : '活动报名'}}</block>
+					<block v-if="detail.status === 'PND'">活动暂未开始</block>
+				</u-button>
 			</view>
 		</view>
 		
@@ -68,7 +71,7 @@ export default {
   data () {
 		return {
 			isSignUp: false,
-			eventData: {},
+			detail: {},
 			isFixedNavbar: true
 		}
   },
@@ -99,12 +102,17 @@ export default {
 			})
 			this.$axios.get(`/event-api/api/v1/events/${this.routerParams.id}`).then(res => {
 				res.text = `<img src="${res.long_image_url}" style="max-width:100%;" />`
-				this.eventData = res;
+				this.detail = res;
 			})
 		},
 		routeTo() {
 			if (!this.userInfo.id) {
 				return this.$refs.refPhoneLogin.open()
+			}
+			
+			
+			if (this.detail.status !== 'ACT') {
+				return this.$toast('活动无效')
 			}
 			
 			if (this.isSignUp) {

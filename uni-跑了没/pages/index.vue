@@ -27,7 +27,11 @@
 						<view class="name ellipsis">{{item.name}}</view>
 						<view class="time">{{item.event_time}}</view>
 					</view>
-					<u-button type="primary" size="small" shape="circle" text="报名"></u-button>
+					
+					<u-button type="primary" :disabled="item.status === 'PND'" size="small" shape="circle" text="">
+						<block v-if="item.status === 'PND'">活动暂未开始</block>
+						<block v-if="item.status === 'ACT'">报名</block>
+					</u-button>
 				</view>
 			</section>
 			
@@ -147,8 +151,8 @@ export default {
 				this.eventList = res.events;
 				
 				this.bannerList = [
-					'../static/7bb3e09687deac8d43c779771c09f897 (1).png',
 					...res.events.map(i => i.background_image_url),
+					'../static/7bb3e09687deac8d43c779771c09f897 (1).png',
 				]
 			})
 		},
