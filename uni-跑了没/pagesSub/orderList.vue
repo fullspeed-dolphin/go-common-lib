@@ -9,7 +9,7 @@
 		
     <mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="240">
 			<view class="" style="height:40rpx"></view>
-			<view class="group-item" v-for="(item,index) in dataList" :key="index">
+			<view class="group-item" v-for="(item,index) in dataList" :key="index" @click="viewDetail(item)">
 				<view class="pb20">
 					订单编号:{{item.order_no}} 
 				</view>
@@ -23,7 +23,10 @@
 							</view>
 						</view>
 						<view class="flex-between-center">
-							<view class="ellipsis" style="color:red;">￥{{item.amount_yuan}}</view>
+							<view class="flex-row">
+								报名费用：
+								<view class="ellipsis" style="color:red;">￥{{item.amount_yuan}}</view>
+							</view>
 							<u-button v-if="item.status === 'PND'" type="primary" color="#19be6b" shape="circle" size="mini" @click="payOrder(item)">
 								微信支付
 							</u-button>
@@ -40,24 +43,19 @@ import tabbar from "@/components/tabBar.vue";
 import MescrollMixin from "@/uni_modules/mescroll-uni/components/mescroll-uni/mescroll-mixins.js";
 import dayjs from '@/uni_modules/uview-ui/libs/util/dayjs.js';
 
-const taleParams = {
-  orderStatus: "PND",
-};
-
 export default {
   mixins: [MescrollMixin],
   components: {},
   data() {
     return {
 			searchTxt: "",
-      taleParams: taleParams,
       tabActive: 0,
       tabList: [
 				{ label: "待付款", value: 'PND' },
 				{ label: "已付款", value: 'SUCC' },
 				{ label: "已过期", value: 'EXP' },
 			],
-      curTab: {},
+      curTab: { label: "待付款", value: 'PND' },
       dataList: [],
     };
   },
@@ -67,17 +65,14 @@ export default {
 		}
 	},
   methods: {
+		viewDetail(item) {
+			uni.setStorageSync('orderDetail', item)
+			uni.$u.route(`/pagesSub/orderDetail`)
+		},
     changeTab(detail) {
       this.curTab = detail;
       console.log(detail);
 
-      this.taleParams.orderStatus = detail.value;
-
-      this.refreshList();
-    },
-    changeDropdown(e) {
-      console.log(e);
-      this.taleParams.orderStatus = e;
       this.refreshList();
     },
     refreshList() {
@@ -88,14 +83,11 @@ export default {
     },
     getList(page) {
       uni.showLoading({ mask: true });
-      const {
-        orderNo,
-      } = this.taleParams;
       
       const data = {
       	"pageIndex": 0,
       	"pageSize": 10,
-      	"orderStatus": this.taleParams.orderStatus
+      	"orderStatus": this.curTab.value
       }
       this.$axios.post(`/pay/order/statusByUser`, data).then(res => {
           uni.hideLoading();
@@ -155,7 +147,7 @@ export default {
 		.poster{
 			width: 124rpx;
 			height: 124rpx;
-			background: #C1C5C6;
+			background: #f5f5f5;
 			margin-right: 30rpx;
 			border-radius: 16rpx 16rpx 16rpx 16rpx;
 		}

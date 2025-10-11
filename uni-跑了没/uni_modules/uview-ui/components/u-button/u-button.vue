@@ -218,6 +218,14 @@ export default {
                     // 非镂空，背景色使用自定义的颜色
                     style["background-color"] = this.color;
                 }
+								
+								if (this.textColor) {
+									style.color = this.textColor
+								}
+								if (this.width) {
+									style.width = this.width
+								}
+								
                 if (this.color.indexOf("gradient") !== -1) {
                     // 如果自定义的颜色为渐变色，不显示边框，以及通过backgroundImage设置渐变色
                     // weex文档说明可以写borderWidth的形式，为什么这里需要分开写？

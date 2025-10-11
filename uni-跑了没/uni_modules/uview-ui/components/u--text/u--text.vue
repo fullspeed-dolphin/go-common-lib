@@ -23,7 +23,8 @@
         :wordWrap="wordWrap"
         :customStyle="customStyle"
         @click="$emit('click')"
-    ></uvText>
+    >
+		</uvText>
 </template>
 
 <script>

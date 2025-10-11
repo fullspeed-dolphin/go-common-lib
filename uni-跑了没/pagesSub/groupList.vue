@@ -93,6 +93,10 @@ export default {
 	  });
 	},
   methods: {
+		viewDetail(item) {
+			uni.setStorageSync('orderDetail', item)
+			// uni.$u.route(`pagesSub/groupDetail?group_id=${item.group_id}`)
+		},
 		openForm() {
 			if (!this.$store.state.userInfo.id) {
 				return this.$refs.refPhoneLogin.open()

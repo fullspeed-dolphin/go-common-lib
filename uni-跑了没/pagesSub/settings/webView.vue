@@ -1,30 +1,18 @@
 <template>
   <view>
-		<rich-text class="richText" :nodes="detail.Content"></rich-text>
+		<web-view :src="link"></web-view>
   </view>
 </template>
 <script>
-	import agree_signUp from "@/utils/agree_signUp.js"
-	import agree_privy from "@/utils/agree_privy.js"
-	import baoxian from "@/utils/baoxian.js"
 export default {
   data() {
     return {
-			detail: {
-				Content: ""
-			}
+			link: ""
 		};
   },
 	onLoad(options) {
-		if (options.type === 'signUp') {
-			this.detail.Content = agree_signUp
-		}
-		if (options.type === 'privy') {
-			this.detail.Content = agree_privy
-		}
-		if (options.type === 'baoxian') {
-			this.detail.Content = baoxian
-		}
+		console.log('options==>', options.link)
+		this.link = options.link
 	},
   methods: {
 		getDetail(ID) {

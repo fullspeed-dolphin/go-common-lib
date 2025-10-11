@@ -18,14 +18,14 @@
 				<view class="">跑团</view>
 				<view class="flex-start" @click="openGroupPop()">
 					<view class="txt">
-						{{myGroup.name || '加入跑团可享九折优惠'}}
+						{{myGroup.name || '加入跑团'}}
 					</view>
 					<u-icon v-if="!myGroup.group_id" name="arrow-right" size="34rpx" color="rgba(0,0,0,.9)"></u-icon>
 				</view>
 			</view>
 		</section>
 		
-		<section class="scroll-view">
+		<section class="scroll-view flex-center">
 			<view class="item" @click="changeTab(item)" v-for="(item,index) in priceList" :key="index">
 				<view class="type-item flex-center" :class="{active: activeType.label === item.label}">
 					{{item.label}}
@@ -54,9 +54,10 @@
 				<u-checkbox-group v-model="isAgree">
 					<u-checkbox inactiveColor="#000" name="agree" labelColor="#000" activeColor="#FF8C00" label="我已阅读并同意该"></u-checkbox>
 				</u-checkbox-group>
-				<text style="color:#FF8C00" @click="$u.route('pagesSub/settings/agreement?type=signUp')">《用户协议以及用户承诺书》</text>
+				<text style="color:#FF8C00" @click="$u.route('pagesSub/settings/agreement?type=signUp')">《用户协议》</text>以及
+				<text style="color:#FF8C00" @click="$u.route('pagesSub/settings/agreement?type=baoxian')">《保险须知》</text>
 			</view>
-			<view class="" style="padding: 26rpx 120rpx 0">
+			<view class="" style="padding: 56rpx 8rpx 0">
 				<u-button type="primary" shape="circle" @click="submitOrder()">￥{{activeType.price}} 支付</u-button>
 			</view>
 		</section>
@@ -135,7 +136,9 @@ export default {
 			uni.showLoading({
 				mask: true
 			})
-			const data = {}
+			const data = {
+				"event_id": this.event_id,
+			}
 			this.$axios.post('/booking-api/user/price', data).then(res => {
 			// this.$axios.post('/booking-api/user/price?test_for_fullspeed', data).then(res => {
 				this.eventInfo = res;

@@ -78,6 +78,14 @@ export default {
 		}
 	},
 	onLoad(options) {
+		// #ifdef MP-WEIXIN
+		wx.showShareMenu({
+			// withShareTicket: true,
+			success: function () {},
+			fail: function () {}
+		})
+		// #endif
+
 		this.routerParams = options
 		this.getDetail()
 	},
@@ -86,6 +94,9 @@ export default {
 	},
   methods: {
 		getDetail() {
+			uni.showLoading({
+				mask: true
+			})
 			this.$axios.get(`/event-api/api/v1/events/${this.routerParams.id}`).then(res => {
 				res.text = `<img src="${res.long_image_url}" style="max-width:100%;" />`
 				this.eventData = res;

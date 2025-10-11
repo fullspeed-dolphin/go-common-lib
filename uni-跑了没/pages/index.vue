@@ -7,11 +7,16 @@
 				<u-search :disabled="true" placeholder="搜索赛事或跑团" shape="round" bgColor="#fff" borderColor="#FF8C00" :showAction="false"></u-search>
 			</view>
 			<view class="section-banner">
-				<u-swiper :list="bannerList" height="270rpx" 
+				<!-- <u-swiper :list="bannerList" height="270rpx" 
 					 indicatorMode="dot"
 					 indicatorActiveColor="#FF8C00"
-					 indicator circular>
-				</u-swiper>
+					 indicator circular @click="clickSwiper">
+				</u-swiper> -->
+				<swiper class="swiper" circular indicator-dots indicator-active-color="#FF8C00" :autoplay="true" :interval="3000">
+					<swiper-item v-for="(item, index) in bannerList" :key="index">
+						<image class="img" :src="item" mode="aspectFill" @click="clickSwiper(index)"></image>
+					</swiper-item>
+				</swiper>
 			</view>
 			
 			<view class="section-title">线下活动</view>
@@ -95,7 +100,6 @@
 </template>
 <script>
 	import tabbar from "@/components/tabBar.vue"
-import eventData from "@/utils/eventData.js"
 export default {
 	components: { tabbar },
   data () {
@@ -120,6 +124,17 @@ export default {
 		this.getEvents()
 	},
   methods: {
+		clickSwiper(index) {
+			console.log(index)
+			
+				const item = this.eventList[index]
+				if (item) {
+					uni.$u.route(`pagesSub/offlineEvents?id=${item.id}`)
+					
+					return;
+				}
+				uni.$u.route(`pagesSub/settings/webView?link=https://mp.weixin.qq.com/s/oNW0UYJCb78zrmzyoY0_Mg?token=1740573090&lang=zh_CN`)
+		},
 		confirmSearch() {
 			const searchTxt = this.searchTxt.trim()
 		},
@@ -131,7 +146,10 @@ export default {
 			this.$axios.get(`/event-api/api/v1/events`).then(res => {
 				this.eventList = res.events;
 				
-				this.bannerList = res.events.map(i => i.background_image_url)
+				this.bannerList = [
+					'../static/7bb3e09687deac8d43c779771c09f897 (1).png',
+					...res.events.map(i => i.background_image_url),
+				]
 			})
 		},
 		getBannerList() {
@@ -197,6 +215,17 @@ export default {
 		margin: 0 auto;
 		border-radius: 16rpx!important;
 		overflow: hidden;
+		
+		.swiper{
+			height: 270rpx;
+		}
+		.img{
+			display: block;
+			width: 100%;
+			height: 270rpx;
+			border-radius: 16rpx!important;
+			overflow: hidden;
+		}
 	}
 	.section-title{
 		margin: 50rpx 0 30rpx;

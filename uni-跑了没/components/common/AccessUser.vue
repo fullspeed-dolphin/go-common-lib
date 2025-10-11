@@ -27,7 +27,7 @@
 						</button>
 					</view>
 					<view class="flex-start u-border-bottom input-line">
-						<view class="title">昵称</view>
+						<view class="h4">昵称</view>
 						<input name="nickName" type="nickname" class="flex tar" placeholder="请输入昵称" v-model="formData.nickName" />
 					</view>
 				</view>
@@ -85,9 +85,13 @@
 				
 				let link = this.formData.avatarUrl;
 				
-				if (this.formData.avatarUrl.includes('http://tmp')) {
+				if (this.formData.avatarUrl.includes('//tmp')) {
 					link = await this.uploadFile(this.formData.avatarUrl);
 				}
+				
+				uni.showLoading({
+					mask: true
+				})
 				
 				const data = {
 					"avatar_url": link,
@@ -160,6 +164,7 @@
 	  font-weight: 500;
 	  margin-bottom: 42rpx;
 	}
+	
 	.flex{
 		flex:1;
 	}

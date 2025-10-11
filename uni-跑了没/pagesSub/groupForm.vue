@@ -43,9 +43,9 @@
 				<u-checkbox-group v-model="isAgree">
 					<u-checkbox inactiveColor="#000" name="agree" labelColor="#000" activeColor="#FF8C00" label="我已阅读并同意该"></u-checkbox>
 				</u-checkbox-group>
-				<text style="color:#FF8C00" @click="$u.route('pagesSub/settings/agreement?type=signUp')">《用户隐私协议 》</text>
+				<text style="color:#FF8C00" @click="$u.route('pagesSub/settings/agreement?type=privy')">《用户隐私协议》</text>
 			</view>
-			<view class="" style="padding: 26rpx 120rpx 0">
+			<view class="" style="padding: 60rpx 8rpx 30rpx">
 				<u-button type="primary" shape="circle" @click="submitForm()">{{group_id ? '更新跑团' : '创建跑团'}} </u-button>
 			</view>
 		</view>

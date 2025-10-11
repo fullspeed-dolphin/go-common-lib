@@ -33,16 +33,28 @@
 				<!-- <u-cell title="我的消息" class="nav-cell" @click="routeTo('/pagesSub/myMessages')" :border="false" isLink>
 					<image slot="icon" class="nav-icon" src="/static/images/我的消息Icon@2x.png"></image>
 				</u-cell> -->
-				<u-cell title="我的订单" class="nav-cell" @click="routeTo('/pagesSub/myOrder')" :border="false" isLink>
+				<u-cell title="我的订单" class="nav-cell" @click="routeTo('/pagesSub/orderList')" :border="false" isLink>
 					<image slot="icon" class="nav-icon" src="/static/images/WX20250908-193754.png"></image>
 				</u-cell>
-				<view class="service-cell">
-					<u-cell :title="null" class=" nav-cell" isLink>
+				<view class="service-cell u-cell u-cell__body" @click="showLoading()">
+					<button class="u-reset-button" open-type="contact">
+					  <view class="flex-row" style="width:100%;">
+					  	<view class="flex-start flex-1">
+					  		<view class="icon">
+					  			<image class="nav-icon" src="/static/images/我的消息Icon@2x.png"></image>
+					  		</view>
+					  		联系客服
+					  	</view>
+							<u-icon name="arrow-right" size="14" ></u-icon>
+					  </view>
+					</button>
+					
+					<!-- <u-cell :title="null" class=" nav-cell" isLink>
 						<image slot="icon" class="nav-icon" src="/static/images/我的消息Icon@2x.png"></image>
 						<button class="u-reset-button" open-type="contact">
 						      联系客服
 						</button>
-					</u-cell>
+					</u-cell> -->
 				</view>
 				
 				<!-- <u-cell title="意见反馈" class="nav-cell" @click="routeTo('/pagesSub/settings/feedback')" :border="false" isLink>
@@ -83,6 +95,15 @@ export default {
 		this.$store.dispatch('getUserInfo')
 	},
   methods: {
+		showLoading() {
+			uni.showLoading({
+				mask: true
+			})
+			
+			setTimeout(() => {
+				uni.hideLoading()
+			}, 300)
+		},
 		routeTo(link) {
 			if (!this.userInfo.id) {
 				return this.$refs.refPhoneLogin.open()
@@ -122,6 +143,16 @@ export default {
 <style lang="less" scoped>
 	::v-deep{
 		.service-cell{
+			.icon{
+				display: flex;
+				align-items: center;
+				width: 52rpx;
+				height: 52rpx;
+				border-radius: 53rpx;
+				background: rgba(0,0,0,0.06);
+				justify-content: center;
+				margin-right:22rpx;
+			}
 			.u-cell__body__content{
 				flex: unset;
 			}
@@ -131,10 +162,18 @@ export default {
 				max-width: 100%;
 			}
 			.u-reset-button{
+				height: 120rpx;
 				text-align: left;
 				font-size: 15px;
 				line-height: 22px;
 				color: #303133;
+				display: flex;
+				flex-direction: row;
+				box-sizing: border-box;
+				padding: 10px 15px;
+				font-size: 15px;
+				color: #303133;
+				align-items: center;
 			}
 		}
 	}

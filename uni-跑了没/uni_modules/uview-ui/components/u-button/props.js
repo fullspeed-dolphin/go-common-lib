@@ -24,6 +24,14 @@ export default {
             type: String,
             default: uni.$u.props.button.size
         },
+        textColor: {
+            type: String,
+            default: ''
+        },
+        width: {
+            type: String,
+            default: ''
+        },
         // 按钮形状，circle（两边为半圆），square（带圆角）
         shape: {
             type: String,
