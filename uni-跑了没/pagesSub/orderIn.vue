@@ -26,7 +26,9 @@
 			
 			<view class="cell flex-between-center">
 				<view class="">全速码</view>
-				<u--input placeholder="全速码" maxlength="5" :border="none" v-model="verifyCode" inputAlign="right"/>
+				<u--input placeholder="全速码" maxlength="5" border="none" v-model="verifyCode" @change="checkCode" inputAlign="right">
+				</u--input>
+				<u-tag v-if="!!verifyCode.length" :text="computedCode.text" plain size="mini" :type="computedCode.isOk ? 'success' : 'error'"></u-tag>
 			</view>
 		</section>
 		
@@ -82,12 +84,33 @@ export default {
 			isAgree: [],
 			SignerInfo: {},
 			eventInfo: {},
-			priceList: []
+			priceList: [],
+			computedCode: {}
 		}
   },
 	computed: {
 		userInfo() {
 			return this.$store.state.userInfo
+		},
+	},
+	watch: {
+		verifyCode(newVal) {
+			let codeState = {
+				isOk: false,
+				text: '全速码无效'
+			}
+			
+			// if (!this.verifyCode.length) {
+			// 	codeState.text = '全速码无效'
+			// }
+			
+			// const reg = /^[0-9a-zA-Z]*$/g;
+			// console.log(reg.test(this.verifyCode))
+			// if (!reg.test(this.verifyCode)) {
+				
+			// }
+			
+			this.computedCode = codeState;
 		}
 	},
 	onLoad(options) {
@@ -139,16 +162,40 @@ export default {
 				};
 			})
 		},
-		getEventPrice() {
+		checkCode() {
+			if (!this.verifyCode) return;
+			
+			const reg = /^[0-9a-zA-Z]*$/g;
+			if (!reg.test(this.verifyCode) || this.verifyCode.length !== 5) {
+				return
+			}
+			
+			this.getEventPrice(this.verifyCode)
+		},
+		getEventPrice(spxcode = null) {
 			uni.showLoading({
 				mask: true
 			})
 			const data = {
 				"event_id": this.event_id,
+				spxcode,
 			}
 			this.$axios.post('/booking-api/user/price', data).then(res => {
 			// this.$axios.post('/booking-api/user/price?test_for_fullspeed', data).then(res => {
 				this.eventInfo = res;
+				
+				if (res.spxcode_status === 'ACT') {
+					this.computedCode = {
+						isOk: true,
+						text: '全速码有效'
+					}
+				} else {
+					this.computedCode = {
+						isOk: false,
+						text: '全速码无效'
+					}
+				}
+				
 				let priceList = []
 				Object.keys(res).forEach(i => {
 					if (String(i).includes('km')) {
@@ -200,7 +247,7 @@ export default {
 				"payment_method": "wechat",
 				"event_id": this.event_id,
 				"payment_amount": this.activeType.price,
-				spxcode: this.verifyCode,
+				spxcode: this.computedCode.isOk ? this.verifyCode : null,
 				running_group: String(this.userInfo.running_group || '')
 			}
 			
