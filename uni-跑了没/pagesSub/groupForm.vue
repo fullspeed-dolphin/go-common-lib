@@ -40,9 +40,13 @@
 			</u--form>
 			
 			<view class="txt flex-start mt30 pt20">
-				<u-checkbox-group v-model="isAgree">
-					<u-checkbox inactiveColor="#000" name="agree" labelColor="#000" activeColor="#FF8C00" label="我已阅读并同意该"></u-checkbox>
-				</u-checkbox-group>
+				<text @click="isAgree = !isAgree">
+					<u-icon 
+						size="15"
+						:color="isAgree ? '#FF8C00' : '#999'"
+						:name="isAgree ? 'checkmark-circle-fill' : 'checkmark-circle'" ></u-icon>
+					<text class="ml5">我已阅读并同意该</text>
+				</text>
 				<text style="color:#FF8C00" @click="$u.route('pagesSub/settings/agreement?type=privy')">《用户隐私协议》</text>
 			</view>
 			<view class="" style="padding: 60rpx 8rpx 30rpx">
@@ -73,7 +77,7 @@
 					// amount: '',
 					establish_time: dayjs().valueOf(),
 				},
-				isAgree: [],
+				isAgree: false,
 				rules: {
 					poster: [{
 						required: true,
@@ -136,7 +140,7 @@
 							establish_time: dayjs(res.establish_time).valueOf(),
 						}
 						
-						this.isAgree = ['agree']
+						this.isAgree = true
 					})
 			},
 			submitForm() {
@@ -150,7 +154,7 @@
 						return 
 					}
 					
-					if (!this.isAgree.length) return this.$toast("请勾选同意协议");
+					if (!this.isAgree) return this.$toast("请勾选同意协议");
 					
 					const data = {
 						"avatar_url": this.form.poster,

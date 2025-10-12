@@ -26,7 +26,7 @@
 			
 			<view class="cell flex-between-center">
 				<view class="">全速码</view>
-				<u--input placeholder="全速码" maxlength="5" border="none" v-model="verifyCode" @change="checkCode" inputAlign="right">
+				<u--input placeholder="全速码" maxlength="5" border="none" v-model="verifyCode" inputAlign="right">
 				</u--input>
 				<u-tag v-if="!!verifyCode.length" :text="computedCode.text" plain size="mini" :type="computedCode.isOk ? 'success' : 'error'"></u-tag>
 			</view>
@@ -58,9 +58,13 @@
 		
 		<section class="section-bottom">
 			<view class="txt flex-start">
-				<u-checkbox-group v-model="isAgree">
-					<u-checkbox inactiveColor="#000" name="agree" labelColor="#000" activeColor="#FF8C00" label="我已阅读并同意该"></u-checkbox>
-				</u-checkbox-group>
+				<text @click="isAgree = !isAgree">
+					<u-icon 
+						size="15"
+						:color="isAgree ? '#FF8C00' : '#999'"
+						:name="isAgree ? 'checkmark-circle-fill' : 'checkmark-circle'" ></u-icon>
+					<text class="ml5">我已阅读并同意该</text>
+				</text>
 				<text style="color:#FF8C00" @click="$u.route('pagesSub/settings/agreement?type=signUp')">《用户协议》</text>以及
 				<text style="color:#FF8C00" @click="$u.route('pagesSub/settings/agreement?type=baoxian')">《保险须知》</text>
 			</view>
@@ -81,7 +85,7 @@ export default {
 			verifyCode: '',
 			myGroup: {},
 			activeType: {},
-			isAgree: [],
+			isAgree: false,
 			SignerInfo: {},
 			eventInfo: {},
 			priceList: [],
@@ -111,6 +115,15 @@ export default {
 			// }
 			
 			this.computedCode = codeState;
+			
+			if (!this.verifyCode) return;
+			
+			const reg = /^[0-9a-zA-Z]*$/g;
+			if (!reg.test(this.verifyCode) || this.verifyCode.length !== 5) {
+				return
+			}
+			
+			this.getEventPrice()
 		}
 	},
 	onLoad(options) {
@@ -162,23 +175,13 @@ export default {
 				};
 			})
 		},
-		checkCode() {
-			if (!this.verifyCode) return;
-			
-			const reg = /^[0-9a-zA-Z]*$/g;
-			if (!reg.test(this.verifyCode) || this.verifyCode.length !== 5) {
-				return
-			}
-			
-			this.getEventPrice(this.verifyCode)
-		},
 		getEventPrice(spxcode = null) {
 			uni.showLoading({
 				mask: true
 			})
 			const data = {
 				"event_id": this.event_id,
-				spxcode,
+				spxcode: this.verifyCode,
 			}
 			this.$axios.post('/booking-api/user/price', data).then(res => {
 			// this.$axios.post('/booking-api/user/price?test_for_fullspeed', data).then(res => {
@@ -239,7 +242,7 @@ export default {
 				}
 			}
 			
-			if (!this.isAgree.length) return this.$toast("请勾选同意协议");
+			if (!this.isAgree) return this.$toast("请勾选同意协议");
 			
 			const data = {
 				...this.SignerInfo,
