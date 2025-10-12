@@ -4,8 +4,8 @@
 		
 		<section class="section-assign">
 			<view class="cell flex-between-center" @click="selectSigner()">
-				<view class="">
-					<u-icon name="star-fill" color="#E53935" size="8"></u-icon> 参赛者 
+				<view class="flex-start">
+					参赛者 <u-icon name="star-fill" color="#E53935" size="8"></u-icon>
 				</view>
 				<view class="flex-start">
 					<view class="txt flex-row">
@@ -38,7 +38,7 @@
 			</view>
 		</section>
 		
-		<section class="section-payment panel">
+		<section v-if="priceList.length" class="section-payment panel">
 			<view class="money flex-row" style="align-items: baseline;">
 				￥{{activeType.price}}
 				<view class="txt">
@@ -185,11 +185,12 @@ export default {
 			
 			if (!this.SignerInfo.id_card) return this.$toast("请完善参赛者信息");
 			
-			const reg = /^[0-9a-zA-Z]*$/g
-			if (this.verifyCode && !reg.test(this.verifyCode)) return this.$toast("全速码格式有误")
-			
-			
-			return
+			const reg = /^[0-9a-zA-Z]*$/g;
+			if (this.verifyCode) {
+				if (!reg.test(this.verifyCode) || this.verifyCode.length !== 5) {
+					return this.$toast("全速码 格式有误")
+				}
+			}
 			
 			if (!this.isAgree.length) return this.$toast("请勾选同意协议");
 			
