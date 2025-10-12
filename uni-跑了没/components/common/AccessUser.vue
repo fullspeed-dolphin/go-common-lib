@@ -28,7 +28,22 @@
 					</view>
 					<view class="flex-start u-border-bottom input-line">
 						<view class="h4">昵称</view>
-						<input name="nickName" type="nickname" class="flex tar" placeholder="请输入昵称" v-model="formData.nickName" />
+						<input name="nickname" type="nickname" class="flex tar" placeholder="请输入昵称" v-model="formData.nickname" />
+					</view>
+					<view class="flex-between-center u-border-bottom input-line">
+						<view class="h4">性别</view>
+						<u-radio-group
+						   v-model="formData.gender"
+						 >
+						   <u-radio
+						     activeColor="#FF8C00"
+						     v-for="(item, index) in radiolist"
+						     :key="index"
+						     :label="item.name"
+						     :name="item.value"
+						   >
+						   </u-radio>
+						 </u-radio-group>
 					</view>
 				</view>
 				<view class="mt20 pt30" style="margin-top:50rpx;">
@@ -43,12 +58,25 @@
 <script>
 	import { baseLink } from "@/utils/config.js"
 	export default {
+		options: {
+		  styleIsolation: "shared",
+		},
 		data() {
 			return {
 				isShowPop: false,
+				radiolist: [
+					{
+						name: '男',
+						value: 1
+					}, {
+						name: '女',
+						value: 0
+					}
+				],
 				formData: {
 					avatarUrl: "",
-					nickName: ""
+					nickname: "",
+					gender: 1
 				}
 			};
 		},
@@ -62,29 +90,32 @@
 				const userInfo = this.$store.state.userInfo;
 				
 				if (!this.formData.avatarUrl) {
-					this.formData.avatarUrl = userInfo.avatar_url
-				}
-				if (!this.formData.nickName) {
-					this.formData.nickName = userInfo.nickname
+					this.formData.avatarUrl = userInfo.avatar_url;
+					this.formData.nickname = userInfo.nickname
+					this.formData.gender = userInfo.gender
 				}
 				
 				this.isShowPop = true;
 			},
 			close() {
 				this.isShowPop = false;
+				this.formData = {
+					avatarUrl: "",
+					nickname: "",
+					gender: 1
+				}
 			},
 			async submit() {
 				if (!this.formData.avatarUrl.length) return this.$toast('请上传头像')
-				if (!this.formData.nickName.length) return this.$toast('请输入昵称')
+				if (!this.formData.nickname.length) return this.$toast('请输入昵称')
 				
 				uni.showLoading({
 					mask: true
 				})
 				
-				const userInfo = this.$store.state.userInfo;
-				
 				let link = this.formData.avatarUrl;
 				
+				// 头像 tmp 开头，说明更换了头像，需要上传
 				if (this.formData.avatarUrl.includes('//tmp')) {
 					link = await this.uploadFile(this.formData.avatarUrl);
 				}
@@ -95,7 +126,8 @@
 				
 				const data = {
 					"avatar_url": link,
-					"nickname": this.formData.nickName
+					"nickname": this.formData.nickname,
+					"gender": this.formData.gender
 				}
 				this.$axios.post(`/user-api/user/updateUserInfo`, data).then(res => {
 					this.$store.dispatch('getUserInfo')
@@ -201,6 +233,12 @@
 	}
 
 	::v-deep {
+		.u-radio{
+			margin-left: 30rpx;
+		}
+		.u-radio-group{
+			justify-content: flex-end;
+		}
 		.u-button {
 			height: 76rpx;
 			border-color: #e2e2e2 !important;

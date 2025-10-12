@@ -10,15 +10,23 @@
     <mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="240">
 			<view class="" style="height:40rpx"></view>
 			<view class="group-item" v-for="(item,index) in dataList" :key="index" @click="viewDetail(item)">
-				<view class="pb20">
+				<view class="pb20 flex-between-center">
 					订单编号:{{item.order_no}} 
+					<view class="">
+						<u--text v-if="item.status == 'PND'" size='14' type="error" text="待支付"></u--text>
+						<u--text v-if="item.status == 'SUCC'" size='14' type="success" text="已付款"></u--text>
+						<u--text v-if="item.status == 'FAIL'" size='14' type="error" text="失败"></u--text>
+						<u--text v-if="item.status == 'RFND'" size='14' type="info" text="已退款"></u--text>
+						<u--text v-if="item.status == 'CXL'" size='14' type="info" text="已取消"></u--text>
+						<u--text v-if="item.status == 'EXP'" size='14' type="info" text="已过期"></u--text>
+					</view>
 				</view>
 				<view class="flex-row">
 					<image class="poster" :src="item.event_info.background_image_url || '../static/run.png'" mode="aspectFill"></image>
 					<view class="text">
 						<view class="flex-between-center" style="width: 420rpx;">
 							<view class="">
-								<view class="name ellipsis2">{{item.event_info.name || '活动'}}</view>
+								<view class="name ellipsis2">{{item.event_info.name}}</view>
 								<view class="city ellipsis">创建时间: {{item.created_at}}</view>
 							</view>
 						</view>

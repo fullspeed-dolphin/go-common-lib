@@ -7,11 +7,6 @@
 				<u-search :disabled="true" placeholder="搜索赛事或跑团" shape="round" bgColor="#fff" borderColor="#FF8C00" :showAction="false"></u-search>
 			</view>
 			<view class="section-banner">
-				<!-- <u-swiper :list="bannerList" height="270rpx" 
-					 indicatorMode="dot"
-					 indicatorActiveColor="#FF8C00"
-					 indicator circular @click="clickSwiper">
-				</u-swiper> -->
 				<swiper class="swiper" circular indicator-dots indicator-active-color="#FF8C00" :autoplay="true" :interval="3000">
 					<swiper-item v-for="(item, index) in bannerList" :key="index">
 						<image class="img" :src="item" mode="aspectFill" @click="clickSwiper(index)"></image>
@@ -55,24 +50,7 @@
 				</view>
 			</view>
 			<section class="section-group">
-				<view class="group-item flex-start" @click="$u.route(`pagesSub/groupDetail?group_id=${item.group_id}`)" v-for="(item,index) in GroupList" :key="index">
-					<image class="poster" :src="item.avatar_url || '../static/run.png'" mode="aspectFill"></image>
-					<view class="text">
-						<view class="flex-between-center" style="width: 520rpx;">
-							<view class="">
-								<view class="name ellipsis">{{item.name}}</view>
-								<view class="city flex-row">
-									<view class="ellipsis mr10" style="max-width:350rpx;">
-										{{item.establish_location}}
-									</view>
-									{{item.total_members}}人
-								</view>
-							</view>
-							<u-button type="primary" size="small" shape="circle" text="加入"></u-button>
-						</view>
-						<view class="desc ellipsis">{{item.introduction}}</view>
-					</view>
-				</view>
+				<GroupItem :item="item" v-for="(item,index) in GroupList" :key="index" />
 			</section>
 			
 			<!-- <view class="section-title flex-between-center">
@@ -104,8 +82,9 @@
 </template>
 <script>
 	import tabbar from "@/components/tabBar.vue"
+	import GroupItem from "@/components/GroupItem.vue"
 export default {
-	components: { tabbar },
+	components: { tabbar, GroupItem },
   data () {
     return {
 			searchTxt: "",
@@ -215,6 +194,7 @@ export default {
 	}
 	
 	.section-banner{
+		min-height: 270rpx;
 		width: 682rpx;
 		margin: 0 auto;
 		border-radius: 16rpx!important;
@@ -253,32 +233,7 @@ export default {
 			font-weight: 400;
 		}
 	}
-	
-	.group-item{
-		padding: 10rpx 34rpx;
-		.poster{
-			width: 124rpx;
-			height: 124rpx;
-			background: #f5f5f5;
-			margin-right: 40rpx;
-			border-radius: 16rpx 16rpx 16rpx 16rpx;
-		}
-		.name{
-			line-height: 40rpx;
-			margin-bottom: 12rpx;
-		}
-		.city{
-			line-height: 28rpx;
-			font-size: 20rpx;
-			margin-bottom: 18rpx;
-		}
-		.desc{
-			width: 422rpx;
-			line-height: 26rpx;
-			font-size: 18rpx;
-		}
-	}
-	
+		
 	::v-deep{
 		.section-search{
 			position: relative;

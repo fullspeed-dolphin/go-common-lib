@@ -16,7 +16,6 @@
 					{ "path": "orderDetail", "style": { "navigationStyle": "custom","navigationBarTitleText": "", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					{ "path": "orderList", "style": { "navigationStyle": "custom","navigationBarTitleText": "", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					{ "path": "groupList", "style": { "navigationStyle": "custom","navigationBarTitleText": "跑团招募", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "myGroup", "style": { "navigationStyle": "custom","navigationBarTitleText": "跑团详情", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					{ "path": "groupDetail", "style": { "navigationStyle": "custom","navigationBarTitleText": "跑团详情", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					{ "path": "groupForm", "style": { "navigationStyle": "custom","navigationBarTitleText": "创建跑团", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
 					{ "path": "groupMemberList", "style": { "navigationStyle": "custom","navigationBarTitleText": "跑团成员", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },

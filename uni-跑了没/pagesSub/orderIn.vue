@@ -26,7 +26,7 @@
 			
 			<view class="cell flex-between-center">
 				<view class="">全速码</view>
-				<u--input placeholder="全速码" maxlength="5" :border="false" v-model="verifyCode" inputAlign="right"/>
+				<u--input placeholder="全速码" maxlength="5" :border="none" v-model="verifyCode" inputAlign="right"/>
 			</view>
 		</section>
 		

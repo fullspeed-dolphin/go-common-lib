@@ -8,7 +8,7 @@
       	</view>
       	<view class="">
       		<view class="mb10" style="color: #222;">{{item.nickname || '成员'}}</view>
-      		{{item.user_phone}}
+      		<!-- {{item.user_phone}} -->
       	</view>
       </view>
     </mescroll-uni>

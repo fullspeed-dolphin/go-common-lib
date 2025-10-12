@@ -63,7 +63,7 @@
 				
 				<view class="bar flex-between-center">
 					成员
-					<view v-if="memberList.length > 10" class="flex-center" style="font-size: 20rpx;" @click="viewMoreMembers()">
+					<view v-if="memberList.length >= 8" class="flex-center" style="font-size: 20rpx;" @click="viewMoreMembers()">
 						<text style="color:#FF8C00;margin-right:5rpx;">查看更多</text> 
 						<u-icon name="arrow-right" color="#FF8C00" size="10"></u-icon>
 					</view>
@@ -138,7 +138,7 @@
 				this.isEmpty = true;
 				return
 			}
-			
+						
 			this.getDetail()
 			
 			// #ifdef MP-WEIXIN
@@ -149,11 +149,19 @@
 			})
 			// #endif
 		},
+		onUnload() {
+			uni.removeStorageSync('groupDetail')
+		},
 		methods: {
 			viewMoreMembers() {
 				uni.$u.route(`pagesSub/groupMemberList?group_id=${this.routeParams.group_id}`)
 			},
 			getDetail(page) {
+				const groupDetail = uni.getStorageSync('groupDetail')
+				if (groupDetail) {
+					this.detail = groupDetail
+				}
+				
 			  uni.showLoading({ mask: true });
 				
 				this.$axios.get(`/running-group/api/v1/groups/info?group_id=${this.routeParams.group_id}`)
@@ -167,7 +175,7 @@
 			getMemberList() {
 				const data = {
 					"pageIndex": 0,
-					"pageSize": 10,
+					"pageSize": 9,
 					groupId: Number(this.detail.group_id)
 				}
 				this.$axios.post(`/running-group/api/v1/groups/members`, data)

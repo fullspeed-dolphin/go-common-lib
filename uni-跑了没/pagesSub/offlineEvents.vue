@@ -92,11 +92,19 @@ export default {
 		this.routerParams = options
 		this.getDetail()
 	},
+	onUnload() {
+		uni.removeStorageSync('eventDetail')
+	},
 	onPageScroll(e) {
 		this.isFixedNavbar = parseInt(e.scrollTop) < 30
 	},
   methods: {
 		getDetail() {
+			const eventDetail = uni.getStorageSync('eventDetail')
+			if (eventDetail) {
+				this.detail = eventDetail
+			}
+			
 			uni.showLoading({
 				mask: true
 			})

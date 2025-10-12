@@ -13,24 +13,7 @@
     </section>
     <mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="240">
 			<view class="" style="height:40rpx"></view>
-			<view class="group-item flex-start" v-for="(item,index) in dataList" :key="index" @click="$u.route(`pagesSub/groupDetail?group_id=${item.group_id}`)">
-				<image class="poster" :src="item.avatar_url || '../static/run.png'" mode="aspectFill"></image>
-				<view class="text">
-					<view class="flex-between-center" style="width: 520rpx;">
-						<view class="">
-							<view class="name ellipsis">{{item.name}}</view>
-							<view class="city flex-row">
-								<view class="ellipsis mr10" style="max-width:350rpx;">
-									{{item.establish_location}}
-								</view>
-								{{item.total_members}}人
-							</view>
-						</view>
-						<u-button type="primary" size="small" shape="circle" text="加入"></u-button>
-					</view>
-					<view class="desc ellipsis">{{item.introduction}}</view>
-				</view>
-			</view>
+			<GroupItem :item="item" v-for="(item,index) in dataList" :key="index" />
     </mescroll-uni>
 		
 		<section v-if="!userInfo.running_group" class="section-bottom">
@@ -44,28 +27,16 @@
 </template>
 
 <script>
+		import GroupItem from "@/components/GroupItem.vue"
 	import PhoneLogin from "@/components/common/PhoneLogin.vue";
 import MescrollMixin from "@/uni_modules/mescroll-uni/components/mescroll-uni/mescroll-mixins.js";
-import dayjs from '@/uni_modules/uview-ui/libs/util/dayjs.js';
-
-const taleParams = {
-  orderNo: "",
-  orderStatus: "",
-  linkTelPhone: "",
-  storeId: "",
-  payChannel: "",
-  isAddOrder: "",
-  thirdPayOrderNo: "",
-  dateRange: [],
-};
 
 export default {
   mixins: [MescrollMixin],
-  components: { PhoneLogin },
+  components: { PhoneLogin, GroupItem },
   data() {
     return {
 			searchTxt: "",
-      taleParams: taleParams,
       tabActive: 0,
       tabList: [
 				{ label: "同城", value: 0 },
@@ -108,8 +79,6 @@ export default {
       this.curTab = detail;
       console.log(detail);
 
-      this.taleParams.orderStatus = detail.value;
-
       this.refreshList();
     },
     refreshList() {
@@ -120,12 +89,9 @@ export default {
     },
     getList(page) {
       uni.showLoading({ mask: true });
-      const {
-        orderNo,
-      } = this.taleParams;
       
       const data = {
-      	"pageIndex": 0,
+      	"pageIndex": page.num - 1,
       	"pageSize": 10,
       	"keyword": this.searchTxt
       }
@@ -133,7 +99,7 @@ export default {
           uni.hideLoading();
 
           //联网成功的回调,隐藏下拉刷新和上拉加载的状态;
-          this.mescroll.endBySize(res.data.length, 8);
+          this.mescroll.endSuccess(res.data.length)
 
           //如果是第一页需手动制空列表
           if (page.num == 1) {

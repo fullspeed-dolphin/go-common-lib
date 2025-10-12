@@ -5,12 +5,17 @@
     	<view class="rel section-user">
     		<view class="user-box" @click="handleUserClick">
     			<view class="flex-start">
-						<image class="avatar" :src="userInfo.avatar_url || '../static/run.png'" mode="aspectFill"></image>
+						<view class="img-box">
+							<image class="avatar" :src="userInfo.avatar_url || '../static/run.png'" mode="aspectFill"></image>
+							<view class="gender">
+								<u-icon v-if="userInfo.gender === 1" color="#409eff" name="man" size="17" ></u-icon>
+								<u-icon v-if="userInfo.gender === 0" color="#f5abb8" name="woman" size="17" ></u-icon>
+							</view>
+						</view>
     				<view class="text">
 							<block v-if="userInfo.id">
 								<view class="name flex-start" >
 									{{userInfo.nickname || '微信用户'}}
-									
 									<view class="ml10">
 										<u-icon name="edit-pen-fill" size="17" ></u-icon>
 									</view>
@@ -71,7 +76,7 @@
 		
 		<AccessUser ref="refAccessUser"/>
 		
-		<PhoneLogin ref="refPhoneLogin" />
+		<PhoneLogin ref="refPhoneLogin" @success="successLogin"/>
   </view>
 </template>
 <script>
@@ -118,6 +123,12 @@ export default {
 			
 			this.$refs.refAccessUser.open()
 		},
+		// 登录成功后 如果用户没有头像信息，弹窗让用户填信息
+		successLogin() {
+			if (!this.userInfo.avatar_url) {
+				return this.$refs.refAccessUser.open()
+			}
+		},
     logout () {
       uni.showModal({
         title: '提示',
@@ -141,6 +152,16 @@ export default {
 </script>
 
 <style lang="less" scoped>
+	.img-box{
+		position: relative;
+		.gender{
+			position: absolute;
+			background: #fff;
+			bottom:-2rpx;
+			right:25rpx;
+			border-radius: 40rpx;
+		}
+	}
 	::v-deep{
 		.service-cell{
 			.icon{

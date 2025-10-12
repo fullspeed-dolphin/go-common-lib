@@ -75,11 +75,11 @@
 				},
 				isAgree: [],
 				rules: {
-					// poster: [{
-					// 	required: true,
-					// 	message: '必填项',
-					// 	trigger: ['blur', 'change']
-					// }],
+					poster: [{
+						required: true,
+						message: '请点击上传跑团 logo',
+						trigger: ['blur', 'change']
+					}],
 					name: [{
 						required: true,
 						message: '必填项',
