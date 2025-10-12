@@ -15,7 +15,13 @@
 					<view class="flex-between-center" style="width: 520rpx;">
 						<view class="">
 							<view class="name ellipsis">{{item.name}}</view>
-							<view class="city ellipsis">{{item.establish_location}} {{item.total_members}}人</view>
+							
+							<view class="city flex-row">
+								<view class="ellipsis mr10" style="max-width:350rpx;">
+									{{item.establish_location}}
+								</view>
+								{{item.total_members}}人
+							</view>
 						</view>
 						<u-button type="primary" size="small" shape="circle" @click="joinGroup(item)">加入</u-button>
 					</view>
@@ -97,13 +103,13 @@ export default {
 		        uni.showLoading({ mask: true });
 		        this.$axios
 		          .post(`/user-api/user/joinRunningGroup`, data)
-		          .then((res) => {
+		          .then(async (res) => {
 		            uni.hideLoading();
 		            this.$toast("加入成功！");
 								
 								this.close()
 								
-								this.$store.dispatch('getUserInfo')
+								await this.$store.dispatch('getUserInfo')
 								
 								this.$emit('success')
 		          });

@@ -23,6 +23,11 @@
 					<u-icon v-if="!myGroup.group_id" name="arrow-right" size="34rpx" color="rgba(0,0,0,.9)"></u-icon>
 				</view>
 			</view>
+			
+			<view class="cell flex-between-center">
+				<view class="">全速码</view>
+				<u--input placeholder="全速码" maxlength="5" :border="false" v-model="verifyCode" inputAlign="right"/>
+			</view>
 		</section>
 		
 		<section class="scroll-view flex-center">
@@ -71,6 +76,7 @@ export default {
 	components: { GroupList },
   data () {
 		return {
+			verifyCode: '',
 			myGroup: {},
 			activeType: {},
 			isAgree: [],
@@ -101,16 +107,17 @@ export default {
 		async getUserGroup() {
 		  uni.showLoading({ mask: true });
 			
+			if (!this.userInfo.running_group) {
+				this.myGroup = {}
+				
+				return
+			}
+			
 			try {
-				let res = await this.$axios.post(`/user-api/user/getCreatedGroup`)
+				let res = await this.$axios.get(`/running-group/api/v1/groups/info?group_id=${this.userInfo.running_group}`)
 				if (res) {
 					this.myGroup = res;
 				}
-				let temp = await this.$axios.post(`/user-api/user/getUserGroup`)
-				if (temp) {
-					this.myGroup = temp;
-				}
-				
 			} catch (error) {
 				console.error(error)
 				//TODO handle the exception
@@ -177,6 +184,13 @@ export default {
 			}
 			
 			if (!this.SignerInfo.id_card) return this.$toast("请完善参赛者信息");
+			
+			const reg = /^[0-9a-zA-Z]*$/g
+			if (this.verifyCode && !reg.test(this.verifyCode)) return this.$toast("全速码格式有误")
+			
+			
+			return
+			
 			if (!this.isAgree.length) return this.$toast("请勾选同意协议");
 			
 			const data = {
@@ -185,6 +199,7 @@ export default {
 				"payment_method": "wechat",
 				"event_id": this.event_id,
 				"payment_amount": this.activeType.price,
+				spxcode: this.verifyCode,
 				running_group: String(this.userInfo.running_group || '')
 			}
 			
@@ -330,6 +345,12 @@ export default {
 				font-size: 30rpx;
 				color: #FF8C00;
 			}
+		}
+	}
+	
+	::v-deep{
+		.input-cell {
+			padding:0!important;
 		}
 	}
 </style>

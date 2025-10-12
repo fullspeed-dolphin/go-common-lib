@@ -27,7 +27,7 @@
 				</view>
     	</view>
 			<view class="section-box">
-				<u-cell title="我的跑团" class="nav-cell" @click="routeTo('/pagesSub/myGroup?from=mine')" :border="false" isLink>
+				<u-cell title="我的跑团" class="nav-cell" @click="routeTo(`pagesSub/groupDetail?from=mine&group_id=${userInfo.running_group}`)" :border="false" isLink>
 					<image slot="icon" class="nav-icon" src="/static/images/个人信息Icon@2x.png"></image>
 				</u-cell>
 				<!-- <u-cell title="我的消息" class="nav-cell" @click="routeTo('/pagesSub/myMessages')" :border="false" isLink>

@@ -28,9 +28,9 @@
 					<PickerTime v-model="form.establish_time" placeholder="请输入创建时间" />
 					<!-- <u-input v-model="form.establish_time" placeholder="请输入创建时间" /> -->
 				</u-form-item>
-				<u-form-item label="成员数量" prop="amount" required>
+				<!-- <u-form-item label="成员数量" prop="amount" required>
 					<u-input v-model="form.amount" type="digit" placeholder="请输入成员数量" />
-				</u-form-item>
+				</u-form-item> -->
 				<u-form-item label="真实姓名" prop="fullName" required>
 					<u-input v-model="form.fullName" placeholder="请输入您的真实姓名" />
 				</u-form-item>
@@ -70,7 +70,7 @@
 					description: "",
 					fullName: '',
 					phone: '',
-					amount: '',
+					// amount: '',
 					establish_time: dayjs().valueOf(),
 				},
 				isAgree: [],
@@ -90,11 +90,11 @@
 						message: '必填项',
 						trigger: ['blur', 'change']
 					}],
-					amount: [{
-						required: true,
-						message: '必填项',
-						trigger: ['blur', 'change']
-					}],
+					// amount: [{
+					// 	required: true,
+					// 	message: '必填项',
+					// 	trigger: ['blur', 'change']
+					// }],
 					fullName: [{
 						required: true,
 						message: '必填项',
@@ -121,6 +121,7 @@
 		},
 		methods: {
 			getDetail(page) {
+				this.form.phone = this.$store.state.userInfo.phone
 				if (!this.group_id) return;
 				this.$axios.get(`/running-group/api/v1/groups/info?group_id=${this.group_id}`)
 					.then((res) => {

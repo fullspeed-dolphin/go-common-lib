@@ -28,8 +28,8 @@
 						<view class="time">{{item.event_time}}</view>
 					</view>
 					
-					<u-button type="primary" :disabled="item.status === 'PND'" size="small" shape="circle" text="">
-						<block v-if="item.status === 'PND'">活动暂未开始</block>
+					<u-button type="primary" :color="item.status === 'PND' ? '#999' : ''" textColor="#fff" :disabled="item.status === 'PND'" size="small" shape="circle">
+						<block v-if="item.status === 'PND'">未开始</block>
 						<block v-if="item.status === 'ACT'">报名</block>
 					</u-button>
 				</view>
@@ -209,7 +209,7 @@ export default {
 		}
 		::v-deep{
 			.u-button--disabled{
-				color: #707070!important;
+				// color: #707070!important;
 			}
 		}
 	}

@@ -2,7 +2,11 @@
 	<view>
 		<u-navbar :title="pageTitle"></u-navbar>
 		
-		<block>
+		<mescroll-empty v-if="isEmpty" mode="data" :option="{
+			btnText: '创建跑团',
+		}" @emptyclick="$u.route(`pagesSub/groupForm`)"/>
+		
+		<block v-if="!isEmpty">
 			<section class="section-card flex-col-center">
 				<image class="img" :src="detail.avatar_url || '../static/run.png'" mode="aspectFill"></image>
 				<view class="name ellipsis2">{{detail.name}}</view>
@@ -111,6 +115,7 @@
 		components: { PhoneLogin },
 		data() {
 			return {
+				isEmpty: false,
 				detail: {},
 				routeParams: {},
 				memberList: [],
@@ -128,7 +133,12 @@
 		onLoad(options) {
 			console.log("option", options);
 			this.routeParams = options;
-			// this.detail = options
+			
+			if (!options.group_id || options.group_id === 'null') {
+				this.isEmpty = true;
+				return
+			}
+			
 			this.getDetail()
 			
 			// #ifdef MP-WEIXIN
