@@ -38,7 +38,7 @@ export default {
     getList(page) {
       uni.showLoading({ mask: true });
 			const data = {
-				"pageIndex": page.num,
+				"pageIndex": page.num - 1,
 				"pageSize": 10,
 				groupId: Number(this.group_id)
 			}

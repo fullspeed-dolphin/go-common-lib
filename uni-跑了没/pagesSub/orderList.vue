@@ -93,7 +93,7 @@ export default {
       uni.showLoading({ mask: true });
       
       const data = {
-      	"pageIndex": 0,
+      	"pageIndex": page.num - 1,
       	"pageSize": 10,
       	"orderStatus": this.curTab.value
       }
