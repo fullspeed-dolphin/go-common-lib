@@ -107,12 +107,14 @@
 		</block>
 		
 		<PhoneLogin ref="refPhoneLogin" />
+		<AccessUser ref="refAccessUser"/>
 	</view>
 </template>
 <script>
 	import PhoneLogin from "@/components/common/PhoneLogin.vue";
+	import AccessUser from "@/components/common/AccessUser.vue"
 	export default {
-		components: { PhoneLogin },
+		components: { PhoneLogin, AccessUser },
 		data() {
 			return {
 				isEmpty: false,
@@ -204,6 +206,11 @@
 			            uni.hideLoading();
 			            this.getDetail();
 			            this.$toast("加入成功！");
+									
+									// 如果用户没有头像昵称数据，提示更新
+									if (!this.userInfo.avatar_url) {
+										return this.$refs.refAccessUser.open()
+									}
 			          });
 			      } else if (res.cancel) {
 			        console.log("用户点击取消");

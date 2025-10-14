@@ -18,7 +18,7 @@
 			<section class="section-offline" v-for="(item, index) in eventList" :key="index" @click="$u.route(`pagesSub/offlineEvents?id=${item.id}`)">
 				<image class="poster" :src="item.background_image_url" mode="aspectFill"></image>
 				<view class="flex-start">
-					<view class="text">
+					<view class="flex-1 ofh text">
 						<view class="name ellipsis">{{item.name}}</view>
 						<view class="time">{{item.event_time}}</view>
 					</view>
@@ -176,7 +176,6 @@ export default {
 		}
 		.text{
 			padding: 20rpx 16rpx;
-			width: 560rpx;
 			.name{
 				line-height: 40rpx;
 				margin-bottom: 10rpx;
