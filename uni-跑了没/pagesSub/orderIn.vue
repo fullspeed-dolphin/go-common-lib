@@ -8,7 +8,7 @@
 					参赛者 <u-icon name="star-fill" color="#E53935" size="8"></u-icon>
 				</view>
 				<view class="flex-start">
-					<view class="txt flex-row">
+					<view class="txt flex-row" :class="{c70: !SignerInfo.id_card}">
 						{{SignerInfo.id_card ? SignerInfo.full_name : '请完善参赛者信息'}}
 					</view>
 					<u-icon name="arrow-right" size="34rpx" color="rgba(0,0,0,.9)"></u-icon>
@@ -17,14 +17,14 @@
 			<view class="cell flex-between-center">
 				<view class="">跑团</view>
 				<view class="flex-start" @click="openGroupPop()">
-					<view class="txt">
+					<view class="txt" :class="{c70: !myGroup.name}">
 						{{myGroup.name || '加入跑团'}}
 					</view>
 					<u-icon v-if="!myGroup.group_id" name="arrow-right" size="34rpx" color="rgba(0,0,0,.9)"></u-icon>
 				</view>
 			</view>
 			
-			<view class="cell flex-between-center">
+			<view class="cell flex-between-center" style="margin-bottom: 30rpx;">
 				<view class="">全速码</view>
 				<u--input placeholder="全速码" maxlength="5" border="none" v-model="verifyCode" inputAlign="right">
 				</u--input>
@@ -47,7 +47,7 @@
 					({{activeType.label}})
 				</view>
 			</view>
-			<view class="" style="line-height: 34rpx;margin-bottom:34rpx;">
+			<view class="" style="line-height: 34rpx;margin-bottom:34rpx;font-size: 24rpx;">
 				选择支付方式
 			</view>
 			<view class="flex-between-center method-cell">
@@ -68,7 +68,7 @@
 				<text style="color:#FF8C00" @click="$u.route('pagesSub/settings/agreement?type=signUp')">《用户协议》</text>以及
 				<text style="color:#FF8C00" @click="$u.route('pagesSub/settings/agreement?type=baoxian')">《保险须知》</text>
 			</view>
-			<view class="" style="padding: 56rpx 8rpx 0">
+			<view class="" style="padding: 56rpx 20rpx 80rpx">
 				<u-button type="primary" shape="circle" @click="submitOrder()">￥{{activeType.price}} 支付</u-button>
 			</view>
 		</section>
@@ -164,15 +164,11 @@ export default {
 		getSignerInfo() {
 			this.SignerInfo = uni.getStorageSync('SignerInfo') || {}
 			
-			return false;
 			const data = {
 				phone_number: this.userInfo.phone
 			}
 			this.$axios.post('/booking-api/registration/getSignerInfo', data).then(res => {
-				this.SignerInfo = {
-					...res,
-					...(uni.getStorageSync('SignerInfo') || {})
-				};
+				this.SignerInfo = res;
 			})
 		},
 		getEventPrice(spxcode = null) {
@@ -204,7 +200,7 @@ export default {
 					if (String(i).includes('km')) {
 						priceList.push({
 							price: res[i],
-							label: i,
+							label: i?.toUpperCase(),
 							km: parseFloat(i)
 						})
 					}
@@ -333,14 +329,14 @@ export default {
 		margin: 50rpx 34rpx;
 	}
 	.section-payment{
-		padding: 50rpx 24rpx;
+		padding: 50rpx 34rpx;
 		.money{
 			color:#E53935;
 			font-size: 44rpx;
 			line-height: 60rpx;
 			margin-bottom: 30rpx;
 			.txt{
-				font-size: 28rpx;
+				font-size: 34rpx;
 				color: #000;
 				margin-left:20rpx;
 			}
@@ -364,22 +360,25 @@ export default {
 	.section-assign{
 		.cell{
 			width: 682rpx;
-			height: 72rpx;
+			height: 120rpx;
 			padding: 0 20rpx;
-			margin: 50rpx auto;
+			margin: 40rpx auto;
 			background: #FFFFFF;
 			box-shadow: 0rpx 4rpx 10rpx 2rpx rgba(0,0,0,0.16);
 			border-radius: 16rpx 16rpx 16rpx 16rpx;
 		}
 		.txt{
 			font-weight: 500;
-			font-size: 24rpx;
-			color: #666;
+			font-size: 28rpx;
+			color: rgb(48, 49, 51);
+			&.c70{
+				color: #707070;
+			}
 		}
 	}
 	
 	.scroll-view{
-		padding: 20rpx 34rpx;
+		padding: 10rpx 34rpx;
 		.type-item{
 			margin-right: 46rpx;
 			width: 196rpx;

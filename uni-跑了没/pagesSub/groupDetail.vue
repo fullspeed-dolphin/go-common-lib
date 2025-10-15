@@ -4,7 +4,7 @@
 		
 		<mescroll-empty v-if="isEmpty" mode="data" :option="{
 			btnText: '创建跑团',
-		}" @emptyclick="$u.route(`pagesSub/groupForm`)"/>
+		}" @emptyclick="$u.route(`pagesSub/groupForm?from=mine`)"/>
 		
 		<block v-if="!isEmpty">
 			<section class="section-card flex-col-center">
@@ -29,7 +29,7 @@
 					</view>
 					成员人数
 				</view>
-				<view class="flex-1 flex-col-center">
+				<view class="flex-1 flex-col-center u-border-left">
 					<view class="number">
 						{{detail.total_members}}:{{0}}
 					</view>
@@ -86,7 +86,7 @@
 			<view class="" style="height: 120rpx;"></view>
 			<!-- 未加入跑团，才可加入跑团 -->
 			<section v-if="!userInfo.running_group && detail.user_role === 'guest'" class="section-bottom">
-				<view style="padding: 0rpx 156rpx 40rpx">
+				<view style="padding: 56rpx 54rpx 40rpx">
 					<u-button type="primary" shape="circle" @click="joinGroup()">加入跑团</u-button>
 				</view>
 			</section>
@@ -100,8 +100,8 @@
 			</section>
 			
 			<section v-if="detail.user_role === 'member'" class="section-bottom">
-				<view style="padding: 0rpx 156rpx 40rpx" class="flex-center">
-					<u-button type="primary" color="#f2f2f2" textColor="#FF8C00" width="320rpx" shape="circle" @click="leaveGroup()">退出跑团</u-button>
+				<view style="padding: 56rpx 54rpx 40rpx">
+					<u-button type="primary" color="#f2f2f2" textColor="#FF8C00" shape="circle" @click="leaveGroup()">退出跑团</u-button>
 				</view>
 			</section>
 		</block>
@@ -153,6 +153,19 @@
 		},
 		onUnload() {
 			uni.removeStorageSync('groupDetail')
+		},
+		onShow() {
+		  // 移除全局自定义事件监听器
+		  uni.$off("updateList");
+		
+		  // 监听全局的自定义事件
+		  uni.$once("updateList", (data) => {
+		    // 判断从我的跑团创建，返回没有跑团 ID，页面空白的问题
+		    if (data.from === 'mine' && data.group_id) {
+					this.routeParams.group_id = data.group_id
+					this.getDetail()
+		    }
+		  });
 		},
 		methods: {
 			viewMoreMembers() {
@@ -410,5 +423,8 @@
 	  bottom: 0px;
 	  width: 100%;
 	  z-index: 10;
+	}
+	.u-border-left{
+		border-color: #F3F3F3;
 	}
 </style>

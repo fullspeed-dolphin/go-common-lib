@@ -11,7 +11,7 @@
 					</view>
 					<view class="" style="margin-left:28rpx;">
 						<u-form-item label="性别" prop="gender" required>
-							<view class="u-input flex-center" style="width:200rpx;" @click="openActionSheet('gender')">
+							<view class="u-input flex-start flex-end pr20" style="width:200rpx;" @click="openActionSheet('gender')">
 								<view v-if="form.gender" class="mr10">
 									{{calcuValue('gender')}}
 								</view>
@@ -25,13 +25,33 @@
 				</view>
 				<view class="flex-between-center cell-line">
 					<view class="flex">
-						<u-form-item label="电话号码" prop="phone" required>
+						<u-form-item label="手机号码" prop="phone" required>
 							<u-input v-model="form.phone" placeholder="请填写手机号码" />
 						</u-form-item>
 					</view>
 					<view class="" style="width:200rpx;margin-left:28rpx;">
+						<u-form-item label="血型" prop="bloodType">
+							<view class="u-input flex-start flex-end pr20" style="width:200rpx;" @click="openActionSheet('bloodType')">
+								<view v-if="form.bloodType" class="mr10">
+									{{calcuValue('bloodType')}}
+								</view>
+								<view v-if="!form.bloodType" class="input-placeholder">
+									请选择血型
+								</view>
+								<u-icon name="arrow-down-fill" color="#FF8C00"></u-icon>
+							</view>
+						</u-form-item>
+					</view>
+				</view>
+				<view class="flex-between-center cell-line">
+					<view class="flex">
+						<u-form-item label="身份证号码" prop="idNumber" required>
+							<u-input v-model="form.idNumber" placeholder="请填写您的身份证号码" />
+						</u-form-item>
+					</view>
+					<view class="" style="width:200rpx;margin-left:28rpx;">
 						<u-form-item label="T恤尺码" prop="colthSize" required>
-							<view class="u-input flex-center" style="width:200rpx;" @click="openActionSheet('colthSize')">
+							<view class="u-input flex-start flex-end pr20" style="width:200rpx;" @click="openActionSheet('colthSize')">
 								<view v-if="form.colthSize" class="mr10">
 									{{calcuValue('colthSize')}}
 								</view>
@@ -43,10 +63,8 @@
 						</u-form-item>
 					</view>
 				</view>
-				<u-form-item label="身份证号码" prop="idNumber" required>
-					<u-input v-model="form.idNumber" placeholder="请填写您的身份证号码" />
-				</u-form-item>
-				<u-form-item label="邮箱" prop="email">
+				
+				<!-- <u-form-item label="邮箱" prop="email">
 					<u-input v-model="form.email" placeholder="请填写您的电子邮箱" />
 				</u-form-item>
 				<view class="flex-between-center cell-line">
@@ -74,17 +92,17 @@
 				</u-form-item>
 				<u-form-item label="擅长的运动项目" prop="strengths">
 					<u-input v-model="form.strengths" placeholder="请填写您擅长的运动项目(如:徒步等)" />
-				</u-form-item>
+				</u-form-item> -->
 			</u--form>
-			
-			<view class="" style="padding: 26rpx 120rpx 0">
-				<u-button type="primary" shape="circle" @click="submit()">保存参赛者信息</u-button>
-			</view>
 			
 			<u-action-sheet :actions="options_sheet" @close="closeActionSheet" round="16" 
 				cancelText="取消"
 				@select="selectActionSheet"
-				:closeOnClickOverlay="true" title="请选择" :show="isShowSheet"></u-action-sheet>
+				:closeOnClickOverlay="true" title="请选择" :show="isShowSheet"/>
+		</view>
+		
+		<view class="fixed-bottom" style="padding: 56rpx 54rpx 80rpx">
+			<u-button type="primary" shape="circle" @click="submit()">保存参赛者信息</u-button>
 		</view>
 	</view>
 </template>
@@ -120,6 +138,11 @@
 						message: '必填项',
 						trigger: ['blur', 'change']
 					}],
+					// bloodType: [{
+					// 	required: true,
+					// 	message: '必填项',
+					// 	trigger: ['blur', 'change']
+					// }],
 					phone: [{
 						required: true,
 						message: '请输入有效手机号',
@@ -192,9 +215,11 @@
 				}
 				this.$axios.post('/booking-api/registration/getSignerInfo', data).then(res => {
 					console.log(res)
+					this.signerId = res.id
+					
 					this.form =	{
 						fullName: res.full_name || '',
-						gender: res.gender || '',
+						gender: res.gender || '1',
 						phone: res.phone_number || '',
 						colthSize: res.tshirt_size || '',
 						idNumber: res.id_card || '',
@@ -224,7 +249,7 @@
 					const res = this.form
 					const data = {
 						full_name: res.fullName || '',
-						gender: res.gender || '',
+						gender: Number(res.gender),
 						phone_number: res.phone || '',
 						tshirt_size: res.colthSize || '',
 						id_card: res.idNumber || '',
@@ -235,19 +260,14 @@
 						good_at_sports: res.strengths || '',
 					}
 					
-					uni.setStorageSync('SignerInfo', data);
+					if (this.signerId) {
+						data.id = this.signerId
+					}
 					
-					this.$toast('保存成功')
-					
-					setTimeout(() => {
-						uni.navigateBack()
-					}, 300)
-					
-					return 
 					uni.showLoading({
 						mask: true
 					})
-					this.$axios.post(`/booking-api/registration/updateSignerInfo`, data).then(res => {
+					this.$axios.post(`/booking-api/registration/${this.signerId ? 'updateSignerInfo' : 'saveSignerInfo'}`, data).then(res => {
 						console.log(res)
 						// uni.hideLoading()
 						
@@ -284,7 +304,7 @@
 		}
 		.u-input{
 			border:0;
-			height: 72rpx;
+			height: 120rpx;
 			background: rgba(255,255,255);
 			border-radius: 16rpx;
 			background: #FFFFFF;
@@ -300,5 +320,10 @@
 	}
 	.flex-between-center{
 		align-items: baseline;
+	}
+	.fixed-bottom{
+		position: fixed;
+		bottom:0;
+		width: 100%;
 	}
 </style>

@@ -24,8 +24,8 @@
 				<u-form-item label="跑团地址" prop="location" required>
 					<PickerMap :title="null" v-model="form.location" placeholder="请选择地址" />
 				</u-form-item>
-				<u-form-item label="创建时间" prop="establish_time">
-					<PickerTime v-model="form.establish_time" placeholder="请输入创建时间" />
+				<u-form-item label="成立时间" prop="establish_time">
+					<PickerTime v-model="form.establish_time" placeholder="请输入成立时间" />
 					<!-- <u-input v-model="form.establish_time" placeholder="请输入创建时间" /> -->
 				</u-form-item>
 				<!-- <u-form-item label="成员数量" prop="amount" required>
@@ -121,6 +121,8 @@
 		onLoad(options) {
 			console.log("option", options);
 			this.group_id = options.group_id;
+			
+			this.from = options.from
 			this.getDetail()
 		},
 		methods: {
@@ -136,7 +138,7 @@
 							description: res.introduction,
 							fullName: res.creator_real_name,
 							phone: res.creator_phone,
-							amount: String(res.total_members),
+							// amount: String(res.total_members),
 							establish_time: dayjs(res.establish_time).valueOf(),
 						}
 						
@@ -161,7 +163,7 @@
 						"name": this.form.name,
 						"establish_location": this.form.location,
 						"creator_real_name": this.form.fullName,
-						"total_members": this.form.amount,
+						// "total_members": this.form.amount,
 						"introduction": this.form.description,
 						"creator_phone": this.form.phone,
 						"establish_time": this.form.establish_time,
@@ -176,19 +178,23 @@
 					if (this.group_id) {
 						url = '/running-group/api/v1/groups/update'
 					}
-					this.$axios.post(url, data).then(res => {
+					this.$axios.post(url, data).then(async res => {
 						console.log(res)
 						
 						this.$toast(this.group_id ? '更新成功' : '创建成功')
 						
-						this.$store.dispatch('getUserInfo')
+						const res1 = await this.$store.dispatch('getUserInfo')
+						
+						// 跳转回上一级页面，返回上一页并传递参数
+						uni.$emit("updateList", { 
+							isChange: true, 
+							from: this.from,
+							group_id: res1.running_group
+						});
 						
 						setTimeout(() => {
 							uni.navigateBack()
-						}, 1000)
-						
-						// 跳转回上一级页面，返回上一页并传递参数
-						uni.$emit("updateList", { isChange: true });
+						}, 500)
 					})
 				})
 			}

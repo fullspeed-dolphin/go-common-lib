@@ -174,7 +174,7 @@
 						quality: 80,
 						success: (res) => {
 							resolve(res.tempFilePath);
-							console.log(res.tempFilePath);
+							console.log('已经压缩：', res.tempFilePath);
 						},
 						fail(e) {
 							console.error(e)

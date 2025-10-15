@@ -40,20 +40,21 @@
 						<u--text v-if="detail.status == 'EXP'" type="info" text="已过期"></u--text>
 					</u-cell>
 					<u-cell title="创建时间" :isLink="false">{{detail.created_at}}</u-cell>
-					<u-cell title="交易号" :border="false" :isLink="false">{{detail.transaction_id}}</u-cell>
+					<u-cell title="交易号" v-if="detail.transaction_id" :border="false" :isLink="false">{{detail.transaction_id}}</u-cell>
 				</u-collapse-item>
 			</u-collapse>
 		</section>
 		
-		<section class="panel" style="padding:0;overflow: hidden;">
+		<section v-if="detail.sign_info" class="panel" style="padding:0;overflow: hidden;">
 			<u-collapse>
 				<u-collapse-item title="报名信息" name="Docs guide">
 					<u-cell title="姓名" :isLink="false">{{detail.sign_info.full_name}}</u-cell>
 					<u-cell title="性别" :isLink="false">{{['女生', '男生','未知'][Number(detail.sign_info.gender)]}}</u-cell>
-					<u-cell title="电话号码" :isLink="false">{{detail.sign_info.phone_number}}</u-cell>
+					<u-cell title="手机号码" :isLink="false">{{detail.sign_info.phone_number}}</u-cell>
 					<u-cell title="T恤尺码" :isLink="false">{{detail.sign_info.tshirt_size}}</u-cell>
 					<u-cell title="身份证号码" :isLink="false">{{detail.sign_info.id_card}}</u-cell>
-					<u-cell title="邮箱" :border="false"  :isLink="false">{{detail.sign_info.email}}</u-cell>
+					<u-cell title="血型" v-if="detail.sign_info.blood_type" :border="false"  :isLink="false">{{detail.sign_info.blood_type}}</u-cell>
+					<u-cell title="所在跑团" :border="false"  :isLink="false">{{detail.sign_info.running_group}}</u-cell>
 				</u-collapse-item>
 			</u-collapse>
 		</section>

@@ -17,7 +17,7 @@
     </mescroll-uni>
 		
 		<section v-if="!userInfo.running_group" class="section-bottom">
-			<view style="padding: 0rpx 156rpx 20rpx">
+			<view style="padding: 0rpx 54rpx 20rpx">
 				<u-button type="primary" shape="circle" @click="openForm()">创建跑团</u-button>
 			</view>
 		</section>
