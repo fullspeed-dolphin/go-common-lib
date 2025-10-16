@@ -46,7 +46,7 @@
 				<view class="flex-between-center cell-line">
 					<view class="flex">
 						<u-form-item label="身份证号码" prop="idNumber" required>
-							<u-input v-model="form.idNumber" placeholder="请填写您的身份证号码" />
+							<u-input v-model="form.idNumber" :disabled="disabled" placeholder="请填写您的身份证号码" />
 						</u-form-item>
 					</view>
 					<view class="" style="width:200rpx;margin-left:28rpx;">
@@ -110,6 +110,7 @@
 	export default {
 		data() {
 			return {
+				disabled: false,
 				form: {
 					fullName: '',
 					gender: '',
@@ -216,6 +217,10 @@
 				this.$axios.post('/booking-api/registration/getSignerInfo', data).then(res => {
 					console.log(res)
 					this.signerId = res.id
+					
+					if (res.id_card) {
+						this.disabled = true;
+					}
 					
 					this.form =	{
 						fullName: res.full_name || '',
