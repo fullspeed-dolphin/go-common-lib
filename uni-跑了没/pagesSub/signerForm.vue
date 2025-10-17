@@ -5,60 +5,66 @@
 			<u--form :model="form" ref="uForm" :rules="rules" labelPosition="top" labelWidth="auto">
 				<view class="flex-between-center cell-line">
 					<view class="flex">
-						<u-form-item label="姓名" prop="fullName" required>
-							<u-input v-model="form.fullName" placeholder="请填写参赛者姓名" />
+						<u-form-item label="姓名" prop="full_name" required>
+							<u-input v-model="form.full_name" placeholder="请填写参赛者姓名" />
 						</u-form-item>
 					</view>
 					<view class="" style="margin-left:28rpx;">
 						<u-form-item label="性别" prop="gender" required>
-							<view class="u-input flex-start flex-end pr20" style="width:200rpx;" @click="openActionSheet('gender')">
+							<view class="u-input flex-start pr20" style="width:200rpx;justify-content: flex-end;" @click="openActionSheet('gender')">
 								<view v-if="form.gender" class="mr10">
 									{{calcuValue('gender')}}
 								</view>
 								<view v-if="!form.gender" class="input-placeholder">
 									请选择性别
 								</view>
-								<u-icon name="arrow-down-fill" color="#FF8C00"></u-icon>
+								<view class="">
+									<u-icon name="arrow-down-fill" color="#FF8C00"></u-icon>
+								</view>
 							</view>
 						</u-form-item>
 					</view>
 				</view>
 				<view class="flex-between-center cell-line">
 					<view class="flex">
-						<u-form-item label="手机号码" prop="phone" required>
-							<u-input v-model="form.phone" placeholder="请填写手机号码" />
+						<u-form-item label="手机号码" prop="phone_number" required>
+							<u-input v-model="form.phone_number" placeholder="请填写手机号码" />
 						</u-form-item>
 					</view>
 					<view class="" style="width:200rpx;margin-left:28rpx;">
-						<u-form-item label="血型" prop="bloodType">
-							<view class="u-input flex-start flex-end pr20" style="width:200rpx;" @click="openActionSheet('bloodType')">
-								<view v-if="form.bloodType" class="mr10">
-									{{calcuValue('bloodType')}}
+						<u-form-item label="血型" prop="blood_type">
+							<view class="u-input flex-start pr20" style="width:200rpx;justify-content: flex-end;" @click="openActionSheet('blood_type')">
+								<view v-if="form.blood_type" class="mr10">
+									{{calcuValue('blood_type')}}
 								</view>
-								<view v-if="!form.bloodType" class="input-placeholder">
+								<view v-if="!form.blood_type" class="input-placeholder">
 									请选择血型
 								</view>
+								<view class="">
 								<u-icon name="arrow-down-fill" color="#FF8C00"></u-icon>
+								</view>
 							</view>
 						</u-form-item>
 					</view>
 				</view>
 				<view class="flex-between-center cell-line">
 					<view class="flex">
-						<u-form-item label="身份证号码" prop="idNumber" required>
-							<u-input v-model="form.idNumber" :disabled="disabled" placeholder="请填写您的身份证号码" />
+						<u-form-item label="身份证号码" prop="id_card" required>
+							<u-input v-model="form.id_card" :disabled="disabled" placeholder="请填写您的身份证号码" />
 						</u-form-item>
 					</view>
 					<view class="" style="width:200rpx;margin-left:28rpx;">
-						<u-form-item label="T恤尺码" prop="colthSize" required>
-							<view class="u-input flex-start flex-end pr20" style="width:200rpx;" @click="openActionSheet('colthSize')">
-								<view v-if="form.colthSize" class="mr10">
-									{{calcuValue('colthSize')}}
+						<u-form-item label="T恤尺码" prop="tshirt_size" required>
+							<view class="u-input flex-start pr20" style="width:200rpx;justify-content: flex-end;" @click="openActionSheet('tshirt_size')">
+								<view v-if="form.tshirt_size" class="mr10">
+									{{calcuValue('tshirt_size')}}
 								</view>
-								<view v-if="!form.colthSize" class="input-placeholder">
+								<view v-if="!form.tshirt_size" class="input-placeholder">
 									请选择尺码
 								</view>
+								<view class="">
 								<u-icon name="arrow-down-fill" color="#FF8C00"></u-icon>
+								</view>
 							</view>
 						</u-form-item>
 					</view>
@@ -69,12 +75,12 @@
 				</u-form-item>
 				<view class="flex-between-center cell-line">
 					<view class="flex">
-						<u-form-item label="血型" prop="bloodType">
-							<view class="u-input flex-center" style="width:200rpx;" @click="openActionSheet('bloodType')">
-								<view v-if="form.bloodType" class="mr10">
-									{{calcuValue('bloodType')}}
+						<u-form-item label="血型" prop="blood_type">
+							<view class="u-input flex-center" style="width:200rpx;" @click="openActionSheet('blood_type')">
+								<view v-if="form.blood_type" class="mr10">
+									{{calcuValue('blood_type')}}
 								</view>
-								<view v-if="!form.bloodType" class="input-placeholder">
+								<view v-if="!form.blood_type" class="input-placeholder">
 									请选择血型
 								</view>
 								<u-icon name="arrow-down-fill" color="#FF8C00"></u-icon>
@@ -112,19 +118,19 @@
 			return {
 				disabled: false,
 				form: {
-					fullName: '',
+					full_name: '',
 					gender: '',
-					phone: '',
-					colthSize: '',
-					idNumber: '',
+					phone_number: '',
+					tshirt_size: '',
+					id_card: '',
 					email: '',
-					bloodType: '',
+					blood_type: '',
 					job: '',
 					sportPurpose: '',
 					strengths: '',
 				},
 				rules: {
-					fullName: [{
+					full_name: [{
 						required: true,
 						message: '必填项',
 						trigger: ['blur', 'change']
@@ -134,23 +140,23 @@
 						message: '必填项',
 						trigger: ['blur', 'change']
 					}],
-					colthSize: [{
+					tshirt_size: [{
 						required: true,
 						message: '必填项',
 						trigger: ['blur', 'change']
 					}],
-					// bloodType: [{
+					// blood_type: [{
 					// 	required: true,
 					// 	message: '必填项',
 					// 	trigger: ['blur', 'change']
 					// }],
-					phone: [{
+					phone_number: [{
 						required: true,
 						message: '请输入有效手机号',
 						pattern: /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/,
 						trigger: ['blur', 'change']
 					}],
-					idNumber: [{
+					id_card: [{
 						required: true,
 						pattern: /^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/,
 						message: '请输入有效身份证号码',
@@ -164,13 +170,13 @@
 					{name: "女", value: '0'},
 					{name: "未知", value: '2'},
 				],
-				options_bloodType: [
+				options_blood_type: [
 					{name: "A型", value: 'A'},
 					{name: "B型", value: 'B'},
 					{name: "AB型", value: 'AB'},
 					{name: "O型", value: 'O'},
 				],
-				options_colthSize: [
+				options_tshirt_size: [
 					{name: "120", value: '120'},
 					{name: "130", value: '130'},
 					{name: "140", value: '140'},
@@ -193,17 +199,13 @@
 		onLoad() {
 			this.getInfo()
 			
-			this.form = {
-				...this.form,
-				...(uni.getStorageSync('SignerInfo') || {})
-			}
+			console.log('this.form=====>', this.form)
 		},
 		methods: {
 			calcuValue(type) {
 				const value = this.form[type];
 				
 				const option = this['options_' + type].find(i => i.value === value)
-				console.log(value)
 				
 				return option?.name || ''
 			},
@@ -221,18 +223,22 @@
 					if (res.id_card) {
 						this.disabled = true;
 					}
+					const cache = uni.getStorageSync('SignerInfo') || {}
 					
+					console.log(cache)
 					this.form =	{
-						fullName: res.full_name || '',
+						full_name: res.full_name || '',
 						gender: res.gender || '1',
-						phone: res.phone_number || '',
-						colthSize: res.tshirt_size || '',
-						idNumber: res.id_card || '',
+						phone_number: res.phone_number || '',
+						tshirt_size: res.tshirt_size || '',
+						id_card: res.id_card || '',
 						email: res.email || '',
-						bloodType: res.blood_type || '',
+						blood_type: res.blood_type || '',
 						job: res.occupation || '',
 						sportPurpose: res.running_goal || '',
 						strengths: res.good_at_sports || '',
+						...cache,
+						gender: cache.gender ? String(cache.gender) : '1',
 					}
 				})
 			},
@@ -253,13 +259,13 @@
 				this.$refs.uForm.validate().then(() => {
 					const res = this.form
 					const data = {
-						full_name: res.fullName || '',
+						full_name: res.full_name || '',
 						gender: Number(res.gender),
-						phone_number: res.phone || '',
-						tshirt_size: res.colthSize || '',
-						id_card: res.idNumber || '',
+						phone_number: res.phone_number || '',
+						tshirt_size: res.tshirt_size || '',
+						id_card: res.id_card || '',
 						email: res.email || '',
-						blood_type: res.bloodType || '',
+						blood_type: res.blood_type || '',
 						occupation: res.job || '',
 						running_goal: res.sportPurpose || '',
 						good_at_sports: res.strengths || '',
@@ -272,6 +278,17 @@
 					uni.showLoading({
 						mask: true
 					})
+					
+					uni.setStorageSync('SignerInfo', data)
+					
+					this.$toast('保存成功')
+					
+					setTimeout(() => {
+						uni.navigateBack()
+					}, 300)
+					
+					return;
+					
 					this.$axios.post(`/booking-api/registration/${this.signerId ? 'updateSignerInfo' : 'saveSignerInfo'}`, data).then(res => {
 						console.log(res)
 						// uni.hideLoading()

@@ -162,13 +162,16 @@ export default {
 			uni.hideLoading()
 		},
 		getSignerInfo() {
-			this.SignerInfo = uni.getStorageSync('SignerInfo') || {}
-			
 			const data = {
 				phone_number: this.userInfo.phone
 			}
 			this.$axios.post('/booking-api/registration/getSignerInfo', data).then(res => {
-				this.SignerInfo = res;
+				this.SignerInfo = {
+					...res,
+					...(uni.getStorageSync('SignerInfo') || {})
+				}
+				
+				console.log(uni.getStorageSync('SignerInfo'), this.SignerInfo)
 			})
 		},
 		getEventPrice(spxcode = null) {
