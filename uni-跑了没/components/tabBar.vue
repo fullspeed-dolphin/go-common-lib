@@ -28,7 +28,7 @@
 			active: '../static/tab_21.png',
 		},
 	]
-	if (isRelease) {
+	// if (!isRelease) {
 		tabs = [{
 				"text": "首页",
 				name: 'index',
@@ -54,7 +54,7 @@
 				active: '../static/tab_21.png',
 			},
 		]
-	}
+	// }
 	export default {
 		props: ['type'],
 		data() {

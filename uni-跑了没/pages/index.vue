@@ -23,9 +23,10 @@
 						<view class="time">{{item.event_time}}</view>
 					</view>
 					
-					<u-button type="primary" :color="item.status === 'PND' ? '#999' : ''" textColor="#fff" :disabled="item.status === 'PND'" size="small" shape="circle">
+					<u-button type="primary" :color="item.status !== 'PND' ? '#999' : ''" textColor="#fff" :disabled="item.status !== 'ACT'" size="small" shape="circle">
 						<block v-if="item.status === 'PND'">未开始</block>
 						<block v-if="item.status === 'ACT'">报名</block>
+						<block v-if="item.status === 'EXP'">已截止</block>
 					</u-button>
 				</view>
 			</section>

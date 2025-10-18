@@ -61,9 +61,10 @@
 				{{isSignUp ? '取消' : ''}}报名截止：2025.09.30 9:00
 			</view> -->
 			<view class="u-border-top1" :class="{isSignUp: isSignUp}" style="padding: 26rpx 20rpx 0">
-				<u-button type="primary" :disabled="detail.status === 'PND'" shape="circle" @click="routeTo()">
+				<u-button type="primary" :disabled="detail.status !== 'ACT'" shape="circle" @click="routeTo()">
 					<block v-if="detail.status === 'ACT'">{{isSignUp ? '取消报名' : '活动报名'}}</block>
 					<block v-if="detail.status === 'PND'">活动暂未开始</block>
+					<block v-if="detail.status === 'EXP'">已截止</block>
 				</u-button>
 			</view>
 		</view>

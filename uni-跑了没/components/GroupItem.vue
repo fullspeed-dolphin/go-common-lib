@@ -14,7 +14,6 @@
 				</view>
 				<u-button type="primary" size="small" shape="circle" @click="joinGroup(item)">加入</u-button>
 			</view>
-			<view class="desc ellipsis">{{item.introduction}}</view>
 		</view>
 	</view>
 </template>
@@ -24,10 +23,6 @@
 			item: {
 				type: Object,
 				default: () => {}
-			},
-			from: {
-				type: String,
-				default: ''
 			}
 		},
 		data() {
@@ -36,13 +31,6 @@
 			};
 		},
 		methods: {
-			viewDetail(item){
-				// 搜索组件中不跳转详情，加入按钮控制交互
-				if (this.from === 'search') return;
-				
-				uni.setStorageSync('groupDetail', item)
-				uni.$u.route(`pagesSub/groupDetail?group_id=${item.group_id}`)
-			},
 			joinGroup(item) {
 				this.$emit('join', item)
 			}

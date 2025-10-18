@@ -65,6 +65,9 @@
 				<!-- <u-cell title="意见反馈" class="nav-cell" @click="routeTo('/pagesSub/settings/feedback')" :border="false" isLink>
 					<image slot="icon" class="nav-icon" src="/static/images/帮助反馈Icon@2x.png"></image>
 				</u-cell> -->
+				<u-cell title="智能设备" class="nav-cell" @click="routeTo('/pagesSub/device/deviceList')" :border="false" isLink>
+					<image slot="icon" class="nav-icon" style="height: 40rpx;" src="/static/images/WX20251018-181116.png"></image>
+				</u-cell>
 			</view>
 			
 	   <view v-if="userInfo.id" class="logout c9 flex-center">
