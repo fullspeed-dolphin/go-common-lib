@@ -1,14 +1,17 @@
 <template>
-  <view class="pb30" style="background: #f5f5f5;" :class="{isFixedNavbar: isFixedNavbar}">
+  <view @tap="clickPage()" class="pb30" style="background: #f5f5f5;" :class="{
+		isFixedNavbar: isFixedNavbar,
+		isLoadedPage: isLoadedPage
+	}">
 		<u-navbar :title="isFixedNavbar ? '' : '线下活动'" :placeholder="false"></u-navbar>
 		
 		<div class="event-status flex-center" v-if="detail.status === 'ACT'">活动进行中</div>
 		
-		<section style="padding:0;overflow: hidden;">
-			<image :src="detail.background_image_url" mode="aspectFill" style="width:100%;display: block;height:500rpx;"></image>
+		<section style="padding:0;overflow: hidden;height:750rpx;" :class="{isScrolled: isScrolled}">
+			<image class="img" :src="detail.background_image_url" mode="aspectFill" style="width:100%;display: block;height:100%;"></image>
 		</section>
 		
-		<section class="panel bgf" style="margin-top: -50rpx;position: relative;z-index: 10;">
+		<section class="section-event panel bgf" style="position: relative;z-index: 10;">
 			<view class="h2">
 				<view class="ellipsis2">
 					{{detail.name}}
@@ -84,9 +87,11 @@ export default {
   data () {
 		return {
 			isScroll: false,
+			isScrolled: false,
 			isSignUp: false,
 			detail: {},
-			isFixedNavbar: true
+			isFixedNavbar: true,
+			isLoadedPage: false,   // 页面加载后控制动画
 		}
   },
 	computed: {
@@ -107,6 +112,7 @@ export default {
 		this.getDetail()
 	},
 	onUnload() {
+		this.isLoadedPage = false;
 		uni.removeStorageSync('eventDetail')
 	},
 	onPageScroll(e) {
@@ -127,6 +133,9 @@ export default {
 		};
 	},
   methods: {
+		clickPage() {
+			this.isScrolled = true;
+		},
 		getDetail() {
 			const eventDetail = uni.getStorageSync('eventDetail')
 			if (eventDetail) {
@@ -140,6 +149,8 @@ export default {
 				res.text = `<img src="${res.long_image_url}" style="max-width:100%;" />`
 				res.eventItems = res.event_projects.split('、')
 				this.detail = res;
+				
+				this.isLoadedPage = true;
 			})
 		},
 		routeTo() {
@@ -266,10 +277,26 @@ export default {
 		left:0;
 		z-index: 10;
 		padding: 0 34rpx 34rpx;
+		transform: translateY(100%);
 		.txt{
 			font-size: 24rpx;
 			line-height: 34rpx;
 			margin-bottom: 22rpx;
+		}
+	}
+	.section-event{
+		transform: translateY(0%);
+	}
+	
+	.isLoadedPage{
+		.section-bottom{
+			// transition: transform 0.5s;
+			// transform: translateY(0%);
+			animation: slideIn 0.5s 0.5s forwards;
+		}
+		.section-event{
+			transition: transform 0.5s;
+			transform: translateY(-100rpx);
 		}
 	}
 	
@@ -299,4 +326,23 @@ export default {
 		border-radius: 888rpx;
 		padding: 20rpx 30rpx;
 	}
+	
+	.isScrolled{
+		transition: height 0.3s;
+		height: 500rpx!important;
+	}
+	@keyframes slideIn {
+	  0% {
+	    transform: translateY(100%);
+	    opacity: 0;
+	  }
+	  50% {
+	    transform: translateY(10px);
+	  }
+	  100% {
+	    transform: translateY(0);
+	    opacity: 1;
+	  }
+	}
+	
 </style>

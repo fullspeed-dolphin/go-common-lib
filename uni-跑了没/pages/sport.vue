@@ -45,9 +45,10 @@
 			</u-collapse>
 		</section>
 		
-		<!-- <view class="flex-center" style="height: 80vh; font-weight: 500;
-font-size: 34rpx;
-color: #707070;">
+		<!-- <view class="flex-center" 
+			style="height: 80vh; font-weight: 500;
+			font-size: 34rpx;
+			color: #707070;">
 			暂未开始 
 		</view> -->
 		
@@ -70,14 +71,7 @@ export default {
 		};
   },
   methods: {
-		routeTo(link) {
-			console.log(link)
-			uni.$u.route(link);
-		},
 		getBannerList() {
-			if(!this.bannerList.length) {
-				uni.showLoading({mask: true})
-			}
 			const data = {
 				Position: 0
 			}

@@ -16,7 +16,14 @@
 			
 			<view class="section-title">线下活动</view>
 			<section class="section-offline" v-for="(item, index) in eventList" :key="index" @click="$u.route(`pagesSub/offlineEvents?id=${item.id}`)">
-				<image class="poster" :src="item.background_image_url" mode="aspectFill"></image>
+				<!-- <image class="poster" :src="item.background_image_url" mode="aspectFill"></image> -->
+				<view class="section-banner">
+					<swiper class="swiper" circular indicator-dots indicator-active-color="#FF8C00" :autoplay="true" :interval="3000">
+						<swiper-item v-for="(item, index) in bannerList" :key="index">
+							<image class="img" :src="item.image_url" mode="aspectFill" @click="clickSwiper(item)"></image>
+						</swiper-item>
+					</swiper>
+				</view>
 				<view class="flex-start">
 					<view class="flex-1 ofh text">
 						<view class="name ellipsis">{{item.name}}</view>
@@ -90,17 +97,14 @@ export default {
     return {
 			searchTxt: "",
 			eventList: [],
+			bannerEventList: [],
 			bannerList: [],
 			GroupList: []
 		};
   },
 	onLoad(options) {
 		// #ifdef MP-WEIXIN
-		wx.showShareMenu({
-			// withShareTicket: true,
-			success: function () {},
-			fail: function () {}
-		})
+		wx.showShareMenu()
 		// #endif
 	},
 	onShow() {
@@ -115,8 +119,8 @@ export default {
 				
 				return;
 			}
-			if (item.link) {
-				uni.$u.route(`pagesSub/settings/webView?link=${item.link}`)
+			if (item.redirect_url) {
+				uni.$u.route(`pagesSub/settings/webView?link=${item.redirect_url}`)
 				
 				return;
 			}
@@ -138,15 +142,18 @@ export default {
 				// 	'../static/7bb3e09687deac8d43c779771c09f897 (1).png',
 				// ]
 			})
+			
+			this.$axios.get(`/event-api/getOfflineEventSwiper`).then(res => {
+				this.bannerEventList = res;
+				uni.hideLoading()
+			})
 		},
 		getBannerList() {
 			if(!this.bannerList.length) {
 				uni.showLoading({mask: true})
 			}
-			const data = {
-				Position: 0
-			}
-			this.$axios.get(`/event-api/api/v1/getOfflineEventSwiper`).then(res => {
+
+			this.$axios.get(`/event-api/getTopSwiper`).then(res => {
 				this.bannerList = res;
 				uni.hideLoading()
 			})

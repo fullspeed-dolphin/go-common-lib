@@ -1,9 +1,15 @@
 <template>
   <view class="">
 		<u-navbar title="运动详情"></u-navbar>
-		<view class="flex-col-center" style="height: calc(100vh-44px);">
-			<section class="section-map flex-1 flex-center" style="width: 100%;min-height: 600rpx;">
-				地图
+		<view class="flex-col-center" :style="'height:' +  pageHeight + 'px'">
+			<section class="section-map flex-1 flex-col" style="width: 100%;min-height: 600rpx;">
+				<map 
+					:latitude="centerLatitude"
+					:longitude="centerLongitude" 
+					:markers="covers" 
+					:polyline="polyline"
+					style="width: 100%; min-height: 600rpx;flex:1;">
+				</map>
 			</section>
 			
 			<section class="section-sport">
@@ -70,18 +76,93 @@
   </view>
 </template>
 <script>
+	function generateTrackData(startLongitude, startLatitude, pointsCount, maxDistance) {
+	  let trackPoints = [{longitude: startLongitude, latitude: startLatitude}];
+	  
+	  for (let i = 1; i < pointsCount; i++) {
+	    let lastPoint = trackPoints[i - 1];
+	    let newLongitude = lastPoint.longitude + (Math.random() * 2 - 1) * maxDistance;
+	    let newLatitude = lastPoint.latitude + (Math.random() * 2 - 1) * maxDistance;
+	    
+	    // 确保不会偏离太多
+	    if(Math.abs(newLongitude) > 180 || Math.abs(newLatitude) > 90) {
+	      i--; // 如果新生成的点不在有效范围内，则重新生成
+	      continue;
+	    }
+	    
+	    trackPoints.push({longitude: newLongitude, latitude: newLatitude});
+	  }
+	  
+	  return trackPoints;
+	}
+	
+	// 使用示例
+	let testTrackData = generateTrackData(116.39742, 39.909, 50, 0.001); // 起始于北京某地，生成50个点
+	
 export default {
   data () {
     return {
+			centerLatitude: 39.909, // 地图中心纬度
+			centerLongitude: 116.39742, // 地图中心经度
+			covers: [{
+				latitude: 39.909,
+				longitude: 116.39742,
+				iconPath: '/static/location.png'
+			}],
+			polyline: [{
+				points: [],
+				color:"#FF0000DD",
+				width: 2,
+				dottedLine: true
+			}]
 		};
   },
 	computed: {
 		userInfo() {
 			return this.$store.state.userInfo
+		},
+		pageHeight() {
+			const systemInfo = uni.getSystemInfoSync();
+			      
+			// 状态栏高度（单位 px）
+			this.statusBarHeight = systemInfo.statusBarHeight || 0;
+
+			// 导航栏高度计算（关键）
+			let navBarHeight = 0;
+			
+			// 方法一：通过胶囊按钮位置计算（推荐）
+			const menuButtonInfo = uni.getMenuButtonBoundingClientRect();
+			if (menuButtonInfo) {
+				// 导航栏高度 ≈ (胶囊顶部 - 状态栏底部) * 2 + 胶囊高度
+				// 简化计算：直接使用胶囊底部到状态栏顶部的距离
+				navBarHeight = menuButtonInfo.bottom + (menuButtonInfo.top - this.statusBarHeight);
+			} else {
+				// 兜底方案：使用默认高度（单位 px）
+				navBarHeight = this.statusBarHeight + 44; // iOS 44px, Android 48px，取中间值或根据平台判断
+			}
+
+			this.navBarHeight = navBarHeight;
+
+			// 计算内容区域可用高度
+			return systemInfo.windowHeight - navBarHeight - 20;
+						
+			// const systemInfo = uni.getSystemInfoSync();
+			// console.log(systemInfo);
+			
+			// return systemInfo.screenHeight - systemInfo.statusBarHeight + 'px'
 		}
 	},
 	onLoad(options) {
+		try {
+		  const systemInfo = uni.getSystemInfoSync();
+		  console.log(systemInfo);
+		} catch (err) {
+		  console.error('获取系统信息失败', err);
+		}
+		
 		this.options = this.options;
+		
+		this.polyline[0].points = testTrackData; // 假设trackPoints已在其他地方定义
 		
 		// #ifdef MP-WEIXIN
 		wx.showShareMenu({

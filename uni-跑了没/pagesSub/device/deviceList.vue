@@ -16,7 +16,7 @@
 					<view class="label">{{item.label}}</view>
 				</view>
 				<view class="" style="font-size: 22rpx;line-height: 1.6;color: #333;">
-					<view class="">{{item.model}}</view>
+					<!-- <view class="">{{item.model}}</view> -->
 					<view class="">{{item.account}}</view>
 					<view class="">{{item.bindTime}}</view>
 				</view>
@@ -36,30 +36,30 @@ export default {
   data () {
     return {
 			deviceList: [
-				{
-					img: '/static/images/华为运动健康@2x.png',
-					label: '华为运动健康',
-					value: '',
-					model: '设备型号：HUAWEI GT5',
-					account: '绑定账号：15934560765',
-					bindTime: '绑定时间：2025-10-14 ',
-				},
-				{
-					img: '/static/images/佳明@2x.png',
-					label: '佳明',
-					value: '',
-					model: '设备型号：HUAWEI GT5',
-					account: '绑定账号：15934560765',
-					bindTime: '绑定时间：2025-10-14 ',
-				},
-				{
-					img: '/static/images/高驰@2x.png',
-					label: '高驰',
-					value: '',
-					model: '设备型号：HUAWEI GT5',
-					account: '绑定账号：15934560765',
-					bindTime: '绑定时间：2025-10-14 ',
-				},
+				// {
+				// 	img: '/static/images/华为运动健康@2x.png',
+				// 	label: '华为运动健康',
+				// 	value: '',
+				// 	model: '设备型号：HUAWEI GT5',
+				// 	account: '绑定账号：15934560765',
+				// 	bindTime: '绑定时间：2025-10-14 ',
+				// },
+				// {
+				// 	img: '/static/images/佳明@2x.png',
+				// 	label: '佳明',
+				// 	value: '',
+				// 	model: '设备型号：HUAWEI GT5',
+				// 	account: '绑定账号：15934560765',
+				// 	bindTime: '绑定时间：2025-10-14 ',
+				// },
+				// {
+				// 	img: '/static/images/高驰@2x.png',
+				// 	label: '高驰',
+				// 	value: '',
+				// 	model: '设备型号：HUAWEI GT5',
+				// 	account: '绑定账号：15934560765',
+				// 	bindTime: '绑定时间：2025-10-14 ',
+				// },
 			]
 		};
   },
@@ -101,7 +101,7 @@ export default {
 	}
 .brand-item{
 	width: 325rpx;
-	height: 274rpx;
+	// height: 274rpx;
 	padding: 30rpx 32rpx;
 	background: #FFFFFF;
 	box-shadow: 0rpx 4rpx 10rpx 2rpx rgba(0,0,0,0.16);
