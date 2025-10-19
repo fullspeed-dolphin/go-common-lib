@@ -15,28 +15,28 @@
 			</view>
 			
 			<view class="section-title">线下活动</view>
-			<section class="section-offline" v-for="(item, index) in eventList" :key="index" @click="$u.route(`pagesSub/offlineEvents?id=${item.id}`)">
-				<!-- <image class="poster" :src="item.background_image_url" mode="aspectFill"></image> -->
-				<view class="section-banner">
-					<swiper class="swiper" circular indicator-dots indicator-active-color="#FF8C00" :autoplay="true" :interval="3000">
-						<swiper-item v-for="(item, index) in bannerEventList" :key="index">
-							<image class="img" :src="item.image_url" mode="aspectFill" @click="clickSwiper(item)"></image>
-						</swiper-item>
-					</swiper>
-				</view>
-				<view class="flex-start">
-					<view class="flex-1 ofh text">
-						<view class="name ellipsis">{{item.name}}</view>
-						<view class="time">{{item.event_time}}</view>
-					</view>
-					
-					<u-button type="primary" :color="item.status !== 'PND' ? '#999' : ''" textColor="#fff" :disabled="item.status !== 'ACT'" size="small" shape="circle">
-						<block v-if="item.status === 'PND'">未开始</block>
-						<block v-if="item.status === 'ACT'">报名</block>
-						<block v-if="item.status === 'EXP'">已截止</block>
-					</u-button>
-				</view>
-			</section>
+			<swiper class="event-swiper" circular indicator-active-color="#FF8C00" :autoplay="true" :interval="3000">
+				<swiper-item v-for="(item, index) in bannerEventList">
+					<section class="section-offline"  :key="index" @click="$u.route(`pagesSub/offlineEvents?id=${item.event_id}`)">
+						<!-- <image class="poster" :src="item.background_image_url" mode="aspectFill"></image> -->
+						<view class="section-banner">
+							<image class="img" :src="item.image_url" mode="aspectFill"></image>
+						</view>
+						<view class="flex-start">
+							<view class="flex-1 ofh text">
+								<view class="name ellipsis">{{item.description}}</view>
+								<view class="time">{{item.event_time}}</view>
+							</view>
+							
+							<u-button type="primary" :color="item.status !== 'ACT' ? '#999' : ''" textColor="#fff" :disabled="item.status !== 'ACT'" size="small" shape="circle">
+								<block v-if="item.status === 'PND'">未开始</block>
+								<block v-if="item.status === 'ACT'">报名</block>
+								<block v-if="item.status === 'EXP'">已截止</block>
+							</u-button>
+						</view>
+					</section>
+				</swiper-item>
+			</swiper>
 			
 			<!-- <view class="section-title">线上赛事</view>
 			<section class="section-offline"  @click="$u.route('pagesSub/offlineEvents')">
@@ -133,11 +133,7 @@ export default {
 			console.log(link)
 			uni.$u.route(link);
 		},
-		getEvents() {
-			this.$axios.get(`/event-api/api/v1/events`).then(res => {
-				this.eventList = res.events;
-			})
-			
+		getEvents() {			
 			this.$axios.get(`/event-api/getOfflineEventSwiper`).then(res => {
 				this.bannerEventList = res;
 				uni.hideLoading()
@@ -168,6 +164,9 @@ export default {
 </script>
 
 <style lang="less" scoped>
+	.event-swiper{
+		height: 360rpx;
+	}
 	.radius999{
 		border-radius: 999em!important;
 	}

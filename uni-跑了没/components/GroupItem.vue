@@ -31,6 +31,13 @@
 			};
 		},
 		methods: {
+			viewDetail(item){
+				// 搜索组件中不跳转详情，加入按钮控制交互
+				if (this.from === 'search') return;
+				
+				uni.setStorageSync('sportDetail', item)
+				uni.$u.route(`pagesSub/groupDetail?group_id=${item.group_id}`)
+			},
 			joinGroup(item) {
 				this.$emit('join', item)
 			}
