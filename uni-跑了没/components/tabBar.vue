@@ -12,24 +12,6 @@
 <script>
 	import { isRelease } from "@/utils/config.js"
 	let tabs = [{
-			"text": "首页",
-			name: 'index',
-			"pagePath": "/pages/index",
-			icon: "icon-shouye",
-			normal: '../static/tab_00.png',
-			active: '../static/tab_01.png',
-		},
-		{
-			"text": "我的",
-			name: 'mine',
-			icon: "icon-wenzi",
-			"pagePath": "/pages/mine",
-			normal: '../static/tab_20.png',
-			active: '../static/tab_21.png',
-		},
-	]
-	if (isRelease) {
-		tabs = [{
 				"text": "首页",
 				name: 'index',
 				"pagePath": "/pages/index",
@@ -54,7 +36,6 @@
 				active: '../static/tab_21.png',
 			},
 		]
-	}
 	export default {
 		props: ['type'],
 		data() {

@@ -15,7 +15,7 @@
 			<view class="statics flex-row">
 				<view class="flex-1">
 					<view class="label">运动次数</view>
-					<view class="value">--</view>
+					<view class="value">0</view>
 				</view>
 				<view class="flex-1">
 					<view class="label">平均配速</view>
@@ -32,7 +32,7 @@
 			</view>
 		</section>
 		
-		<section class="panel" style="padding:0;overflow: hidden;">
+		<!-- <section class="panel" style="padding:0;overflow: hidden;">
 			<u-collapse :value="['row-0']">
 				<u-collapse-item title="2025年9月" :name="'row-'+index" v-for="(item, index) in bannerList" :key="'row-'+index">
 					<view slot="sub" class="flex-start amount-number">
@@ -43,14 +43,14 @@
 					<SportItem :item="{}" v-for="(item,sindex) in 3" :key="'index' + sindex" />
 				</u-collapse-item>
 			</u-collapse>
-		</section>
+		</section> -->
 		
-		<!-- <view class="flex-center" 
-			style="height: 80vh; font-weight: 500;
+		<view class="flex-center" 
+			style="height: 20vh; font-weight: 500;
 			font-size: 34rpx;
 			color: #707070;">
-			暂未开始 
-		</view> -->
+			暂无数据
+		</view>
 		
 		<tabbar type="sport"/>
   </view>

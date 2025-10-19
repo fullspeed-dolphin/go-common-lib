@@ -19,7 +19,7 @@
 				<!-- <image class="poster" :src="item.background_image_url" mode="aspectFill"></image> -->
 				<view class="section-banner">
 					<swiper class="swiper" circular indicator-dots indicator-active-color="#FF8C00" :autoplay="true" :interval="3000">
-						<swiper-item v-for="(item, index) in bannerList" :key="index">
+						<swiper-item v-for="(item, index) in bannerEventList" :key="index">
 							<image class="img" :src="item.image_url" mode="aspectFill" @click="clickSwiper(item)"></image>
 						</swiper-item>
 					</swiper>
@@ -136,11 +136,6 @@ export default {
 		getEvents() {
 			this.$axios.get(`/event-api/api/v1/events`).then(res => {
 				this.eventList = res.events;
-				
-				// this.bannerList = [
-				// 	...res.events.map(i => i.background_image_url),
-				// 	'../static/7bb3e09687deac8d43c779771c09f897 (1).png',
-				// ]
 			})
 			
 			this.$axios.get(`/event-api/getOfflineEventSwiper`).then(res => {

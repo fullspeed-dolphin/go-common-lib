@@ -29,7 +29,7 @@ font-size: 34rpx;">绑定说明</view>
 					<view class="">3、<text class="txt">点击浏览器地址栏，长按、粘贴，打开链接</text></view>
 					<view class="">4、在打开的授权页面填写账号密码完成绑定</view>
 				</view>
-				<view class="flex-between-center btns" style="padding:40rpx 40rpx 0;">
+				<view class="flex-between-center btns" style="padding:40rpx;">
 					<u-button type="primary" shape="circle" color="#F2F2F2" textColor="#707070" @click="$refs.refCommonDialog.close()">取消</u-button>
 					<u-button type="primary" shape="circle" @click="bindDevice()">复制绑定链接</u-button>
 				</view>
