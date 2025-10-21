@@ -1,6 +1,6 @@
 <template>
 	<view class="filter">
-		<u-popup :show="isShowPop" mode="bottom" closeable round="15" @close="isShowPop = false">
+		<u-popup :show="isShowPop" mode="bottom" :closeOnClickOverlay="false" closeable round="15" @close="cancel()">
 			<view class="p20">
 				<view class="section-box mt10 flex-box">
 					<!-- <image class="logo mr10" src="../../static/img/basicprofile.jpeg"
@@ -81,6 +81,16 @@
 			};
 		},
 		methods: {
+			cancel() {
+				this.isShowPop = false;
+				
+				// 去除缓存 token
+				this.$store.commit({
+					type: 'globalToken',
+					data: ''
+				})
+				this.$emit('cancel');
+			},
 			//获取微信头像
 			onChooseAvatar(e) {
 				this.formData.avatarUrl = e.detail.avatarUrl;
@@ -129,9 +139,25 @@
 					"nickname": this.formData.nickname,
 					"gender": this.formData.gender
 				}
+				
+				
+				// case1: 手机号登录成功后，如果没有更新头像，缓存token,直到更新了头像，才把 token 补上；
+				// case 2: 登录后，点击编辑头像，缓存必然不存在，因此可以以此为判定；
+				if (this.$store.state.globalToken) {
+					uni.setStorageSync("token", this.$store.state.globalToken);
+				}
+				
 				this.$axios.post(`/user-api/user/updateUserInfo`, data).then(res => {
+					// 去除缓存 token
+					this.$store.commit({
+						type: 'globalToken',
+						data: ''
+					})
+					
 					this.$store.dispatch('getUserInfo')
 					this.close()
+					
+					this.$toast('更新成功');
 				})
 			},
 			compressImage(src) {

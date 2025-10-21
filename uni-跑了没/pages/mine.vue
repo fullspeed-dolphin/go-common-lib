@@ -1,5 +1,5 @@
 <template>
-  <view class="mine-page">
+  <view class="">
 		<u-navbar title="个人中心" :leftIcon="false"></u-navbar>
     <view class="page-content">
     	<view class="rel section-user">
@@ -77,19 +77,19 @@
     </view>
 		<tabbar type="mine"/>
 		
+		<UserLogin ref="refUserLogin"/>
 		<AccessUser ref="refAccessUser"/>
 		
-		<PhoneLogin ref="refPhoneLogin" @success="successLogin"/>
   </view>
 </template>
 <script>
 	import { clearUserInfo } from "@/utils/util.js"
 	import tabbar from "@/components/tabBar.vue"
+	import UserLogin from "@/components/UserLogin.vue"
 	import AccessUser from "@/components/common/AccessUser.vue"
-	import PhoneLogin from "@/components/common/PhoneLogin.vue";
 export default {
 	components: {
-		tabbar, AccessUser, PhoneLogin
+		tabbar, UserLogin, AccessUser
 	},
   data () {
     return {};
@@ -114,23 +114,17 @@ export default {
 		},
 		routeTo(link) {
 			if (!this.userInfo.id) {
-				return this.$refs.refPhoneLogin.open()
+				return this.$refs.refUserLogin.open()
 			}
 			
 			uni.$u.route(link)
 		},
 		handleUserClick() {
 			if (!this.userInfo.id) {
-				return this.$refs.refPhoneLogin.open()
+				return this.$refs.refUserLogin.open()
 			}
 			
 			this.$refs.refAccessUser.open()
-		},
-		// 登录成功后 如果用户没有头像信息，弹窗让用户填信息
-		successLogin() {
-			if (!this.userInfo.avatar_url) {
-				return this.$refs.refAccessUser.open()
-			}
 		},
     logout () {
       uni.showModal({
@@ -215,7 +209,7 @@ export default {
 			border-radius: 53rpx;
 			background: rgba(0,0,0,0.06);
 			justify-content: center;
-			margin-right:22rpx;
+			margin-right:22rpx!important;
 		}
 	}
 	.nav-icon{
@@ -267,19 +261,12 @@ export default {
 	.section-box{
 		position: relative;
 		z-index: 5;
-		margin-top: -20rpx;
-		padding: 10rpx 0 10rpx 10rpx;
-		border-radius: 20rpx 20rpx 0 0;
 		background-color: #fff;
 	}
 .logout {
   margin-top: 50rpx;
-  padding-bottom: 200rpx;
-	// background: #ebeced;
 }
-.mine-page{
-	min-height: 100vh;
-}
+
 .section-user{
 	overflow: hidden;
 	position: relative;

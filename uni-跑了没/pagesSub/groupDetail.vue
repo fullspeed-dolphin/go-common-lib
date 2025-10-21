@@ -31,7 +31,7 @@
 				</view>
 				<view class="flex-1 flex-col-center u-border-left">
 					<view class="number">
-						{{detail.total_members}}:{{0}}
+						{{detail.gender_ratio}}
 					</view>
 					男女比例
 				</view>
@@ -106,15 +106,14 @@
 			</section>
 		</block>
 		
-		<PhoneLogin ref="refPhoneLogin" />
-		<AccessUser ref="refAccessUser"/>
+		<UserLogin ref="refUserLogin"/>
 	</view>
 </template>
 <script>
-	import PhoneLogin from "@/components/common/PhoneLogin.vue";
-	import AccessUser from "@/components/common/AccessUser.vue"
+	
+	import UserLogin from "@/components/UserLogin.vue";
 	export default {
-		components: { PhoneLogin, AccessUser },
+		components: { UserLogin },
 		data() {
 			return {
 				isEmpty: false,
@@ -144,11 +143,7 @@
 			this.getDetail()
 			
 			// #ifdef MP-WEIXIN
-			wx.showShareMenu({
-				// withShareTicket: true,
-				success: function () {},
-				fail: function () {}
-			})
+			wx.showShareMenu()
 			// #endif
 		},
 		onUnload() {
@@ -201,7 +196,7 @@
 			},
 			joinGroup() {
 				if (!this.$store.state.userInfo.id) {
-					return this.$refs.refPhoneLogin.open()
+					return this.$refs.refUserLogin.open()
 				}
 			  uni.showModal({
 			    title: "提示",
@@ -219,11 +214,6 @@
 			            uni.hideLoading();
 			            this.getDetail();
 			            this.$toast("加入成功！");
-									
-									// 如果用户没有头像昵称数据，提示更新
-									if (!this.userInfo.avatar_url) {
-										return this.$refs.refAccessUser.open()
-									}
 			          });
 			      } else if (res.cancel) {
 			        console.log("用户点击取消");

@@ -1,5 +1,5 @@
 <template>
-  <view @tap="clickPage()" class="pb30" style="background: #f5f5f5;" :class="{
+  <view class="pb30" style="background: #f5f5f5;" :class="{
 		isFixedNavbar: isFixedNavbar,
 		isLoadedPage: isLoadedPage
 	}">
@@ -7,7 +7,7 @@
 		
 		<div class="event-status flex-center" v-if="detail.status === 'ACT'">活动进行中</div>
 		
-		<section style="padding:0;overflow: hidden;height:750rpx;" :class="{isScrolled: isScrolled}">
+		<section style="padding:0;overflow: hidden;height:750rpx;">
 			<image class="img" :src="detail.background_image_url" mode="aspectFill" style="width:100%;display: block;height:100%;"></image>
 		</section>
 		
@@ -87,7 +87,6 @@ export default {
   data () {
 		return {
 			isScroll: false,
-			isScrolled: false,
 			isSignUp: false,
 			detail: {},
 			isFixedNavbar: true,
@@ -133,9 +132,6 @@ export default {
 		};
 	},
   methods: {
-		clickPage() {
-			this.isScrolled = true;
-		},
 		getDetail() {
 			const eventDetail = uni.getStorageSync('eventDetail')
 			if (eventDetail) {
@@ -285,7 +281,8 @@ export default {
 		}
 	}
 	.section-event{
-		transform: translateY(0%);
+		// transform: translateY(0%);
+		margin-top:0;
 	}
 	
 	.isLoadedPage{
@@ -295,8 +292,9 @@ export default {
 			animation: slideIn 0.5s 0.5s forwards;
 		}
 		.section-event{
-			transition: transform 0.5s;
-			transform: translateY(-100rpx);
+			transition: margin 0.5s;
+			// transform: translateY(-100rpx);
+			margin-top: -100rpx;
 		}
 	}
 	
@@ -312,6 +310,9 @@ export default {
 		.isFixedNavbar{
 			.u-navbar--fixed{
 				background: none!important;
+				.navbar-badge{
+					background: #fff;
+				}
 			}
 		}
 	}
@@ -326,11 +327,7 @@ export default {
 		border-radius: 888rpx;
 		padding: 20rpx 30rpx;
 	}
-	
-	.isScrolled{
-		transition: height 0.3s;
-		height: 500rpx!important;
-	}
+
 	@keyframes slideIn {
 	  0% {
 	    transform: translateY(100%);

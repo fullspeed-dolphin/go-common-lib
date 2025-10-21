@@ -26,7 +26,7 @@
 					<view class="value">--</view>
 				</view>
 				<view class="flex-1">
-					<view class="label">消耗打卡</view>
+					<view class="label">消耗大卡</view>
 					<view class="value">0</view>
 				</view>
 			</view>

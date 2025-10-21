@@ -1,22 +1,37 @@
 <template>
-  <u-popup :show="isShowPop" mode="bottom" closeable round="15" @close="isShowPop = false">
-		<view class="p20">
+  <u-popup :show="isShowPop" mode="center" :safeAreaInsetBottom="false" closeable round="15" @close="isShowPop = false">
+		<view class="p20 section-dialog">
 			<view class="section-box">
-				<view class="title flex-center">跑了没小程序申请</view>
+				<view class="title flex-center">欢迎登录 跑了没</view>
 			</view>
-			<view class="">
-				<view class="mt20 mb10">
-					获取你的手机号
+			<view class="flex-col-center">
+				<view class="" style="font-size: 24rpx;">
+					登录后为你提供更好的服务
 				</view>
-				<view class="c9 fs24 lh36">
-					登录小程序，查看用户信息，开发者将在获取你的明示同意后，
-					收集你的手机号
+				<view  style="margin-top:60rpx;width:440rpx;">
+					<u-button v-if="!isAgree" @click="$toast('请点击同意协议!')"  :customStyle="{width: '440rpx'}" type="primary" color="#19be6b" shape="circle">
+						授权手机号登录
+					</u-button>
+					<u-button v-if="isAgree" :disabled="isDisabled" :customStyle="{width: '440rpx'}" type="primary" color="#19be6b" shape="circle" block open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">
+						授权手机号登录
+					</u-button>
+					<view style="margin-top:30rpx;" @click="isShowPop = false">
+						<u-button :customStyle="{width: '440rpx'}" type="primary" color="#F2F2F2" textColor="#000" shape="circle">
+							取消
+						</u-button>
+					</view>
 				</view>
 			</view>
-			<view style="margin-top:60rpx;">
-				<u-button :disabled="isDisabled" type="primary" color="#19be6b" shape="circle" block open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">
-					授权手机号登录
-				</u-button>
+			<view class="txt" style="margin: 60rpx 40rpx 40rpx 40rpx;line-height: 1.4;color:#999;">
+				<text @click="isAgree = !isAgree">
+					<u-icon 
+						size="15"
+						:color="isAgree ? '#FF8C00' : '#999'"
+						:name="isAgree ? 'checkmark-circle-fill' : 'checkmark-circle'" ></u-icon>
+					<text class="ml5">我已阅读并同意该</text>
+				</text>
+				<text style="color:#FF8C00" @click="$u.route('pagesSub/settings/agreement?type=signUp')">《用户协议》</text>以及
+				<text style="color:#FF8C00" @click="$u.route('pagesSub/settings/agreement?type=privy')">《用户隐私协议》</text>。
 			</view>
 		</view>
   </u-popup>
@@ -27,7 +42,8 @@ export default {
   data() {
     return {
 			isShowPop: false,
-			isDisabled: false
+			isDisabled: false,
+			isAgree: false,
 		};
   },
   methods: {
@@ -53,6 +69,8 @@ export default {
         return false;
       }
 			
+			// if (!this.isAgree) return this.$toast('请点击同意协议！');
+			
 			uni.showLoading({
 			  title: "登录中...",
 			  mask: true,
@@ -70,16 +88,21 @@ export default {
 			try {
 				const res = await this.$axios.post("/wechat-login/login", data);
 				
-				uni.setStorageSync("token", res.sessionToken);
-				
-				this.$toast("登录成功");
+				if (res.avatarUrl) {
+					this.$toast("登录成功");
+					uni.setStorageSync("token", res.sessionToken);
+					await this.$store.dispatch('getUserInfo')
+				} else {
+					this.$store.commit('set', {
+						type: 'globalToken',
+						data: res.sessionToken
+					})
+				}
 				
 				this.close()
 				
-				await this.$store.dispatch('getUserInfo')
-				
 				this.isDisabled = false;
-				this.$emit("success");
+				this.$emit("success", !!res.avatarUrl);
 			} catch (error) {
 				console.error(error)
 				this.isDisabled = false;
@@ -91,6 +114,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+	.section-dialog{
+		width: 650rpx;
+	}
 .section-link {
   padding: 0 60rpx;
 }
@@ -99,9 +125,9 @@ export default {
   margin-bottom: 55rpx;
 }
 .title {
-  font-size: 34rpx;
+  font-size: 30rpx;
   font-weight: 500;
-  margin-bottom: 42rpx;
+  margin-bottom: 30rpx;
 }
 .sub-tit {
   font-size: 36rpx;

@@ -22,18 +22,18 @@
 			</view>
 		</section>
 		
-		<PhoneLogin ref="refPhoneLogin" />
+		<UserLogin ref="refUserLogin"/>
   </div>
 </template>
 
 <script>
 		import GroupItem from "@/components/GroupItem.vue"
-	import PhoneLogin from "@/components/common/PhoneLogin.vue";
+	import UserLogin from "@/components/UserLogin.vue";
 import MescrollMixin from "@/uni_modules/mescroll-uni/components/mescroll-uni/mescroll-mixins.js";
 
 export default {
   mixins: [MescrollMixin],
-  components: { PhoneLogin, GroupItem },
+  components: { UserLogin, GroupItem },
   data() {
     return {
 			searchTxt: "",
@@ -70,7 +70,7 @@ export default {
 		},
 		openForm() {
 			if (!this.$store.state.userInfo.id) {
-				return this.$refs.refPhoneLogin.open()
+				return this.$refs.refUserLogin.open()
 			}
 			
 			uni.$u.route(`pagesSub/groupForm`)

@@ -2,12 +2,14 @@
   <div class="">
 		<u-navbar title="我的订单"></u-navbar>
 		
-		<u-tabs lineHeight="2" :duration="0"
-		:inactiveStyle="{color: '#000'}"
-		:activeStyle="{color: '#FF8C00'}"
-		:list="tabList" @change="changeTab" :scrollable="false" keyName="label" lineColor="#FF8C00" />
+		<view class="bgf" style="position: relative;z-index:20;">
+			<u-tabs lineHeight="2" :duration="0"
+			:inactiveStyle="{color: '#000'}"
+			:activeStyle="{color: '#FF8C00'}"
+			:list="tabList" @change="changeTab" :scrollable="false" keyName="label" lineColor="#FF8C00" />
+		</view>
 		
-    <mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="240">
+    <mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="220">
 			<view class="" style="height:40rpx"></view>
 			<view class="group-item" v-for="(item,index) in dataList" :key="index" @click="viewDetail(item)">
 				<view class="pb20 flex-between-center">
@@ -101,18 +103,18 @@ export default {
           uni.hideLoading();
 
           //联网成功的回调,隐藏下拉刷新和上拉加载的状态;
-          this.mescroll.endBySize(res.orders.length, 8);
+          this.mescroll.endBySize(res.orders.length, res.total);
 
           //如果是第一页需手动制空列表
           if (page.num == 1) {
             this.dataList = [];
           }
-
+					
           this.dataList = this.dataList.concat(res.orders); //追加新数据
         })
         .catch((error) => {
           uni.hideLoading();
-          this.mescroll.endSuccess(6);
+          this.mescroll.endSuccess();
         });
     },
     payOrder(item) {

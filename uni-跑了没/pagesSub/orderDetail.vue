@@ -1,11 +1,11 @@
 <template>
   <div class="pb30">
 		<u-navbar title="订单详情"></u-navbar>
-    <view class="group-item">
+    <view class="group-item" style="border-radius: 16rpx;overflow: hidden;">
     	<view class="h4">
     		活动信息
     	</view>
-    	<view class="flex-row" @click="$u.route(`pagesSub/offlineEvents?id=${detail.event_id}`)">
+    	<view class="flex-row"  @click="$u.route(`pagesSub/offlineEvents?id=${detail.event_id}`)">
     		<image class="poster" :src="detail.event_info.background_image_url || '../static/run.png'" mode="aspectFill"></image>
     		<view class="text">
     			<view class="flex-between-center" style="width: 420rpx;">
@@ -49,12 +49,13 @@
 			<u-collapse>
 				<u-collapse-item title="报名信息" name="Docs guide">
 					<u-cell title="姓名" :isLink="false">{{detail.sign_info.full_name}}</u-cell>
-					<u-cell title="性别" :isLink="false">{{['女生', '男生','未知'][Number(detail.sign_info.gender)]}}</u-cell>
+					<u-cell title="性别" :isLink="false">{{['女', '男','未知'][Number(detail.sign_info.gender)]}}</u-cell>
 					<u-cell title="手机号码" :isLink="false">{{detail.sign_info.phone_number}}</u-cell>
 					<u-cell title="T恤尺码" :isLink="false">{{detail.sign_info.tshirt_size}}</u-cell>
 					<u-cell title="身份证号码" :isLink="false">{{detail.sign_info.id_card}}</u-cell>
 					<u-cell title="血型" v-if="detail.sign_info.blood_type" :border="false"  :isLink="false">{{detail.sign_info.blood_type}}</u-cell>
 					<u-cell title="所在跑团" :border="false"  :isLink="false">{{detail.sign_info.running_group}}</u-cell>
+					<u-cell title="参赛号码" :border="false"  :isLink="false">{{detail.sign_info.bib_number || '--'}}</u-cell>
 				</u-collapse-item>
 			</u-collapse>
 		</section>

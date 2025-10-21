@@ -74,12 +74,14 @@
 		</section>
 		
 		<GroupList ref="refGroupList" @success="getUserGroup()"/>
+		<UserLogin ref="refUserLogin"/>
   </view>
 </template>
 <script>
 	import GroupList from "./components/groupList.vue"
+	import UserLogin from "@/components/UserLogin.vue"
 export default {
-	components: { GroupList },
+	components: { GroupList, UserLogin },
   data () {
 		return {
 			verifyCode: '',
@@ -223,13 +225,8 @@ export default {
 			this.activeType = item
 		},
 		submitOrder() {
-			const token = uni.getStorageSync("token");
-			if (!token) {
-				this.$toast("请先登录~");
-				setTimeout(() => {
-					this.$goUrl("/pagesSub/login");
-				}, 1000)
-				return 
+			if (!this.$store.state.userInfo.id) {
+				return this.$refs.refUserLogin.open()
 			}
 			
 			if (!this.SignerInfo.id_card) return this.$toast("请完善参赛者信息");
