@@ -3,8 +3,12 @@
 		<u-tabbar :value="active" @change="onChange" activeColor="#FF8C00" inactiveColor="#000" fixed placeholder
 			zIndex="100" safeAreaInsetBottom :border="false">
 			<u-tabbar-item :text="item.text" v-for="(item, index) in tabList" :key="index" :name="item.name">
-				<view slot="active-icon" class="iconfont active" :class="item.icon"></view>
-				<view slot="inactive-icon" class="iconfont" :class="item.icon"></view>
+				<template #active-icon>
+					<view class="iconfont active" :class="item.icon"></view>
+				</template>
+				<template #inactive-icon>
+					<view class="iconfont" :class="item.icon"></view>
+				</template>
 			</u-tabbar-item>
 		</u-tabbar>
 	</view>

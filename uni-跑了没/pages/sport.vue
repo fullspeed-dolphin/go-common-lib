@@ -35,7 +35,9 @@
 		<!-- <section class="panel" style="padding:0;overflow: hidden;">
 			<u-collapse :value="['row-0']">
 				<u-collapse-item title="2025年9月" :name="'row-'+index" v-for="(item, index) in bannerList" :key="'row-'+index">
-					<view slot="sub" class="flex-start amount-number">
+					<template #sub>
+						<view class="flex-start amount-number">
+					</template>
 						<view class="amount">0.00</view>
 						<view class="">公里</view>
 					</view>

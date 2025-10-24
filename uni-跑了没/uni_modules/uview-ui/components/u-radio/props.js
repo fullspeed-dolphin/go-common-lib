@@ -51,9 +51,9 @@ export default {
             default: uni.$u.props.radio.size
         },
         // 图标颜色
-        color: {
+        iconColor: {
             type: String,
-            default: uni.$u.props.radio.color
+            default: uni.$u.props.radio.iconColor
         },
         // label的颜色
         labelColor: {

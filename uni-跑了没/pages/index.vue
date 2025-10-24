@@ -16,8 +16,8 @@
 			
 			<view class="section-title">线下活动</view>
 			<swiper class="event-swiper" circular indicator-active-color="#FF8C00" :autoplay="true" :interval="3000">
-				<swiper-item v-for="(item, index) in bannerEventList">
-					<section class="section-offline"  :key="index" @click="$u.route(`pagesSub/offlineEvents?id=${item.event_id}`)">
+				<swiper-item v-for="(item, index) in bannerEventList" :key="index">
+					<section class="section-offline" @click="$u.route(`pagesSub/offlineEvents?id=${item.event_id}`)">
 						<!-- <image class="poster" :src="item.background_image_url" mode="aspectFill"></image> -->
 						<view class="section-banner">
 							<image class="img" :src="item.image_url" mode="aspectFill"></image>

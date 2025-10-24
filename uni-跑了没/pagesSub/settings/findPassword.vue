@@ -7,7 +7,9 @@
 
       <van-cell class="verify-cell" title="验证码" title-width="80px" center>
         <uni-easyinput v-model="verifyCode" type="number" :inputBorder="false" :trim="true" :clearable="false" maxlength="50" placeholder="请输入" />
-        <van-button slot="right-icon" :disabled="isSendCode" type="default" @click="getCode">
+        <template #right-icon>
+          <van-button :disabled="isSendCode" type="default" @click="getCode">
+        </template>
           <view class="flex-start" style="color: #323232" v-if="isSendCode">
             <van-count-down :time="seconds * 1000" format="ss" @finish="finishTime" /> s
           </view>

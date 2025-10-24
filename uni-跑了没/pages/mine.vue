@@ -33,13 +33,19 @@
     	</view>
 			<view class="section-box">
 				<u-cell title="我的跑团" class="nav-cell" @click="routeTo(`pagesSub/groupDetail?from=mine&group_id=${userInfo.running_group}`)" :border="false" isLink>
-					<image slot="icon" class="nav-icon" src="/static/images/个人信息Icon@2x.png"></image>
+					<template #icon>
+						<image class="nav-icon" src="/static/images/个人信息Icon@2x.png"></image>
+					</template>
 				</u-cell>
-				<!-- <u-cell title="我的消息" class="nav-cell" @click="routeTo('/pagesSub/myMessages')" :border="false" isLink>
-					<image slot="icon" class="nav-icon" src="/static/images/我的消息Icon@2x.png"></image>
+				<!-- 				<u-cell title="我的消息" class="nav-cell" @click="routeTo('/pagesSub/myMessages')" :border="false" isLink>
+					<template #icon>
+						<image class="nav-icon" src="/static/images/我的消息Icon@2x.png"></image>
+					</template>
 				</u-cell> -->
 				<u-cell title="我的订单" class="nav-cell" @click="routeTo('/pagesSub/orderList')" :border="false" isLink>
-					<image slot="icon" class="nav-icon" src="/static/images/WX20250908-193754.png"></image>
+					<template #icon>
+						<image class="nav-icon" src="/static/images/WX20250908-193754.png"></image>
+					</template>
 				</u-cell>
 				<view class="service-cell u-cell u-cell__body" @click="showLoading()">
 					<button class="u-reset-button" open-type="contact">
@@ -55,7 +61,9 @@
 					</button>
 					
 					<!-- <u-cell :title="null" class=" nav-cell" isLink>
-						<image slot="icon" class="nav-icon" src="/static/images/我的消息Icon@2x.png"></image>
+						<template #icon>
+							<image class="nav-icon" src="/static/images/我的消息Icon@2x.png"></image>
+						</template>
 						<button class="u-reset-button" open-type="contact">
 						      联系客服
 						</button>
@@ -63,10 +71,14 @@
 				</view>
 				
 				<!-- <u-cell title="意见反馈" class="nav-cell" @click="routeTo('/pagesSub/settings/feedback')" :border="false" isLink>
-					<image slot="icon" class="nav-icon" src="/static/images/帮助反馈Icon@2x.png"></image>
+					<template #icon>
+						<image class="nav-icon" src="/static/images/帮助反馈Icon@2x.png"></image>
+					</template>
 				</u-cell> -->
 				<u-cell title="智能设备" class="nav-cell" @click="routeTo('/pagesSub/device/deviceList')" :border="false" isLink>
-					<image slot="icon" class="nav-icon" style="height: 40rpx;" src="/static/images/WX20251018-181116.png"></image>
+					<template #icon>
+						<image class="nav-icon" style="height: 40rpx;" src="/static/images/WX20251018-181116.png"></image>
+					</template>
 				</u-cell>
 			</view>
 			

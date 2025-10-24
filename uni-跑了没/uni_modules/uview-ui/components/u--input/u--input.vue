@@ -54,8 +54,12 @@
 			<slot name="suffix"></slot>
 			<!-- #endif -->
 			<!-- #ifndef MP -->
-			<slot name="prefix" slot="prefix"></slot>
-			<slot name="suffix" slot="suffix"></slot>
+			<template #prefix>
+				<slot name="prefix"></slot>
+			</template>
+			<template #suffix>
+				<slot name="suffix"></slot>
+			</template>
 			<!-- #endif -->
 		</uvInput>
 	</view>
