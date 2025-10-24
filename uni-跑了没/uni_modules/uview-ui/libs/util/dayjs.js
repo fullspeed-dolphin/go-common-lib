@@ -1,7 +1,4 @@
-!(function (t, e) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = e() : typeof define === 'function'
-		&& define.amd ? define(e) : t.dayjs = e()
-}(this, () => {
+const dayjs = (() => {
     'use strict'
 
     const t = 'millisecond'
@@ -305,4 +302,6 @@
     }, v.locale = D, v.isDayjs = m, v.unix = function (t) {
         return v(1e3 * t)
     }, v.en = M[y], v.Ls = M, v.p = {}, v
-}))
+})()
+
+export default dayjs

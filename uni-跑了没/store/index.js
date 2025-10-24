@@ -1,44 +1,40 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import axios from "@/utils/request.js";
+import { createStore } from 'vuex'
+import axios from "@/utils/request.js"
 import { clearUserInfo } from "@/utils/util.js"
 
-Vue.use(Vuex)
-
-export default new Vuex.Store({
-	state: {
-		userInfo: uni.getStorageSync('userInfo') || {},
-		globalToken: ''
-	},
-	mutations: {
-		set(state, payload) {
-			console.log('payload======>', payload)
-			state[payload.type] = payload.data;
-			
-			uni.setStorageSync(payload.type, payload.data);
-		},
-	},
-	getters: {
-		userInfo: state => state.userInfo,
-	},
-	actions: {
-		getUserInfo({commit}, payload) {
-			if (!uni.getStorageSync('token')) return{};
-			return new Promise((resolve, reject) => {
-				axios.get('/user-api/user').then(res => {
-					uni.setStorageSync('userInfo', res)
-
-					commit('set', {
-						type: 'userInfo',
-						data: res,
-					})
-					
-					// console.log("res", res)
-					resolve(res)
-				}).catch(error => {
-					reject(error)
-				})
-			})
-		}
-	}
+const store = createStore({
+    state() {
+        return {
+            userInfo: uni.getStorageSync('userInfo') || {},
+            globalToken: ''
+        }
+    },
+    mutations: {
+        set(state, payload) {
+            console.log('payload======>', payload)
+            state[payload.type] = payload.data
+            uni.setStorageSync(payload.type, payload.data)
+        }
+    },
+    getters: {
+        userInfo: state => state.userInfo
+    },
+    actions: {
+        async getUserInfo({commit}) {
+            if (!uni.getStorageSync('token')) return {}
+            try {
+                const res = await axios.get('/user-api/user')
+                uni.setStorageSync('userInfo', res)
+                commit('set', {
+                    type: 'userInfo',
+                    data: res
+                })
+                return res
+            } catch (error) {
+                throw error
+            }
+        }
+    }
 })
+
+export default store

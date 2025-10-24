@@ -60,18 +60,19 @@ const $u = {
 // $u挂载到uni对象上
 uni.$u = $u
 
-const install = (Vue) => {
-    // 时间格式化，同时两个名称，date和timeFormat
-    Vue.filter('timeFormat', (timestamp, format) => uni.$u.timeFormat(timestamp, format))
-    Vue.filter('date', (timestamp, format) => uni.$u.timeFormat(timestamp, format))
-    // 将多久以前的方法，注入到全局过滤器
-    Vue.filter('timeFrom', (timestamp, format) => uni.$u.timeFrom(timestamp, format))
-    // 同时挂载到uni和Vue.prototype中
-    // #ifndef APP-NVUE
-    // 只有vue，挂载到Vue.prototype才有意义，因为nvue中全局Vue.prototype和Vue.mixin是无效的
-    Vue.prototype.$u = $u
-    Vue.mixin(mixin)
-    // #endif
+const install = (app) => {
+    // 时间格式化方法
+    const timeFormat = (timestamp, format) => uni.$u.timeFormat(timestamp, format)
+    const timeFrom = (timestamp, format) => uni.$u.timeFrom(timestamp, format)
+    
+    // 挂载到全局
+    app.config.globalProperties.$timeFormat = timeFormat
+    app.config.globalProperties.$date = timeFormat
+    app.config.globalProperties.$timeFrom = timeFrom
+    app.config.globalProperties.$u = $u
+    
+    // 全局 mixin
+    app.mixin(mixin)
 }
 
 export default {
