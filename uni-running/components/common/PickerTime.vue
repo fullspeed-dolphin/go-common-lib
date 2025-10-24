@@ -6,7 +6,7 @@
   </view>
 </template>
 <script>
-import dayjs from "@/uni_modules/uview-ui/libs/util/dayjs.js"
+import dayjs from "dayjs"
 export default {
   options: {
     styleIsolation: "shared",

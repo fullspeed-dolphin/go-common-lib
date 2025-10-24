@@ -59,7 +59,7 @@
 	import FileUploader from "@/components/common/fileUploader.vue"
 	import PickerMap from "@/components/common/PickerMap.vue"
 	import PickerTime from "@/components/common/PickerTime.vue"
-	import dayjs from "../uni_modules/uview-ui/libs/util/dayjs";
+	import dayjs from "dayjs";
 	export default {
 		components: {
 			FileUploader, PickerMap, PickerTime

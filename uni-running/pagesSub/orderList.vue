@@ -51,7 +51,7 @@
 <script>
 import tabbar from "@/components/tabBar.vue";
 import MescrollMixin from "@/uni_modules/mescroll-uni/components/mescroll-uni/mescroll-mixins.js";
-import dayjs from '@/uni_modules/uview-ui/libs/util/dayjs.js';
+import dayjs from 'dayjs';
 
 export default {
   mixins: [MescrollMixin],

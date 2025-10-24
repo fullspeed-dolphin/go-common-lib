@@ -5,7 +5,7 @@ import { toast } from "@/utils/util.js"
 import request from "@/utils/request.js"
 
 // 引入全局uView
-import uView from '@/uni_modules/uview-ui'
+import uView from '@/uni_modules/uview-plus'
 
 export function createApp() {
     const app = createSSRApp(App)

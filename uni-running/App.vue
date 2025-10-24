@@ -13,7 +13,7 @@ onHide(() => {
 </script>
 
 <style lang="scss">
-@import "@/uni_modules/uview-ui/index.scss";
+@import "@/uni_modules/uview-plus/index.scss";
 // @import './static/iconfont.css';
 @import './assets/style/common.scss';
 @import './assets/style/theme.scss';

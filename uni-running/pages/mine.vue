@@ -1,6 +1,6 @@
 <template>
   <view class="">
-		<u-navbar title="个人中心" :leftIcon="false"></u-navbar>
+		<u-navbar placeholder title="个人中心" :leftIcon="false"></u-navbar>
     <view class="page-content">
     	<view class="rel section-user">
     		<view class="user-box" @click="handleUserClick">

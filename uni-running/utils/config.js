@@ -13,6 +13,7 @@ if (['release'].includes(envVersion)) {
 	baseUrl = 'https://speexpay.com'
 }
 
-
+console.log(envVersion, baseUrl, 'envVersion, baseUrl');
 export const baseLink = baseUrl
+
 export const isRelease =['release'].includes(envVersion);

@@ -1,6 +1,6 @@
 <template>
   <view class="pt20">
-		<u-navbar title="运动" :leftIcon="false"></u-navbar>
+		<u-navbar placeholder title="运动" :leftIcon="false"></u-navbar>
 		
 		<section class="section-dashboard">
 			<view class="h1">

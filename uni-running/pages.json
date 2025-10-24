@@ -1,68 +1,229 @@
 {
-    "pages": [
-        { "path": "pages/index", "style": { "navigationStyle": "custom","navigationBarTitleText": "首页" } },
-        { "path": "pages/sport", "style": { "navigationStyle": "custom","navigationBarTitleText": "" } },
-        { "path": "pages/mine", "style": { "navigationStyle": "custom","navigationBarTitleText": "" } }
-    ],
-		"subpackages": [
-			{
-				"root": "pagesSub",
-				"pages": [
-					{ "path": "login", "style": { "navigationStyle": "custom","navigationBarTitleText": "登录", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "signerForm", "style": { "navigationStyle": "custom","navigationBarTitleText": "收集信息", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "signUpStatus", "style": { "navigationStyle": "custom","navigationBarTitleText": "", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "offlineEvents", "style": { "navigationStyle": "custom","navigationBarTitleText": "线下活动", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "orderIn", "style": { "navigationStyle": "custom","navigationBarTitleText": "活动报名", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "orderDetail", "style": { "navigationStyle": "custom","navigationBarTitleText": "", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "orderList", "style": { "navigationStyle": "custom","navigationBarTitleText": "", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "groupList", "style": { "navigationStyle": "custom","navigationBarTitleText": "跑团招募", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "groupDetail", "style": { "navigationStyle": "custom","navigationBarTitleText": "跑团详情", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "groupForm", "style": { "navigationStyle": "custom","navigationBarTitleText": "创建跑团", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "groupMemberList", "style": { "navigationStyle": "custom","navigationBarTitleText": "跑团成员", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "myEvent", "style": { "navigationStyle": "custom","navigationBarTitleText": "我的赛事", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "myMessages", "style": { "navigationStyle": "custom","navigationBarTitleText": "我的消息", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "sportDetail", "style": { "navigationStyle": "custom","navigationBarTitleText": "运动详情", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "device/deviceList", "style": { "navigationStyle": "custom","navigationBarTitleText": "", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "device/deviceBrands", "style": { "navigationStyle": "custom","navigationBarTitleText": "", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "device/deviceDetail", "style": { "navigationStyle": "custom","navigationBarTitleText": "", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "device/deviceBind", "style": { "navigationStyle": "custom","navigationBarTitleText": "", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "settings/agreement", "style": { "navigationBarTitleText": "用户协议", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "settings/webView", "style": { "navigationBarTitleText": "详情", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					// { "path": "settings/forgetPassword", "style": { "navigationBarTitleText": "忘记密码", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					// { "path": "settings/findPassword", "style": { "navigationBarTitleText": "重置密码", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					{ "path": "settings/editPassword", "style": { "navigationBarTitleText": "修改密码", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-					// { "path": "settings/settings", "style": { "navigationBarTitleText": "设置", "app-plus": { "titleNView": false, "backgroundcolor": "#ffffff" } } },
-					{ "path": "settings/feedback", "style": { "navigationStyle": "custom", "navigationBarTitleText": "意见反馈", "app-plus": { "titleNView": false, "backgroundcolor": "#ffffff" } } }
-				]
-			}
-		],
-		"tabBar": {
-			"custom": true,
-			"selectedColor": "#fd2840",
-			"list": [{
-					"text": "首页",
-					"pagePath": "pages/index",
-					"iconPath": "./static/tab_00.png",
-					"selectedIconPath": "./static/tab_00.png"
-				},
-				{
-					"text": "",
-					"pagePath": "pages/sport",
-					"iconPath": "./static/tab_00.png",
-					"selectedIconPath": "./static/tab_00.png"
-				},
-				{
-					"text": "",
-					"pagePath": "pages/mine",
-					"iconPath": "./static/tab_00.png",
-					"selectedIconPath": "./static/tab_00.png"
-				}
-			]
-		},
-    "globalStyle": {
-        "navigationBarTextStyle": "black",
-        "navigationBarTitleText": "跑了没",
-        "navigationBarBackgroundColor": "#fff",
-        "backgroundColor": "#fff"
+  "pages": [
+    {
+      "path": "pages/index",
+      "style": { "navigationStyle": "custom", "navigationBarTitleText": "首页" }
+    },
+    {
+      "path": "pages/sport",
+      "style": { "navigationStyle": "custom", "navigationBarTitleText": "" }
+    },
+    {
+      "path": "pages/mine",
+      "style": { "navigationStyle": "custom", "navigationBarTitleText": "" }
     }
+  ],
+  "subpackages": [
+    {
+      "root": "pagesSub",
+      "pages": [
+        {
+          "path": "login",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "登录",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        {
+          "path": "signerForm",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "收集信息",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        {
+          "path": "signUpStatus",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        {
+          "path": "offlineEvents",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "线下活动",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        {
+          "path": "orderIn",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "活动报名",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        {
+          "path": "orderDetail",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        {
+          "path": "orderList",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        {
+          "path": "groupList",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "跑团招募",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        {
+          "path": "groupDetail",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "跑团详情",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        {
+          "path": "groupForm",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "创建跑团",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        {
+          "path": "groupMemberList",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "跑团成员",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        {
+          "path": "myEvent",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "我的赛事",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        {
+          "path": "myMessages",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "我的消息",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        {
+          "path": "sportDetail",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "运动详情",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        {
+          "path": "device/deviceList",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        {
+          "path": "device/deviceBrands",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        {
+          "path": "device/deviceDetail",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        {
+          "path": "device/deviceBind",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        {
+          "path": "settings/agreement",
+          "style": {
+            "navigationBarTitleText": "用户协议",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        {
+          "path": "settings/webView",
+          "style": {
+            "navigationBarTitleText": "详情",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        // { "path": "settings/forgetPassword", "style": { "navigationBarTitleText": "忘记密码", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
+        // { "path": "settings/findPassword", "style": { "navigationBarTitleText": "重置密码", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
+        {
+          "path": "settings/editPassword",
+          "style": {
+            "navigationBarTitleText": "修改密码",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        // { "path": "settings/settings", "style": { "navigationBarTitleText": "设置", "app-plus": { "titleNView": false, "backgroundcolor": "#ffffff" } } },
+        {
+          "path": "settings/feedback",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "意见反馈",
+            "app-plus": { "titleNView": false, "backgroundcolor": "#ffffff" }
+          }
+        }
+      ]
+    }
+  ],
+  "tabBar": {
+    "custom": true,
+    "selectedColor": "#fd2840",
+    "list": [
+      {
+        "text": "首页",
+        "pagePath": "pages/index",
+        "iconPath": "./static/tab_00.png",
+        "selectedIconPath": "./static/tab_00.png"
+      },
+      {
+        "text": "",
+        "pagePath": "pages/sport",
+        "iconPath": "./static/tab_00.png",
+        "selectedIconPath": "./static/tab_00.png"
+      },
+      {
+        "text": "",
+        "pagePath": "pages/mine",
+        "iconPath": "./static/tab_00.png",
+        "selectedIconPath": "./static/tab_00.png"
+      }
+    ]
+  },
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "跑了没",
+    "navigationBarBackgroundColor": "#fff",
+    "backgroundColor": "#fff"
+  }
 }
