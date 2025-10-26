@@ -192,6 +192,14 @@
             "navigationBarTitleText": "意见反馈",
             "app-plus": { "titleNView": false, "backgroundcolor": "#ffffff" }
           }
+        },
+        {
+          "path": "runMap",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "跑步轨迹",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
         }
       ]
     }
