@@ -15,7 +15,7 @@
 				:show-location="true"
 				:enable-3D="false"
 				:enable-overlooking="false"
-				:enable-zoom="false"
+				:enable-zoom="true"
 				:enable-scroll="true"
 				:enable-rotate="false"
 				:enable-satellite="false"
@@ -136,7 +136,7 @@ const showSuccessModal = ref(false)
 const targetDistance = ref(10000) // 10km = 10000米
 
 // 调试模式
-const debug = ref(true) // 设置为true显示测试功能
+const debug = ref(false) // 设置为true显示测试功能
 
 // 计算属性
 const progressPercent = computed(() => {
@@ -824,7 +824,6 @@ const clearTestTrack = () => {
 .button-container {
 	display: flex;
 	justify-content: center;
-	margin-bottom: 20rpx;
 }
 
 .start-button {
