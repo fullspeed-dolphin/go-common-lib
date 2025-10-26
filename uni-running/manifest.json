@@ -109,7 +109,8 @@
     "requiredPrivateInfos": [
       "getLocation",
       "chooseLocation",
-      "startLocationUpdateBackground"
+      "startLocationUpdateBackground",
+      "onLocationChange"
     ],
     "requiredBackgroundModes": ["location"],
     "permission": {
