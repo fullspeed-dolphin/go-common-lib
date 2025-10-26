@@ -651,9 +651,9 @@ const formatTime = (seconds) => {
 // 格式化配速
 const formatPace = (pace) => {
 	if (pace === 0) return '--'
-	const minutes = Math.floor(pace / 60)
-	const seconds = Math.floor(pace % 60)
-	return `${minutes}:${seconds.toString().padStart(2, '0')}/km`
+	// 计算米/秒 (m/s)
+	const metersPerSecond = (1000 / pace).toFixed(1)
+	return `${metersPerSecond} m/s`
 }
 
 // 提交跑步数据到后端
