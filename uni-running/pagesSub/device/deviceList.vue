@@ -1,6 +1,6 @@
 <template>
   <view class="" style="padding-top: 50rpx;">
-		<u-navbar title="智能设备"></u-navbar>
+		<u-navbar placeholder title="智能设备"></u-navbar>
 		<view v-if="!deviceList.length" class="flex-col-center section-empty" 
 		style="">
 			尚未添加任何设备

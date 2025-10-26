@@ -1,6 +1,6 @@
 <template>
   <view class="" >
-		<u-navbar title="活动报名"></u-navbar>
+		<u-navbar placeholder title="活动报名"></u-navbar>
 		
 		<section class="section-assign">
 			<view class="cell flex-between-center" @click="selectSigner()">

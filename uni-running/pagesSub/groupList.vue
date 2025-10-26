@@ -1,6 +1,6 @@
 <template>
   <div class="">
-		<u-navbar title="跑团招募"></u-navbar>
+		<u-navbar placeholder title="跑团招募"></u-navbar>
     <section class="section-filter bgf">
 			<view class="section-search">
 				<u-search v-model="searchTxt" @search="refreshList" placeholder="搜索跑团" shape="round" bgColor="#fff" borderColor="#FF8C00" :showAction="false"></u-search>

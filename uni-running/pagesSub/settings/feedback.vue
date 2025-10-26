@@ -1,6 +1,6 @@
 <template>
   <view class="page">
-    <u-navbar title="意见反馈"></u-navbar>
+    <u-navbar placeholder title="意见反馈"></u-navbar>
     <view style="padding: 20rpx 34rpx">
       <u--form :model="form" ref="uForm" :rules="rules" labelWidth="auto" labelPosition="top">
         <u-form-item label="反馈类型（必填）" prop="checked">

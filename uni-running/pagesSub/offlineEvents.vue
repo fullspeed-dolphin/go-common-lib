@@ -3,7 +3,7 @@
 		isFixedNavbar: isFixedNavbar,
 		isLoadedPage: isLoadedPage
 	}">
-		<u-navbar :title="isFixedNavbar ? '' : '线下活动'" :placeholder="false"></u-navbar>
+		<u-navbar placeholder :title="isFixedNavbar ? '' : '线下活动'" :placeholder="false"></u-navbar>
 		
 		<div class="event-status flex-center" v-if="detail.status === 'ACT'">活动进行中</div>
 		

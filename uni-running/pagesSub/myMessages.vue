@@ -1,6 +1,6 @@
 <template>
   <div class="">
-		<u-navbar title="我的消息"></u-navbar>
+		<u-navbar placeholder title="我的消息"></u-navbar>
 		<mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="180">
       <view class="member-item flex-start" :class="{'u-border-bottom': index !== 4}" v-for="(item,index) in 5" :key="index">
       	<image class="img" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>

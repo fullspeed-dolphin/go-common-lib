@@ -1,6 +1,6 @@
 <template>
   <view class="" >
-		<u-navbar title="我的赛事"></u-navbar>
+		<u-navbar placeholder title="我的赛事"></u-navbar>
 		<section class="panel" @click="$u.route('pagesSub/offlineEvents')">
 			<image class="poster" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
 			<view class="p20">

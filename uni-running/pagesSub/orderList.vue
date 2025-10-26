@@ -1,6 +1,6 @@
 <template>
   <div class="">
-		<u-navbar title="我的订单"></u-navbar>
+		<u-navbar placeholder title="我的订单"></u-navbar>
 		
 		<view class="bgf" style="position: relative;z-index:20;">
 			<u-tabs lineHeight="2" :duration="0"

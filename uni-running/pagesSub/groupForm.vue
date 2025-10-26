@@ -1,6 +1,6 @@
 <template>
 	<view class="page">
-		<u-navbar title="创建跑团"></u-navbar>
+		<u-navbar placeholder title="创建跑团"></u-navbar>
 		<view style="padding:20rpx 34rpx;">
 			<u--form :model="form" ref="uForm" :rules="rules"  labelPosition="top" labelWidth="auto">
 				

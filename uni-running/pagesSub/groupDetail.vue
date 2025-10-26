@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<u-navbar :title="pageTitle"></u-navbar>
+		<u-navbar placeholder :title="pageTitle"></u-navbar>
 		
 		<mescroll-empty v-if="isEmpty" mode="data" :option="{
 			btnText: '创建跑团',

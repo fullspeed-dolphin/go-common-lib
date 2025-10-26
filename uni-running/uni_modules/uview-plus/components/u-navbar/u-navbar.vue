@@ -103,7 +103,7 @@
 	 * @property {Object | String}	titleStyle			标题的样式，对象或字符串
 	 * @event {Function} leftClick		点击左侧区域
 	 * @event {Function} rightClick		点击右侧区域
-	 * @example <u-navbar title="剑未配妥，出门已是江湖" left-text="返回" right-text="帮助" @click-left="onClickBack" @click-right="onClickRight"></u-navbar>
+	 * @example <u-navbar placeholder title="剑未配妥，出门已是江湖" left-text="返回" right-text="帮助" @click-left="onClickBack" @click-right="onClickRight"></u-navbar>
 	 */
 	export default {
 		name: 'u-navbar',
