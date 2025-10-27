@@ -21,73 +21,89 @@
 		</view>
   </u-popup>
 </template>
-<script>
-export default {
-  options: { styleIsolation: "shared" },
-  data() {
-    return {
-			isShowPop: false,
-			isDisabled: false
-		};
-  },
-  methods: {
-		open() {
-			this.isShowPop = true;
-		},
-		close() {
-			this.isShowPop = false;
-		},
-    async getCode() {
-      return (
-        await new Promise((resolve) =>
-          uni.login({ success: (e) => resolve(e) })
-        )
-      ).code;
-    },
-    async getPhoneNumber({ detail }) {
-      // console.log(detail);
-      if (detail.errMsg == "getPhoneNumber:fail user deny") {
-        this.$toast("用户已拒绝");
-				
-				this.isDisabled = false;
-        return false;
-      }
-			
-			uni.showLoading({
-			  title: "登录中...",
-			  mask: true,
-			});
-			
-			this.isDisabled = true;
-			
-      const data = {
-        jsCode: await this.getCode(),
-        encryptedData: detail.encryptedData,
-        ivStr: detail.iv,
-        phoneCode: detail.code,
-      };
+<script setup>
+import { ref } from 'vue'
+import { useStore } from 'vuex'
+import { getCurrentInstance } from 'vue'
 
-			try {
-				const res = await this.$axios.post("/wechat-login/login", data);
-				
-				uni.setStorageSync("token", res.sessionToken);
-				
-				this.$toast("登录成功");
-				
-				this.close()
-				
-				await this.$store.dispatch('getUserInfo')
-				
-				this.isDisabled = false;
-				this.$emit("success");
-			} catch (error) {
-				console.error(error)
-				this.isDisabled = false;
-				//TODO handle the exception
-			}
-    }
-  },
-};
+// 获取当前实例以访问全局属性
+const { proxy } = getCurrentInstance()
+
+// 使用store
+const store = useStore()
+
+// 响应式数据
+const isShowPop = ref(false)
+const isDisabled = ref(false)
+
+// Emits
+const emit = defineEmits(['success'])
+
+// 方法定义
+const open = () => {
+	isShowPop.value = true;
+}
+
+const close = () => {
+	isShowPop.value = false;
+}
+
+const getCode = async () => {
+	return (
+		await new Promise((resolve) =>
+			uni.login({ success: (e) => resolve(e) })
+		)
+	).code;
+}
+
+const getPhoneNumber = async ({ detail }) => {
+	// console.log(detail);
+	if (detail.errMsg == "getPhoneNumber:fail user deny") {
+		proxy.$toast("用户已拒绝");
+		
+		isDisabled.value = false;
+		return false;
+	}
+	
+	uni.showLoading({
+		title: "登录中...",
+		mask: true,
+	});
+	
+	isDisabled.value = true;
+	
+	const data = {
+		jsCode: await getCode(),
+		encryptedData: detail.encryptedData,
+		ivStr: detail.iv,
+		phoneCode: detail.code,
+	};
+
+	try {
+		const res = await proxy.$axios.post("/wechat-login/login", data);
+		
+		uni.setStorageSync("token", res.sessionToken);
+		
+		proxy.$toast("登录成功");
+		
+		close()
+		
+		await store.dispatch('getUserInfo')
+		
+		isDisabled.value = false;
+		emit("success");
+	} catch (error) {
+		console.error(error)
+		isDisabled.value = false;
+		//TODO handle the exception
+	}
+}
+
+// 暴露方法给父组件
+defineExpose({
+	open,
+	close
+})
 </script>
 
 <style lang="scss" scoped>

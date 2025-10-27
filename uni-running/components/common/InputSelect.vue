@@ -18,166 +18,154 @@
     </view>
   </view>
 </template>
-<script>
-export default {
-  emits: ['update:modelValue', 'input', 'confirm'],
-  props: {
-    loading: {
-      type: Boolean,
-      default: false
-    },
-    maxHeight: {
-      type: String || Number,
-      default: "125"
-    },
-    valueKey: {
-      type: String,
-      default: 'value'
-    },
-    nameKey: {
-      type: String,
-      default: 'label'
-    },
-    placeholder: {
-      type: String,
-      default: '请输入'
-    },
-    loadingText: {
-      type: String,
-      default: '加载中'
-    },
-    modelValue: [Number, String],
-    value: [Number, String],
-    list: {
-      type: Array,
-      default: () => []
-    }
-  },
-  data() {
-    return {
-      showComboxSelect: false,
-      checkValue: ''
-    }
-  },
+<script setup>
+import { ref, watch, onMounted, nextTick } from 'vue'
 
-  created() {
- 
-  },
+// Props定义
+const props = defineProps({
+	loading: {
+		type: Boolean,
+		default: false
+	},
+	maxHeight: {
+		type: String || Number,
+		default: "125"
+	},
+	valueKey: {
+		type: String,
+		default: 'value'
+	},
+	nameKey: {
+		type: String,
+		default: 'label'
+	},
+	placeholder: {
+		type: String,
+		default: '请输入'
+	},
+	loadingText: {
+		type: String,
+		default: '加载中'
+	},
+	modelValue: [Number, String],
+	value: [Number, String],
+	list: {
+		type: Array,
+		default: () => []
+	}
+})
 
-  mounted() {
-    if (!this.$refs['uni-easyinput']) {
-      console.error('请先导入uni-easyinput插件')
-      return
-    }
-    this.watchInitialValue()
-  },
+// Emits
+const emit = defineEmits(['update:modelValue', 'input', 'confirm'])
 
-  watch: {
-	// #ifdef VUE2
-	  value(val) {
-	 
-		this.checkValue = val
-		this.getInitText()
-		
-	  },
-	// #endif
-	// #ifdef VUE3
-	 modelValue(val) {
-		this.checkValue = val
-		this.getInitText()
-	 },
-	// #endif
-    checkValue(val) { },
-    list: {
-      handler(val) {
-        // console.log(val, 'watch')
-      }
-    }
-  },
-  methods: {
-    gclick() {
-      this.showComboxSelect = false
-      this.reset()
-    },
+// 模板引用
+const uniEasyinput = ref(null)
 
-    /*
-      * 判断如果数据源有数据直接获取，没有数据就进行监听
-      */
-    watchInitialValue() {
-      if (this.list.length) {
-        this.getInitText()
-        return
-      }
-      const unwatchList = this.$watch('list', (val) => {
-        this.getInitText()
-        unwatchList()
-      })
-    },
+// 响应式数据
+const showComboxSelect = ref(false)
+const checkValue = ref('')
 
-    getInitText() {
-		 
-      this.checkValue = this.modelValue === null ? this.value : this.modelValue
-	  
-      if (!this.list.length) return
-      if (this.checkValue === '' || this.checkValue === undefined || this.checkValue === null) return
-      if (this.showComboxSelect) return
+// 监听value变化
+watch(() => props.value, (val) => {
+	checkValue.value = val
+	getInitText()
+})
 
-      const _item = this.list.find((item) => {
-        return item[this.valueKey] === +this.checkValue
-      })
-      this.$refs['uni-easyinput'].val = _item[this.nameKey]
-    },
+// 监听modelValue变化
+watch(() => props.modelValue, (val) => {
+	checkValue.value = val
+	getInitText()
+})
 
-    /**
-     * 重置
-     */
-    reset() {
-		 
-      // #ifdef VUE3
-      this.$emit('update:modelValue', '')
-      // #endif
-      // #ifdef VUE2
-      this.$emit('input', '')
-      // #endif
-      this.$nextTick(() => {
-        this.$refs['uni-easyinput'].val = ''
-      })
-    },
+// 监听checkValue变化
+watch(() => checkValue.value, (val) => { })
 
-    /**
-     * 选中事件
-     */
-    comboxCheckHandel(item) {
-      const text = item[this.nameKey]
-      const value = item[this.valueKey]
-      this.checkValue = ''
-      this.checkValue = value
-      this.showComboxSelect = false
-      // #ifdef VUE3
-      this.$emit('update:modelValue', value)
-      // #endif
-      // #ifdef VUE2
-      this.$emit('input', value)
-      // #endif
-      this.$nextTick(() => {
-        this.$refs['uni-easyinput'].val = text
-      })
-      this.$emit('confirm', value)
-    },
+// 监听list变化
+watch(() => props.list, (val) => {
+	// console.log(val, 'watch')
+})
 
-    /**
-     * 输入事件
-     */
-    oninput(val) {
-      this.$emit('update:modelValue', val);
-      this.$emit('input', val)
-      if (!val) {
-        this.showComboxSelect = false
-        return
-      }
-      this.showComboxSelect = true
-    }
-  }
+// 组件挂载
+onMounted(() => {
+	if (!uniEasyinput.value) {
+		console.error('请先导入uni-easyinput插件')
+		return
+	}
+	watchInitialValue()
+})
+
+// 方法定义
+const gclick = () => {
+	showComboxSelect.value = false
+	reset()
+}
+
+/*
+ * 判断如果数据源有数据直接获取，没有数据就进行监听
+ */
+const watchInitialValue = () => {
+	if (props.list.length) {
+		getInitText()
+		return
+	}
+	const unwatchList = watch(() => props.list, (val) => {
+		getInitText()
+		unwatchList()
+	})
+}
+
+const getInitText = () => {
+	checkValue.value = props.modelValue === null ? props.value : props.modelValue
+	
+	if (!props.list.length) return
+	if (checkValue.value === '' || checkValue.value === undefined || checkValue.value === null) return
+	if (showComboxSelect.value) return
+
+	const _item = props.list.find((item) => {
+		return item[props.valueKey] === +checkValue.value
+	})
+	uniEasyinput.value.val = _item[props.nameKey]
+}
+
+/**
+ * 重置
+ */
+const reset = () => {
+	emit('update:modelValue', '')
+	emit('input', '')
+	nextTick(() => {
+		uniEasyinput.value.val = ''
+	})
+}
+
+/**
+ * 选中事件
+ */
+const comboxCheckHandel = (item) => {
+	const text = item[props.nameKey]
+	const value = item[props.valueKey]
+	checkValue.value = ''
+	checkValue.value = value
+	showComboxSelect.value = false
+	emit('update:modelValue', value)
+	emit('input', value)
+	nextTick(() => {
+		uniEasyinput.value.val = text
+	})
+	emit('confirm', value)
+}
+
+/**
+ * 输入事件
+ */
+const oninput = (val) => {
+	emit('update:modelValue', val);
+	emit('input', val)
+	if (!val) {
+		showComboxSelect.value = false
+		return
+	}
+	showComboxSelect.value = true
 }
 </script>
 <style lang="scss">

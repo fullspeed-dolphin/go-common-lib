@@ -8,33 +8,41 @@
     </view>
   </u-popup>
 </template>
-<script>
-export default {
-  options: {
-    styleIsolation: "shared",
-  },
-  props: ["title", "confirmButtonTxt", "isShowConfirm", "position"],
-  data() {
-    return {
-      isShowPop: false,
-      text: "",
-    };
-  },
-  methods: {
-    open(data) {
-      this.text = data || "";
-      this.isShowPop = true;
-    },
-    close(data) {
-      this.isShowPop = false;
-			this.$emit("close")
-    },
-    confirm() {
-      this.isShowPop = false;
-      this.$emit("confirm");
-    },
-  },
-};
+<script setup>
+import { ref } from 'vue'
+
+// Props定义
+const props = defineProps(["title", "confirmButtonTxt", "isShowConfirm", "position"])
+
+// Emits
+const emit = defineEmits(['close', 'confirm'])
+
+// 响应式数据
+const isShowPop = ref(false)
+const text = ref("")
+
+// 方法定义
+const open = (data) => {
+	text.value = data || "";
+	isShowPop.value = true;
+}
+
+const close = (data) => {
+	isShowPop.value = false;
+	emit("close")
+}
+
+const confirm = () => {
+	isShowPop.value = false;
+	emit("confirm");
+}
+
+// 暴露方法给父组件
+defineExpose({
+	open,
+	close,
+	confirm
+})
 </script>
 
 <style lang="scss">

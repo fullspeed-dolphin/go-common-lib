@@ -24,78 +24,79 @@
     </view>
   </view>
 </template>
-<script>
+<script setup>
+import { ref } from 'vue'
+import { getCurrentInstance } from 'vue'
 import FileUploader from '@/components/common/fileUploader.vue'
-export default {
-  components: {
-    FileUploader
-  },
-  data() {
-    return {
-      form: {
-        checked: [],
-        description: ''
-      },
-      issueTypeOptions: [
-        { text: '功能异常：功能故障或不可用', value: 1 },
-        { text: '产品建议：我有新创意/想法/意见', value: 2 },
-        { text: '安全问题：密码/隐私/欺诈等', value: 3 },
-        { text: '流程问题：加载慢/提示错误/页面卡顿等', value: 4 },
-        { text: '其他', value: 5 }
-      ],
-      rules: {
-        checked: [
-          {
-						type: 'array',
-						min: 1,
-            required: true,
-            message: '必填项',
-            trigger: ['blur', 'change']
-          }
-        ],
-        description: [
-          {
-            required: true,
-            message: '必填项',
-            trigger: ['blur', 'change']
-          }
-        ]
-      }
-    }
-  },
-  methods: {
-    submitForm() {
-      this.$refs.uForm.validate().then((res) => {
-        const token = uni.getStorageSync('token')
-        if (!token) {
-          this.$toast('请先登录~')
-          setTimeout(() => {
-            this.$goUrl('/pagesSub/login')
-          }, 1000)
-          return
-        }
 
-        if (!this.isAgree.length) return this.$toast('请勾选同意协议')
+// 获取当前实例以访问全局属性
+const { proxy } = getCurrentInstance()
 
-        const data = {
-          Account: this.form.name,
-          Password: this.form.password
-        }
-        uni.showLoading({
-          mask: true
-        })
-        this.$axios.post(`/api/store/login`, data).then((res) => {
-          console.log(res)
+// 模板引用
+const uForm = ref(null)
 
-          uni.$u.toast('提交成功')
-					
-					setTimeout(res => {
-						uni.navigateBack()
-					}, 300)
-        })
-      })
-    }
-  }
+// 响应式数据
+const form = ref({
+	checked: [],
+	description: ''
+})
+const issueTypeOptions = ref([
+	{ text: '功能异常：功能故障或不可用', value: 1 },
+	{ text: '产品建议：我有新创意/想法/意见', value: 2 },
+	{ text: '安全问题：密码/隐私/欺诈等', value: 3 },
+	{ text: '流程问题：加载慢/提示错误/页面卡顿等', value: 4 },
+	{ text: '其他', value: 5 }
+])
+const rules = ref({
+	checked: [
+		{
+			type: 'array',
+			min: 1,
+			required: true,
+			message: '必填项',
+			trigger: ['blur', 'change']
+		}
+	],
+	description: [
+		{
+			required: true,
+			message: '必填项',
+			trigger: ['blur', 'change']
+		}
+	]
+})
+
+// 方法定义
+const submitForm = () => {
+	uForm.value.validate().then((res) => {
+		const token = uni.getStorageSync('token')
+		if (!token) {
+			proxy.$toast('请先登录~')
+			setTimeout(() => {
+				proxy.$goUrl('/pagesSub/login')
+			}, 1000)
+			return
+		}
+
+		// if (!this.isAgree.length) return this.$toast('请勾选同意协议')
+
+		const data = {
+			Account: form.value.name,
+			Password: form.value.password
+		}
+		uni.showLoading({
+			mask: true
+		})
+		proxy.$axios.post(`/api/store/login`, data).then((res) => {
+			console.log(res)
+
+			proxy.$toast('提交成功')
+			
+			setTimeout(res => {
+				uni.navigateBack()
+			}, 300)
+		})
+	})
 }
 </script>
 

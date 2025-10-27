@@ -14,86 +14,84 @@
     </u-popup>
   </view>
 </template>
-<script>
-export default {
-  options: {
-    styleIsolation: "shared",
-  },
-  props: {
-    title: {
-      type: String,
-      default: "",
-    },
-    placeholder: {
-      type: String,
-      default: "请选择",
-    },
-    required: {
-      type: Boolean,
-      default: false,
-    },
-    customClass: {
-      type: String,
-      default: "",
-    },
-    value: {
-      type: String | Number,
-      default: "",
-    },
-    columns: {
-      type: Array,
-      default() {
-        return [];
-      },
-    },
-  },
-  data() {
-    return {
-      isShowPop: false,
-      selectedList: [],
-      selectedLbaels: "",
-      detail: {
-        field: "",
-        title: "",
-        columns: [],
-      },
-    };
-  },
-  watch: {
-    value: {
-      handler(val) {
-        if (String(val)) {
-          console.log("String(val)", this.columns, String(val));
-          const list = String(val).split(",");
-          const string = this.columns
-            .filter((i) => list.includes(String(i.value)))
-            .map((i) => i.label);
-          this.selectedLbaels = string.join(",");
-          this.selectedList = list;
-        } else {
-          this.selectedList = [];
-          this.selectedLbaels = "";
-        }
-      },
-      deep: true,
-      immediate: true,
-    },
-  },
-  methods: {
-    confirm() {
-      const valueText = this.columns
-        .filter((i) => this.selectedList.includes(String(i.value)))
-        .map((i) => i.label);
+<script setup>
+import { ref, watch } from 'vue'
 
-      this.$emit("input", this.selectedList.join(","));
+// Props定义
+const props = defineProps({
+	title: {
+		type: String,
+		default: "",
+	},
+	placeholder: {
+		type: String,
+		default: "请选择",
+	},
+	required: {
+		type: Boolean,
+		default: false,
+	},
+	customClass: {
+		type: String,
+		default: "",
+	},
+	value: {
+		type: String | Number,
+		default: "",
+	},
+	columns: {
+		type: Array,
+		default() {
+			return [];
+		},
+	},
+})
 
-      this.$emit("change", this.selectedList, valueText);
+// Emits
+const emit = defineEmits(['input', 'change'])
 
-      this.isShowPop = false;
-      this.selectedList = [];
-    },
-  },
-};
+// 响应式数据
+const isShowPop = ref(false)
+const selectedList = ref([])
+const selectedLbaels = ref("")
+const detail = ref({
+	field: "",
+	title: "",
+	columns: [],
+})
+
+// 监听value变化
+watch(() => props.value, (val) => {
+	if (String(val)) {
+		console.log("String(val)", props.columns, String(val));
+		const list = String(val).split(",");
+		const string = props.columns
+			.filter((i) => list.includes(String(i.value)))
+			.map((i) => i.label);
+		selectedLbaels.value = string.join(",");
+		selectedList.value = list;
+	} else {
+		selectedList.value = [];
+		selectedLbaels.value = "";
+	}
+}, {
+	deep: true,
+	immediate: true,
+})
+
+// 方法定义
+const confirm = () => {
+	const valueText = props.columns
+		.filter((i) => selectedList.value.includes(String(i.value)))
+		.map((i) => i.label);
+
+	emit("input", selectedList.value.join(","));
+
+	emit("change", selectedList.value, valueText);
+
+	isShowPop.value = false;
+	selectedList.value = [];
+}
 </script>
 
 <style lang="scss" scoped>

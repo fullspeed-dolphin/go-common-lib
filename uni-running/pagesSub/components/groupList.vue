@@ -14,78 +14,95 @@
   </u-popup>
 </template>
 
-<script>
+<script setup>
+import { ref, computed } from 'vue'
+import { useStore } from 'vuex'
+import { getCurrentInstance } from 'vue'
 import GroupItem from "@/components/GroupItem.vue"
-export default {
-  components: { GroupItem },
-  data() {
-    return {
-			searchTxt: "",
-      isShowPop: false,
-      dataList: [],
-    };
-  },
-	computed: {
-		userInfo() {
-			return this.$store.state.userInfo
-		}
-	},
-  methods: {
-		open() {
-			this.isShowPop = true;
-			this.getList()
-		},
-		close() {
-			this.isShowPop = false;
-		},
-    getList() {
-      uni.showLoading({ mask: true });
-      
-      const data = {
-      	"pageIndex": 0,
-      	"pageSize": 20,
-      	"keyword": this.searchTxt
-      }
-      this.$axios.get(`/running-group/api/v1/groups/list`, data).then(res => {
-				uni.hideLoading();
 
-				this.dataList = res.data;
-			})
-    },
-		joinGroup(item) {
-			if (!this.$store.state.userInfo.id) {
-				return this.$refs.refPhoneLogin.open()
+// 获取当前实例以访问全局属性
+const { proxy } = getCurrentInstance()
+
+// 使用store
+const store = useStore()
+
+// 模板引用
+const refPhoneLogin = ref(null)
+
+// 响应式数据
+const searchTxt = ref("")
+const isShowPop = ref(false)
+const dataList = ref([])
+
+// 计算属性
+const userInfo = computed(() => store.state.userInfo)
+
+// Emits
+const emit = defineEmits(['success'])
+
+// 方法定义
+const open = () => {
+	isShowPop.value = true;
+	getList()
+}
+
+const close = () => {
+	isShowPop.value = false;
+}
+
+const getList = () => {
+	uni.showLoading({ mask: true });
+	
+	const data = {
+		"pageIndex": 0,
+		"pageSize": 20,
+		"keyword": searchTxt.value
+	}
+	proxy.$axios.get(`/running-group/api/v1/groups/list`, data).then(res => {
+		uni.hideLoading();
+
+		dataList.value = res.data;
+	})
+}
+
+const joinGroup = (item) => {
+	if (!store.state.userInfo.id) {
+		return refPhoneLogin.value.open()
+	}
+	uni.showModal({
+		title: "提示",
+		content: "是否确认加入该跑团？",
+		success: (res) => {
+			if (res.confirm) {
+				const data = {
+					running_group: Number(item.group_id)
+				};
+
+				uni.showLoading({ mask: true });
+				proxy.$axios
+					.post(`/user-api/user/joinRunningGroup`, data)
+					.then(async (res) => {
+						uni.hideLoading();
+						proxy.$toast("加入成功！");
+						
+						close()
+						
+						await store.dispatch('getUserInfo')
+						
+						emit('success')
+					});
+			} else if (res.cancel) {
+				console.log("用户点击取消");
 			}
-		  uni.showModal({
-		    title: "提示",
-		    content: "是否确认加入该跑团？",
-		    success: (res) => {
-		      if (res.confirm) {
-		        const data = {
-		          running_group: Number(item.group_id)
-		        };
-		
-		        uni.showLoading({ mask: true });
-		        this.$axios
-		          .post(`/user-api/user/joinRunningGroup`, data)
-		          .then(async (res) => {
-		            uni.hideLoading();
-		            this.$toast("加入成功！");
-								
-								this.close()
-								
-								await this.$store.dispatch('getUserInfo')
-								
-								this.$emit('success')
-		          });
-		      } else if (res.cancel) {
-		        console.log("用户点击取消");
-		      }
-		    },
-		  });
 		},
-  },
-};
+	});
+}
+
+// 暴露方法给父组件
+defineExpose({
+	open,
+	close
+})
 </script>
 
 <style lang="scss" scoped>

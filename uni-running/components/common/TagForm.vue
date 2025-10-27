@@ -25,61 +25,60 @@
     </u-popup>
   </view>
 </template>
-<script>
-export default {
-  props: {
-    title: {
-      type: String,
-      default: "",
-    },
-    value: {
-      type: String,
-      default: "",
-    },
-    required: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  options: {
-    styleIsolation: "shared",
-  },
-  data() {
-    return {
-      isShowPop: false,
-      tagList: [],
-      inputValue: "",
-    };
-  },
-  watch: {
-    value: {
-      handler(val) {
-        if (val) {
-          // 首先将值转为数组
-          const list = Array.isArray(val) ? val : this.value.split(",");
-          this.tagList = list;
-        } else {
-          this.tagList = [];
-          return [];
-        }
-      },
-      deep: true,
-      immediate: true,
-    },
-  },
-  methods: {
-    deleteTag(index) {
-      this.tagList.splice(index, 1);
-      this.$emit("input", this.tagList.join(","));
-    },
-    submitForm() {
-      this.tagList.push(this.inputValue);
-      this.inputValue = "";
-      this.$emit("input", this.tagList.join(","));
-      this.isShowPop = false;
-    },
-  },
-};
+<script setup>
+import { ref, watch } from 'vue'
+
+// Props定义
+const props = defineProps({
+	title: {
+		type: String,
+		default: "",
+	},
+	value: {
+		type: String,
+		default: "",
+	},
+	required: {
+		type: Boolean,
+		default: false,
+	},
+})
+
+// Emits
+const emit = defineEmits(['input'])
+
+// 响应式数据
+const isShowPop = ref(false)
+const tagList = ref([])
+const inputValue = ref("")
+
+// 监听value变化
+watch(() => props.value, (val) => {
+	if (val) {
+		// 首先将值转为数组
+		const list = Array.isArray(val) ? val : props.value.split(",");
+		tagList.value = list;
+	} else {
+		tagList.value = [];
+		return [];
+	}
+}, {
+	deep: true,
+	immediate: true,
+})
+
+// 方法定义
+const deleteTag = (index) => {
+	tagList.value.splice(index, 1);
+	emit("input", tagList.value.join(","));
+}
+
+const submitForm = () => {
+	tagList.value.push(inputValue.value);
+	inputValue.value = "";
+	emit("input", tagList.value.join(","));
+	isShowPop.value = false;
+}
 </script>
 
 <style lang="scss" scoped>

@@ -3,32 +3,36 @@
 		<web-view :src="link"></web-view>
   </view>
 </template>
-<script>
-export default {
-  data() {
-    return {
-			link: ""
-		};
-  },
-	onLoad(options) {
-		console.log('options==>', options.link)
-		this.link = options.link
-	},
-  methods: {
-		getDetail(ID) {
-			const data = {
-				CallIndex: "RentalServices"
-			}
-			this.$axios.post(`/client/article/detail/callindex`, data).then(res => {
-				this.detail = res
-				
-				uni.setNavigationBarTitle({
-					title: res.Title
-				});
-			})
-		}
+<script setup>
+import { ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import { getCurrentInstance } from 'vue'
+
+// 获取当前实例以访问全局属性
+const { proxy } = getCurrentInstance()
+
+// 响应式数据
+const link = ref("")
+
+// 页面加载
+onLoad((options) => {
+	console.log('options==>', options.link)
+	link.value = options.link
+})
+
+// 方法定义
+const getDetail = (ID) => {
+	const data = {
+		CallIndex: "RentalServices"
 	}
-};
+	proxy.$axios.post(`/client/article/detail/callindex`, data).then(res => {
+		// detail.value = res
+		
+		uni.setNavigationBarTitle({
+			title: res.Title
+		});
+	})
+}
 </script>
 
 <style lang="scss" scoped>

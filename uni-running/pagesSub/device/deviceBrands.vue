@@ -11,49 +11,50 @@
 		</view>
   </view>
 </template>
-<script>
-export default {
-  data () {
-    return {
-			brandList: [
-				{
-					img: '/static/images/华为运动健康@2x.png',
-					label: '华为运动健康',
-					value: ''
-				},
-				{
-					img: '/static/images/佳明@2x.png',
-					label: '佳明',
-					value: ''
-				},
-				{
-					img: '/static/images/高驰@2x.png',
-					label: '高驰',
-					value: ''
-				},
-			]
-		};
-  },
-	onLoad(options) {
-		this.options = this.options;
+<script setup>
+import { ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+
+// 响应式数据
+const brandList = ref([
+	{
+		img: '/static/images/华为运动健康@2x.png',
+		label: '华为运动健康',
+		value: ''
 	},
-  methods: {
-		successLogin() {
-		  if (this.options?.direct) {
-		    uni.navigateBack()
-		
-		    return false;
-		  }
-		
-		  uni.switchTab({
-		    url: "/pages/index",
-		    success() {
-		      uni.hideLoading();
-		    },
-		  });
+	{
+		img: '/static/images/佳明@2x.png',
+		label: '佳明',
+		value: ''
+	},
+	{
+		img: '/static/images/高驰@2x.png',
+		label: '高驰',
+		value: ''
+	},
+])
+const options = ref({})
+
+// 页面加载
+onLoad((optionsParam) => {
+	options.value = optionsParam;
+})
+
+// 方法定义
+const successLogin = () => {
+	if (options.value?.direct) {
+		uni.navigateBack()
+	
+		return false;
+	}
+	
+	uni.switchTab({
+		url: "/pages/index",
+		success() {
+			uni.hideLoading();
 		},
-  }
-};
+	});
+}
 </script>
 
 <style lang="less" scoped>

@@ -31,117 +31,123 @@
     </view>
   </view>
 </template>
-<script>
-export default {
-  data() {
-    return {
-      pageIndex: 1,
-      checked: true,
-      curAreaCode: '+65',
+<script setup>
+import { ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import { getCurrentInstance } from 'vue'
 
-      phone: '',
-      verifyCode: '',
-      password: '',
-      password1: '',
+// 获取当前实例以访问全局属性
+const { proxy } = getCurrentInstance()
 
-      isShowCodePop: false,
+// 响应式数据
+const pageIndex = ref(1)
+const checked = ref(true)
+const curAreaCode = ref('+65')
 
-      isSendCode: false,
-      seconds: 60,
-      smsPhone: '',
-      smsCode: '',
-      actions: [
-        {
-          name: '+86'
-        },
-        {
-          name: '+65'
-        }
-      ]
-    }
-  },
-  onLoad() {
-    // const phone = this.$route.query.phone
-    // if (phone) {
-    // 	this.parentPhone = phone
-    // }
-  },
-  methods: {
-    onSelectCode({ detail }) {
-      console.log(detail)
-      this.curAreaCode = detail.name
-    },
-    changeCheckBox({ detail }) {
-      this.checked = detail
-    },
-    finishTime() {
-      this.isSendCode = false
-    },
-    onChangeInput({ currentTarget, detail }) {
-      this[currentTarget.dataset.type] = detail.trim()
-    },
-    getCode() {
-      const { isSendCode, phone } = this
-      if (isSendCode) return
+const phone = ref('')
+const verifyCode = ref('')
+const password = ref('')
+const password1 = ref('')
 
-      if (!phone.length) {
-        return this.$toast(this.$t('请输入手机号'))
-      }
-      // if (!(/^1[3456789]\d{9}$/.test(phone))) {
-      //   return this.$toast('手机号码格式有误')
-      // }
-      const data = {
-        phone
-      }
+const isShowCodePop = ref(false)
 
-      this.$axios({ url: `api/index/get_login_yzm`, data }).then(res => {
-        this.smsCode = res.code
-        this.$toast(this.$t('短信验证码已经发送'))
-        this.isSendCode = true
-        this.seconds = 60
-      })
-    },
-    async submit() {
-      const { phone, verifyCode, password, password1 } = this
+const isSendCode = ref(false)
+const seconds = ref(60)
+const smsPhone = ref('')
+const smsCode = ref('')
+const actions = ref([
+	{
+		name: '+86'
+	},
+	{
+		name: '+65'
+	}
+])
 
-      if (!phone.length) {
-        return this.$toast(this.$t('请输入手机号'))
-      }
+// 页面加载
+onLoad(() => {
+	// const phone = this.$route.query.phone
+	// if (phone) {
+	// 	this.parentPhone = phone
+	// }
+})
 
-      // if (!(/^1[3456789]\d{9}$/.test(phone))) {
-      //   return this.$toast('手机号码格式有误')
-      // }
+// 方法定义
+const onSelectCode = ({ detail }) => {
+	console.log(detail)
+	curAreaCode.value = detail.name
+}
 
-      if (!verifyCode.length) {
-        return this.$toast(this.$t('请输入验证码'))
-      }
-      if (!password.length) {
-        return this.$toast(this.$t('请输入新密码'))
-      }
-      if (password.length < 6) {
-        return this.$toast(this.$t('密码长度应该为6位'))
-      }
+const changeCheckBox = ({ detail }) => {
+	checked.value = detail
+}
 
-      if (!password1.length) {
-        return this.$toast(this.$t('请输入确认密码'))
-      }
+const finishTime = () => {
+	isSendCode.value = false
+}
 
-      const data = {
-        phone: this.phone,
-        yzm: this.verifyCode,
-        password: this.password
-      }
+const onChangeInput = ({ currentTarget, detail }) => {
+	// this[currentTarget.dataset.type] = detail.trim()
+}
 
-      this.$axios({ url: 'api/index/forget_password', data }).then(res => {
-        this.$toast(this.$t('重置成功，请重新登录'))
-        setTimeout(() => {
-          uni.redirectTo({
-            url: '/pages/login'
-          })
-        }, 300)
-      })
-    }
-  }
+const getCode = () => {
+	if (isSendCode.value) return
+
+	if (!phone.value.length) {
+		return proxy.$toast(proxy.$t('请输入手机号'))
+	}
+	// if (!(/^1[3456789]\d{9}$/.test(phone))) {
+	//   return this.$toast('手机号码格式有误')
+	// }
+	const data = {
+		phone: phone.value
+	}
+
+	proxy.$axios({ url: `api/index/get_login_yzm`, data }).then(res => {
+		smsCode.value = res.code
+		proxy.$toast(proxy.$t('短信验证码已经发送'))
+		isSendCode.value = true
+		seconds.value = 60
+	})
+}
+
+const submit = async () => {
+	if (!phone.value.length) {
+		return proxy.$toast(proxy.$t('请输入手机号'))
+	}
+
+	// if (!(/^1[3456789]\d{9}$/.test(phone))) {
+	//   return this.$toast('手机号码格式有误')
+	// }
+
+	if (!verifyCode.value.length) {
+		return proxy.$toast(proxy.$t('请输入验证码'))
+	}
+	if (!password.value.length) {
+		return proxy.$toast(proxy.$t('请输入新密码'))
+	}
+	if (password.value.length < 6) {
+		return proxy.$toast(proxy.$t('密码长度应该为6位'))
+	}
+
+	if (!password1.value.length) {
+		return proxy.$toast(proxy.$t('请输入确认密码'))
+	}
+
+	const data = {
+		phone: phone.value,
+		yzm: verifyCode.value,
+		password: password.value
+	}
+
+	proxy.$axios({ url: 'api/index/forget_password', data }).then(res => {
+		proxy.$toast(proxy.$t('重置成功，请重新登录'))
+		setTimeout(() => {
+			uni.redirectTo({
+				url: '/pages/login'
+			})
+		}, 300)
+	})
 }
 </script>
 

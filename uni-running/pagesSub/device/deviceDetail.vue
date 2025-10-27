@@ -40,62 +40,73 @@ font-size: 34rpx;">绑定说明</view>
 		</CommonDialog>
   </view>
 </template>
-<script>
-	import CommonDialog from '@/components/common/CommonDialog.vue'
-	import { gaoChi, huaWei, jiaMing } from "./deviceBind.js"
-export default {
-	components: { CommonDialog },
-  data () {
-    return {
-			textContent: '',
-			options: {
-				value: ''
+<script setup>
+import { ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import { getCurrentInstance } from 'vue'
+import CommonDialog from '@/components/common/CommonDialog.vue'
+import { gaoChi, huaWei, jiaMing } from "./deviceBind.js"
+
+// 获取当前实例以访问全局属性
+const { proxy } = getCurrentInstance()
+
+// 模板引用
+const refCommonDialog = ref(null)
+
+// 响应式数据
+const textContent = ref('')
+const options = ref({
+	value: ''
+})
+
+// 页面加载
+onLoad((optionsParam) => {
+	if (optionsParam.value.includes('华为')) {
+		textContent.value = huaWei
+	}
+	if (optionsParam.value.includes('佳明')) {
+		textContent.value = jiaMing
+	}
+	if (optionsParam.value.includes('高驰')) {
+		textContent.value = gaoChi
+	}
+	options.value = optionsParam;
+})
+
+// 方法定义
+const confirmAsync = () => {
+	uni.showLoading({
+		mask: true,
+		title: '同步中...'
+	})
+	
+	setTimeout(() => {
+		proxy.$toast('同步成功')
+	}, 1300)
+}
+
+const unDevice = () => {
+	uni.showModal({
+		title: '提示',
+		content: '确定解除绑定吗？',
+		success: (res) => {
+			if (res.confirm) {
+				// clearUserInfo();
+				// setTimeout(() => {
+				// 	uni.redirectTo({
+				// 		url: '/pagesSub/login'
+				// 	})
+				// }, 200)
+			} else if (res.cancel) {
+				console.log('用户点击取消');
 			}
-		};
-  },
-	onLoad(options) {
-		if (options.value.includes('华为')) {
-			this.textContent = huaWei
 		}
-		if (options.value.includes('佳明')) {
-			this.textContent = jiaMing
-		}
-		if (options.value.includes('高驰')) {
-			this.textContent = gaoChi
-		}
-		this.options = options;
-	},
-  methods: {
-		confirmAsync() {
-			uni.showLoading({
-				mask: true,
-				title: '同步中...'
-			})
-			
-			setTimeout(() => {
-				this.$toast('同步成功')
-			}, 1300)
-		},
-		unDevice() {
-		  uni.showModal({
-		    title: '提示',
-		    content: '确定解除绑定吗？',
-		    success: (res) => {
-		      if (res.confirm) {
-		  			clearUserInfo();
-		  			// setTimeout(() => {
-		  			// 	uni.redirectTo({
-		  			// 		url: '/pagesSub/login'
-		  			// 	})
-		  			// }, 200)
-		      } else if (res.cancel) {
-		        console.log('用户点击取消');
-		      }
-		    }
-		  });
-		},
-  }
-};
+	});
+}
+
+const bindDevice = () => {
+	refCommonDialog.value.close()
+}
 </script>
 
 <style lang="less" scoped>

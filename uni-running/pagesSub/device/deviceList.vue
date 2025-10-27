@@ -31,58 +31,59 @@
 		</section>
   </view>
 </template>
-<script>
-export default {
-  data () {
-    return {
-			deviceList: [
-				// {
-				// 	img: '/static/images/华为运动健康@2x.png',
-				// 	label: '华为运动健康',
-				// 	value: '',
-				// 	model: '设备型号：HUAWEI GT5',
-				// 	account: '绑定账号：15934560765',
-				// 	bindTime: '绑定时间：2025-10-14 ',
-				// },
-				// {
-				// 	img: '/static/images/佳明@2x.png',
-				// 	label: '佳明',
-				// 	value: '',
-				// 	model: '设备型号：HUAWEI GT5',
-				// 	account: '绑定账号：15934560765',
-				// 	bindTime: '绑定时间：2025-10-14 ',
-				// },
-				// {
-				// 	img: '/static/images/高驰@2x.png',
-				// 	label: '高驰',
-				// 	value: '',
-				// 	model: '设备型号：HUAWEI GT5',
-				// 	account: '绑定账号：15934560765',
-				// 	bindTime: '绑定时间：2025-10-14 ',
-				// },
-			]
-		};
-  },
-	onLoad(options) {
-		this.options = this.options;
-	},
-  methods: {
-		successLogin() {
-		  if (this.options?.direct) {
-		    uni.navigateBack()
-		
-		    return false;
-		  }
-		
-		  uni.switchTab({
-		    url: "/pages/index",
-		    success() {
-		      uni.hideLoading();
-		    },
-		  });
+<script setup>
+import { ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+
+// 响应式数据
+const deviceList = ref([
+	// {
+	// 	img: '/static/images/华为运动健康@2x.png',
+	// 	label: '华为运动健康',
+	// 	value: '',
+	// 	model: '设备型号：HUAWEI GT5',
+	// 	account: '绑定账号：15934560765',
+	// 	bindTime: '绑定时间：2025-10-14 ',
+	// },
+	// {
+	// 	img: '/static/images/佳明@2x.png',
+	// 	label: '佳明',
+	// 	value: '',
+	// 	model: '设备型号：HUAWEI GT5',
+	// 	account: '绑定账号：15934560765',
+	// 	bindTime: '绑定时间：2025-10-14 ',
+	// },
+	// {
+	// 	img: '/static/images/高驰@2x.png',
+	// 	label: '高驰',
+	// 	value: '',
+	// 	model: '设备型号：HUAWEI GT5',
+	// 	account: '绑定账号：15934560765',
+	// 	bindTime: '绑定时间：2025-10-14 ',
+	// },
+])
+const options = ref({})
+
+// 页面加载
+onLoad((optionsParam) => {
+	options.value = optionsParam;
+})
+
+// 方法定义
+const successLogin = () => {
+	if (options.value?.direct) {
+		uni.navigateBack()
+	
+		return false;
+	}
+	
+	uni.switchTab({
+		url: "/pages/index",
+		success() {
+			uni.hideLoading();
 		},
-  }
-};
+	});
+}
 </script>
 
 <style lang="less" scoped>

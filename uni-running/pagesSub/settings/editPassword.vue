@@ -24,95 +24,99 @@
 		</view>
   </view>
 </template>
-<script>
-export default {
-  data () {
-    return {
-			form: {
-				OriginalPassword: '',
-				Password: '',
-				Password2: '',
-			},
-			pageStep:1,
-			rules: {
-				OriginalPassword: [
-					{
-						required: true,
-						message: '请输入原密码',
-						trigger: ['blur', 'change']
-					}
-				],
-				Password: [
-					{
-						required: true,
-						message: '请输入新密码',
-						trigger: ['blur', 'change']
-					}
-				],
-				Password2: [
-					{
-						required: true,
-						message: '请再输入新密码',
-						trigger: ['blur', 'change']
-					}
-				],
-			}
-		};
-  },
-  methods: {
-		submitForm() {
-			this.$refs.uForm.validate().then(res => {
-				if (this.pageStep === 1) {
-					this.pageStep ++;
-					setTimeout(() => {
-						this.$refs.uForm.clearValidate()
-					}, 10)
-					return
-				}
-				
-				if (this.form.Password !== this.form.Password2) {
-					uni.showToast({
-						icon: "error",
-						title: "两次密码不同"
-					})
-					
-					this.form.Password = ""
-					this.form.Password2 = ""
-					
-					this.$refs.uForm.clearValidate()
-					return
-				}
-				
-				const data = {
-					"OriginalPassword": this.form.OriginalPassword,
-					"Password": this.form.Password,
-				}
-				uni.showLoading({
-					mask: true
-				})
-				this.$axios.post(`/api/store/account/password/update`, data).then(res => {
-					console.log(res)
-					uni.hideLoading()
-					uni.showToast({
-						icon: "success",
-						title: "修改密码成功"
-					})
-					
-					setTimeout(() => {
-						this.$goUrl("/pagesSub/login")
-					}, 1000)
-				}).catch(error => {
-					this.pageStep = 1;
-					this.form.OriginalPassword = ""
-					this.form.Password = ""
-					this.form.Password2 = ""
-				})
-			}).catch(errors => {
-				// uni.$u.toast('校验失败')
-			})
+<script setup>
+import { ref } from 'vue'
+import { getCurrentInstance } from 'vue'
+
+// 获取当前实例以访问全局属性
+const { proxy } = getCurrentInstance()
+
+// 模板引用
+const uForm = ref(null)
+
+// 响应式数据
+const form = ref({
+	OriginalPassword: '',
+	Password: '',
+	Password2: '',
+})
+const pageStep = ref(1)
+const rules = ref({
+	OriginalPassword: [
+		{
+			required: true,
+			message: '请输入原密码',
+			trigger: ['blur', 'change']
 		}
-  }
-};
+	],
+	Password: [
+		{
+			required: true,
+			message: '请输入新密码',
+			trigger: ['blur', 'change']
+		}
+	],
+	Password2: [
+		{
+			required: true,
+			message: '请再输入新密码',
+			trigger: ['blur', 'change']
+		}
+	],
+})
+
+// 方法定义
+const submitForm = () => {
+	uForm.value.validate().then(res => {
+		if (pageStep.value === 1) {
+			pageStep.value++;
+			setTimeout(() => {
+				uForm.value.clearValidate()
+			}, 10)
+			return
+		}
+		
+		if (form.value.Password !== form.value.Password2) {
+			uni.showToast({
+				icon: "error",
+				title: "两次密码不同"
+			})
+			
+			form.value.Password = ""
+			form.value.Password2 = ""
+			
+			uForm.value.clearValidate()
+			return
+		}
+		
+		const data = {
+			"OriginalPassword": form.value.OriginalPassword,
+			"Password": form.value.Password,
+		}
+		uni.showLoading({
+			mask: true
+		})
+		proxy.$axios.post(`/api/store/account/password/update`, data).then(res => {
+			console.log(res)
+			uni.hideLoading()
+			uni.showToast({
+				icon: "success",
+				title: "修改密码成功"
+			})
+			
+			setTimeout(() => {
+				proxy.$goUrl("/pagesSub/login")
+			}, 1000)
+		}).catch(error => {
+			pageStep.value = 1;
+			form.value.OriginalPassword = ""
+			form.value.Password = ""
+			form.value.Password2 = ""
+		})
+	}).catch(errors => {
+		// uni.$u.toast('校验失败')
+	})
+}
 </script>
 
 <style lang="less" scoped>
