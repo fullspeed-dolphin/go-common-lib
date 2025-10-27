@@ -1,6 +1,6 @@
 <template>
 	<view class="page">
-		<u-navbar placeholder title="跑步轨迹"></u-navbar>
+		<u-navbar  placeholder title="跑步轨迹"></u-navbar>
 		
 		<!-- 地图容器 -->
 		<view class="map-container">
@@ -253,7 +253,7 @@ const initLocation = async () => {
 				latitude: res.latitude,
 				longitude: res.longitude,
 				title: '当前位置',
-				iconPath: '/static/location.png',
+				// iconPath: '/static/location.png',
 				width: 30,
 				height: 30,
 				anchor: { x: 0.5, y: 0.5 }
@@ -400,7 +400,7 @@ const startRunning = async () => {
 				latitude: startLocation.latitude,
 				longitude: startLocation.longitude,
 				title: '起始点',
-				iconPath: '/static/start.png',
+				// iconPath: '/static/start.png',
 				width: 25,
 				height: 25,
 				anchor: { x: 0.5, y: 0.5 }
@@ -545,7 +545,7 @@ const updateMapTrack = () => {
 	// 创建轨迹线
 	polylines.value = [{
 		points: validPoints,
-		color: '#FF6B6B',
+		color: '#ff8c00',
 		width: 6,
 		arrowLine: true,
 		borderColor: '#FFFFFF',
@@ -570,7 +570,7 @@ const updateMapTrack = () => {
 				latitude: validPoints[0].latitude,
 				longitude: validPoints[0].longitude,
 				title: '起始点',
-				iconPath: '/static/start.png',
+				// iconPath: '/static/start.png',
 				width: 25,
 				height: 25,
 				anchor: { x: 0.5, y: 0.5 }
@@ -583,7 +583,7 @@ const updateMapTrack = () => {
 			latitude: lastPoint.latitude,
 			longitude: lastPoint.longitude,
 			title: '当前位置',
-			iconPath: '/static/location.png',
+			// iconPath: '/static/location.png',
 			width: 30,
 			height: 30,
 			anchor: { x: 0.5, y: 0.5 }
@@ -829,7 +829,7 @@ const clearTestTrack = () => {
 .start-button {
 	width: 200rpx;
 	height: 80rpx;
-	background: linear-gradient(135deg, #FF6B6B, #FF8E8E);
+	background: linear-gradient(135deg, #ff8c00, #ffa500);
 	color: white;
 	border: none;
 	border-radius: 40rpx;
@@ -838,12 +838,12 @@ const clearTestTrack = () => {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	box-shadow: 0 4rpx 15rpx rgba(255, 107, 107, 0.3);
+	box-shadow: 0 4rpx 15rpx rgba(255, 140, 0, 0.3);
 	transition: all 0.3s ease;
 }
 
 .stop-button {
-	background: linear-gradient(135deg, #FF4757, #FF6B6B);
+	background: linear-gradient(135deg, #e67e00, #ff8c00);
 }
 
 .start-button:active {
@@ -899,7 +899,7 @@ const clearTestTrack = () => {
 
 .progress-fill {
 	height: 100%;
-	background: linear-gradient(90deg, #FF6B6B, #FF8E8E);
+	background: linear-gradient(90deg, #ff8c00, #ffa500);
 	transition: width 0.3s ease;
 }
 

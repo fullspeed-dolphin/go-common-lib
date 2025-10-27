@@ -1,6 +1,6 @@
 <template>
 	<view class="pt20">
-		  <u-navbar placeholder title="运动" :leftIcon="false"></u-navbar>
+		  <u-navbar  placeholder title="运动" :leftIcon="false"></u-navbar>
 		  
 		  <section class="section-dashboard">
 			  <view class="h1">
@@ -153,9 +153,9 @@
 	right: 30rpx;
 	width: 140rpx;
 	height: 140rpx;
-	background: linear-gradient(135deg, #FF6B6B, #FF8E8E);
+	background: linear-gradient(135deg, #ff8c00, #ffa500);
 	border-radius: 70rpx;
-	box-shadow: 0 8rpx 20rpx rgba(255, 107, 107, 0.4);
+	box-shadow: 0 8rpx 20rpx rgba(255, 140, 0, 0.4);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -165,7 +165,7 @@
 
 .floating-button:active {
 	transform: scale(0.95);
-	box-shadow: 0 4rpx 15rpx rgba(255, 107, 107, 0.6);
+	box-shadow: 0 4rpx 15rpx rgba(255, 140, 0, 0.6);
 }
 
 .button-content {

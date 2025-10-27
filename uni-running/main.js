@@ -5,13 +5,13 @@ import { toast } from "@/utils/util.js"
 import request from "@/utils/request.js"
 
 // 引入全局uView
-import uView from '@/uni_modules/uview-plus'
+import uviewPlus from '@/uni_modules/uview-plus/index.js'
 
 export function createApp() {
     const app = createSSRApp(App)
     
     app.use(store)
-    app.use(uView)
+    app.use(uviewPlus)
     
     // 配置全局属性
     app.config.globalProperties.$toast = toast
