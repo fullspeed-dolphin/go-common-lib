@@ -1,11 +1,25 @@
 <template>
   <view class="index-page">
-		<u-navbar autoBack  placeholder title="跑了没" :leftIcon="false"></u-navbar>
-		
-		<view class="" style="position:relative;z-index: 10;">
-			<view class="section-search" @click="$u.route('pagesSub/groupList')">
-				<u-search :disabled="true" placeholder="搜索赛事或跑团" shape="round" bgColor="#fff" borderColor="#FF8C00" :showAction="false"></u-search>
+		<view class="header">
+			<u-navbar className="navbar" autoBack title="跑了没" :leftIcon="false" bgColor="transparent" placeholder></u-navbar>
+			<view class="header-content">
+				<view class="user">
+					<image class="avatar" :src="userInfo.avatar_url || '../static/run.png'" mode="aspectFill"></image>
+					<view class="user-info">
+						<view class="nickname">{{userInfo.nickname || '微信用户'}}</view>
+						<view class="money"><image class="img" src="/static/images/coin@2x.png" mode="aspectFill"></image> 0</view>
+					</view>
+				</view>
+				<view class="search-box">
+					<u-search class="search" :disabled="true" placeholder="" shape="round" bgColor="#fff" :showAction="false" @click="$u.route('pagesSub/groupList')"></u-search>
+					<view class="message">
+						<image class="img" src="/static/images/message@2x.png" mode="aspectFill"></image>
+					</view>
+				</view>
+				
 			</view>
+		</view>
+		<view class="content" style="position:relative;">
 			<view class="section-banner">
 				<swiper class="swiper" circular indicator-dots indicator-active-color="#FF8C00" :autoplay="true" :interval="3000">
 					<swiper-item v-for="(item, index) in bannerList" :key="index">
@@ -89,11 +103,16 @@
   </view>
 </template>
 <script setup>
-import { ref, onMounted } from 'vue'
-import { onLoad, onShow } from '@dcloudio/uni-app'
+import { ref, onMounted, computed } from 'vue'
+import { onLoad, onShow, onPageScroll } from '@dcloudio/uni-app'
 import { getCurrentInstance } from 'vue'
+import { useStore } from 'vuex'
 import tabbar from "@/components/tabBar.vue"
 import GroupItem from "@/components/GroupItem.vue"
+import Navbar from "@/components/navbar.vue"
+
+// 使用store
+const store = useStore()
 
 // 获取当前实例以访问全局属性
 const { proxy } = getCurrentInstance()
@@ -104,6 +123,9 @@ const eventList = ref([])
 const bannerEventList = ref([])
 const bannerList = ref([])
 const GroupList = ref([])
+
+// 计算属性
+const userInfo = computed(() => store.state.userInfo)
 
 // 页面加载
 onLoad((options) => {
@@ -117,6 +139,12 @@ onShow(() => {
 	getGroupList()
 	getEvents()
 	getBannerList()
+})
+
+// 页面滚动监听
+onPageScroll((e) => {
+	// 触发navbar组件的滚动事件
+	uni.$emit('pageScroll', e)
 })
 
 // 方法定义
@@ -172,6 +200,77 @@ const getGroupList = () => {
 </script>
 
 <style lang="less" scoped>
+.index-page {
+	.header {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 288rpx;
+		background: linear-gradient( 180deg, #FF8C00 0%, #FAFAFA 100%);
+		z-index: 11;
+		.header-content {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 0 34rpx;
+			.user {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 10rpx;
+				.avatar {
+					width: 90rpx;
+					height: 90rpx;
+					border-radius: 50%;
+				}
+				.user-info {
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					justify-content: space-between;
+					gap: 10rpx;
+					.nickname {
+						font-size: 34rpx;
+						font-weight: bold;
+					}
+					.money {
+						display: flex;
+						align-items: center;
+						justify-content: space-between;
+						.img {
+							width: 34rpx;
+							height: 34rpx;
+						}
+					}
+				}
+				
+			}
+			.search-box {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				gap: 20rpx;
+				::v-deep {
+					.u-search{
+						width: 342rpx;
+						height: 72rpx;
+					}
+				}
+				.message {
+					.img {
+						width: 58rpx;
+						height: 48rpx;
+					}
+				}
+			}
+			
+		}
+	}
+	.content {
+		margin-top: 320rpx;
+	}
+
 	.event-swiper{
 		height: 360rpx;
 	}
@@ -246,27 +345,5 @@ const getGroupList = () => {
 		}
 	}
 		
-	::v-deep{
-		.section-search{
-			position: relative;
-			height: 130rpx;
-			&:before{
-				position: absolute;
-				content: "";
-				width: 100%;
-				height: 100%;
-				top:0;
-				left:0;
-				z-index: 12;
-			}
-		}
-		.u-search{
-			position: fixed;
-			// top:44px;
-			width: 100%;
-			z-index: 10;
-			background: #fff;
-			padding: 20rpx 34rpx;
-		}
-	}
+}
 </style>
