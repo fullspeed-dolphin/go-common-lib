@@ -213,7 +213,7 @@ const getGroupList = () => {
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
-			padding: 0 34rpx;
+			padding: 20rpx 34rpx;
 			.user {
 				display: flex;
 				align-items: center;
