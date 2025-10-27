@@ -385,6 +385,7 @@ const startRunning = async () => {
 		
 		// 获取起始位置
 		const startLocation = await uni.getLocation({
+			isHighAccuracy: true,
 			type: 'gcj02',
 			altitude: true
 		})
