@@ -17,43 +17,46 @@
 		</section>
   </view>
 </template>
-<script>
-export default {
-  data () {
-		return {
-			isSignUp: false,
-		}
-  },
-  methods: {
-		routeTo() {
-			if (this.isSignUp) {
-				this.cancelSignUp()
-				return false;
-			}
-			uni.$u.route('pagesSub/orderIn')
-		},
-		cancelSignUp() {
-			uni.showModal({
-			  title: '提示',
-			  content: '确定取消报名吗？',
-			  success: (res) => {
-			    if (res.confirm) {
-						this.$axios({url: "api/index/logout"}).then(res => {
-							this.$toast('已取消报名')
-						})
-			    } else if (res.cancel) {
-			      console.log('用户点击取消');
-			    }
-			  }
-			});
-		},
-		copyText(txt) {
-			uni.setClipboardData({
-				data: String(txt)
-			})
-		}
+<script setup>
+import { ref } from 'vue'
+import { getCurrentInstance } from 'vue'
+
+// 获取当前实例以访问全局属性
+const { proxy } = getCurrentInstance()
+
+// 响应式数据
+const isSignUp = ref(false)
+
+// 方法定义
+const routeTo = () => {
+	if (isSignUp.value) {
+		cancelSignUp()
+		return false;
 	}
-};
+	uni.$u.route('pagesSub/orderIn')
+}
+
+const cancelSignUp = () => {
+	uni.showModal({
+		title: '提示',
+		content: '确定取消报名吗？',
+		success: (res) => {
+			if (res.confirm) {
+				proxy.$axios({url: "api/index/logout"}).then(res => {
+					proxy.$toast('已取消报名')
+				})
+			} else if (res.cancel) {
+				console.log('用户点击取消');
+			}
+		}
+	});
+}
+
+const copyText = (txt) => {
+	uni.setClipboardData({
+		data: String(txt)
+	})
+}
 </script>
 
 <style lang="less">

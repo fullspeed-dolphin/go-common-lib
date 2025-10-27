@@ -112,197 +112,220 @@
 		</view>
 	</view>
 </template>
-<script>
-	export default {
-		data() {
-			return {
-				disabled: false,
-				form: {
-					full_name: '',
-					gender: '',
-					phone_number: '',
-					tshirt_size: '',
-					id_card: '',
-					email: '',
-					blood_type: '',
-					job: '',
-					sportPurpose: '',
-					strengths: '',
-				},
-				rules: {
-					full_name: [{
-						required: true,
-						message: '必填项',
-						trigger: ['blur', 'change']
-					}],
-					gender: [{
-						required: true,
-						message: '必填项',
-						trigger: ['blur', 'change']
-					}],
-					tshirt_size: [{
-						required: true,
-						message: '必填项',
-						trigger: ['blur', 'change']
-					}],
-					// blood_type: [{
-					// 	required: true,
-					// 	message: '必填项',
-					// 	trigger: ['blur', 'change']
-					// }],
-					phone_number: [{
-						required: true,
-						message: '请输入有效手机号',
-						pattern: /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/,
-						trigger: ['blur', 'change']
-					}],
-					id_card: [{
-						required: true,
-						pattern: /^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/,
-						message: '请输入有效身份证号码',
-						trigger: ['blur', 'change']
-					}],
-				},
-				isShowSheet: false,
-				options_sheet: [],
-				options_gender: [
-					{name: "男", value: '1'},
-					{name: "女", value: '0'},
-					{name: "未知", value: '2'},
-				],
-				options_blood_type: [
-					{name: "A型", value: 'A'},
-					{name: "B型", value: 'B'},
-					{name: "AB型", value: 'AB'},
-					{name: "O型", value: 'O'},
-				],
-				options_tshirt_size: [
-					{name: "120", value: '120'},
-					{name: "130", value: '130'},
-					{name: "140", value: '140'},
-					{name: "XS", value: 'XS'},
-					{name: "S", value: 'S'},
-					{name: "M", value: 'M'},
-					{name: "L", value: 'L'},
-					{name: "XL", value: 'XL'},
-					{name: "2XL", value: '2XL'},
-					{name: "3XL", value: '3XL'},
-					{name: "4XL", value: '4XL'},
-				],
-			};
-		},
-		computed: {
-			userInfo() {
-				return this.$store.state.userInfo
-			}
-		},
-		onLoad() {
-			this.getInfo()
-			
-			console.log('this.form=====>', this.form)
-		},
-		methods: {
-			calcuValue(type) {
-				const value = this.form[type];
-				
-				const option = this['options_' + type].find(i => i.value === value)
-				
-				return option?.name || ''
-			},
-			getInfo() {
-				uni.showLoading({
-					mask: true
-				})
-				const data = {
-					phone_number: this.userInfo.phone
-				}
-				this.$axios.post('/booking-api/registration/getSignerInfo', data).then(res => {
-					console.log(res)
-					this.signerId = res.id
-					
-					if (res.id_card) {
-						this.disabled = true;
-					}
-					const cache = uni.getStorageSync('SignerInfo') || {}
-					
-					console.log(cache)
-					this.form =	{
-						full_name: res.full_name || '',
-						gender: res.gender || '1',
-						phone_number: res.phone_number || '',
-						tshirt_size: res.tshirt_size || '',
-						id_card: res.id_card || '',
-						email: res.email || '',
-						blood_type: res.blood_type || '',
-						job: res.occupation || '',
-						sportPurpose: res.running_goal || '',
-						strengths: res.good_at_sports || '',
-						...cache,
-						gender: cache.gender ? String(cache.gender) : '1',
-					}
-				})
-			},
-			openActionSheet(type) {
-				this.sheetType = type;
-				this.options_sheet = this['options_' + type];
-				this.isShowSheet = true;
-			},
-			selectActionSheet(e) {
-				console.log(e)
-				this.form[this.sheetType] = e.value
-				this.isShowSheet = false;
-			},
-			closeActionSheet() {
-				this.isShowSheet = false;
-			},
-			submit() {
-				this.$refs.uForm.validate().then(() => {
-					const res = this.form
-					const data = {
-						full_name: res.full_name || '',
-						gender: Number(res.gender),
-						phone_number: res.phone_number || '',
-						tshirt_size: res.tshirt_size || '',
-						id_card: res.id_card || '',
-						email: res.email || '',
-						blood_type: res.blood_type || '',
-						occupation: res.job || '',
-						running_goal: res.sportPurpose || '',
-						good_at_sports: res.strengths || '',
-					}
-					
-					if (this.signerId) {
-						data.id = this.signerId
-					}
-					
-					uni.showLoading({
-						mask: true
-					})
-					
-					uni.setStorageSync('SignerInfo', data)
-					
-					this.$toast('保存成功')
-					
-					setTimeout(() => {
-						uni.navigateBack()
-					}, 300)
-					
-					return;
-					
-					this.$axios.post(`/booking-api/registration/${this.signerId ? 'updateSignerInfo' : 'saveSignerInfo'}`, data).then(res => {
-						console.log(res)
-						// uni.hideLoading()
-						
-						this.$toast('保存成功')
+<script setup>
+import { ref, computed } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import { useStore } from 'vuex'
+import { getCurrentInstance } from 'vue'
 
-						setTimeout(() => {
-							uni.navigateBack()
-						}, 300)
-					})
-				})
-			}
+// 获取当前实例以访问全局属性
+const { proxy } = getCurrentInstance()
+
+// 使用store
+const store = useStore()
+
+// 模板引用
+const uForm = ref(null)
+
+// 响应式数据
+const disabled = ref(false)
+const form = ref({
+	full_name: '',
+	gender: '',
+	phone_number: '',
+	tshirt_size: '',
+	id_card: '',
+	email: '',
+	blood_type: '',
+	job: '',
+	sportPurpose: '',
+	strengths: '',
+})
+const rules = ref({
+	full_name: [{
+		required: true,
+		message: '必填项',
+		trigger: ['blur', 'change']
+	}],
+	gender: [{
+		required: true,
+		message: '必填项',
+		trigger: ['blur', 'change']
+	}],
+	tshirt_size: [{
+		required: true,
+		message: '必填项',
+		trigger: ['blur', 'change']
+	}],
+	// blood_type: [{
+	// 	required: true,
+	// 	message: '必填项',
+	// 	trigger: ['blur', 'change']
+	// }],
+	phone_number: [{
+		required: true,
+		message: '请输入有效手机号',
+		pattern: /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/,
+		trigger: ['blur', 'change']
+	}],
+	id_card: [{
+		required: true,
+		pattern: /^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/,
+		message: '请输入有效身份证号码',
+		trigger: ['blur', 'change']
+	}],
+})
+const isShowSheet = ref(false)
+const options_sheet = ref([])
+const options_gender = ref([
+	{name: "男", value: '1'},
+	{name: "女", value: '0'},
+	{name: "未知", value: '2'},
+])
+const options_blood_type = ref([
+	{name: "A型", value: 'A'},
+	{name: "B型", value: 'B'},
+	{name: "AB型", value: 'AB'},
+	{name: "O型", value: 'O'},
+])
+const options_tshirt_size = ref([
+	{name: "120", value: '120'},
+	{name: "130", value: '130'},
+	{name: "140", value: '140'},
+	{name: "XS", value: 'XS'},
+	{name: "S", value: 'S'},
+	{name: "M", value: 'M'},
+	{name: "L", value: 'L'},
+	{name: "XL", value: 'XL'},
+	{name: "2XL", value: '2XL'},
+	{name: "3XL", value: '3XL'},
+	{name: "4XL", value: '4XL'},
+])
+const signerId = ref('')
+const sheetType = ref('')
+
+// 计算属性
+const userInfo = computed(() => store.state.userInfo)
+
+// 页面加载
+onLoad(() => {
+	getInfo()
+	
+	console.log('form=====>', form.value)
+})
+
+// 方法定义
+const calcuValue = (type) => {
+	const value = form.value[type];
+	
+	const option = options_gender.value.find(i => i.value === value) || 
+				  options_blood_type.value.find(i => i.value === value) ||
+				  options_tshirt_size.value.find(i => i.value === value)
+	
+	return option?.name || ''
+}
+
+const getInfo = () => {
+	uni.showLoading({
+		mask: true
+	})
+	const data = {
+		phone_number: userInfo.value.phone
+	}
+	proxy.$axios.post('/booking-api/registration/getSignerInfo', data).then(res => {
+		console.log(res)
+		signerId.value = res.id
+		
+		if (res.id_card) {
+			disabled.value = true;
 		}
-	};
+		const cache = uni.getStorageSync('SignerInfo') || {}
+		
+		console.log(cache)
+		form.value =	{
+			full_name: res.full_name || '',
+			gender: res.gender || '1',
+			phone_number: res.phone_number || '',
+			tshirt_size: res.tshirt_size || '',
+			id_card: res.id_card || '',
+			email: res.email || '',
+			blood_type: res.blood_type || '',
+			job: res.occupation || '',
+			sportPurpose: res.running_goal || '',
+			strengths: res.good_at_sports || '',
+			...cache,
+			gender: cache.gender ? String(cache.gender) : '1',
+		}
+	})
+}
+
+const openActionSheet = (type) => {
+	sheetType.value = type;
+	options_sheet.value = options_gender.value.concat(options_blood_type.value).concat(options_tshirt_size.value).filter(option => {
+		if (type === 'gender') return options_gender.value.includes(option)
+		if (type === 'blood_type') return options_blood_type.value.includes(option)
+		if (type === 'tshirt_size') return options_tshirt_size.value.includes(option)
+		return false
+	})
+	isShowSheet.value = true;
+}
+
+const selectActionSheet = (e) => {
+	console.log(e)
+	form.value[sheetType.value] = e.value
+	isShowSheet.value = false;
+}
+
+const closeActionSheet = () => {
+	isShowSheet.value = false;
+}
+
+const submit = () => {
+	uForm.value.validate().then(() => {
+		const res = form.value
+		const data = {
+			full_name: res.full_name || '',
+			gender: Number(res.gender),
+			phone_number: res.phone_number || '',
+			tshirt_size: res.tshirt_size || '',
+			id_card: res.id_card || '',
+			email: res.email || '',
+			blood_type: res.blood_type || '',
+			occupation: res.job || '',
+			running_goal: res.sportPurpose || '',
+			good_at_sports: res.strengths || '',
+		}
+		
+		if (signerId.value) {
+			data.id = signerId.value
+		}
+		
+		uni.showLoading({
+			mask: true
+		})
+		
+		uni.setStorageSync('SignerInfo', data)
+		
+		proxy.$toast('保存成功')
+		
+		setTimeout(() => {
+			uni.navigateBack()
+		}, 300)
+		
+		return;
+		
+		proxy.$axios.post(`/booking-api/registration/${signerId.value ? 'updateSignerInfo' : 'saveSignerInfo'}`, data).then(res => {
+			console.log(res)
+			// uni.hideLoading()
+			
+			proxy.$toast('保存成功')
+
+			setTimeout(() => {
+				uni.navigateBack()
+			}, 300)
+		})
+	})
+}
 </script>
 
 <style lang="less" scoped>

@@ -62,50 +62,54 @@
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      detail: {
-				event_info: {},
-				sign_info: {}
-			},
-    };
-  },
-  onLoad() {
-		this.detail = uni.getStorageSync('orderDetail')
-	},
-  methods: {
-    payOrder(item) {
-    	const respay = item.payment_params
-      // 触发微信支付
-      wx.requestPayment({
-      	'timeStamp': respay.timeStamp,
-      	'nonceStr': respay.nonceStr,
-      	'package': respay.package,
-      	'signType': respay.signType,
-      	'paySign': respay.paySign,
-      	'success': (res) => {
-      		uni.hideLoading();
-      		this.$toast('支付成功')
-      		setTimeout(() => {
-      			// uni.navigateBack()
-      			uni.$u.route('pagesSub/signUpStatus?order_no=' + item.order_no);
-      		}, 300)
-      	},
-      	'fail': (res) => {
-      		uni.hideLoading();
-      		console.log("res======>", res)
-      		this.$toast('支付未完成')
-      		setTimeout(() => {
-      			// uni.navigateBack()
-      			uni.$u.route('pagesSub/signUpStatus?order_no=' + item.order_no);
-      		}, 300)
-      	}
-      })
-    },
-  },
-};
+<script setup>
+import { ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import { getCurrentInstance } from 'vue'
+
+// 获取当前实例以访问全局属性
+const { proxy } = getCurrentInstance()
+
+// 响应式数据
+const detail = ref({
+	event_info: {},
+	sign_info: {}
+})
+
+// 页面加载
+onLoad(() => {
+	detail.value = uni.getStorageSync('orderDetail')
+})
+
+// 方法定义
+const payOrder = (item) => {
+	const respay = item.payment_params
+	// 触发微信支付
+	wx.requestPayment({
+		'timeStamp': respay.timeStamp,
+		'nonceStr': respay.nonceStr,
+		'package': respay.package,
+		'signType': respay.signType,
+		'paySign': respay.paySign,
+		'success': (res) => {
+			uni.hideLoading();
+			proxy.$toast('支付成功')
+			setTimeout(() => {
+				// uni.navigateBack()
+				uni.$u.route('pagesSub/signUpStatus?order_no=' + item.order_no);
+			}, 300)
+		},
+		'fail': (res) => {
+			uni.hideLoading();
+			console.log("res======>", res)
+			proxy.$toast('支付未完成')
+			setTimeout(() => {
+				// uni.navigateBack()
+				uni.$u.route('pagesSub/signUpStatus?order_no=' + item.order_no);
+			}, 300)
+		}
+	})
+}
 </script>
 
 <style lang="scss" scoped>

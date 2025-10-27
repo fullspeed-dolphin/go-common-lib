@@ -77,251 +77,263 @@
 		<UserLogin ref="refUserLogin"/>
   </view>
 </template>
-<script>
-	import GroupList from "./components/groupList.vue"
-	import UserLogin from "@/components/UserLogin.vue"
-export default {
-	components: { GroupList, UserLogin },
-  data () {
-		return {
-			verifyCode: '',
-			myGroup: {},
-			activeType: {},
-			isAgree: false,
-			SignerInfo: {},
-			eventInfo: {},
-			priceList: [],
-			computedCode: {}
+<script setup>
+import { ref, computed, watch } from 'vue'
+import { onLoad, onShow } from '@dcloudio/uni-app'
+import { useStore } from 'vuex'
+import { getCurrentInstance } from 'vue'
+import GroupList from "./components/groupList.vue"
+import UserLogin from "@/components/UserLogin.vue"
+
+// 获取当前实例以访问全局属性
+const { proxy } = getCurrentInstance()
+
+// 使用store
+const store = useStore()
+
+// 模板引用
+const refGroupList = ref(null)
+const refUserLogin = ref(null)
+
+// 响应式数据
+const verifyCode = ref('')
+const myGroup = ref({})
+const activeType = ref({})
+const isAgree = ref(false)
+const SignerInfo = ref({})
+const eventInfo = ref({})
+const priceList = ref([])
+const computedCode = ref({})
+const event_id = ref('')
+const isSubmitting = ref(false)
+
+// 计算属性
+const userInfo = computed(() => store.state.userInfo)
+
+// 监听verifyCode变化
+watch(() => verifyCode.value, (newVal) => {
+	let codeState = {
+		isOk: false,
+		text: '全速码无效'
+	}
+	
+	computedCode.value = codeState;
+	
+	if (!verifyCode.value) return;
+	
+	const reg = /^[0-9a-zA-Z]*$/g;
+	if (!reg.test(verifyCode.value) || verifyCode.value.length !== 5) {
+		return
+	}
+	
+	getEventPrice()
+})
+
+// 页面加载
+onLoad((options) => {
+	event_id.value = options.event_id
+})
+
+// 页面显示
+onShow(() => {
+	getSignerInfo()
+	getEventPrice()
+	getUserGroup()
+})
+
+// 方法定义
+const openGroupPop = () => {
+	if (myGroup.value.group_id) return;
+	
+	refGroupList.value.open()
+}
+
+const getUserGroup = async () => {
+	uni.showLoading({ mask: true });
+		
+	if (!userInfo.value.running_group) {
+		myGroup.value = {}
+		
+		return
+	}
+	
+	try {
+		let res = await proxy.$axios.get(`/running-group/api/v1/groups/info?group_id=${userInfo.value.running_group}`)
+		if (res) {
+			myGroup.value = res;
 		}
-  },
-	computed: {
-		userInfo() {
-			return this.$store.state.userInfo
-		},
-	},
-	watch: {
-		verifyCode(newVal) {
-			let codeState = {
+	} catch (error) {
+		console.error(error)
+		//TODO handle the exception
+	}
+	
+	uni.hideLoading()
+}
+
+const getSignerInfo = () => {
+	const data = {
+		phone_number: userInfo.value.phone
+	}
+	proxy.$axios.post('/booking-api/registration/getSignerInfo', data).then(res => {
+		SignerInfo.value = {
+			...res,
+			...(uni.getStorageSync('SignerInfo') || {})
+		}
+		
+		console.log(uni.getStorageSync('SignerInfo'), SignerInfo.value)
+	})
+}
+
+const getEventPrice = (spxcode = null) => {
+	uni.showLoading({
+		mask: true
+	})
+	const data = {
+		"event_id": event_id.value,
+		spxcode: verifyCode.value,
+	}
+	proxy.$axios.post('/booking-api/user/price', data).then(res => {
+	// proxy.$axios.post('/booking-api/user/price?test_for_fullspeed', data).then(res => {
+		eventInfo.value = res;
+		
+		if (res.spxcode_status === 'ACT') {
+			computedCode.value = {
+				isOk: true,
+				text: '全速码有效'
+			}
+		} else {
+			computedCode.value = {
 				isOk: false,
 				text: '全速码无效'
 			}
-			
-			// if (!this.verifyCode.length) {
-			// 	codeState.text = '全速码无效'
-			// }
-			
-			// const reg = /^[0-9a-zA-Z]*$/g;
-			// console.log(reg.test(this.verifyCode))
-			// if (!reg.test(this.verifyCode)) {
-				
-			// }
-			
-			this.computedCode = codeState;
-			
-			if (!this.verifyCode) return;
-			
-			const reg = /^[0-9a-zA-Z]*$/g;
-			if (!reg.test(this.verifyCode) || this.verifyCode.length !== 5) {
-				return
-			}
-			
-			this.getEventPrice()
 		}
-	},
-	onLoad(options) {
-		this.event_id = options.event_id
-	},
-	onShow() {
-		this.getSignerInfo()
-		this.getEventPrice()
-		this.getUserGroup()
-	},
-  methods: {
-		openGroupPop() {
-			if (this.myGroup.group_id) return;
-			
-			this.$refs.refGroupList.open()
-		},
-		async getUserGroup() {
-		  uni.showLoading({ mask: true });
-			
-			if (!this.userInfo.running_group) {
-				this.myGroup = {}
-				
-				return
-			}
-			
-			try {
-				let res = await this.$axios.get(`/running-group/api/v1/groups/info?group_id=${this.userInfo.running_group}`)
-				if (res) {
-					this.myGroup = res;
-				}
-			} catch (error) {
-				console.error(error)
-				//TODO handle the exception
-			}
-			
-			uni.hideLoading()
-		},
-		getSignerInfo() {
-			const data = {
-				phone_number: this.userInfo.phone
-			}
-			this.$axios.post('/booking-api/registration/getSignerInfo', data).then(res => {
-				this.SignerInfo = {
-					...res,
-					...(uni.getStorageSync('SignerInfo') || {})
-				}
-				
-				console.log(uni.getStorageSync('SignerInfo'), this.SignerInfo)
-			})
-		},
-		getEventPrice(spxcode = null) {
-			uni.showLoading({
-				mask: true
-			})
-			const data = {
-				"event_id": this.event_id,
-				spxcode: this.verifyCode,
-			}
-			this.$axios.post('/booking-api/user/price', data).then(res => {
-			// this.$axios.post('/booking-api/user/price?test_for_fullspeed', data).then(res => {
-				this.eventInfo = res;
-				
-				if (res.spxcode_status === 'ACT') {
-					this.computedCode = {
-						isOk: true,
-						text: '全速码有效'
-					}
-				} else {
-					this.computedCode = {
-						isOk: false,
-						text: '全速码无效'
-					}
-				}
-				
-				let priceList = []
-				Object.keys(res).forEach(i => {
-					if (String(i).includes('km')) {
-						priceList.push({
-							price: res[i],
-							label: i?.toUpperCase(),
-							km: parseFloat(i)
-						})
-					}
+		
+		let priceListData = []
+		Object.keys(res).forEach(i => {
+			if (String(i).includes('km')) {
+				priceListData.push({
+					price: res[i],
+					label: i?.toUpperCase(),
+					km: parseFloat(i)
 				})
-				
-				// 小距离在前
-				priceList.sort((a,b) => a.km - b.km)
-				
-				this.activeType = priceList[0]
-				this.priceList = priceList;
-			})
-		},
-		selectSigner() {
-			uni.$u.route('pagesSub/signerForm')
-		},
-		changeTab(item) {
-			this.activeType = item
-		},
-		submitOrder() {
-			if (!this.$store.state.userInfo.id) {
-				return this.$refs.refUserLogin.open()
 			}
-			
-			if (!this.SignerInfo.id_card) return this.$toast("请完善参赛者信息");
-			
-			const reg = /^[0-9a-zA-Z]*$/g;
-			if (this.verifyCode) {
-				if (!reg.test(this.verifyCode) || this.verifyCode.length !== 5) {
-					return this.$toast("全速码 格式有误")
-				}
-			}
-			
-			if (!this.isAgree) return this.$toast("请勾选同意协议");
-			
-			const data = {
-				...this.SignerInfo,
-				"running_km": parseFloat(this.activeType.label),
-				"payment_method": "wechat",
-				"event_id": this.event_id,
-				"payment_amount": this.activeType.price,
-				spxcode: this.computedCode.isOk ? this.verifyCode : null,
-				running_group: String(this.userInfo.running_group || '')
-			}
-			
-			delete data.updated_at;
-			delete data.status;
-			delete data.created_at;
-			
-			if (this.isSubmitting) return;
-			this.isSubmitting = true;
-			uni.showLoading({
-				mask: true
-			})
-			this.$axios.post(`/booking-api/registration/SignInEvent`, data).then(res => {
-				this.creatOrder(res.reg_no)
-			}).catch(err => {
-				console.error(err)
-				uni.hideLoading()
-				uni.showModal({
-					title: '提示',
-					content: err.msg,
-					showCancel: false,
-				})
-				this.isSubmitting = false;
-			})
-		},
-		async getCode() {
-			return (await new Promise(resolve => uni.login({success: e => resolve(e) }))).code
-		},
-		async creatOrder(reg_no) {
-			const data = {
-				reg_no,
-				event_id: this.event_id,
-				openid: this.userInfo.openid
-			}
-			
-			uni.showLoading({
-				mask: true
-			})
-			
-			this.$axios.post(`/pay/wechat/payment`, data).then(res => {
-				console.log("res", res)
-				uni.hideLoading();
-				this.isSubmitting = false;
-				this.wxPay(res);
-			})
-		},
-		wxPay(respay) {
-			// 触发微信支付
-			wx.requestPayment({
-				'timeStamp': respay.timeStamp,
-				'nonceStr': respay.nonceStr,
-				'package': respay.package,
-				'signType': respay.signType,
-				'paySign': respay.paySign,
-				'success': (res) => {
-					uni.hideLoading();
-					this.$toast('支付成功')
-					setTimeout(() => {
-						// uni.navigateBack()
-						uni.$u.route('pagesSub/signUpStatus?order_no=' + respay.order_no);
-					}, 300)
-				},
-				'fail': (res) => {
-					uni.hideLoading();
-					console.log("res======>", res)
-					this.$toast('支付未完成')
-					setTimeout(() => {
-						// uni.navigateBack()
-						uni.$u.route('pagesSub/signUpStatus?order_no=' + respay.order_no);
-					}, 300)
-				}
-			})
-		},
+		})
+		
+		// 小距离在前
+		priceListData.sort((a,b) => a.km - b.km)
+		
+		activeType.value = priceListData[0]
+		priceList.value = priceListData;
+	})
+}
+
+const selectSigner = () => {
+	uni.$u.route('pagesSub/signerForm')
+}
+
+const changeTab = (item) => {
+	activeType.value = item
+}
+
+const submitOrder = () => {
+	if (!store.state.userInfo.id) {
+		return refUserLogin.value.open()
 	}
-};
+	
+	if (!SignerInfo.value.id_card) return proxy.$toast("请完善参赛者信息");
+	
+	const reg = /^[0-9a-zA-Z]*$/g;
+	if (verifyCode.value) {
+		if (!reg.test(verifyCode.value) || verifyCode.value.length !== 5) {
+			return proxy.$toast("全速码 格式有误")
+		}
+	}
+	
+	if (!isAgree.value) return proxy.$toast("请勾选同意协议");
+	
+	const data = {
+		...SignerInfo.value,
+		"running_km": parseFloat(activeType.value.label),
+		"payment_method": "wechat",
+		"event_id": event_id.value,
+		"payment_amount": activeType.value.price,
+		spxcode: computedCode.value.isOk ? verifyCode.value : null,
+		running_group: String(userInfo.value.running_group || '')
+	}
+	
+	delete data.updated_at;
+	delete data.status;
+	delete data.created_at;
+	
+	if (isSubmitting.value) return;
+	isSubmitting.value = true;
+	uni.showLoading({
+		mask: true
+	})
+	proxy.$axios.post(`/booking-api/registration/SignInEvent`, data).then(res => {
+		creatOrder(res.reg_no)
+	}).catch(err => {
+		console.error(err)
+		uni.hideLoading()
+		uni.showModal({
+			title: '提示',
+			content: err.msg,
+			showCancel: false,
+		})
+		isSubmitting.value = false;
+	})
+}
+
+const getCode = async () => {
+	return (await new Promise(resolve => uni.login({success: e => resolve(e) }))).code
+}
+
+const creatOrder = async (reg_no) => {
+	const data = {
+		reg_no,
+		event_id: event_id.value,
+		openid: userInfo.value.openid
+	}
+	
+	uni.showLoading({
+		mask: true
+	})
+	
+	proxy.$axios.post(`/pay/wechat/payment`, data).then(res => {
+		console.log("res", res)
+		uni.hideLoading();
+		isSubmitting.value = false;
+		wxPay(res);
+	})
+}
+
+const wxPay = (respay) => {
+	// 触发微信支付
+	wx.requestPayment({
+		'timeStamp': respay.timeStamp,
+		'nonceStr': respay.nonceStr,
+		'package': respay.package,
+		'signType': respay.signType,
+		'paySign': respay.paySign,
+		'success': (res) => {
+			uni.hideLoading();
+			proxy.$toast('支付成功')
+			setTimeout(() => {
+				// uni.navigateBack()
+				uni.$u.route('pagesSub/signUpStatus?order_no=' + respay.order_no);
+			}, 300)
+		},
+		'fail': (res) => {
+			uni.hideLoading();
+			console.log("res======>", res)
+			proxy.$toast('支付未完成')
+			setTimeout(() => {
+				// uni.navigateBack()
+				uni.$u.route('pagesSub/signUpStatus?order_no=' + respay.order_no);
+			}, 300)
+		}
+	})
+}
 </script>
 
 <style lang="less">

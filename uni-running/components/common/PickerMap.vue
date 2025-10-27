@@ -3,76 +3,79 @@
     <u-cell :title="title" titleStyle="min-width:100px;" :border="false" isLink :required="required" :value="valueString ? valueString : placeholder" @click="chooseLocation" />
   </div>
 </template>
-<script>
-export default {
-  options: {
-    styleIsolation: "shared",
-  },
-  props: {
-    title: {
-      type: String,
-      default: "",
-    },
-    required: {
-      type: Boolean,
-      default: false,
-    },
-    placeholder: {
-      type: String,
-      default: "请选择",
-    },
-    customClass: {
-      type: String,
-      default: "",
-    },
-    value: {
-      type: String | Number,
-      default: "",
-    },
-  },
-  data() {
-    return {
-      isShowPop: false,
-      valueString: this.value,
-    };
-  },
-  watch: {
-    value: {
-      handler(val) {
-        if (String(val)) {
-					this.valueString = val
-        } else {
-        }
-      },
-      deep: true,
-      immediate: true,
-    },
-  },
-  methods: {
-    open() {
-      this.isShowPop = true;
-    },
-    chooseLocation() {
-      const that = this;
-      uni.chooseLocation({
-        success: (res) => {
-          console.log(res, "返回地址");
-          // that.ruleForm.address = res.address;
-          // that.ruleForm.latitude = res.latitude;
-          // that.ruleForm.longitude = res.longitude;
-          this.valueString = res.address;
-          this.$emit("input", res.address);
+<script setup>
+import { ref, watch } from 'vue'
 
-          console.log(res, "返回地址");
-          this.$emit("change", `${res.latitude},${res.longitude}`);
-        },
-        fail: function (e) {
-          console.log(e, "报错");
-        },
-      });
-    },
-  },
-};
+// Props定义
+const props = defineProps({
+	title: {
+		type: String,
+		default: "",
+	},
+	required: {
+		type: Boolean,
+		default: false,
+	},
+	placeholder: {
+		type: String,
+		default: "请选择",
+	},
+	customClass: {
+		type: String,
+		default: "",
+	},
+	value: {
+		type: String | Number,
+		default: "",
+	},
+})
+
+// Emits
+const emit = defineEmits(['input', 'change'])
+
+// 响应式数据
+const isShowPop = ref(false)
+const valueString = ref(props.value)
+
+// 监听value变化
+watch(() => props.value, (val) => {
+	if (String(val)) {
+		valueString.value = val
+	} else {
+	}
+}, {
+	deep: true,
+	immediate: true,
+})
+
+// 方法定义
+const open = () => {
+	isShowPop.value = true;
+}
+
+const chooseLocation = () => {
+	uni.chooseLocation({
+		success: (res) => {
+			console.log(res, "返回地址");
+			// that.ruleForm.address = res.address;
+			// that.ruleForm.latitude = res.latitude;
+			// that.ruleForm.longitude = res.longitude;
+			valueString.value = res.address;
+			emit("input", res.address);
+
+			console.log(res, "返回地址");
+			emit("change", `${res.latitude},${res.longitude}`);
+		},
+		fail: function (e) {
+			console.log(e, "报错");
+		},
+	});
+}
+
+// 暴露方法给父组件
+defineExpose({
+	open
+})
 </script>
 
 <style lang="scss" scoped>

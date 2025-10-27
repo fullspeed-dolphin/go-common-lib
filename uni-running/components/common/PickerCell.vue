@@ -7,122 +7,128 @@
     <u-picker :title="'请选择' + title" :show="isShowPop" :defaultIndex="defaultIndex" :keyName="valuekey" :columns="[columns]" @confirm="confirm" @cancel="isShowPop = false" />
   </div>
 </template>
-<script>
-export default {
-  options: {
-    styleIsolation: "shared",
-  },
-  props: {
-    title: {
-      type: String,
-      default: "",
-    },
-    position: {
-      type: String,
-      default: "bottom",
-    },
-    rightIcon: {
-      type: String,
-      default: "",
-    },
-    placeholder: {
-      type: String,
-      default: "请选择",
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    border: {
-      type: Boolean,
-      default: true,
-    },
-    required: {
-      type: Boolean,
-      default: false,
-    },
-    customClass: {
-      type: String,
-      default: "",
-    },
-    valuekey: {
-      // picker column 的显示字段
-      type: String,
-      default: "label",
-    },
-    field: {
-      // 当前字段
-      type: String,
-      default: "label",
-    },
-    value: {
-      type: String | Number,
-      default: "",
-    },
-    columns: {
-      type: Array,
-      default() {
-        return [];
-      },
-    },
-  },
-  data() {
-    return {
-      isShowPop: false,
-      selected: {},
-      defaultIndex: [0],
-    };
-  },
-  watch: {
-    value: {
-      handler(val) {
-        this.setDefaultValue();
-      },
-      deep: true,
-      immediate: true,
-    },
-    columns: {
-      handler(columns) {
-        this.setDefaultValue();
-        // console.log("columns", columns);
-      },
-      deep: true,
-      immediate: true,
-    },
-  },
-  methods: {
-    setDefaultValue() {
-      if (String(this.value).length && this.columns?.length) {
-        const index = this.columns.findIndex(
-          (i) => String(i.value) === String(this.value)
-        );
+<script setup>
+import { ref, watch } from 'vue'
 
-        // console.log("index=====>", index)
-        if (index !== -1) {
-          this.defaultIndex = [index];
-          this.selected = this.columns[index];
+// Props定义
+const props = defineProps({
+	title: {
+		type: String,
+		default: "",
+	},
+	position: {
+		type: String,
+		default: "bottom",
+	},
+	rightIcon: {
+		type: String,
+		default: "",
+	},
+	placeholder: {
+		type: String,
+		default: "请选择",
+	},
+	disabled: {
+		type: Boolean,
+		default: false,
+	},
+	border: {
+		type: Boolean,
+		default: true,
+	},
+	required: {
+		type: Boolean,
+		default: false,
+	},
+	customClass: {
+		type: String,
+		default: "",
+	},
+	valuekey: {
+		// picker column 的显示字段
+		type: String,
+		default: "label",
+	},
+	field: {
+		// 当前字段
+		type: String,
+		default: "label",
+	},
+	value: {
+		type: String | Number,
+		default: "",
+	},
+	columns: {
+		type: Array,
+		default() {
+			return [];
+		},
+	},
+})
 
-          // console.log("selected=====>", this.selected)
-        }
-      } else {
-        this.selected = {};
-      }
-    },
-    open() {
-      if (this.disabled) return;
-      this.isShowPop = true;
-    },
-    confirm(detail) {
-      console.log("detail", detail);
-      this.selected = detail.value;
-      this.$emit("input", String(detail.value[0].value));
+// Emits
+const emit = defineEmits(['input', 'change'])
 
-      this.$emit("change", detail.value[0], this.field);
+// 响应式数据
+const isShowPop = ref(false)
+const selected = ref({})
+const defaultIndex = ref([0])
 
-      this.isShowPop = false;
-    },
-  },
-};
+// 监听value变化
+watch(() => props.value, (val) => {
+	setDefaultValue();
+}, {
+	deep: true,
+	immediate: true,
+})
+
+// 监听columns变化
+watch(() => props.columns, (columns) => {
+	setDefaultValue();
+	// console.log("columns", columns);
+}, {
+	deep: true,
+	immediate: true,
+})
+
+// 方法定义
+const setDefaultValue = () => {
+	if (String(props.value).length && props.columns?.length) {
+		const index = props.columns.findIndex(
+			(i) => String(i.value) === String(props.value)
+		);
+
+		// console.log("index=====>", index)
+		if (index !== -1) {
+			defaultIndex.value = [index];
+			selected.value = props.columns[index];
+
+			// console.log("selected=====>", selected.value)
+		}
+	} else {
+		selected.value = {};
+	}
+}
+
+const open = () => {
+	if (props.disabled) return;
+	isShowPop.value = true;
+}
+
+const confirm = (detail) => {
+	console.log("detail", detail);
+	selected.value = detail.value;
+	emit("input", String(detail.value[0].value));
+
+	emit("change", detail.value[0], props.field);
+
+	isShowPop.value = false;
+}
+
+// 暴露方法给父组件
+defineExpose({
+	open
+})
 </script>
 
 <style lang="scss">

@@ -41,47 +41,54 @@
 		</section>
   </view>
 </template>
-<script>
-export default {
-  data () {
-		return {
-			isSuccess: false,
-			orderDetail: {}
-		}
-  },
-	onLoad(options) {
-		this.order_no = options.order_no;
-		
-		uni.showLoading({
-			mask: true
-		})
-		
-		setTimeout(() => {
-			this.getOrder()
-		}, 2000)
-	},
-  methods: {
-		getOrder() {
-			const data = {
-				order_no: this.order_no
-			}
-			
-			this.$axios.post(`/pay/order/status`, data).then(res => {
-				console.log("res", res)
-				this.orderDetail = res;
-				this.isSuccess = res.status === 'SUCC';
-			})
-		},
-		goBack() {
-			uni.navigateBack()
-		},
-		rightClick() {
-			uni.navigateBack({
-				delta: 2
-			})
-		}
+<script setup>
+import { ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import { getCurrentInstance } from 'vue'
+
+// 获取当前实例以访问全局属性
+const { proxy } = getCurrentInstance()
+
+// 响应式数据
+const isSuccess = ref(false)
+const orderDetail = ref({})
+const order_no = ref('')
+
+// 页面加载
+onLoad((options) => {
+	order_no.value = options.order_no;
+	
+	uni.showLoading({
+		mask: true
+	})
+	
+	setTimeout(() => {
+		getOrder()
+	}, 2000)
+})
+
+// 方法定义
+const getOrder = () => {
+	const data = {
+		order_no: order_no.value
 	}
-};
+	
+	proxy.$axios.post(`/pay/order/status`, data).then(res => {
+		console.log("res", res)
+		orderDetail.value = res;
+		isSuccess.value = res.status === 'SUCC';
+	})
+}
+
+const goBack = () => {
+	uni.navigateBack()
+}
+
+const rightClick = () => {
+	uni.navigateBack({
+		delta: 2
+	})
+}
 </script>
 
 <style lang="less">
