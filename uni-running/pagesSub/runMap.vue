@@ -463,7 +463,7 @@ const stopRunning = () => {
 				latitude: validPoints[0].latitude,
 				longitude: validPoints[0].longitude,
 				title: '起始点',
-				iconPath: '/static/start.png',
+				// iconPath: '/static/start.png',
 				width: 25,
 				height: 25,
 				anchor: { x: 0.5, y: 0.5 }
@@ -476,7 +476,7 @@ const stopRunning = () => {
 					latitude: validPoints[validPoints.length - 1].latitude,
 					longitude: validPoints[validPoints.length - 1].longitude,
 					title: '终点',
-					iconPath: '/static/end.png',
+					// iconPath: '/static/end.png',
 					width: 25,
 					height: 25,
 					anchor: { x: 0.5, y: 0.5 }
