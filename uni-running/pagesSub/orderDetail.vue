@@ -1,6 +1,6 @@
 <template>
   <div class="pb30">
-		<u-navbar placeholder title="订单详情"></u-navbar>
+		<u-navbar autoBack placeholder title="订单详情"></u-navbar>
     <view class="group-item" style="border-radius: 16rpx;overflow: hidden;">
     	<view class="h4">
     		活动信息

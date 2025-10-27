@@ -55,165 +55,182 @@
 		</u-popup>
 	</view>
 </template>
-<script>
-	import { baseLink } from "@/utils/config.js"
-	export default {
-		options: {
-		  styleIsolation: "shared",
-		},
-		data() {
-			return {
-				isShowPop: false,
-				radiolist: [
-					{
-						name: '男',
-						value: 1
-					}, {
-						name: '女',
-						value: 0
-					}
-				],
-				formData: {
-					avatarUrl: "",
-					nickname: "",
-					gender: 1
-				}
-			};
-		},
-		methods: {
-			cancel() {
-				this.isShowPop = false;
-				
-				// 去除缓存 token
-				this.$store.commit({
-					type: 'globalToken',
-					data: ''
-				})
-				this.$emit('cancel');
+<script setup>
+import { ref } from 'vue'
+import { useStore } from 'vuex'
+import { getCurrentInstance } from 'vue'
+import { baseLink } from "@/utils/config.js"
+
+// 获取当前实例以访问全局属性
+const { proxy } = getCurrentInstance()
+
+// 使用store
+const store = useStore()
+
+// Emits
+const emit = defineEmits(['cancel'])
+
+// 响应式数据
+const isShowPop = ref(false)
+const radiolist = ref([
+	{
+		name: '男',
+		value: 1
+	}, {
+		name: '女',
+		value: 0
+	}
+])
+const formData = ref({
+	avatarUrl: "",
+	nickname: "",
+	gender: 1
+})
+
+// 方法定义
+const cancel = () => {
+	isShowPop.value = false;
+	
+	// 去除缓存 token
+	store.commit({
+		type: 'globalToken',
+		data: ''
+	})
+	emit('cancel');
+}
+
+//获取微信头像
+const onChooseAvatar = (e) => {
+	formData.value.avatarUrl = e.detail.avatarUrl;
+	console.log("eeee", e.detail);
+}
+
+const open = () => {
+	const userInfo = store.state.userInfo;
+	
+	if (!formData.value.avatarUrl) {
+		formData.value.avatarUrl = userInfo.avatar_url;
+		formData.value.nickname = userInfo.nickname
+		formData.value.gender = userInfo.gender
+	}
+	
+	isShowPop.value = true;
+}
+
+const close = () => {
+	isShowPop.value = false;
+	formData.value = {
+		avatarUrl: "",
+		nickname: "",
+		gender: 1
+	}
+}
+
+const submit = async () => {
+	if (!formData.value.avatarUrl.length) return proxy.$toast('请上传头像')
+	if (!formData.value.nickname.length) return proxy.$toast('请输入昵称')
+	
+	uni.showLoading({
+		mask: true
+	})
+	
+	let link = formData.value.avatarUrl;
+	
+	// 头像 tmp 开头，说明更换了头像，需要上传
+	if (formData.value.avatarUrl.includes('//tmp')) {
+		link = await uploadFile(formData.value.avatarUrl);
+	}
+	
+	uni.showLoading({
+		mask: true
+	})
+	
+	const data = {
+		"avatar_url": link,
+		"nickname": formData.value.nickname,
+		"gender": formData.value.gender
+	}
+	
+	
+	// case1: 手机号登录成功后，如果没有更新头像，缓存token,直到更新了头像，才把 token 补上；
+	// case 2: 登录后，点击编辑头像，缓存必然不存在，因此可以以此为判定；
+	if (store.state.globalToken) {
+		uni.setStorageSync("token", store.state.globalToken);
+	}
+	
+	proxy.$axios.post(`/user-api/user/updateUserInfo`, data).then(res => {
+		// 去除缓存 token
+		store.commit({
+			type: 'globalToken',
+			data: ''
+		})
+		
+		store.dispatch('getUserInfo')
+		close()
+		
+		proxy.$toast('更新成功');
+	})
+}
+
+const compressImage = (src) => {
+	return new Promise((resolve) => {
+		uni.compressImage({
+			src,
+			width: 750,
+			height: "auto",
+			quality: 80,
+			success: (res) => {
+				resolve(res.tempFilePath);
+				console.log(res.tempFilePath);
 			},
-			//获取微信头像
-			onChooseAvatar(e) {
-				this.formData.avatarUrl = e.detail.avatarUrl;
-				console.log("eeee", e.detail);
+		});
+	});
+}
+
+const uploadFile = async (filePath) => {
+	console.log("filePath", filePath)
+	// const filePath = await compressImage(file);
+
+	return new Promise((resolve, reject) => {
+		uni.uploadFile({
+			url: baseLink + `/basic-service/image/upload`,
+			filePath: filePath,
+			name: "image",
+			header: {
+				Authorization: uni.getStorageSync('token'),
+				'content-type': 'application/json',
 			},
-			open() {
-				const userInfo = this.$store.state.userInfo;
-				
-				if (!this.formData.avatarUrl) {
-					this.formData.avatarUrl = userInfo.avatar_url;
-					this.formData.nickname = userInfo.nickname
-					this.formData.gender = userInfo.gender
-				}
-				
-				this.isShowPop = true;
-			},
-			close() {
-				this.isShowPop = false;
-				this.formData = {
-					avatarUrl: "",
-					nickname: "",
-					gender: 1
-				}
-			},
-			async submit() {
-				if (!this.formData.avatarUrl.length) return this.$toast('请上传头像')
-				if (!this.formData.nickname.length) return this.$toast('请输入昵称')
-				
-				uni.showLoading({
-					mask: true
-				})
-				
-				let link = this.formData.avatarUrl;
-				
-				// 头像 tmp 开头，说明更换了头像，需要上传
-				if (this.formData.avatarUrl.includes('//tmp')) {
-					link = await this.uploadFile(this.formData.avatarUrl);
-				}
-				
-				uni.showLoading({
-					mask: true
-				})
-				
-				const data = {
-					"avatar_url": link,
-					"nickname": this.formData.nickname,
-					"gender": this.formData.gender
-				}
-				
-				
-				// case1: 手机号登录成功后，如果没有更新头像，缓存token,直到更新了头像，才把 token 补上；
-				// case 2: 登录后，点击编辑头像，缓存必然不存在，因此可以以此为判定；
-				if (this.$store.state.globalToken) {
-					uni.setStorageSync("token", this.$store.state.globalToken);
-				}
-				
-				this.$axios.post(`/user-api/user/updateUserInfo`, data).then(res => {
-					// 去除缓存 token
-					this.$store.commit({
-						type: 'globalToken',
-						data: ''
-					})
-					
-					this.$store.dispatch('getUserInfo')
-					this.close()
-					
-					this.$toast('更新成功');
-				})
-			},
-			compressImage(src) {
-				return new Promise((resolve) => {
-					uni.compressImage({
-						src,
-						width: 750,
-						height: "auto",
-						quality: 80,
-						success: (res) => {
-							resolve(res.tempFilePath);
-							console.log(res.tempFilePath);
-						},
+			success(res) {
+				res = JSON.parse(res.data);
+				if (res.data.url) {
+					return resolve(res.data.url);
+				} else {
+					uni.showToast({
+						icon: "none",
+						title: res.msg || "上传失败",
 					});
-				});
+				}
 			},
-			async uploadFile(filePath) {
-				console.log("filePath", filePath)
-				// const filePath = await this.compressImage(file);
-			
-				return new Promise((resolve, reject) => {
-					uni.uploadFile({
-						url: baseLink + `/basic-service/image/upload`,
-						filePath: filePath,
-						name: "image",
-						header: {
-							Authorization: uni.getStorageSync('token'),
-							'content-type': 'application/json',
-						},
-						success(res) {
-							res = JSON.parse(res.data);
-							if (res.data.url) {
-								return resolve(res.data.url);
-							} else {
-								uni.showToast({
-									icon: "none",
-									title: res.msg || "上传失败",
-								});
-							}
-						},
-						fail(e) {
-							return resolve("");
-			
-							uni.showToast({
-								icon: "none",
-								title: "上传失败",
-							});
-			
-							console.error(e);
-							reject(e);
-						},
-					});
+			fail(e) {
+				return resolve("");
+
+				uni.showToast({
+					icon: "none",
+					title: "上传失败",
 				});
+
+				console.error(e);
+				reject(e);
 			},
-		},
-	};
+		});
+	});
+}
+
+// 暴露方法给父组件
+defineExpose({
+	open,
+	close
+})
 </script>
 
 <style lang="scss" scoped>

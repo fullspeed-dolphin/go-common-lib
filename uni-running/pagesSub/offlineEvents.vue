@@ -3,7 +3,7 @@
 		  isFixedNavbar: isFixedNavbar,
 		  isLoadedPage: isLoadedPage
 	  }">
-		  <u-navbar  placeholder title="线下活动" :leftIcon="false"></u-navbar>
+		  <u-navbar autoBack  placeholder title="线下活动" :leftIcon="false"></u-navbar>
 		  
 		  <div class="event-status flex-center" v-if="detail.status === 'ACT'">活动进行中</div>
 		  
@@ -79,120 +79,141 @@
 		  <PhoneLogin ref="refPhoneLogin" />
 	</view>
   </template>
-  <script>
-	  let timer = null;
-	  import PhoneLogin from "@/components/common/PhoneLogin.vue";
-  export default {
-	  components: { PhoneLogin },
-	data () {
-		  return {
-			  isScroll: false,
-			  isSignUp: false,
-			  detail: {},
-			  isFixedNavbar: true,
-			  isLoadedPage: false,   // 页面加载后控制动画
-		  }
-	},
-	  computed: {
-		  userInfo() {
-			  return this.$store.state.userInfo
-		  }
-	  },
-	  onLoad(options) {
-		  // #ifdef MP-WEIXIN
-		  wx.showShareMenu()
-		  // #endif
-  
-		  this.routerParams = options
-		  this.getDetail()
-	  },
-	  onUnload() {
-		  this.isLoadedPage = false;
-		  uni.removeStorageSync('eventDetail')
-	  },
-	  onPageScroll(e) {
-		  this.isFixedNavbar = parseInt(e.scrollTop) < 30;
-		  
-		  this.isScroll = true;
-	  
-		  clearTimeout(timer);
-		  timer = setTimeout(() => {
-			  this.isScroll = false;
-		  }, 100);
-	  },
-	  onShareAppMessage() {
-		  return {
-			  title: this.detail.name, // 分享标题
-			  // path: '/pages/index/index',     // 分享路径（必须是已经存在的页面路径）
-			  imageUrl: this.detail.background_image_url // 可选：分享时显示的封面图（网络图片或本地图片）
-		  };
-	  },
-	methods: {
-		  getDetail() {
-			  const eventDetail = uni.getStorageSync('eventDetail')
-			  if (eventDetail) {
-				  this.detail = eventDetail
-			  }
-			  
-			  uni.showLoading({
-				  mask: true
-			  })
-			  this.$axios.get(`/event-api/api/v1/events/${this.routerParams.id}`).then(res => {
-				  res.text = `<img src="${res.long_image_url}" style="max-width:100%;" />`
-				  res.eventItems = res.event_projects.split('、')
-				  this.detail = res;
-				  
-				  this.isLoadedPage = true;
-			  })
-		  },
-		  routeTo() {
-			  if (!this.userInfo.id) {
-				  return this.$refs.refPhoneLogin.open()
-			  }
-			  
-			  if (this.detail.status === 'EXP' && !!this.detail.event_detail_url) {
-				  uni.$u.route(`pagesSub/settings/webView?link=${this.detail.event_detail_url}`)
-				  return;
-			  }
-			  
-			  if (this.detail.status !== 'ACT') {
-				  return this.$toast('活动无效')
-			  }
-			  
-			  if (this.isSignUp) {
-				  this.cancelSignUp()
-				  return false;
-			  }
-			  uni.$u.route('pagesSub/orderIn?event_id=' + this.routerParams.id)
-		  },
-		  cancelSignUp() {
-			  uni.showModal({
-				title: '提示',
-				content: '确定取消报名吗？',
-				success: (res) => {
-				  if (res.confirm) {
-						  this.$axios({url: "api/index/logout"}).then(res => {
-							  this.$toast('已取消报名')
-						  })
-				  } else if (res.cancel) {
-					console.log('用户点击取消');
-				  }
-				}
-			  });
-		  },
-		  copyText(txt) {
-			  uni.setClipboardData({
-				  data: String(txt)
-			  })
-		  },
-		  callPhone(phoneNumber) {
-			  uni.makePhoneCall({
-				  phoneNumber
-			  })
-		  }
-	  }
-  };
-  </script>
+  <script setup>
+import { ref, computed } from 'vue'
+import { onLoad, onUnload, onPageScroll, onShareAppMessage } from '@dcloudio/uni-app'
+import { useStore } from 'vuex'
+import { getCurrentInstance } from 'vue'
+import PhoneLogin from "@/components/common/PhoneLogin.vue"
+
+// 获取当前实例以访问全局属性
+const { proxy } = getCurrentInstance()
+
+// 使用store
+const store = useStore()
+
+// 模板引用
+const refPhoneLogin = ref(null)
+
+// 响应式数据
+const isScroll = ref(false)
+const isSignUp = ref(false)
+const detail = ref({})
+const isFixedNavbar = ref(true)
+const isLoadedPage = ref(false)
+const routerParams = ref({})
+
+// 计算属性
+const userInfo = computed(() => store.state.userInfo)
+
+// 定时器
+let timer = null
+
+// 页面加载
+onLoad((options) => {
+	// #ifdef MP-WEIXIN
+	wx.showShareMenu()
+	// #endif
+
+	routerParams.value = options
+	getDetail()
+})
+
+// 页面卸载
+onUnload(() => {
+	isLoadedPage.value = false;
+	uni.removeStorageSync('eventDetail')
+})
+
+// 页面滚动
+onPageScroll((e) => {
+	isFixedNavbar.value = parseInt(e.scrollTop) < 30;
+	
+	isScroll.value = true;
+
+	clearTimeout(timer);
+	timer = setTimeout(() => {
+		isScroll.value = false;
+	}, 100);
+})
+
+// 分享
+onShareAppMessage(() => {
+	return {
+		title: detail.value.name, // 分享标题
+		// path: '/pages/index/index',     // 分享路径（必须是已经存在的页面路径）
+		imageUrl: detail.value.background_image_url // 可选：分享时显示的封面图（网络图片或本地图片）
+	};
+})
+
+// 方法定义
+const getDetail = () => {
+	const eventDetail = uni.getStorageSync('eventDetail')
+	if (eventDetail) {
+		detail.value = eventDetail
+	}
+	
+	uni.showLoading({
+		mask: true
+	})
+	proxy.$axios.get(`/event-api/api/v1/events/${routerParams.value.id}`).then(res => {
+		res.text = `<img src="${res.long_image_url}" style="max-width:100%;" />`
+		res.eventItems = res.event_projects.split('、')
+		detail.value = res;
+		
+		isLoadedPage.value = true;
+	})
+}
+
+const routeTo = () => {
+	if (!userInfo.value.id) {
+		return refPhoneLogin.value.open()
+	}
+	
+	if (detail.value.status === 'EXP' && !!detail.value.event_detail_url) {
+		uni.$u.route(`pagesSub/settings/webView?link=${detail.value.event_detail_url}`)
+		return;
+	}
+	
+	if (detail.value.status !== 'ACT') {
+		return proxy.$toast('活动无效')
+	}
+	
+	if (isSignUp.value) {
+		cancelSignUp()
+		return false;
+	}
+	uni.$u.route('pagesSub/orderIn?event_id=' + routerParams.value.id)
+}
+
+const cancelSignUp = () => {
+	uni.showModal({
+		title: '提示',
+		content: '确定取消报名吗？',
+		success: (res) => {
+			if (res.confirm) {
+				proxy.$axios({url: "api/index/logout"}).then(res => {
+					proxy.$toast('已取消报名')
+				})
+			} else if (res.cancel) {
+				console.log('用户点击取消');
+			}
+		}
+	});
+}
+
+const copyText = (txt) => {
+	uni.setClipboardData({
+		data: String(txt)
+	})
+}
+
+const callPhone = (phoneNumber) => {
+	uni.makePhoneCall({
+		phoneNumber
+	})
+}
+</script>
   
   <style lang="less">
 	  .share-btn {

@@ -1,6 +1,6 @@
 <template>
   <view class="pt30">
-		<u-navbar placeholder title="添加设备"></u-navbar>
+		<u-navbar autoBack placeholder title="添加设备"></u-navbar>
 		<view class="">
 		  <view class="brand-item flex-start" 
 				@click="$u.route('pagesSub/device/deviceBind?value=' + item.label)"

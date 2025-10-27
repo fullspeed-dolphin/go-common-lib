@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<u-navbar placeholder :title="pageTitle"></u-navbar>
+		<u-navbar autoBack placeholder :title="pageTitle"></u-navbar>
 		
 		<mescroll-empty v-if="isEmpty" mode="data" :option="{
 			btnText: '创建跑团',
@@ -109,174 +109,193 @@
 		<UserLogin ref="refUserLogin"/>
 	</view>
 </template>
-<script>
+<script setup>
+import { ref, computed } from 'vue'
+import { onLoad, onUnload, onShow } from '@dcloudio/uni-app'
+import { useStore } from 'vuex'
+import { getCurrentInstance } from 'vue'
+import UserLogin from "@/components/UserLogin.vue"
+
+// 获取当前实例以访问全局属性
+const { proxy } = getCurrentInstance()
+
+// 使用store
+const store = useStore()
+
+// 模板引用
+const refUserLogin = ref(null)
+
+// 响应式数据
+const isEmpty = ref(false)
+const detail = ref({})
+const routeParams = ref({})
+const memberList = ref([])
+const memberLeader = ref({})
+
+// 计算属性
+const pageTitle = computed(() => {
+	return routeParams.value.from === 'mine' ? '我的跑团' : '跑团详情';
+})
+
+const userInfo = computed(() => store.state.userInfo)
+
+// 页面加载
+onLoad((options) => {
+	console.log("option", options);
+	routeParams.value = options;
 	
-	import UserLogin from "@/components/UserLogin.vue";
-	export default {
-		components: { UserLogin },
-		data() {
-			return {
-				isEmpty: false,
-				detail: {},
-				routeParams: {},
-				memberList: [],
-				memberLeader: {}
-			};
-		},
-		computed: {
-			pageTitle() {
-				return this.routeParams.from === 'mine' ? '我的跑团' : '跑团详情';
-			},
-			userInfo() {
-				return this.$store.state.userInfo
-			}
-		},
-		onLoad(options) {
-			console.log("option", options);
-			this.routeParams = options;
-			
-			if (!options.group_id || options.group_id === 'null') {
-				this.isEmpty = true;
-				return
-			}
-						
-			this.getDetail()
-			
-			// #ifdef MP-WEIXIN
-			wx.showShareMenu()
-			// #endif
-		},
-		onUnload() {
-			uni.removeStorageSync('groupDetail')
-		},
-		onShow() {
-		  // 移除全局自定义事件监听器
-		  uni.$off("updateList");
-		
-		  // 监听全局的自定义事件
-		  uni.$once("updateList", (data) => {
-		    // 判断从我的跑团创建，返回没有跑团 ID，页面空白的问题
-		    if (data.from === 'mine' && data.group_id) {
-					this.routeParams.group_id = data.group_id
-					this.getDetail()
-		    }
-		  });
-		},
-		methods: {
-			viewMoreMembers() {
-				uni.$u.route(`pagesSub/groupMemberList?group_id=${this.routeParams.group_id}`)
-			},
-			getDetail(page) {
-				const groupDetail = uni.getStorageSync('groupDetail')
-				if (groupDetail) {
-					this.detail = groupDetail
-				}
+	if (!options.group_id || options.group_id === 'null') {
+		isEmpty.value = true;
+		return
+	}
 				
-			  uni.showLoading({ mask: true });
-				
-				this.$axios.get(`/running-group/api/v1/groups/info?group_id=${this.routeParams.group_id}`)
-					.then((res) => {
-						res.establish_time = res.establish_time.slice(0, 10)
-						this.detail = res
-						
-						this.getMemberList()
-					})
-			},
-			getMemberList() {
-				const data = {
-					"pageIndex": 0,
-					"pageSize": 9,
-					groupId: Number(this.detail.group_id)
-				}
-				this.$axios.post(`/running-group/api/v1/groups/members`, data)
-					.then((res) => {
-						this.memberLeader = (res.memberships || []).find(i => i.role === 'creator') || {}
-						this.memberList = (res.memberships || []).filter(i => i.role !== 'creator')
-					})
-			},
-			joinGroup() {
-				if (!this.$store.state.userInfo.id) {
-					return this.$refs.refUserLogin.open()
-				}
-			  uni.showModal({
-			    title: "提示",
-			    content: "是否确认加入该跑团？",
-			    success: (res) => {
-			      if (res.confirm) {
-			        const data = {
-			          running_group: Number(this.detail.group_id)
-			        };
-			
-			        uni.showLoading({ mask: true });
-			        this.$axios
-			          .post(`/user-api/user/joinRunningGroup`, data)
-			          .then((res) => {
-			            uni.hideLoading();
-			            this.getDetail();
-			            this.$toast("加入成功！");
-			          });
-			      } else if (res.cancel) {
-			        console.log("用户点击取消");
-			      }
-			    },
-			  });
-			},
-			updateGroup() {
-				uni.$u.route(`pagesSub/groupForm?group_id=${this.detail.group_id}`)
-			},
-			deleteGroup() {
-			  uni.showModal({
-			    title: "提示",
-			    content: "是否确认删除该跑团？",
-			    success: (res) => {
-			      if (res.confirm) {
-			        uni.showLoading({ mask: true });
-			        this.$axios.delete(`/running-group/api/v1/groups?group_id=${this.detail.group_id}`)
-			          .then((res) => {
-			            this.$toast("删除成功！");
-									
-									// 调用用户数据，检查参加或创建跑团标记
-									this.$store.dispatch('getUserInfo')
-									
-									setTimeout(() => {
-										uni.navigateBack()
-									}, 300)
-			          });
-			      } else if (res.cancel) {
-			        console.log("用户点击取消");
-			      }
-			    },
-			  });
-			},
-			leaveGroup() {
-			  uni.showModal({
-			    title: "提示",
-			    content: "是否确认退出该跑团？",
-			    success: (res) => {
-			      if (res.confirm) {
-			        uni.showLoading({ mask: true });
-			        this.$axios.post(`/user-api/user/quitRunningGroup`)
-			          .then((res) => {
-			            this.$toast("操作成功！");
-									
-									// 调用用户数据，检查参加或创建跑团标记
-									this.$store.dispatch('getUserInfo')
-									
-									this.getDetail()
-			          });
-			      } else if (res.cancel) {
-			        console.log("用户点击取消");
-			      }
-			    },
-			  });
-			},
-			callPhone(phoneNumber) {
-				uni.makePhoneCall({
-					phoneNumber
-				})
-			}
+	getDetail()
+	
+	// #ifdef MP-WEIXIN
+	wx.showShareMenu()
+	// #endif
+})
+
+// 页面卸载
+onUnload(() => {
+	uni.removeStorageSync('groupDetail')
+})
+
+// 页面显示
+onShow(() => {
+	// 移除全局自定义事件监听器
+	uni.$off("updateList");
+
+	// 监听全局的自定义事件
+	uni.$once("updateList", (data) => {
+		// 判断从我的跑团创建，返回没有跑团 ID，页面空白的问题
+		if (data.from === 'mine' && data.group_id) {
+			routeParams.value.group_id = data.group_id
+			getDetail()
 		}
-	};
+	});
+})
+
+// 方法定义
+const viewMoreMembers = () => {
+	uni.$u.route(`pagesSub/groupMemberList?group_id=${routeParams.value.group_id}`)
+}
+
+const getDetail = (page) => {
+	const groupDetail = uni.getStorageSync('groupDetail')
+	if (groupDetail) {
+		detail.value = groupDetail
+	}
+	
+	uni.showLoading({ mask: true });
+		
+	proxy.$axios.get(`/running-group/api/v1/groups/info?group_id=${routeParams.value.group_id}`)
+		.then((res) => {
+			res.establish_time = res.establish_time.slice(0, 10)
+			detail.value = res
+			
+			getMemberList()
+		})
+}
+
+const getMemberList = () => {
+	const data = {
+		"pageIndex": 0,
+		"pageSize": 9,
+		groupId: Number(detail.value.group_id)
+	}
+	proxy.$axios.post(`/running-group/api/v1/groups/members`, data)
+		.then((res) => {
+			memberLeader.value = (res.memberships || []).find(i => i.role === 'creator') || {}
+			memberList.value = (res.memberships || []).filter(i => i.role !== 'creator')
+		})
+}
+
+const joinGroup = () => {
+	if (!store.state.userInfo.id) {
+		return refUserLogin.value.open()
+	}
+	uni.showModal({
+		title: "提示",
+		content: "是否确认加入该跑团？",
+		success: (res) => {
+			if (res.confirm) {
+				const data = {
+					running_group: Number(detail.value.group_id)
+				};
+
+				uni.showLoading({ mask: true });
+				proxy.$axios
+					.post(`/user-api/user/joinRunningGroup`, data)
+					.then((res) => {
+						uni.hideLoading();
+						getDetail();
+						proxy.$toast("加入成功！");
+					});
+			} else if (res.cancel) {
+				console.log("用户点击取消");
+			}
+		},
+	});
+}
+
+const updateGroup = () => {
+	uni.$u.route(`pagesSub/groupForm?group_id=${detail.value.group_id}`)
+}
+
+const deleteGroup = () => {
+	uni.showModal({
+		title: "提示",
+		content: "是否确认删除该跑团？",
+		success: (res) => {
+			if (res.confirm) {
+				uni.showLoading({ mask: true });
+				proxy.$axios.delete(`/running-group/api/v1/groups?group_id=${detail.value.group_id}`)
+					.then((res) => {
+						proxy.$toast("删除成功！");
+						
+						// 调用用户数据，检查参加或创建跑团标记
+						store.dispatch('getUserInfo')
+						
+						setTimeout(() => {
+							uni.navigateBack()
+						}, 300)
+					});
+			} else if (res.cancel) {
+				console.log("用户点击取消");
+			}
+		},
+	});
+}
+
+const leaveGroup = () => {
+	uni.showModal({
+		title: "提示",
+		content: "是否确认退出该跑团？",
+		success: (res) => {
+			if (res.confirm) {
+				uni.showLoading({ mask: true });
+				proxy.$axios.post(`/user-api/user/quitRunningGroup`)
+					.then((res) => {
+						proxy.$toast("操作成功！");
+						
+						// 调用用户数据，检查参加或创建跑团标记
+						store.dispatch('getUserInfo')
+						
+						getDetail()
+					});
+			} else if (res.cancel) {
+				console.log("用户点击取消");
+			}
+		},
+	});
+}
+
+const callPhone = (phoneNumber) => {
+	uni.makePhoneCall({
+		phoneNumber
+	})
+}
 </script>
 
 <style lang="less" scoped>

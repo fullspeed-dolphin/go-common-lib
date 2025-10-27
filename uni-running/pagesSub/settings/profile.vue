@@ -22,100 +22,111 @@
 
   </view>
 </template>
-<script>
+<script setup>
+import { ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
+import { useStore } from 'vuex'
+import { getCurrentInstance } from 'vue'
 import PickerCell from '@/components/common/PickerCell.vue'
 import moment from '@/utils/moment.js'
 import { asyncAlls, baseLink } from '@/utils/util.js'
-export default {
-	components: { PickerCell },
-  data() {
-    return {
-			isSubmitting: false,
-      userInfo: {},
-    }
-  },
-  onShow() {
-		const userInfo = this.$store.getters.userInfo;
-		
-		if (!userInfo.Avatar) {
-			userInfo.Avatar = ""
-		}
-		if (userInfo.Birthday) {
-			userInfo.Birthday = moment(userInfo.Birthday).format('YYYY-MM-DD')
-		}
-		
-    this.userInfo = userInfo;
-		
-		this.initData = JSON.parse(JSON.stringify(userInfo))
-  },
-  methods: {
-		//获取昵称输入内容
-		userNameInput(e) {
-			this.nickname = e.detail.value
-		},
-		async changePic(e) {
-			this.userInfo.Head = await this.imageToBase64(e.avatarUrl)
-		},
-		imageToBase64(filePath) {
-		  return new Promise((resolve, reject) => {
-		    const fileManager = wx.getFileSystemManager();
-		    fileManager.readFile({
-		      filePath: filePath,
-		      encoding: 'base64',
-		      success(res) {
-		        // res.data is the base64 string without prefix
-		        resolve('data:image/png;base64,' + res.data);
-		      },
-		      fail(err) {
-		        reject(err);
-		      }
-		    });
-		  });
-		},
-    async submit() {
-			const {
-				Head,
-				Name,
-			} = this.userInfo;
-      // if (!Head || !Head.length) {
-      //   return this.$toast('请上传头像')
-      // }
-      if (!Name || !Name.length) {
-        return this.$toast('请输入昵称')
-      }
-			
-      uni.showLoading({ mask: true })
-			this.isSubmitting = true;
-			try{
-				
-				console.log("this.initData", this.initData)
-				
-				if (this.initData.Name !== Name) {
-					await this.$axios.post('/Student/Name/Update', { Name })
-				}
-				if (this.initData.Head !== Head && Head?.length) {
-					await this.$axios.post('/Student/Head/Update', { Head })
-				}
-				
-				uni.hideLoading()
-				this.$toast('保存成功');
-				
-				setTimeout(() => {
-					this.isSubmitting = false;
-					uni.navigateBack()
-				}, 300)
-				
-				// uni.setStorageSync('userInfo', {
-				//   ...this.userInfo,
-				//   ...data
-				// })
-			}catch(e){
-				this.isSubmitting = false;
-				uni.hideLoading()
-				//TODO handle the exception
+
+// 获取当前实例以访问全局属性
+const { proxy } = getCurrentInstance()
+
+// 使用store
+const store = useStore()
+
+// 响应式数据
+const isSubmitting = ref(false)
+const userInfo = ref({})
+const initData = ref({})
+
+// 页面显示
+onShow(() => {
+	const userInfoData = store.getters.userInfo;
+	
+	if (!userInfoData.Avatar) {
+		userInfoData.Avatar = ""
+	}
+	if (userInfoData.Birthday) {
+		userInfoData.Birthday = moment(userInfoData.Birthday).format('YYYY-MM-DD')
+	}
+	
+	userInfo.value = userInfoData;
+	
+	initData.value = JSON.parse(JSON.stringify(userInfoData))
+})
+
+// 方法定义
+//获取昵称输入内容
+const userNameInput = (e) => {
+	// this.nickname = e.detail.value
+}
+
+const changePic = async (e) => {
+	userInfo.value.Head = await imageToBase64(e.avatarUrl)
+}
+
+const imageToBase64 = (filePath) => {
+	return new Promise((resolve, reject) => {
+		const fileManager = wx.getFileSystemManager();
+		fileManager.readFile({
+			filePath: filePath,
+			encoding: 'base64',
+			success(res) {
+				// res.data is the base64 string without prefix
+				resolve('data:image/png;base64,' + res.data);
+			},
+			fail(err) {
+				reject(err);
 			}
-    }
-  }
+		});
+	});
+}
+
+const submit = async () => {
+	const {
+		Head,
+		Name,
+	} = userInfo.value;
+	// if (!Head || !Head.length) {
+	//   return proxy.$toast('请上传头像')
+	// }
+	if (!Name || !Name.length) {
+		return proxy.$toast('请输入昵称')
+	}
+		
+	uni.showLoading({ mask: true })
+	isSubmitting.value = true;
+	try{
+		
+		console.log("initData", initData.value)
+		
+		if (initData.value.Name !== Name) {
+			await proxy.$axios.post('/Student/Name/Update', { Name })
+		}
+		if (initData.value.Head !== Head && Head?.length) {
+			await proxy.$axios.post('/Student/Head/Update', { Head })
+		}
+		
+		uni.hideLoading()
+		proxy.$toast('保存成功');
+		
+		setTimeout(() => {
+			isSubmitting.value = false;
+			uni.navigateBack()
+		}, 300)
+		
+		// uni.setStorageSync('userInfo', {
+		//   ...userInfo.value,
+		//   ...data
+		// })
+	}catch(e){
+		isSubmitting.value = false;
+		uni.hideLoading()
+		//TODO handle the exception
+	}
 }
 </script>
 

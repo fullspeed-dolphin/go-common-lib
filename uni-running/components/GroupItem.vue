@@ -17,32 +17,30 @@
 		</view>
 	</view>
 </template>
-<script>
-	export default {
-		props: {
-			item: {
-				type: Object,
-				default: () => {}
-			}
-		},
-		data() {
-			return {
-				
-			};
-		},
-		methods: {
-			viewDetail(item){
-				// 搜索组件中不跳转详情，加入按钮控制交互
-				if (this.from === 'search') return;
-				
-				uni.setStorageSync('sportDetail', item)
-				uni.$u.route(`pagesSub/groupDetail?group_id=${item.group_id}`)
-			},
-			joinGroup(item) {
-				this.$emit('join', item)
-			}
-		},
-	};
+<script setup>
+// Props
+const props = defineProps({
+	item: {
+		type: Object,
+		default: () => {}
+	}
+})
+
+// Emits
+const emit = defineEmits(['join'])
+
+// 方法定义
+const viewDetail = (item) => {
+	// 搜索组件中不跳转详情，加入按钮控制交互
+	if (props.from === 'search') return;
+	
+	uni.setStorageSync('sportDetail', item)
+	uni.$u.route(`pagesSub/groupDetail?group_id=${item.group_id}`)
+}
+
+const joinGroup = (item) => {
+	emit('join', item)
+}
 </script>
 
 <style lang="scss" scoped>

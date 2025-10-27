@@ -1,6 +1,6 @@
 <template>
   <view class="">
-		<u-navbar placeholder title="个人中心" :leftIcon="false"></u-navbar>
+		<u-navbar autoBack placeholder title="个人中心" :leftIcon="false"></u-navbar>
     <view class="page-content">
     	<view class="rel section-user">
     		<view class="user-box" @click="handleUserClick">
@@ -94,70 +94,75 @@
 		
   </view>
 </template>
-<script>
-	import { clearUserInfo } from "@/utils/util.js"
-	import tabbar from "@/components/tabBar.vue"
-	import UserLogin from "@/components/UserLogin.vue"
-	import AccessUser from "@/components/common/AccessUser.vue"
-export default {
-	components: {
-		tabbar, UserLogin, AccessUser
-	},
-  data () {
-    return {};
-  },
-	computed: {
-		userInfo() {
-			return this.$store.state.userInfo
+<script setup>
+import { ref, computed } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
+import { useStore } from 'vuex'
+import { clearUserInfo } from "@/utils/util.js"
+import tabbar from "@/components/tabBar.vue"
+import UserLogin from "@/components/UserLogin.vue"
+import AccessUser from "@/components/common/AccessUser.vue"
+
+// 使用store
+const store = useStore()
+
+// 模板引用
+const refUserLogin = ref(null)
+const refAccessUser = ref(null)
+
+// 计算属性
+const userInfo = computed(() => store.state.userInfo)
+
+// 页面显示
+onShow(() => {
+	store.dispatch('getUserInfo')
+})
+
+// 方法定义
+const showLoading = () => {
+	uni.showLoading({
+		mask: true
+	})
+	
+	setTimeout(() => {
+		uni.hideLoading()
+	}, 300)
+}
+
+const routeTo = (link) => {
+	if (!userInfo.value.id) {
+		return refUserLogin.value.open()
+	}
+	
+	uni.$u.route(link)
+}
+
+const handleUserClick = () => {
+	if (!userInfo.value.id) {
+		return refUserLogin.value.open()
+	}
+	
+	refAccessUser.value.open()
+}
+
+const logout = () => {
+	uni.showModal({
+		title: '提示',
+		content: '确定退出登录吗？',
+		success: (res) => {
+			if (res.confirm) {
+				clearUserInfo();
+				// setTimeout(() => {
+				// 	uni.redirectTo({
+				// 		url: '/pagesSub/login'
+				// 	})
+				// }, 200)
+			} else if (res.cancel) {
+				console.log('用户点击取消');
+			}
 		}
-	},
-	onShow() {
-		this.$store.dispatch('getUserInfo')
-	},
-  methods: {
-		showLoading() {
-			uni.showLoading({
-				mask: true
-			})
-			
-			setTimeout(() => {
-				uni.hideLoading()
-			}, 300)
-		},
-		routeTo(link) {
-			if (!this.userInfo.id) {
-				return this.$refs.refUserLogin.open()
-			}
-			
-			uni.$u.route(link)
-		},
-		handleUserClick() {
-			if (!this.userInfo.id) {
-				return this.$refs.refUserLogin.open()
-			}
-			
-			this.$refs.refAccessUser.open()
-		},
-    logout () {
-      uni.showModal({
-        title: '提示',
-        content: '确定退出登录吗？',
-        success: (res) => {
-          if (res.confirm) {
-						clearUserInfo();
-						// setTimeout(() => {
-						// 	uni.redirectTo({
-						// 		url: '/pagesSub/login'
-						// 	})
-						// }, 200)
-          } else if (res.cancel) {
-            console.log('用户点击取消');
-          }
-        }
-      });
-    },
-  }
-};
+	});
+}
 </script>
 
 <style lang="less" scoped>

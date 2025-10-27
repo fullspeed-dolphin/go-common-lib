@@ -1,6 +1,6 @@
 <template>
 	<view class="page">
-		<u-navbar  placeholder title="跑步轨迹"></u-navbar>
+		<u-navbar autoBack placeholder title="跑步轨迹"></u-navbar>
 		
 		<!-- 地图容器 -->
 		<view class="map-container">

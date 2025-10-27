@@ -1,6 +1,6 @@
 <template>
   <view class="pt30">
-		<u-navbar placeholder title="添加设备"></u-navbar>
+		<u-navbar autoBack placeholder title="添加设备"></u-navbar>
 		<view class="" style="padding-top: 50rpx;">
 			<view v-if="options.value" class="flex-center" style="margin-bottom: 50rpx;">
 				<image v-if="options.value.includes('华为')" class="poster" src="/static/images/华为运动健康@2x.png" mode="aspectFill"></image>

@@ -1,6 +1,6 @@
 <template>
   <view class="" style="padding-top:166rpx;">
-		<u-navbar placeholder title="支付状态" @leftClick="rightClick" :autoBack="false"></u-navbar>
+		<u-navbar autoBack placeholder title="支付状态" @leftClick="rightClick" :autoBack="false"></u-navbar>
 		<section v-if="orderDetail.order_no" class="panel">
 			<view class="status-icon flex-center" :class="{error: !isSuccess}">
 				<u-icon 

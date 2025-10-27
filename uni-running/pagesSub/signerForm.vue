@@ -1,6 +1,6 @@
 <template>
 	<view class="page">
-		<u-navbar placeholder title="完善信息"></u-navbar>
+		<u-navbar autoBack placeholder title="完善信息"></u-navbar>
 		<view style="padding:20rpx 34rpx;">
 			<u--form :model="form" ref="uForm" :rules="rules" labelPosition="top" labelWidth="auto">
 				<view class="flex-between-center cell-line">

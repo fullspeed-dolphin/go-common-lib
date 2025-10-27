@@ -1,6 +1,6 @@
 <template>
 	<view class="page">
-		<u-navbar placeholder title="创建跑团"></u-navbar>
+		<u-navbar autoBack placeholder title="创建跑团"></u-navbar>
 		<view style="padding:20rpx 34rpx;">
 			<u--form :model="form" ref="uForm" :rules="rules"  labelPosition="top" labelWidth="auto">
 				
@@ -55,151 +55,161 @@
 		</view>
 	</view>
 </template>
-<script>
-	import FileUploader from "@/components/common/fileUploader.vue"
-	import PickerMap from "@/components/common/PickerMap.vue"
-	import PickerTime from "@/components/common/PickerTime.vue"
-	import dayjs from "dayjs";
-	export default {
-		components: {
-			FileUploader, PickerMap, PickerTime
-		},
-		data() {
-			return {
-				group_id: "",
-				form: {
-					poster: '',
-					name: '',
-					location: '',
-					description: "",
-					fullName: '',
-					phone: '',
-					// amount: '',
-					establish_time: dayjs().valueOf(),
-				},
-				isAgree: false,
-				rules: {
-					poster: [{
-						required: true,
-						message: '请点击上传跑团 logo',
-						trigger: ['blur', 'change']
-					}],
-					name: [{
-						required: true,
-						message: '必填项',
-						trigger: ['blur', 'change']
-					}],
-					location: [{
-						required: true,
-						message: '必填项',
-						trigger: ['blur', 'change']
-					}],
-					// amount: [{
-					// 	required: true,
-					// 	message: '必填项',
-					// 	trigger: ['blur', 'change']
-					// }],
-					fullName: [{
-						required: true,
-						message: '必填项',
-						trigger: ['blur', 'change']
-					}],
-					description: [{
-						required: true,
-						message: '必填项',
-						trigger: ['blur', 'change']
-					}],
-					phone: [{
-						required: true,
-						message: '请输入有效手机号',
-						pattern: /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/,
-						trigger: ['blur', 'change']
-					}],
-				},
-			};
-		},
-		onLoad(options) {
-			console.log("option", options);
-			this.group_id = options.group_id;
-			
-			this.from = options.from
-			this.getDetail()
-		},
-		methods: {
-			getDetail(page) {
-				this.form.phone = this.$store.state.userInfo.phone
-				if (!this.group_id) return;
-				this.$axios.get(`/running-group/api/v1/groups/info?group_id=${this.group_id}`)
-					.then((res) => {
-						this.form = {
-							poster: res.avatar_url,
-							name: res.name,
-							location: res.establish_location,
-							description: res.introduction,
-							fullName: res.creator_real_name,
-							phone: res.creator_phone,
-							// amount: String(res.total_members),
-							establish_time: dayjs(res.establish_time).valueOf(),
-						}
-						
-						this.isAgree = true
-					})
-			},
-			submitForm() {
-				this.$refs.uForm.validate().then(res => {
-					const token = uni.getStorageSync("token");
-					if (!token) {
-						this.$toast("请先登录~");
-						setTimeout(() => {
-							this.$goUrl("/pagesSub/login");
-						}, 1000)
-						return 
-					}
-					
-					if (!this.isAgree) return this.$toast("请勾选同意协议");
-					
-					const data = {
-						"avatar_url": this.form.poster,
-						"name": this.form.name,
-						"establish_location": this.form.location,
-						"creator_real_name": this.form.fullName,
-						// "total_members": this.form.amount,
-						"introduction": this.form.description,
-						"creator_phone": this.form.phone,
-						"establish_time": this.form.establish_time,
-					}
-					uni.showLoading({
-						mask: true
-					})
-					
-					let url = '/running-group/api/v1/groups'
-					
-					// 更新跑团
-					if (this.group_id) {
-						url = '/running-group/api/v1/groups/update'
-					}
-					this.$axios.post(url, data).then(async res => {
-						console.log(res)
-						
-						this.$toast(this.group_id ? '更新成功' : '创建成功')
-						
-						const res1 = await this.$store.dispatch('getUserInfo')
-						
-						// 跳转回上一级页面，返回上一页并传递参数
-						uni.$emit("updateList", { 
-							isChange: true, 
-							from: this.from,
-							group_id: res1.running_group
-						});
-						
-						setTimeout(() => {
-							uni.navigateBack()
-						}, 500)
-					})
-				})
+<script setup>
+import { ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import { useStore } from 'vuex'
+import { getCurrentInstance } from 'vue'
+import FileUploader from "@/components/common/fileUploader.vue"
+import PickerMap from "@/components/common/PickerMap.vue"
+import PickerTime from "@/components/common/PickerTime.vue"
+import dayjs from "dayjs"
+
+// 获取当前实例以访问全局属性
+const { proxy } = getCurrentInstance()
+
+// 使用store
+const store = useStore()
+
+// 模板引用
+const uForm = ref(null)
+
+// 响应式数据
+const group_id = ref("")
+const from = ref("")
+const form = ref({
+	poster: '',
+	name: '',
+	location: '',
+	description: "",
+	fullName: '',
+	phone: '',
+	// amount: '',
+	establish_time: dayjs().valueOf(),
+})
+const isAgree = ref(false)
+const rules = ref({
+	poster: [{
+		required: true,
+		message: '请点击上传跑团 logo',
+		trigger: ['blur', 'change']
+	}],
+	name: [{
+		required: true,
+		message: '必填项',
+		trigger: ['blur', 'change']
+	}],
+	location: [{
+		required: true,
+		message: '必填项',
+		trigger: ['blur', 'change']
+	}],
+	// amount: [{
+	// 	required: true,
+	// 	message: '必填项',
+	// 	trigger: ['blur', 'change']
+	// }],
+	fullName: [{
+		required: true,
+		message: '必填项',
+		trigger: ['blur', 'change']
+	}],
+	description: [{
+		required: true,
+		message: '必填项',
+		trigger: ['blur', 'change']
+	}],
+	phone: [{
+		required: true,
+		message: '请输入有效手机号',
+		pattern: /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/,
+		trigger: ['blur', 'change']
+	}],
+})
+
+// 页面加载
+onLoad((options) => {
+	console.log("option", options);
+	group_id.value = options.group_id;
+	
+	from.value = options.from
+	getDetail()
+})
+
+// 方法定义
+const getDetail = (page) => {
+	form.value.phone = store.state.userInfo.phone
+	if (!group_id.value) return;
+	proxy.$axios.get(`/running-group/api/v1/groups/info?group_id=${group_id.value}`)
+		.then((res) => {
+			form.value = {
+				poster: res.avatar_url,
+				name: res.name,
+				location: res.establish_location,
+				description: res.introduction,
+				fullName: res.creator_real_name,
+				phone: res.creator_phone,
+				// amount: String(res.total_members),
+				establish_time: dayjs(res.establish_time).valueOf(),
 			}
+			
+			isAgree.value = true
+		})
+}
+
+const submitForm = () => {
+	uForm.value.validate().then(res => {
+		const token = uni.getStorageSync("token");
+		if (!token) {
+			proxy.$toast("请先登录~");
+			setTimeout(() => {
+				proxy.$goUrl("/pagesSub/login");
+			}, 1000)
+			return 
 		}
-	};
+		
+		if (!isAgree.value) return proxy.$toast("请勾选同意协议");
+		
+		const data = {
+			"avatar_url": form.value.poster,
+			"name": form.value.name,
+			"establish_location": form.value.location,
+			"creator_real_name": form.value.fullName,
+			// "total_members": form.value.amount,
+			"introduction": form.value.description,
+			"creator_phone": form.value.phone,
+			"establish_time": form.value.establish_time,
+		}
+		uni.showLoading({
+			mask: true
+		})
+		
+		let url = '/running-group/api/v1/groups'
+		
+		// 更新跑团
+		if (group_id.value) {
+			url = '/running-group/api/v1/groups/update'
+		}
+		proxy.$axios.post(url, data).then(async res => {
+			console.log(res)
+			
+			proxy.$toast(group_id.value ? '更新成功' : '创建成功')
+			
+			const res1 = await store.dispatch('getUserInfo')
+			
+			// 跳转回上一级页面，返回上一页并传递参数
+			uni.$emit("updateList", { 
+				isChange: true, 
+				from: from.value,
+				group_id: res1.running_group
+			});
+			
+			setTimeout(() => {
+				uni.navigateBack()
+			}, 500)
+		})
+	})
+}
 </script>
 
 <style lang="less" scoped>

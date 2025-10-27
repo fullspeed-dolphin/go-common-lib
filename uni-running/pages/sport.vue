@@ -1,6 +1,6 @@
 <template>
 	<view class="pt20">
-		  <u-navbar  placeholder title="运动" :leftIcon="false"></u-navbar>
+		  <u-navbar autoBack  placeholder title="运动" :leftIcon="false"></u-navbar>
 		  
 		  <section class="section-dashboard">
 			  <view class="h1">
@@ -63,40 +63,40 @@
 		  <tabbar type="sport"/>
 	</view>
   </template>
-  <script>
-	  import tabbar from "@/components/tabBar.vue"
-	  import SportItem from "@/components/SportItem.vue"
-  
-  export default {
-	  components: { tabbar, SportItem },
-	data () {
-	  return {
-			  bannerList: [
-				  "https://cdn.uviewui.com/uview/album/1.jpg",
-				  "https://cdn.uviewui.com/uview/album/1.jpg",
-				  "https://cdn.uviewui.com/uview/album/1.jpg",
-			  ],
-		  };
-	},
-	methods: {
-		  getBannerList() {
-			  const data = {
-				  Position: 0
-			  }
-			  this.$axios.post(`/Advertisement/Search/List`, data).then(res => {
-				  this.bannerList = res.List;
-				  uni.hideLoading()
-			  })
-		  },
-		  // 跳转到跑步轨迹页面
-			goToRunMap() {
-				uni.navigateTo({
-					url: '/pagesSub/runMap'
-				})
-			}
-	  }
-  };
-  </script>
+  <script setup>
+import { ref } from 'vue'
+import { getCurrentInstance } from 'vue'
+import tabbar from "@/components/tabBar.vue"
+import SportItem from "@/components/SportItem.vue"
+
+// 获取当前实例以访问全局属性
+const { proxy } = getCurrentInstance()
+
+// 响应式数据
+const bannerList = ref([
+	"https://cdn.uviewui.com/uview/album/1.jpg",
+	"https://cdn.uviewui.com/uview/album/1.jpg",
+	"https://cdn.uviewui.com/uview/album/1.jpg",
+])
+
+// 方法定义
+const getBannerList = () => {
+	const data = {
+		Position: 0
+	}
+	proxy.$axios.post(`/Advertisement/Search/List`, data).then(res => {
+		bannerList.value = res.List;
+		uni.hideLoading()
+	})
+}
+
+// 跳转到跑步轨迹页面
+const goToRunMap = () => {
+	uni.navigateTo({
+		url: '/pagesSub/runMap'
+	})
+}
+</script>
   
   <style lang="less" scoped>
   .section-dashboard{

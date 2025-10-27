@@ -1,6 +1,6 @@
 <template>
   <div class="">
-		<u-navbar placeholder title="我的订单"></u-navbar>
+		<u-navbar autoBack placeholder title="我的订单"></u-navbar>
 		
 		<view class="bgf" style="position: relative;z-index:20;">
 			<u-tabs lineHeight="2" :duration="0"
@@ -48,105 +48,123 @@
   </div>
 </template>
 
-<script>
-import tabbar from "@/components/tabBar.vue";
-import MescrollMixin from "@/uni_modules/mescroll-uni/components/mescroll-uni/mescroll-mixins.js";
-import dayjs from 'dayjs';
+<script setup>
+import { ref, computed, nextTick } from 'vue'
+import { useStore } from 'vuex'
+import { getCurrentInstance } from 'vue'
+import tabbar from "@/components/tabBar.vue"
+import MescrollMixin from "@/uni_modules/mescroll-uni/components/mescroll-uni/mescroll-mixins.js"
+import dayjs from 'dayjs'
 
-export default {
-  mixins: [MescrollMixin],
-  components: {},
-  data() {
-    return {
-			searchTxt: "",
-      tabActive: 0,
-      tabList: [
-				{ label: "待付款", value: 'PND' },
-				{ label: "已付款", value: 'SUCC' },
-				{ label: "已过期", value: 'EXP' },
-			],
-      curTab: { label: "待付款", value: 'PND' },
-      dataList: [],
-    };
-  },
-	computed: {
-		userInfo() {
-			return this.$store.state.userInfo
+// 获取当前实例以访问全局属性
+const { proxy } = getCurrentInstance()
+
+// 使用store
+const store = useStore()
+
+// 模板引用
+const mescrollRef = ref(null)
+
+// 响应式数据
+const searchTxt = ref("")
+const tabActive = ref(0)
+const tabList = ref([
+	{ label: "待付款", value: 'PND' },
+	{ label: "已付款", value: 'SUCC' },
+	{ label: "已过期", value: 'EXP' },
+])
+const curTab = ref({ label: "待付款", value: 'PND' })
+const dataList = ref([])
+
+// 计算属性
+const userInfo = computed(() => store.state.userInfo)
+
+// mescroll相关
+let mescroll = null
+
+const mescrollInit = (mescrollInstance) => {
+	mescroll = mescrollInstance
+}
+
+// 方法定义
+const viewDetail = (item) => {
+	uni.setStorageSync('orderDetail', item)
+	uni.$u.route(`/pagesSub/orderDetail`)
+}
+
+const changeTab = (detail) => {
+	curTab.value = detail;
+	console.log(detail);
+	refreshList();
+}
+
+const refreshList = () => {
+	nextTick(() => {
+		mescroll.resetUpScroll(); // 重置列表数据为第一页
+		mescroll.scrollTo(0, 0); // 重置列表数据为第一页时,建议把滚动条也重置到顶部,避免无法再次翻页的问题
+	});
+}
+
+const getList = (page) => {
+	uni.showLoading({ mask: true });
+	
+	const data = {
+		"pageIndex": page.num - 1,
+		"pageSize": 10,
+		"orderStatus": curTab.value.value
+	}
+	proxy.$axios.post(`/pay/order/statusByUser`, data).then(res => {
+		uni.hideLoading();
+
+		//联网成功的回调,隐藏下拉刷新和上拉加载的状态;
+		mescroll.endBySize(res.orders.length, res.total);
+
+		//如果是第一页需手动制空列表
+		if (page.num == 1) {
+			dataList.value = [];
 		}
-	},
-  methods: {
-		viewDetail(item) {
-			uni.setStorageSync('orderDetail', item)
-			uni.$u.route(`/pagesSub/orderDetail`)
+		
+		dataList.value = dataList.value.concat(res.orders); //追加新数据
+	})
+	.catch((error) => {
+		uni.hideLoading();
+		mescroll.endSuccess();
+	});
+}
+
+const payOrder = (item) => {
+	const respay = item.payment_params
+	// 触发微信支付
+	wx.requestPayment({
+		'timeStamp': respay.timeStamp,
+		'nonceStr': respay.nonceStr,
+		'package': respay.package,
+		'signType': respay.signType,
+		'paySign': respay.paySign,
+		'success': (res) => {
+			uni.hideLoading();
+			proxy.$toast('支付成功')
+			setTimeout(() => {
+				// uni.navigateBack()
+				uni.$u.route('pagesSub/signUpStatus?order_no=' + item.order_no);
+			}, 300)
 		},
-    changeTab(detail) {
-      this.curTab = detail;
-      console.log(detail);
+		'fail': (res) => {
+			uni.hideLoading();
+			console.log("res======>", res)
+			proxy.$toast('支付未完成')
+			setTimeout(() => {
+				// uni.navigateBack()
+				uni.$u.route('pagesSub/signUpStatus?order_no=' + item.order_no);
+			}, 300)
+		}
+	})
+}
 
-      this.refreshList();
-    },
-    refreshList() {
-      this.$nextTick(() => {
-        this.mescroll.resetUpScroll(); // 重置列表数据为第一页
-        this.mescroll.scrollTo(0, 0); // 重置列表数据为第一页时,建议把滚动条也重置到顶部,避免无法再次翻页的问题
-      });
-    },
-    getList(page) {
-      uni.showLoading({ mask: true });
-      
-      const data = {
-      	"pageIndex": page.num - 1,
-      	"pageSize": 10,
-      	"orderStatus": this.curTab.value
-      }
-      this.$axios.post(`/pay/order/statusByUser`, data).then(res => {
-          uni.hideLoading();
-
-          //联网成功的回调,隐藏下拉刷新和上拉加载的状态;
-          this.mescroll.endBySize(res.orders.length, res.total);
-
-          //如果是第一页需手动制空列表
-          if (page.num == 1) {
-            this.dataList = [];
-          }
-					
-          this.dataList = this.dataList.concat(res.orders); //追加新数据
-        })
-        .catch((error) => {
-          uni.hideLoading();
-          this.mescroll.endSuccess();
-        });
-    },
-    payOrder(item) {
-			const respay = item.payment_params
-      // 触发微信支付
-      wx.requestPayment({
-      	'timeStamp': respay.timeStamp,
-      	'nonceStr': respay.nonceStr,
-      	'package': respay.package,
-      	'signType': respay.signType,
-      	'paySign': respay.paySign,
-      	'success': (res) => {
-      		uni.hideLoading();
-      		this.$toast('支付成功')
-      		setTimeout(() => {
-      			// uni.navigateBack()
-      			uni.$u.route('pagesSub/signUpStatus?order_no=' + item.order_no);
-      		}, 300)
-      	},
-      	'fail': (res) => {
-      		uni.hideLoading();
-      		console.log("res======>", res)
-      		this.$toast('支付未完成')
-      		setTimeout(() => {
-      			// uni.navigateBack()
-      			uni.$u.route('pagesSub/signUpStatus?order_no=' + item.order_no);
-      		}, 300)
-      	}
-      })
-    },
-  },
-};
+const downCallback = (mescroll) => {
+	// 下拉刷新的回调
+	mescroll.resetUpScroll()
+}
 </script>
 
 <style lang="scss" scoped>

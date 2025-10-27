@@ -18,39 +18,36 @@
     </view>
   </view>
 </template>
-<script>
-export default {
-  data() {
-    return {
-      
-    }
-  },
-  methods: {
-    logout() {
-      uni.showModal({
-        title: '提示',
-        content: `确定退出登录吗？`,
-        cancelText: '取消',
-        confirmText: '确定',
-				confirmColor: "#ff523d",
-        success: res => {
-          if (res.confirm) {
-            this.$toast('已退出登录')
+<script setup>
+import { getCurrentInstance } from 'vue'
 
-            uni.removeStorageSync('token')
-            uni.removeStorageSync('userInfo')
-            this.isLogin = false
+// 获取当前实例以访问全局属性
+const { proxy } = getCurrentInstance()
 
-            setTimeout(() => {
-              uni.redirectTo({
-                url: '/pagesSub/login'
-              })
-            }, 200)
-          }
-        }
-      })
-    }
-  }
+// 方法定义
+const logout = () => {
+	uni.showModal({
+		title: '提示',
+		content: `确定退出登录吗？`,
+		cancelText: '取消',
+		confirmText: '确定',
+		confirmColor: "#ff523d",
+		success: res => {
+			if (res.confirm) {
+				proxy.$toast('已退出登录')
+
+				uni.removeStorageSync('token')
+				uni.removeStorageSync('userInfo')
+				// this.isLogin = false
+
+				setTimeout(() => {
+					uni.redirectTo({
+						url: '/pagesSub/login'
+					})
+				}, 200)
+			}
+		}
+	})
 }
 </script>
 

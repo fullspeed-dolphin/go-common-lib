@@ -1,6 +1,6 @@
 <template>
   <view class="">
-		<u-navbar placeholder title="运动详情"></u-navbar>
+		<u-navbar autoBack placeholder title="运动详情"></u-navbar>
 		<view class="flex-col-center" :style="'height:' +  pageHeight + 'px'">
 			<section class="section-map flex-1 flex-col" style="width: 100%;min-height: 600rpx;">
 				<map 

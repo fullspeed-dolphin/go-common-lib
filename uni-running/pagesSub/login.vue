@@ -1,6 +1,6 @@
 <template>
   <view class="page">
-		<u-navbar placeholder title="用户登录"></u-navbar>
+		<u-navbar autoBack placeholder title="用户登录"></u-navbar>
 		<view class="section-box flex-col-center">
 		  <image class="logo" src="../static/run.png" mode="aspectFill"></image>
 		  <view class="title flex-center">欢迎使用跑了没</view>
@@ -10,34 +10,33 @@
 		</view>
   </view>
 </template>
-<script>
-	import PhoneLogin from "@/components/common/PhoneLogin.vue";
-export default {
-	components: { PhoneLogin },
-  data () {
-    return {
-		};
-  },
-	onLoad(options) {
-		this.options = this.options;
-	},
-  methods: {
-		successLogin() {
-		  if (this.options?.direct) {
-		    uni.navigateBack()
-		
-		    return false;
-		  }
-		
-		  uni.switchTab({
-		    url: "/pages/index",
-		    success() {
-		      uni.hideLoading();
-		    },
-		  });
+<script setup>
+import { ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import PhoneLogin from "@/components/common/PhoneLogin.vue"
+
+// 响应式数据
+const options = ref({})
+
+// 页面加载
+onLoad((pageOptions) => {
+	options.value = pageOptions
+})
+
+// 方法定义
+const successLogin = () => {
+	if (options.value?.direct) {
+		uni.navigateBack()
+		return false;
+	}
+
+	uni.switchTab({
+		url: "/pages/index",
+		success() {
+			uni.hideLoading();
 		},
-  }
-};
+	});
+}
 </script>
 
 <style lang="less" scoped>

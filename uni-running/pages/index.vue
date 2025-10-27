@@ -1,6 +1,6 @@
 <template>
   <view class="index-page">
-		<u-navbar  placeholder title="跑了没" :leftIcon="false"></u-navbar>
+		<u-navbar autoBack  placeholder title="跑了没" :leftIcon="false"></u-navbar>
 		
 		<view class="" style="position:relative;z-index: 10;">
 			<view class="section-search" @click="$u.route('pagesSub/groupList')">
@@ -88,79 +88,87 @@
 		<tabbar type="index"/>
   </view>
 </template>
-<script>
-	import tabbar from "@/components/tabBar.vue"
-	import GroupItem from "@/components/GroupItem.vue"
-export default {
-	components: { tabbar, GroupItem },
-  data () {
-    return {
-			searchTxt: "",
-			eventList: [],
-			bannerEventList: [],
-			bannerList: [],
-			GroupList: []
-		};
-  },
-	onLoad(options) {
-		// #ifdef MP-WEIXIN
-		wx.showShareMenu()
-		// #endif
-	},
-	onShow() {
-		this.getGroupList()
-		this.getEvents()
-		this.getBannerList()
-	},
-  methods: {
-		clickSwiper(item) {
-			if (item.event_id) {
-				uni.$u.route(`pagesSub/offlineEvents?id=${item.event_id}`)
-				
-				return;
-			}
-			if (item.redirect_url) {
-				uni.$u.route(`pagesSub/settings/webView?link=${item.redirect_url}`)
-				
-				return;
-			}
-				// uni.$u.route(`pagesSub/settings/webView?link=https://mp.weixin.qq.com/s/oNW0UYJCb78zrmzyoY0_Mg?token=1740573090&lang=zh_CN`)
-		},
-		confirmSearch() {
-			const searchTxt = this.searchTxt.trim()
-		},
-		routeTo(link) {
-			console.log(link)
-			uni.$u.route(link);
-		},
-		getEvents() {			
-			this.$axios.get(`/event-api/getOfflineEventSwiper`).then(res => {
-				this.bannerEventList = res;
-				uni.hideLoading()
-			})
-		},
-		getBannerList() {
-			if(!this.bannerList.length) {
-				uni.showLoading({mask: true})
-			}
+<script setup>
+import { ref, onMounted } from 'vue'
+import { onLoad, onShow } from '@dcloudio/uni-app'
+import { getCurrentInstance } from 'vue'
+import tabbar from "@/components/tabBar.vue"
+import GroupItem from "@/components/GroupItem.vue"
 
-			this.$axios.get(`/event-api/getTopSwiper`).then(res => {
-				this.bannerList = res;
-				uni.hideLoading()
-			})
-		},
-		getGroupList() {
-			const data = {
-				"pageIndex": 0,
-				"pageSize": 5,
-				"keyword": ""
-			}
-			this.$axios.get(`/running-group/api/v1/groups/list`, data).then(res => {
-				this.GroupList = res.data;
-			})
-		},
+// 获取当前实例以访问全局属性
+const { proxy } = getCurrentInstance()
+
+// 响应式数据
+const searchTxt = ref("")
+const eventList = ref([])
+const bannerEventList = ref([])
+const bannerList = ref([])
+const GroupList = ref([])
+
+// 页面加载
+onLoad((options) => {
+	// #ifdef MP-WEIXIN
+	wx.showShareMenu()
+	// #endif
+})
+
+// 页面显示
+onShow(() => {
+	getGroupList()
+	getEvents()
+	getBannerList()
+})
+
+// 方法定义
+const clickSwiper = (item) => {
+	if (item.event_id) {
+		uni.$u.route(`pagesSub/offlineEvents?id=${item.event_id}`)
+		return;
 	}
-};
+	if (item.redirect_url) {
+		uni.$u.route(`pagesSub/settings/webView?link=${item.redirect_url}`)
+		return;
+	}
+	// uni.$u.route(`pagesSub/settings/webView?link=https://mp.weixin.qq.com/s/oNW0UYJCb78zrmzyoY0_Mg?token=1740573090&lang=zh_CN`)
+}
+
+const confirmSearch = () => {
+	const searchTxtValue = searchTxt.value.trim()
+}
+
+const routeTo = (link) => {
+	console.log(link)
+	uni.$u.route(link);
+}
+
+const getEvents = () => {			
+	proxy.$axios.get(`/event-api/getOfflineEventSwiper`).then(res => {
+		bannerEventList.value = res;
+		uni.hideLoading()
+	})
+}
+
+const getBannerList = () => {
+	if(!bannerList.value.length) {
+		uni.showLoading({mask: true})
+	}
+
+	proxy.$axios.get(`/event-api/getTopSwiper`).then(res => {
+		bannerList.value = res;
+		uni.hideLoading()
+	})
+}
+
+const getGroupList = () => {
+	const data = {
+		"pageIndex": 0,
+		"pageSize": 5,
+		"keyword": ""
+	}
+	proxy.$axios.get(`/running-group/api/v1/groups/list`, data).then(res => {
+		GroupList.value = res.data;
+	})
+}
 </script>
 
 <style lang="less" scoped>

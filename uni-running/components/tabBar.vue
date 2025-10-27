@@ -13,51 +13,50 @@
 		</u-tabbar>
 	</view>
 </template>
-<script>
-	import { isRelease } from "@/utils/config.js"
-	let tabs = [{
-				"text": "首页",
-				name: 'index',
-				"pagePath": "/pages/index",
-				icon: "icon-shouye",
-				normal: '../static/tab_00.png',
-				active: '../static/tab_01.png',
-			},
-			{
-				"text": "运动",
-				name: 'sport',
-				"pagePath": "/pages/sport",
-				icon: "icon-huabi-",
-				normal: '../static/tab_00.png',
-				active: '../static/tab_01.png',
-			},
-			{
-				"text": "我的",
-				name: 'mine',
-				icon: "icon-wenzi",
-				"pagePath": "/pages/mine",
-				normal: '../static/tab_20.png',
-				active: '../static/tab_21.png',
-			},
-		]
-	export default {
-		props: ['type'],
-		data() {
-			return {
-				active: this.type,
-				tabList: tabs
-			};
-		},
-		methods: {
-			onChange(detail) {
-				if (detail === this.type) return
+<script setup>
+import { ref } from 'vue'
+import { isRelease } from "@/utils/config.js"
 
-				uni.switchTab({
-					url: "/pages/" + detail
-				})
-			}
-		},
-	};
+// Props
+const props = defineProps(['type'])
+
+// 响应式数据
+const active = ref(props.type)
+const tabList = ref([
+	{
+		"text": "首页",
+		name: 'index',
+		"pagePath": "/pages/index",
+		icon: "icon-shouye",
+		normal: '../static/tab_00.png',
+		active: '../static/tab_01.png',
+	},
+	{
+		"text": "运动",
+		name: 'sport',
+		"pagePath": "/pages/sport",
+		icon: "icon-huabi-",
+		normal: '../static/tab_00.png',
+		active: '../static/tab_01.png',
+	},
+	{
+		"text": "我的",
+		name: 'mine',
+		icon: "icon-wenzi",
+		"pagePath": "/pages/mine",
+		normal: '../static/tab_20.png',
+		active: '../static/tab_21.png',
+	},
+])
+
+// 方法定义
+const onChange = (detail) => {
+	if (detail === props.type) return
+
+	uni.switchTab({
+		url: "/pages/" + detail
+	})
+}
 </script>
 
 <style lang="scss" scoped>
