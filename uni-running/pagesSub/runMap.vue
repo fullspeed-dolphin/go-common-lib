@@ -138,6 +138,32 @@ const targetDistance = ref(10000) // 10km = 10000米
 // 调试模式
 const debug = ref(false) // 设置为true显示测试功能
 
+// 标记配置常量
+const MARKER_CONFIG = {
+	width: 40,
+	height: 40,
+	anchor: { x: 0.5, y: 0.5 }
+}
+
+// 创建标记的通用方法
+const createMarker = (id, latitude, longitude, type) => {
+	const isStart = type === 'start'
+	const config = {
+		id,
+		latitude,
+		longitude,
+		width: MARKER_CONFIG.width,
+		height: MARKER_CONFIG.height,
+		anchor: MARKER_CONFIG.anchor,
+		iconPath: isStart ? '/static/images/go@2x.png' : '/static/images/end@2x.png'
+	}
+	
+	// 设置title用于调试
+	config.title = isStart ? 'GO' : 'END'
+	
+	return config
+}
+
 // 计算属性
 const progressPercent = computed(() => {
 	return Math.min((totalDistance.value / targetDistance.value) * 100, 100)
@@ -396,16 +422,7 @@ const startRunning = async () => {
 			trackPoints.value.push(startLocation)
 			
 			// 设置起始点marker
-			markers.value = [{
-				id: 1,
-				latitude: startLocation.latitude,
-				longitude: startLocation.longitude,
-				title: '起始点',
-				// iconPath: '/static/start.png',
-				width: 25,
-				height: 25,
-				anchor: { x: 0.5, y: 0.5 }
-			}]
+			markers.value = [createMarker(1, startLocation.latitude, startLocation.longitude, 'start')]
 		} else {
 			console.warn('起始位置坐标无效')
 			uni.showToast({
@@ -459,29 +476,11 @@ const stopRunning = () => {
 			const newMarkers = []
 			
 			// 起始点
-			newMarkers.push({
-				id: 1,
-				latitude: validPoints[0].latitude,
-				longitude: validPoints[0].longitude,
-				title: '起始点',
-				// iconPath: '/static/start.png',
-				width: 25,
-				height: 25,
-				anchor: { x: 0.5, y: 0.5 }
-			})
+			newMarkers.push(createMarker(1, validPoints[0].latitude, validPoints[0].longitude, 'start'))
 			
 			// 终点
 			if (validPoints.length > 1) {
-				newMarkers.push({
-					id: 2,
-					latitude: validPoints[validPoints.length - 1].latitude,
-					longitude: validPoints[validPoints.length - 1].longitude,
-					title: '终点',
-					// iconPath: '/static/end.png',
-					width: 25,
-					height: 25,
-					anchor: { x: 0.5, y: 0.5 }
-				})
+				newMarkers.push(createMarker(2, validPoints[validPoints.length - 1].latitude, validPoints[validPoints.length - 1].longitude, 'end'))
 			}
 			
 			markers.value = newMarkers
@@ -566,16 +565,7 @@ const updateMapTrack = () => {
 		
 		// 添加起始点标记
 		if (validPoints.length > 0) {
-			newMarkers.push({
-				id: 1,
-				latitude: validPoints[0].latitude,
-				longitude: validPoints[0].longitude,
-				title: '起始点',
-				// iconPath: '/static/start.png',
-				width: 25,
-				height: 25,
-				anchor: { x: 0.5, y: 0.5 }
-			})
+			newMarkers.push(createMarker(1, validPoints[0].latitude, validPoints[0].longitude, 'start'))
 		}
 		
 		// 添加当前位置标记

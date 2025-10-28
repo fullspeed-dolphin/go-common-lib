@@ -1,6 +1,6 @@
 <template>
 	<view class="navbar-box">
-        <view class="navbar-bg" :style="{ height: `${bgHeight}Px` }"></view>
+        <view class="navbar-bg" :style="{ height: `${bgHeight}rpx` }"></view>
         <u-navbar className="navbar" autoBack :title="title" :leftIcon="false" :bgColor="bgColor" placeholder></u-navbar>
     </view>
 </template>
@@ -51,6 +51,7 @@ onUnmounted(() => {
         left: 0;
         width: 100%;
         background: linear-gradient( 180deg, #FF8C00 0%, #FAFAFA 100%);
+        z-index: -1;
     }
 }
 </style>
