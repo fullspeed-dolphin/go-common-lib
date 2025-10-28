@@ -57,6 +57,8 @@
           indicator-active-color="#FF8C00"
           :autoplay="true"
           :interval="3000"
+          :previous-margin="10"
+          :next-margin="10"
         >
           <swiper-item v-for="(item, index) in bannerList" :key="index">
             <image
@@ -68,47 +70,62 @@
           </swiper-item>
         </swiper>
       </view>
+      <view class="menu">
+        <view class="menu-item" v-for="(item, index) in menus" :key="index">
+          <image
+            class="menu-item-icon"
+            :src="item.icon"
+            mode="aspectFill"
+          ></image>
+          <view class="menu-item-title">{{ item.title }}</view>
+        </view>
+      </view>
 
-      <view class="section-title">线下活动</view>
+      <view class="section-title">
+        <view class="section-title-left">线下活动</view>
+        <view class="section-title-right">
+          <view class="section-title-right-item">查看更多</view>
+          <u-icon name="arrow-right" size="24rpx" color="#ff8c00"></u-icon>
+        </view>
+      </view>
       <swiper
         class="event-swiper"
         circular
         indicator-active-color="#FF8C00"
         :autoplay="true"
         :interval="3000"
+        :display-multiple-items="1.2"
       >
-        <swiper-item v-for="(item, index) in bannerEventList" :key="index">
-          <section
-            class="section-offline"
-            :key="index"
-            @click="$u.route(`pagesSub/offlineEvents?id=${item.event_id}`)"
-          >
-            <!-- <image class="poster" :src="item.background_image_url" mode="aspectFill"></image> -->
-            <view class="section-banner">
-              <image
-                class="img"
-                :src="item.image_url"
-                mode="aspectFill"
-              ></image>
-            </view>
-            <view class="flex-start">
-              <view class="flex-1 ofh text">
-                <view class="name ellipsis">{{ item.description }}</view>
-                <view class="time">{{ item.event_time }}</view>
-              </view>
+        <swiper-item
+          class="event-swiper-item"
+          v-for="(item, index) in bannerEventList"
+          :key="index"
+        >
+          <EventItem :item="item" :key="index" />
+        </swiper-item>
+      </swiper>
 
-              <u-button
-                type="primary"
-                textColor="#fff"
-                size="small"
-                shape="circle"
-              >
-                <block v-if="item.status === 'PND'">未开始</block>
-                <block v-if="item.status === 'ACT'">报名</block>
-                <block v-if="item.status === 'EXP'">查看详情</block>
-              </u-button>
-            </view>
-          </section>
+      <view class="section-title">
+        <view class="section-title-left">线上赛事</view>
+        <view class="section-title-right">
+          <view class="section-title-right-item">查看更多</view>
+          <u-icon name="arrow-right" size="24rpx" color="#ff8c00"></u-icon>
+        </view>
+      </view>
+      <swiper
+        class="event-swiper"
+        circular
+        indicator-active-color="#FF8C00"
+        :autoplay="true"
+        :interval="3000"
+        :display-multiple-items="1.2"
+      >
+        <swiper-item
+          class="event-swiper-item"
+          v-for="(item, index) in bannerEventList"
+          :key="index"
+        >
+          <EventItem :item="item" :key="index" />
         </swiper-item>
       </swiper>
 
@@ -124,18 +141,11 @@
 				</view>
 			</section> -->
 
-      <view
-        class="section-title flex-between-center"
-        @click="$u.route('pagesSub/groupList')"
-      >
-        跑团招募
-        <view class="flex-start">
-          <view class="txt">更多</view>
-          <u-icon
-            name="arrow-right"
-            size="34rpx"
-            color="rgba(0,0,0,.9)"
-          ></u-icon>
+      <view class="section-title">
+        <view class="section-title-left">跑团风采</view>
+        <view class="section-title-right">
+          <view class="section-title-right-item">查看更多</view>
+          <u-icon name="arrow-right" size="24rpx" color="#ff8c00"></u-icon>
         </view>
       </view>
       <section class="section-group">
@@ -180,7 +190,7 @@ import { getCurrentInstance } from "vue";
 import { useStore } from "vuex";
 import tabbar from "@/components/tabBar.vue";
 import GroupItem from "@/components/GroupItem.vue";
-import Navbar from "@/components/navbar.vue";
+import EventItem from "@/components/EventItem.vue";
 
 // 使用store
 const store = useStore();
@@ -236,7 +246,7 @@ const routeTo = (link) => {
 
 const getEvents = () => {
   proxy.$axios.get(`/event-api/getOfflineEventSwiper`).then((res) => {
-    bannerEventList.value = res;
+    bannerEventList.value = [...res, ...res, ...res];
     uni.hideLoading();
   });
 };
@@ -262,6 +272,29 @@ const getGroupList = () => {
     GroupList.value = res.data;
   });
 };
+
+const menus = ref([
+  {
+    icon: "/static/images/华为运动健康@2x.png",
+    title: "线上赛事",
+    url: "pagesSub/groupList",
+  },
+  {
+    icon: "/static/images/华为运动健康@2x.png",
+    title: "跑团风采",
+    url: "pagesSub/groupList",
+  },
+  {
+    icon: "/static/images/华为运动健康@2x.png",
+    title: "最美跑者",
+    url: "pagesSub/groupList",
+  },
+  {
+    icon: "/static/images/华为运动健康@2x.png",
+    title: "全速天使",
+    url: "pagesSub/groupList",
+  },
+]);
 </script>
 
 <style lang="less" scoped>
@@ -332,19 +365,24 @@ const getGroupList = () => {
   }
   .content {
     margin-top: 320rpx;
+    background: #fafafa;
   }
 
   .event-swiper {
-    height: 360rpx;
+    padding: 0 34rpx;
+    height: 488rpx;
+    background: #fafafa;
+    .event-swiper-item {
+      padding-right: 20rpx;
+    }
   }
   .radius999 {
     border-radius: 999em !important;
   }
   .section-offline {
-    padding: 0 34rpx;
     .poster {
       display: block;
-      width: 682rpx;
+      width: 100%;
       height: 270rpx;
       background: #f5f5f5;
       border-radius: 16rpx 16rpx 16rpx 16rpx;
@@ -360,16 +398,16 @@ const getGroupList = () => {
         font-size: 20rpx;
       }
     }
-    ::v-deep {
-      .u-button--disabled {
-        // color: #707070!important;
-      }
-    }
+    // ::v-deep {
+    //   .u-button--disabled {
+    //     color: #707070!important;
+    //   }
+    // }
   }
 
   .section-banner {
     min-height: 270rpx;
-    width: 682rpx;
+    width: 100%;
     margin: 0 auto;
     border-radius: 16rpx !important;
     overflow: hidden;
@@ -379,33 +417,67 @@ const getGroupList = () => {
     }
     .img {
       display: block;
-      width: 100%;
+      width: calc(100% - 20rpx);
       height: 270rpx;
       border-radius: 16rpx !important;
       overflow: hidden;
+      margin: 0 10rpx;
     }
   }
   .section-title {
-    margin: 50rpx 0 30rpx;
+    margin: 40rpx 0;
+    padding: 0 34rpx;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     position: relative;
-    font-weight: bold;
-    font-size: 34rpx;
+    font-weight: 800;
+    font-size: 40rpx;
     color: #000000;
-    padding-left: 78rpx;
     line-height: 48rpx;
-    padding-right: 34rpx;
-    &:before {
-      position: absolute;
-      content: "";
-      left: 0;
-      width: 58rpx;
-      height: 48rpx;
-      background: linear-gradient(90deg, #ffffff 0%, #ff8c00 100%);
-    }
     .txt {
       font-size: 28rpx;
       font-weight: 400;
     }
+    .section-title-right {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10rpx;
+      .section-title-right-item {
+        font-size: 28rpx;
+        color: #ff8c00;
+      }
+    }
   }
+}
+.menu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 34rpx;
+  margin-top: 40rpx;
+  .menu-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16rpx;
+    .menu-item-icon {
+      width: 100rpx;
+      height: 100rpx;
+      border-radius: 50%;
+    }
+    .menu-item-title {
+      font-weight: 800;
+      font-size: 28rpx;
+      color: #000000;
+    }
+  }
+}
+.section-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
 }
 </style>
