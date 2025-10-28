@@ -96,12 +96,10 @@
         :interval="3000"
         :display-multiple-items="1.2"
       >
-        <swiper-item
-          class="event-swiper-item"
-          v-for="(item, index) in bannerEventList"
-          :key="index"
-        >
-          <EventItem :item="item" :key="index" />
+        <swiper-item v-for="(item, index) in bannerEventList" :key="index">
+          <view class="event-swiper-item">
+            <EventItem :item="item" :key="index" />
+          </view>
         </swiper-item>
       </swiper>
 
@@ -120,12 +118,10 @@
         :interval="3000"
         :display-multiple-items="1.2"
       >
-        <swiper-item
-          class="event-swiper-item"
-          v-for="(item, index) in bannerEventList"
-          :key="index"
-        >
-          <EventItem :item="item" :key="index" />
+        <swiper-item v-for="(item, index) in bannerEventList" :key="index">
+          <view class="event-swiper-item-content">
+            <EventItem :item="item" :key="index" />
+          </view>
         </swiper-item>
       </swiper>
 
