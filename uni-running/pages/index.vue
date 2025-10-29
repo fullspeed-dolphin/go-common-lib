@@ -21,7 +21,7 @@
             <view class="money"
               ><image
                 class="img"
-                src="/static/images/coin@2x.png"
+                src="/static/images/icon-coin@2x.png"
                 mode="aspectFill"
               ></image>
               0</view
@@ -321,20 +321,21 @@ const menus = ref([
         .user-info {
           display: flex;
           flex-direction: column;
-          align-items: center;
           justify-content: space-between;
           gap: 10rpx;
           .nickname {
-            font-size: 34rpx;
+            font-size: 24rpx;
             font-weight: bold;
           }
           .money {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            font-weight: 800;
+            font-size: 32rpx;
             .img {
-              width: 34rpx;
-              height: 34rpx;
+              width: 44rpx;
+              height: 38rpx;
             }
           }
         }
@@ -346,6 +347,10 @@ const menus = ref([
         gap: 20rpx;
         ::v-deep {
           .u-search {
+            width: 342rpx;
+            height: 72rpx;
+          }
+          .u-search__content {
             width: 342rpx;
             height: 72rpx;
           }

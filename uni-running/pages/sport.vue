@@ -19,11 +19,12 @@
             <view class="money"
               ><image
                 class="img"
-                src="/static/images/coin@2x.png"
+                style="width: 88rpx; height: 78rpx"
+                src="/static/images/icon-coin@2x.png"
                 mode="aspectFill"
               ></image>
-              0</view
-            >
+              <view class="money-text"> 0 </view>
+            </view>
           </view>
           <view class="col">
             <view class="section">
@@ -45,9 +46,9 @@
             <view class="section">
               <view class="section-content">
                 <view class="section-content-left">
-                  <view class="section-content-title">运动记录</view>
+                  <view class="section-content-title">跑量排行榜</view>
                   <view class="section-content-description"
-                    >查看你的运动记录</view
+                    >戳这里看谁是第一~</view
                   >
                 </view>
                 <image
@@ -71,8 +72,8 @@
             <view class="section-content-title"
               ><image
                 class="section-content-title-icon"
-                style="width: 53rpx; height: 68rpx"
-                src="/static/images/icon-record@2x.png"
+                style="width: 68rpx; height: 68rpx"
+                src="/static/images/icon-run@2x.png"
                 mode="aspectFill"
               ></image
               >累计量程：7589.92公里</view
@@ -182,6 +183,14 @@ const goToRunMap = () => {
     font-size: 30rpx;
     color: #000000;
   }
+  .section-content-title-icon {
+    width: 68rpx;
+    height: 68rpx;
+    background: #ff8c00;
+    border-radius: 16rpx;
+    padding: 10rpx;
+    box-sizing: border-box;
+  }
   .section-content-description {
     font-weight: 500;
     font-size: 24rpx;
@@ -197,6 +206,7 @@ const goToRunMap = () => {
   width: 332rpx;
   display: flex;
   flex-direction: column;
+  align-items: baseline;
   gap: 20rpx;
   .bg {
     position: absolute;
@@ -211,9 +221,13 @@ const goToRunMap = () => {
     border-radius: 50%;
   }
   .money {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 10rpx;
+    margin-left: 28rpx;
+    font-weight: bold;
+    font-size: 44rpx;
     .img {
       width: 88rpx;
       height: 78rpx;
