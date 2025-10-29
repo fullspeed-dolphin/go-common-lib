@@ -92,7 +92,12 @@
         :class="{ isSignUp: isSignUp }"
         style="padding: 26rpx 20rpx 0"
       >
-        <u-button type="primary" shape="circle" @click="routeTo()">
+        <u-button
+          type="primary"
+          color="#FF8C00"
+          customStyle="border-radius: 16rpx;height: 80rpx;"
+          @click="routeTo()"
+        >
           <block v-if="detail.status === 'ACT'">{{
             isSignUp ? "取消报名" : "活动报名"
           }}</block>
