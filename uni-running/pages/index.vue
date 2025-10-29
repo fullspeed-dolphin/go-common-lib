@@ -119,7 +119,7 @@
         :display-multiple-items="1.2"
       >
         <swiper-item v-for="(item, index) in bannerEventList" :key="index">
-          <view class="event-swiper-item-content">
+          <view class="event-swiper-item">
             <EventItem :item="item" :key="index" />
           </view>
         </swiper-item>

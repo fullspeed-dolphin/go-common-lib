@@ -1,76 +1,104 @@
 <template>
-	<view class="page">
-		<u-navbar autoBack placeholder title="完善信息"></u-navbar>
-		<view style="padding:20rpx 34rpx;">
-			<u--form :model="form" ref="uForm" :rules="rules" labelPosition="top" labelWidth="auto">
-				<view class="flex-between-center cell-line">
-					<view class="flex">
-						<u-form-item label="姓名" prop="full_name" required>
-							<u-input v-model="form.full_name" placeholder="请填写参赛者姓名" />
-						</u-form-item>
-					</view>
-					<view class="" style="margin-left:28rpx;">
-						<u-form-item label="性别" prop="gender" required>
-							<view class="u-input flex-start pr20" style="width:200rpx;justify-content: flex-end;" @click="openActionSheet('gender')">
-								<view v-if="form.gender" class="mr10">
-									{{calcuValue('gender')}}
-								</view>
-								<view v-if="!form.gender" class="input-placeholder">
-									请选择性别
-								</view>
-								<view class="">
-									<u-icon name="arrow-down-fill" color="#FF8C00"></u-icon>
-								</view>
-							</view>
-						</u-form-item>
-					</view>
-				</view>
-				<view class="flex-between-center cell-line">
-					<view class="flex">
-						<u-form-item label="手机号码" prop="phone_number" required>
-							<u-input v-model="form.phone_number" placeholder="请填写手机号码" />
-						</u-form-item>
-					</view>
-					<view class="" style="width:200rpx;margin-left:28rpx;">
-						<u-form-item label="血型" prop="blood_type">
-							<view class="u-input flex-start pr20" style="width:200rpx;justify-content: flex-end;" @click="openActionSheet('blood_type')">
-								<view v-if="form.blood_type" class="mr10">
-									{{calcuValue('blood_type')}}
-								</view>
-								<view v-if="!form.blood_type" class="input-placeholder">
-									请选择血型
-								</view>
-								<view class="">
-								<u-icon name="arrow-down-fill" color="#FF8C00"></u-icon>
-								</view>
-							</view>
-						</u-form-item>
-					</view>
-				</view>
-				<view class="flex-between-center cell-line">
-					<view class="flex">
-						<u-form-item label="身份证号码" prop="id_card" required>
-							<u-input v-model="form.id_card" :disabled="disabled" placeholder="请填写您的身份证号码" />
-						</u-form-item>
-					</view>
-					<view class="" style="width:200rpx;margin-left:28rpx;">
-						<u-form-item label="T恤尺码" prop="tshirt_size" required>
-							<view class="u-input flex-start pr20" style="width:200rpx;justify-content: flex-end;" @click="openActionSheet('tshirt_size')">
-								<view v-if="form.tshirt_size" class="mr10">
-									{{calcuValue('tshirt_size')}}
-								</view>
-								<view v-if="!form.tshirt_size" class="input-placeholder">
-									请选择尺码
-								</view>
-								<view class="">
-								<u-icon name="arrow-down-fill" color="#FF8C00"></u-icon>
-								</view>
-							</view>
-						</u-form-item>
-					</view>
-				</view>
-				
-				<!-- <u-form-item label="邮箱" prop="email">
+  <view class="page">
+    <Navbar title="完善信息" :bgHeight="280" />
+    <view style="padding: 20rpx 34rpx">
+      <u--form
+        :model="form"
+        ref="uForm"
+        :rules="rules"
+        labelPosition="top"
+        labelWidth="auto"
+      >
+        <view class="flex-between-center cell-line">
+          <view class="flex">
+            <u-form-item label="姓名" prop="full_name" required>
+              <u-input
+                v-model="form.full_name"
+                placeholder="请填写参赛者姓名"
+              />
+            </u-form-item>
+          </view>
+          <view class="" style="margin-left: 28rpx">
+            <u-form-item label="性别" prop="gender" required>
+              <view
+                class="u-input flex-start pr20"
+                style="width: 200rpx; justify-content: flex-end"
+                @click="openActionSheet('gender')"
+              >
+                <view v-if="form.gender" class="mr10">
+                  {{ calcuValue("gender") }}
+                </view>
+                <view v-if="!form.gender" class="input-placeholder">
+                  请选择性别
+                </view>
+                <view class="">
+                  <u-icon name="arrow-down-fill" color="#FF8C00"></u-icon>
+                </view>
+              </view>
+            </u-form-item>
+          </view>
+        </view>
+        <view class="flex-between-center cell-line">
+          <view class="flex">
+            <u-form-item label="手机号码" prop="phone_number" required>
+              <u-input
+                v-model="form.phone_number"
+                placeholder="请填写手机号码"
+              />
+            </u-form-item>
+          </view>
+          <view class="" style="width: 200rpx; margin-left: 28rpx">
+            <u-form-item label="血型" prop="blood_type">
+              <view
+                class="u-input flex-start pr20"
+                style="width: 200rpx; justify-content: flex-end"
+                @click="openActionSheet('blood_type')"
+              >
+                <view v-if="form.blood_type" class="mr10">
+                  {{ calcuValue("blood_type") }}
+                </view>
+                <view v-if="!form.blood_type" class="input-placeholder">
+                  请选择血型
+                </view>
+                <view class="">
+                  <u-icon name="arrow-down-fill" color="#FF8C00"></u-icon>
+                </view>
+              </view>
+            </u-form-item>
+          </view>
+        </view>
+        <view class="flex-between-center cell-line">
+          <view class="flex">
+            <u-form-item label="身份证号码" prop="id_card" required>
+              <u-input
+                v-model="form.id_card"
+                :disabled="disabled"
+                placeholder="请填写您的身份证号码"
+              />
+            </u-form-item>
+          </view>
+          <view class="" style="width: 200rpx; margin-left: 28rpx">
+            <u-form-item label="T恤尺码" prop="tshirt_size" required>
+              <view
+                class="u-input flex-start pr20"
+                style="width: 200rpx; justify-content: flex-end"
+                @click="openActionSheet('tshirt_size')"
+              >
+                <view v-if="form.tshirt_size" class="mr10">
+                  {{ calcuValue("tshirt_size") }}
+                </view>
+                <view v-if="!form.tshirt_size" class="input-placeholder">
+                  请选择尺码
+                </view>
+                <view class="">
+                  <u-icon name="arrow-down-fill" color="#FF8C00"></u-icon>
+                </view>
+              </view>
+            </u-form-item>
+          </view>
+        </view>
+
+        <!-- <u-form-item label="邮箱" prop="email">
 					<u-input v-model="form.email" placeholder="请填写您的电子邮箱" />
 				</u-form-item>
 				<view class="flex-between-center cell-line">
@@ -99,276 +127,312 @@
 				<u-form-item label="擅长的运动项目" prop="strengths">
 					<u-input v-model="form.strengths" placeholder="请填写您擅长的运动项目(如:徒步等)" />
 				</u-form-item> -->
-			</u--form>
-			
-			<u-action-sheet :actions="options_sheet" @close="closeActionSheet" round="16" 
-				cancelText="取消"
-				@select="selectActionSheet"
-				:closeOnClickOverlay="true" title="请选择" :show="isShowSheet"/>
-		</view>
-		
-		<view class="fixed-bottom" style="padding: 56rpx 54rpx 80rpx">
-			<u-button type="primary" shape="circle" @click="submit()">保存参赛者信息</u-button>
-		</view>
-	</view>
+      </u--form>
+
+      <u-action-sheet
+        :actions="options_sheet"
+        @close="closeActionSheet"
+        round="16"
+        cancelText="取消"
+        @select="selectActionSheet"
+        :closeOnClickOverlay="true"
+        title="请选择"
+        :show="isShowSheet"
+      />
+    </view>
+
+    <view class="fixed-bottom" style="padding: 56rpx 54rpx 80rpx">
+      <u-button type="primary" shape="circle" @click="submit()"
+        >保存参赛者信息</u-button
+      >
+    </view>
+  </view>
 </template>
 <script setup>
-import { ref, computed } from 'vue'
-import { onLoad } from '@dcloudio/uni-app'
-import { useStore } from 'vuex'
-import { getCurrentInstance } from 'vue'
+import { ref, computed } from "vue";
+import { onLoad } from "@dcloudio/uni-app";
+import { useStore } from "vuex";
+import { getCurrentInstance } from "vue";
+import Navbar from "@/components/navbar.vue";
 
 // 获取当前实例以访问全局属性
-const { proxy } = getCurrentInstance()
+const { proxy } = getCurrentInstance();
 
 // 使用store
-const store = useStore()
+const store = useStore();
 
 // 模板引用
-const uForm = ref(null)
+const uForm = ref(null);
 
 // 响应式数据
-const disabled = ref(false)
+const disabled = ref(false);
 const form = ref({
-	full_name: '',
-	gender: '',
-	phone_number: '',
-	tshirt_size: '',
-	id_card: '',
-	email: '',
-	blood_type: '',
-	job: '',
-	sportPurpose: '',
-	strengths: '',
-})
+  full_name: "",
+  gender: "",
+  phone_number: "",
+  tshirt_size: "",
+  id_card: "",
+  email: "",
+  blood_type: "",
+  job: "",
+  sportPurpose: "",
+  strengths: "",
+});
 const rules = ref({
-	full_name: [{
-		required: true,
-		message: '必填项',
-		trigger: ['blur', 'change']
-	}],
-	gender: [{
-		required: true,
-		message: '必填项',
-		trigger: ['blur', 'change']
-	}],
-	tshirt_size: [{
-		required: true,
-		message: '必填项',
-		trigger: ['blur', 'change']
-	}],
-	// blood_type: [{
-	// 	required: true,
-	// 	message: '必填项',
-	// 	trigger: ['blur', 'change']
-	// }],
-	phone_number: [{
-		required: true,
-		message: '请输入有效手机号',
-		pattern: /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/,
-		trigger: ['blur', 'change']
-	}],
-	id_card: [{
-		required: true,
-		pattern: /^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/,
-		message: '请输入有效身份证号码',
-		trigger: ['blur', 'change']
-	}],
-})
-const isShowSheet = ref(false)
-const options_sheet = ref([])
+  full_name: [
+    {
+      required: true,
+      message: "必填项",
+      trigger: ["blur", "change"],
+    },
+  ],
+  gender: [
+    {
+      required: true,
+      message: "必填项",
+      trigger: ["blur", "change"],
+    },
+  ],
+  tshirt_size: [
+    {
+      required: true,
+      message: "必填项",
+      trigger: ["blur", "change"],
+    },
+  ],
+  // blood_type: [{
+  // 	required: true,
+  // 	message: '必填项',
+  // 	trigger: ['blur', 'change']
+  // }],
+  phone_number: [
+    {
+      required: true,
+      message: "请输入有效手机号",
+      pattern:
+        /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/,
+      trigger: ["blur", "change"],
+    },
+  ],
+  id_card: [
+    {
+      required: true,
+      pattern:
+        /^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/,
+      message: "请输入有效身份证号码",
+      trigger: ["blur", "change"],
+    },
+  ],
+});
+const isShowSheet = ref(false);
+const options_sheet = ref([]);
 const options_gender = ref([
-	{name: "男", value: '1'},
-	{name: "女", value: '0'},
-	{name: "未知", value: '2'},
-])
+  { name: "男", value: "1" },
+  { name: "女", value: "0" },
+  { name: "未知", value: "2" },
+]);
 const options_blood_type = ref([
-	{name: "A型", value: 'A'},
-	{name: "B型", value: 'B'},
-	{name: "AB型", value: 'AB'},
-	{name: "O型", value: 'O'},
-])
+  { name: "A型", value: "A" },
+  { name: "B型", value: "B" },
+  { name: "AB型", value: "AB" },
+  { name: "O型", value: "O" },
+]);
 const options_tshirt_size = ref([
-	{name: "120", value: '120'},
-	{name: "130", value: '130'},
-	{name: "140", value: '140'},
-	{name: "XS", value: 'XS'},
-	{name: "S", value: 'S'},
-	{name: "M", value: 'M'},
-	{name: "L", value: 'L'},
-	{name: "XL", value: 'XL'},
-	{name: "2XL", value: '2XL'},
-	{name: "3XL", value: '3XL'},
-	{name: "4XL", value: '4XL'},
-])
-const signerId = ref('')
-const sheetType = ref('')
+  { name: "120", value: "120" },
+  { name: "130", value: "130" },
+  { name: "140", value: "140" },
+  { name: "XS", value: "XS" },
+  { name: "S", value: "S" },
+  { name: "M", value: "M" },
+  { name: "L", value: "L" },
+  { name: "XL", value: "XL" },
+  { name: "2XL", value: "2XL" },
+  { name: "3XL", value: "3XL" },
+  { name: "4XL", value: "4XL" },
+]);
+const signerId = ref("");
+const sheetType = ref("");
 
 // 计算属性
-const userInfo = computed(() => store.state.userInfo)
+const userInfo = computed(() => store.state.userInfo);
 
 // 页面加载
 onLoad(() => {
-	getInfo()
-	
-	console.log('form=====>', form.value)
-})
+  getInfo();
+
+  console.log("form=====>", form.value);
+});
 
 // 方法定义
 const calcuValue = (type) => {
-	const value = form.value[type];
-	
-	const option = options_gender.value.find(i => i.value === value) || 
-				  options_blood_type.value.find(i => i.value === value) ||
-				  options_tshirt_size.value.find(i => i.value === value)
-	
-	return option?.name || ''
-}
+  const value = form.value[type];
+
+  const option =
+    options_gender.value.find((i) => i.value === value) ||
+    options_blood_type.value.find((i) => i.value === value) ||
+    options_tshirt_size.value.find((i) => i.value === value);
+
+  return option?.name || "";
+};
 
 const getInfo = () => {
-	uni.showLoading({
-		mask: true
-	})
-	const data = {
-		phone_number: userInfo.value.phone
-	}
-	proxy.$axios.post('/booking-api/registration/getSignerInfo', data).then(res => {
-		console.log(res)
-		signerId.value = res.id
-		
-		if (res.id_card) {
-			disabled.value = true;
-		}
-		const cache = uni.getStorageSync('SignerInfo') || {}
-		
-		console.log(cache)
-		form.value =	{
-			full_name: res.full_name || '',
-			gender: res.gender || '1',
-			phone_number: res.phone_number || '',
-			tshirt_size: res.tshirt_size || '',
-			id_card: res.id_card || '',
-			email: res.email || '',
-			blood_type: res.blood_type || '',
-			job: res.occupation || '',
-			sportPurpose: res.running_goal || '',
-			strengths: res.good_at_sports || '',
-			...cache,
-			gender: cache.gender ? String(cache.gender) : '1',
-		}
-	})
-}
+  uni.showLoading({
+    mask: true,
+  });
+  const data = {
+    phone_number: userInfo.value.phone,
+  };
+  proxy.$axios
+    .post("/booking-api/registration/getSignerInfo", data)
+    .then((res) => {
+      console.log(res);
+      signerId.value = res.id;
+
+      if (res.id_card) {
+        disabled.value = true;
+      }
+      const cache = uni.getStorageSync("SignerInfo") || {};
+
+      console.log(cache);
+      form.value = {
+        full_name: res.full_name || "",
+        gender: res.gender || "1",
+        phone_number: res.phone_number || "",
+        tshirt_size: res.tshirt_size || "",
+        id_card: res.id_card || "",
+        email: res.email || "",
+        blood_type: res.blood_type || "",
+        job: res.occupation || "",
+        sportPurpose: res.running_goal || "",
+        strengths: res.good_at_sports || "",
+        ...cache,
+        gender: cache.gender ? String(cache.gender) : "1",
+      };
+    });
+};
 
 const openActionSheet = (type) => {
-	sheetType.value = type;
-	options_sheet.value = options_gender.value.concat(options_blood_type.value).concat(options_tshirt_size.value).filter(option => {
-		if (type === 'gender') return options_gender.value.includes(option)
-		if (type === 'blood_type') return options_blood_type.value.includes(option)
-		if (type === 'tshirt_size') return options_tshirt_size.value.includes(option)
-		return false
-	})
-	isShowSheet.value = true;
-}
+  sheetType.value = type;
+  options_sheet.value = options_gender.value
+    .concat(options_blood_type.value)
+    .concat(options_tshirt_size.value)
+    .filter((option) => {
+      if (type === "gender") return options_gender.value.includes(option);
+      if (type === "blood_type")
+        return options_blood_type.value.includes(option);
+      if (type === "tshirt_size")
+        return options_tshirt_size.value.includes(option);
+      return false;
+    });
+  isShowSheet.value = true;
+};
 
 const selectActionSheet = (e) => {
-	console.log(e)
-	form.value[sheetType.value] = e.value
-	isShowSheet.value = false;
-}
+  console.log(e);
+  form.value[sheetType.value] = e.value;
+  isShowSheet.value = false;
+};
 
 const closeActionSheet = () => {
-	isShowSheet.value = false;
-}
+  isShowSheet.value = false;
+};
 
 const submit = () => {
-	uForm.value.validate().then(() => {
-		const res = form.value
-		const data = {
-			full_name: res.full_name || '',
-			gender: Number(res.gender),
-			phone_number: res.phone_number || '',
-			tshirt_size: res.tshirt_size || '',
-			id_card: res.id_card || '',
-			email: res.email || '',
-			blood_type: res.blood_type || '',
-			occupation: res.job || '',
-			running_goal: res.sportPurpose || '',
-			good_at_sports: res.strengths || '',
-		}
-		
-		if (signerId.value) {
-			data.id = signerId.value
-		}
-		
-		uni.showLoading({
-			mask: true
-		})
-		
-		uni.setStorageSync('SignerInfo', data)
-		
-		proxy.$toast('保存成功')
-		
-		setTimeout(() => {
-			uni.navigateBack()
-		}, 300)
-		
-		return;
-		
-		proxy.$axios.post(`/booking-api/registration/${signerId.value ? 'updateSignerInfo' : 'saveSignerInfo'}`, data).then(res => {
-			console.log(res)
-			// uni.hideLoading()
-			
-			proxy.$toast('保存成功')
+  uForm.value.validate().then(() => {
+    const res = form.value;
+    const data = {
+      full_name: res.full_name || "",
+      gender: Number(res.gender),
+      phone_number: res.phone_number || "",
+      tshirt_size: res.tshirt_size || "",
+      id_card: res.id_card || "",
+      email: res.email || "",
+      blood_type: res.blood_type || "",
+      occupation: res.job || "",
+      running_goal: res.sportPurpose || "",
+      good_at_sports: res.strengths || "",
+    };
 
-			setTimeout(() => {
-				uni.navigateBack()
-			}, 300)
-		})
-	})
-}
+    if (signerId.value) {
+      data.id = signerId.value;
+    }
+
+    uni.showLoading({
+      mask: true,
+    });
+
+    uni.setStorageSync("SignerInfo", data);
+
+    proxy.$toast("保存成功");
+
+    setTimeout(() => {
+      uni.navigateBack();
+    }, 300);
+
+    return;
+
+    proxy.$axios
+      .post(
+        `/booking-api/registration/${
+          signerId.value ? "updateSignerInfo" : "saveSignerInfo"
+        }`,
+        data
+      )
+      .then((res) => {
+        console.log(res);
+        // uni.hideLoading()
+
+        proxy.$toast("保存成功");
+
+        setTimeout(() => {
+          uni.navigateBack();
+        }, 300);
+      });
+  });
+};
 </script>
 
 <style lang="less" scoped>
-	.submit-btn {
-		width: 682rpx;
-		height: 72rpx;
-		margin: 48rpx auto;
-		border-radius: 16rpx;
-		font-weight: bold;
-		font-size: 30rpx;
-		color: #FF8C00;
-		background: rgba(255,255,255, .2);
-	}
+.submit-btn {
+  width: 682rpx;
+  height: 72rpx;
+  margin: 48rpx auto;
+  border-radius: 16rpx;
+  font-weight: bold;
+  font-size: 30rpx;
+  color: #ff8c00;
+  background: rgba(255, 255, 255, 0.2);
+}
 
-	::v-deep {
-		.u-form-item__body__left__content__label {
-			flex:none;
-		}
-		.u-form-item__body__left__content__required{
-			position: static;
-		}
-		.u-input{
-			border:0;
-			height: 120rpx;
-			background: rgba(255,255,255);
-			border-radius: 16rpx;
-			background: #FFFFFF;
-			box-shadow: 0rpx 4rpx 10rpx 2rpx rgba(0,0,0,0.16);
-		}
-		.cell-line .u-form-item__body__left{
-			flex-shrink: 1!important;
-		}
-		.input-placeholder{
-			font-size: 24rpx;
-			color:rgb(192, 196, 204);
-		}
-	}
-	.flex-between-center{
-		align-items: baseline;
-	}
-	.fixed-bottom{
-		position: fixed;
-		bottom:0;
-		width: 100%;
-	}
+::v-deep {
+  .u-form-item__body__left__content__label {
+    flex: none;
+  }
+  .u-form-item__body__left__content__required {
+    position: static;
+  }
+  .u-input {
+    border: 0;
+    height: 120rpx;
+    background: rgba(255, 255, 255);
+    border-radius: 16rpx;
+    background: #ffffff;
+    box-shadow: 0rpx 4rpx 10rpx 2rpx rgba(0, 0, 0, 0.16);
+  }
+  .cell-line .u-form-item__body__left {
+    flex-shrink: 1 !important;
+  }
+  .input-placeholder {
+    font-size: 24rpx;
+    color: rgb(192, 196, 204);
+  }
+}
+.flex-between-center {
+  align-items: baseline;
+}
+.fixed-bottom {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
 </style>
