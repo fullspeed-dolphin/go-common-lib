@@ -3,9 +3,9 @@
     <view class="navbar-bg" :style="{ height: `${bgHeight}rpx` }"></view>
     <u-navbar
       className="navbar"
-      autoBack
+      :autoBack="back"
       :title="title"
-      :leftIcon="false"
+      :leftIcon="back ? 'arrow-left' : ''"
       :bgColor="bgColor"
       placeholder
     ></u-navbar>
@@ -14,7 +14,6 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
-import { onPageScroll } from "@dcloudio/uni-app";
 
 const props = defineProps({
   title: {
@@ -25,6 +24,10 @@ const props = defineProps({
     type: Number,
     default: 144,
   },
+  back: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const bgColor = ref("transparent");
@@ -32,7 +35,6 @@ const bgColor = ref("transparent");
 // 监听页面滚动
 const handleScroll = (e) => {
   const scrollTop = e.scrollTop || 0;
-  console.log(scrollTop, "scrollTop");
   if (scrollTop >= 5) {
     bgColor.value = "#ffffff";
   } else {
@@ -40,18 +42,12 @@ const handleScroll = (e) => {
   }
 };
 
-// 页面滚动
-onPageScroll((e) => {
-  console.log(e, "onPageScroll");
-  handleScroll(e);
-});
-
 onMounted(() => {
-  console.log("onMounted");
+  uni.$on("pageScroll", handleScroll);
 });
 
 onUnmounted(() => {
-  console.log("onUnmounted");
+  uni.$off("pageScroll", handleScroll);
 });
 </script>
 

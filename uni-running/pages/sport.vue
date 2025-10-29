@@ -1,6 +1,6 @@
 <template>
   <view class="pt20">
-    <Navbar title="运动" :bgHeight="370" />
+    <Navbar title="运动" :bgHeight="370" :back="false" />
 
     <view class="content">
       <view class="col">
