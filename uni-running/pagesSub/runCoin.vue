@@ -211,6 +211,7 @@ const checkIns = ref([
 .balance {
   color: #ffffff;
   gap: 0;
+  padding: 0 16rpx;
   .title {
     font-size: 24rpx;
     font-weight: bold;
