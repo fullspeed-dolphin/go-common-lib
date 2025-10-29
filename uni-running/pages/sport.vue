@@ -238,7 +238,7 @@ const goToRunMap = () => {
 // 悬浮按钮样式
 .floating-button {
   position: fixed;
-  bottom: 134rpx;
+  bottom: 180rpx;
   left: 50%;
   transform: translateX(-50%);
   display: flex;

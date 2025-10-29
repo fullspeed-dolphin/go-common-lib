@@ -206,6 +206,14 @@
             "navigationBarTitleText": "跑步轨迹",
             "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
           }
+        },
+        {
+          "path": "runCoin",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "我的跑币",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
         }
       ]
     }
