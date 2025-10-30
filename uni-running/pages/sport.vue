@@ -1,5 +1,5 @@
 <template>
-  <view class="pt20">
+  <view>
     <Navbar title="运动" :bgHeight="370" :back="false" />
 
     <view class="content">

@@ -1,5 +1,5 @@
 <template>
-  <view class="navbar-box">
+  <view class="navbar-box" :style="{ height: navbarBoxHeight }">
     <view class="navbar-bg" :style="{ height: `${bgHeight}rpx` }"></view>
     <u-navbar
       className="navbar"
@@ -31,6 +31,13 @@ const props = defineProps({
 });
 
 const bgColor = ref("transparent");
+const navbarBoxHeight = ref("0px");
+
+const computeNavbarBoxHeight = () => {
+  const statusBarHeight =
+    (uni.getWindowInfo && uni.getWindowInfo().statusBarHeight) || 0;
+  navbarBoxHeight.value = `${44 + statusBarHeight}px`;
+};
 
 // 监听页面滚动
 const handleScroll = (e) => {
@@ -44,6 +51,8 @@ const handleScroll = (e) => {
 
 onMounted(() => {
   uni.$on("pageScroll", handleScroll);
+  computeNavbarBoxHeight();
+  console.log(props.bgHeight, "bgHeight");
 });
 
 onUnmounted(() => {
@@ -53,14 +62,10 @@ onUnmounted(() => {
 
 <style lang="less" scoped>
 .navbar-box {
-  position: relative;
+  overflow: visible;
   .navbar-bg {
-    position: fixed;
-    top: 0;
-    left: 0;
     width: 100%;
     background: linear-gradient(180deg, #ff8c00 0%, #fafafa 100%);
-    z-index: -1;
   }
 }
 </style>

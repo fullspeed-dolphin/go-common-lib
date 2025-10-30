@@ -38,7 +38,10 @@
             ></up-checkbox>
             设为本人
           </view>
-          <view class="card-item-actions-item">
+          <view
+            class="card-item-actions-item"
+            @click="$u.route('pagesSub/registrationCard/edit')"
+          >
             <u-icon name="edit-pen" size="20" color="#999999"></u-icon>
             修改
           </view>
@@ -52,7 +55,7 @@
           type="primary"
           color="#FF8C00"
           customStyle="border-radius: 16rpx;"
-          @click="$u.route('pagesSub/device/deviceBrands')"
+          @click="$u.route('pagesSub/registrationCard/create')"
           >添加报名卡</u-button
         >
       </view>

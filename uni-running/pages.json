@@ -222,6 +222,22 @@
             "navigationBarTitleText": "报名卡",
             "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
           }
+        },
+        {
+          "path": "registrationCard/create",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "添加报名卡",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        {
+          "path": "registrationCard/edit",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "编辑报名卡",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
         }
       ]
     }
