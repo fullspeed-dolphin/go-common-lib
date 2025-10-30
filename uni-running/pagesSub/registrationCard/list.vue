@@ -2,7 +2,7 @@
   <view class="" style="padding-top: 50rpx">
     <Navbar title="报名卡" :bgHeight="370" />
     <view
-      v-if="!deviceList.length"
+      v-if="!registrationCardList.length"
       class="flex-col-center section-empty"
       style=""
     >
@@ -10,21 +10,38 @@
       <view class="">点击下面的“添加报名卡”按钮进行添加</view>
     </view>
 
-    <view class="flex-row flex-wrap" style="padding-left: 34rpx">
+    <view class="flex-row flex-wrap card">
       <view
-        class="brand-item"
-        @click="$u.route('pagesSub/device/deviceDetail?value=' + item.label)"
-        v-for="(item, index) in deviceList"
+        class="card-item"
+        v-for="(item, index) in registrationCardList"
         :key="index"
       >
-        <view class="flex-start mb30">
-          <image class="img" :src="item.img" mode="aspectFill"></image>
-          <view class="label">{{ item.label }}</view>
+        <view class="name">
+          <view class="name-text">{{ item.name }}</view>
+          <view class="name-owner" v-if="item.isOwner">本人</view>
         </view>
-        <view class="" style="font-size: 22rpx; line-height: 1.6; color: #333">
-          <!-- <view class="">{{item.model}}</view> -->
-          <view class="">{{ item.account }}</view>
-          <view class="">{{ item.bindTime }}</view>
+        <view class="id-card-number">
+          <view class="id-card-number-text"
+            >{{ item.idCardNumber.slice(0, 1) }} ***************
+            {{ item.idCardNumber.slice(-2) }}</view
+          >
+          <view class="id-card-number-separator">|</view>
+          <view class="id-card-number-type"> 成人 </view>
+        </view>
+        <view class="card-item-actions">
+          <view class="card-item-actions-item">
+            <up-checkbox
+              shape="circle"
+              activeColor="#8CC63E"
+              :checked="item.isOwner"
+              size="14"
+            ></up-checkbox>
+            设为本人
+          </view>
+          <view class="card-item-actions-item">
+            <u-icon name="edit-pen" size="20" color="#999999"></u-icon>
+            修改
+          </view>
         </view>
       </view>
     </view>
@@ -48,31 +65,12 @@ import { onLoad } from "@dcloudio/uni-app";
 import Navbar from "@/components/navbar.vue";
 
 // 响应式数据
-const deviceList = ref([
-  // {
-  // 	img: '/static/images/华为运动健康@2x.png',
-  // 	label: '华为运动健康',
-  // 	value: '',
-  // 	model: '设备型号：HUAWEI GT5',
-  // 	account: '绑定账号：15934560765',
-  // 	bindTime: '绑定时间：2025-10-14 ',
-  // },
-  // {
-  // 	img: '/static/images/佳明@2x.png',
-  // 	label: '佳明',
-  // 	value: '',
-  // 	model: '设备型号：HUAWEI GT5',
-  // 	account: '绑定账号：15934560765',
-  // 	bindTime: '绑定时间：2025-10-14 ',
-  // },
-  // {
-  // 	img: '/static/images/高驰@2x.png',
-  // 	label: '高驰',
-  // 	value: '',
-  // 	model: '设备型号：HUAWEI GT5',
-  // 	account: '绑定账号：15934560765',
-  // 	bindTime: '绑定时间：2025-10-14 ',
-  // },
+const registrationCardList = ref([
+  {
+    name: "报名卡1",
+    isOwner: true,
+    idCardNumber: "123456789012345678",
+  },
 ]);
 const options = ref({});
 
@@ -80,22 +78,6 @@ const options = ref({});
 onLoad((optionsParam) => {
   options.value = optionsParam;
 });
-
-// 方法定义
-const successLogin = () => {
-  if (options.value?.direct) {
-    uni.navigateBack();
-
-    return false;
-  }
-
-  uni.switchTab({
-    url: "/pages/index",
-    success() {
-      uni.hideLoading();
-    },
-  });
-};
 </script>
 
 <style lang="less" scoped>
@@ -112,21 +94,69 @@ const successLogin = () => {
   width: 100%;
   z-index: 10;
 }
-.brand-item {
-  width: 325rpx;
-  // height: 274rpx;
-  padding: 30rpx 32rpx;
-  background: #ffffff;
-  box-shadow: 0rpx 4rpx 10rpx 2rpx rgba(0, 0, 0, 0.16);
-  border-radius: 16rpx 16rpx 16rpx 16rpx;
-  margin-right: 34rpx;
-  margin-bottom: 34rpx;
-  .img {
-    width: 80rpx;
-    height: 80rpx;
-    border-radius: 10rpx;
-    margin-right: 20rpx;
-    border: 1px solid #f5f5f5;
+.card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 34rpx;
+  gap: 20rpx;
+  .card-item {
+    width: 100%;
+    // height: 274rpx;
+    padding: 24rpx 20rpx;
+    background: #ffffff;
+    border-radius: 16rpx 16rpx 16rpx 16rpx;
+    .name {
+      display: flex;
+      align-items: center;
+      font-size: 28rpx;
+      .name-text {
+        font-weight: bold;
+        font-size: 30rpx;
+        color: #000000;
+      }
+      .name-owner {
+        display: flex;
+        align-items: center;
+        margin-left: 26rpx;
+        background: #f1ffde;
+        border-radius: 8rpx 8rpx 8rpx 8rpx;
+        font-weight: bold;
+        font-size: 24rpx;
+        color: #8cc63e;
+        padding: 8rpx 16rpx;
+      }
+    }
+    .id-card-number {
+      display: flex;
+      align-items: center;
+      margin-top: 12rpx;
+      font-weight: bold;
+      font-size: 32rpx;
+      color: #000000;
+      .id-card-number-separator {
+        margin: 0 16rpx;
+        font-weight: 100;
+        color: #bfbfbf;
+      }
+    }
+    .card-item-actions {
+      display: flex;
+      justify-content: space-between;
+      border-top: 1rpx solid #e5e5e5;
+      align-items: center;
+      margin-top: 20rpx;
+      padding-top: 20rpx;
+      .card-item-actions-item {
+        display: flex;
+        align-items: center;
+        font-size: 28rpx;
+        color: #999;
+        &.active {
+          opacity: 0.8;
+        }
+      }
+    }
   }
 }
 </style>
