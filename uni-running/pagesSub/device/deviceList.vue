@@ -1,6 +1,6 @@
 <template>
   <view class="" style="padding-top: 50rpx">
-    <Navbar title="智能设备" :bgHeight="280" />
+    <Navbar title="智能设备" :bgHeight="370" />
     <view
       v-if="!deviceList.length"
       class="flex-col-center section-empty"
