@@ -89,11 +89,7 @@
         <u-cell
           title="报名卡"
           class="nav-cell"
-          @click="
-            routeTo(
-              `pagesSub/groupDetail?from=mine&group_id=${userInfo.running_group}`
-            )
-          "
+          @click="routeTo('/pagesSub/registrationCard/list')"
           :border="false"
           isLink
         >

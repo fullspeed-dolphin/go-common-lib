@@ -214,6 +214,14 @@
             "navigationBarTitleText": "我的跑币",
             "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
           }
+        },
+        {
+          "path": "registrationCard/list",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "报名卡",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
         }
       ]
     }
