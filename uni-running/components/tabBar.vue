@@ -24,7 +24,11 @@
           <view class="iconfont" :class="item.icon"></view>
         </template>
         <template #text>
-          <text class="tabbar-text">{{ item.text }}</text>
+          <text
+            class="tabbar-text"
+            :class="{ 'tabbar-text--active': active === item.name }"
+            >{{ item.text }}</text
+          >
         </template>
       </u-tabbar-item>
     </u-tabbar>
@@ -86,6 +90,11 @@ const onChange = (detail) => {
 .tabbar-text {
   font-size: 36rpx;
   font-weight: 500;
+  color: #000;
+}
+
+.tabbar-text--active {
+  color: #ff8c00;
 }
 
 .iconfont {
