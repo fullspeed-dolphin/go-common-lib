@@ -132,6 +132,7 @@ const refundOrder = () => {
 
 const confirmRefund = () => {
   console.log("confirmRefund");
+  uni.$u.route("pagesSub/orderRefund");
 };
 
 const closeRefund = () => {

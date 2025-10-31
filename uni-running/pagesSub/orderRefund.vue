@@ -2,25 +2,30 @@
   <view class="page">
     <u-navbar autoBack placeholder title="第四届十全十美欢乐跑"></u-navbar>
     <view class="header">
-      <view class="title">
-        <view>报名失败！</view>
-        <view class="btn">返回首页</view>
+      <view class="header-icon">
+        <u-icon name="checkbox-mark" size="24" color="#8cc63e"></u-icon>
       </view>
-      <view>抱歉，您的报名未成功！</view>
+      <view class="title">
+        <view>已申请退赛</view>
+      </view>
       <view>
-        我们遇到了一点小麻烦，没能完成扣款。别担心，您的账户是安全的。
-        请核实订单或重新支付！
+        退款将于24小时内原路返回，如超24小时未到账，请联
+        系客服。退赛成功后详情查看请前往订单列表
       </view>
     </view>
-    <view class="button">
-      <u-button
-        type="primary"
-        color="#FF8C00"
-        customStyle="border-radius: 16rpx;"
-        @click="refundOrder(detail)"
-      >
-        申请退赛
-      </u-button>
+    <view class="section info">
+      <view class="section-content">
+        <view class="section-items">
+          <view class="section-item">
+            <text class="label">套餐费用</text>
+            <text class="value">￥100</text>
+          </view>
+          <view class="section-item">
+            <text class="label">退赛总额</text>
+            <text class="value">￥100</text>
+          </view>
+        </view>
+      </view>
     </view>
   </view>
 </template>
@@ -29,9 +34,7 @@
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { getCurrentInstance } from "vue";
-import CommonDialog from "@/components/common/CommonDialog.vue";
 
-const refundDialogRef = ref(null);
 // 获取当前实例以访问全局属性
 const { proxy } = getCurrentInstance();
 
@@ -45,48 +48,6 @@ const detail = ref({
 onLoad(() => {
   detail.value = uni.getStorageSync("orderDetail");
 });
-
-const refundOrder = () => {
-  refundDialogRef.value.open();
-};
-
-const confirmRefund = () => {
-  console.log("confirmRefund");
-};
-
-const closeRefund = () => {
-  console.log("closeRefund");
-};
-
-// 方法定义
-const payOrder = (item) => {
-  const respay = item.payment_params;
-  // 触发微信支付
-  wx.requestPayment({
-    timeStamp: respay.timeStamp,
-    nonceStr: respay.nonceStr,
-    package: respay.package,
-    signType: respay.signType,
-    paySign: respay.paySign,
-    success: (res) => {
-      uni.hideLoading();
-      proxy.$toast("支付成功");
-      setTimeout(() => {
-        // uni.navigateBack()
-        uni.$u.route("pagesSub/signUpStatus?order_no=" + item.order_no);
-      }, 300);
-    },
-    fail: (res) => {
-      uni.hideLoading();
-      console.log("res======>", res);
-      proxy.$toast("支付未完成");
-      setTimeout(() => {
-        // uni.navigateBack()
-        uni.$u.route("pagesSub/signUpStatus?order_no=" + item.order_no);
-      }, 300);
-    },
-  });
-};
 </script>
 
 <style lang="less" scoped>
@@ -95,13 +56,27 @@ const payOrder = (item) => {
   padding-bottom: env(safe-area-inset-bottom);
 }
 .header {
-  background: #ff8c00;
+  background: #8cc63e;
   width: 100%;
-  padding: 42rpx 34rpx 142rpx 34rpx;
+  padding: 42rpx 34rpx 82rpx 34rpx;
   font-weight: bold;
   font-size: 28rpx;
   color: #ffffff;
   line-height: 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  .header-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 104rpx;
+    height: 104rpx;
+    background: #ffffff;
+    border-radius: 100%;
+    margin-bottom: 20rpx;
+  }
   .title {
     display: flex;
     justify-content: space-between;
@@ -109,24 +84,39 @@ const payOrder = (item) => {
     font-weight: 800;
     font-size: 44rpx;
     color: #ffffff;
-    .btn {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 12rpx 28rpx;
-      border-radius: 30rpx 30rpx 30rpx 30rpx;
-      border: 2rpx solid #ffffff;
-      font-weight: bold;
-      font-size: 24rpx;
-      color: #ffffff;
-    }
+    margin-bottom: 22rpx;
   }
 }
-
-.refund-button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 26rpx 0 44rpx 0;
+.section {
+  &.info {
+    margin-top: -40rpx;
+  }
+  padding: 0 34rpx;
+  .section-content {
+    background: #ffffff;
+    border-radius: 16rpx 16rpx 16rpx 16rpx;
+    width: 100%;
+    padding: 26rpx 20rpx;
+    .section-items {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 28rpx;
+      font-weight: bold;
+      font-size: 28rpx;
+      color: #000000;
+      .section-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 24rpx;
+        .label {
+          width: 200rpx;
+          flex-shrink: 0;
+          color: #999999;
+        }
+      }
+    }
+  }
 }
 </style>
