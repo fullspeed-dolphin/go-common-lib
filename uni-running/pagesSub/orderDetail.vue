@@ -88,6 +88,20 @@
         </u-button>
       </view>
     </view>
+    <CommonDialog
+      ref="refundDialogRef"
+      confirmButtonTxt="确认"
+      cancelButtonTxt="取消"
+      @confirm="confirmRefund"
+      @close="closeRefund"
+    >
+      <view class="refund-dialog-content">
+        <view class="refund-dialog-title">确认退赛？</view>
+        <view class="refund-dialog-desc">
+          退赛后将不再保留号码，相关费用(如有)将原路返回
+        </view>
+      </view>
+    </CommonDialog>
   </div>
 </template>
 
@@ -95,7 +109,9 @@
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { getCurrentInstance } from "vue";
+import CommonDialog from "@/components/common/CommonDialog.vue";
 
+const refundDialogRef = ref(null);
 // 获取当前实例以访问全局属性
 const { proxy } = getCurrentInstance();
 
@@ -109,6 +125,18 @@ const detail = ref({
 onLoad(() => {
   detail.value = uni.getStorageSync("orderDetail");
 });
+
+const refundOrder = () => {
+  refundDialogRef.value.open();
+};
+
+const confirmRefund = () => {
+  console.log("confirmRefund");
+};
+
+const closeRefund = () => {
+  console.log("closeRefund");
+};
 
 // 方法定义
 const payOrder = (item) => {
@@ -244,6 +272,22 @@ const payOrder = (item) => {
     justify-content: center;
     align-items: center;
     padding: 26rpx 0 44rpx 0;
+  }
+}
+.refund-dialog-content {
+  padding: 48rpx 48rpx 24rpx 48rpx;
+  text-align: center;
+  .refund-dialog-title {
+    font-weight: bold;
+    font-size: 34rpx;
+    color: #353535;
+    padding-bottom: 24rpx;
+  }
+  .refund-dialog-desc {
+    font-weight: bold;
+    font-size: 28rpx;
+    color: #999999;
+    line-height: 40rpx;
   }
 }
 </style>
