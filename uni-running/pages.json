@@ -238,6 +238,22 @@
             "navigationBarTitleText": "编辑报名卡",
             "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
           }
+        },
+        {
+          "path": "orderFail",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "报名失败",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        {
+          "path": "orderRefund",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "退赛申请",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
         }
       ]
     }

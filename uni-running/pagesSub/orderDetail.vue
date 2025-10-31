@@ -177,7 +177,7 @@ const payOrder = (item) => {
 .header {
   background: #ff8c00;
   width: 100%;
-  padding: 42rpx 34rpx 242rpx 34rpx;
+  padding: 42rpx 34rpx 142rpx 34rpx;
   font-weight: bold;
   font-size: 28rpx;
   color: #ffffff;
@@ -204,7 +204,7 @@ const payOrder = (item) => {
 }
 .section {
   &.info {
-    margin-top: -200rpx;
+    margin-top: -100rpx;
   }
   padding: 0 34rpx;
   .section-content {
