@@ -839,8 +839,4 @@ onLoad(() => {});
   width: 100%;
   z-index: 9;
 }
-
-::v-deep(.u-form-item__body__right__message) {
-  text-align: right !important;
-}
 </style>

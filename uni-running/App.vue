@@ -22,4 +22,9 @@ onPageScroll((e) => {
 // @import './static/iconfont.css';
 @import "./assets/style/common.scss";
 @import "./assets/style/theme.scss";
+
+// 全局样式：表单错误提示右对齐
+.u-form-item__body__right__message {
+  text-align: right;
+}
 </style>
