@@ -7,8 +7,6 @@
       isLoadedPage: isLoadedPage,
     }"
   >
-    <u-navbar autoBack placeholder title="线下活动"></u-navbar>
-
     <div class="event-status flex-center" v-if="detail.status === 'ACT'">
       活动进行中
     </div>
@@ -205,6 +203,11 @@ const getDetail = () => {
     .then((res) => {
       res.text = `<img src="${res.long_image_url}" style="max-width:100%;" />`;
       res.eventItems = res.event_projects.split("、");
+
+      // test
+      res.status = "ACT";
+      console.log("res", res);
+
       detail.value = res;
 
       isLoadedPage.value = true;
