@@ -41,10 +41,10 @@
 		<!-- 添加按钮区域 -->
 		<view class="u-cascader-action up-flex up-flex-between">
 			<view class="u-padding-20 up-flex-fill">
-				<up-button @click="handleCancel" type="default">{{ t("up.common.cancel") }}</up-button>
+				<up-button @click="handleCancel" type="default">{{ cancelText || t("up.common.cancel") }}</up-button>
 			</view>
 			<view class="u-padding-20 up-flex-fill">
-				<up-button @click="handleConfirm" type="primary">{{ t("up.common.confirm") }}</up-button>
+				<up-button @click="handleConfirm" type="primary" :color="confirmColor">{{ confirmText || t("up.common.confirm") }}</up-button>
 			</view>
 		</view>
 	</up-popup>
@@ -124,6 +124,21 @@
 			optionsCols: {
 				type: [Number],
 				default: 2
+			},
+			// 取消按钮文字
+			cancelText: {
+				type: String,
+				default: ''
+			},
+			// 确认按钮文字
+			confirmText: {
+				type: String,
+				default: ''
+			},
+			// 确认按钮颜色
+			confirmColor: {
+				type: String,
+				default: ''
 			}
 		},
 		data() {
