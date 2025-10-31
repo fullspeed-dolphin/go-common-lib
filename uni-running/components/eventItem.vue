@@ -1,9 +1,17 @@
 <template>
-  <view class="event-item">
+  <view class="event-item" :style="{ flexDirection: direction }">
     <image
       class="event-item-image"
       :src="item.image_url"
       mode="aspectFill"
+      :style="
+        direction === 'row'
+          ? {
+              height: '184rpx',
+              width: '286rpx',
+            }
+          : {}
+      "
     ></image>
     <view class="event-item-content">
       <view class="event-item-title">{{ item.description }}</view>
@@ -11,7 +19,7 @@
         <view>{{ item.created_at }}</view>
         <view></view>
       </view>
-      <view class="event-item-meta">
+      <view class="event-item-meta" v-if="showButton">
         <view class="event-item-location">{{
           item.event_location || "线上跑"
         }}</view>
@@ -25,6 +33,14 @@ const props = defineProps({
   item: {
     type: Object,
     default: () => {},
+  },
+  showButton: {
+    type: Boolean,
+    default: true,
+  },
+  direction: {
+    type: String,
+    default: "column",
   },
 });
 
@@ -45,6 +61,8 @@ const joinEvent = () => {
   width: 100%;
   height: 244rpx;
   border-radius: 16rpx 16rpx 16rpx 16rpx;
+  flex-shrink: 0;
+  flex-grow: 0;
 }
 .event-item-content {
   display: flex;

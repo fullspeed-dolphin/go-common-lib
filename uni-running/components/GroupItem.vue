@@ -6,10 +6,10 @@
       mode="aspectFill"
     ></image>
     <view class="group-item-content col">
-      <div class="row">
+      <view class="row">
         <view class="name ellipsis">{{ item.name }}</view>
         <view class="gray">{{ item.total_members }}人</view>
-      </div>
+      </view>
       <view class="row justify-start">
         <u-icon name="map" size="24rpx" color="#FF8C00" class="gray"></u-icon>
         <view class="location ellipsis" style="width: 320rpx">

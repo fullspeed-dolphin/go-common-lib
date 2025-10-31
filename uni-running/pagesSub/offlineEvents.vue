@@ -7,9 +7,9 @@
       isLoadedPage: isLoadedPage,
     }"
   >
-    <div class="event-status flex-center" v-if="detail.status === 'ACT'">
+    <view class="event-status flex-center" v-if="detail.status === 'ACT'">
       活动进行中
-    </div>
+    </view>
 
     <section style="padding: 0; overflow: hidden; height: 750rpx">
       <image

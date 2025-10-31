@@ -1,81 +1,93 @@
 <template>
-  <div class="pickermap">
-    <u-cell :title="title" titleStyle="min-width:100px;" :border="false" isLink :required="required" :value="valueString ? valueString : placeholder" @click="chooseLocation" />
-  </div>
+  <view class="pickermap">
+    <u-cell
+      :title="title"
+      titleStyle="min-width:100px;"
+      :border="false"
+      isLink
+      :required="required"
+      :value="valueString ? valueString : placeholder"
+      @click="chooseLocation"
+    />
+  </view>
 </template>
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch } from "vue";
 
 // Props定义
 const props = defineProps({
-	title: {
-		type: String,
-		default: "",
-	},
-	required: {
-		type: Boolean,
-		default: false,
-	},
-	placeholder: {
-		type: String,
-		default: "请选择",
-	},
-	customClass: {
-		type: String,
-		default: "",
-	},
-	value: {
-		type: String | Number,
-		default: "",
-	},
-})
+  title: {
+    type: String,
+    default: "",
+  },
+  required: {
+    type: Boolean,
+    default: false,
+  },
+  placeholder: {
+    type: String,
+    default: "请选择",
+  },
+  customClass: {
+    type: String,
+    default: "",
+  },
+  value: {
+    type: String | Number,
+    default: "",
+  },
+});
 
 // Emits
-const emit = defineEmits(['input', 'change'])
+const emit = defineEmits(["input", "change"]);
 
 // 响应式数据
-const isShowPop = ref(false)
-const valueString = ref(props.value)
+const isShowPop = ref(false);
+const valueString = ref(props.value);
 
 // 监听value变化
-watch(() => props.value, (val) => {
-	if (String(val)) {
-		valueString.value = val
-	} else {
-	}
-}, {
-	deep: true,
-	immediate: true,
-})
+watch(
+  () => props.value,
+  (val) => {
+    if (String(val)) {
+      valueString.value = val;
+    } else {
+    }
+  },
+  {
+    deep: true,
+    immediate: true,
+  }
+);
 
 // 方法定义
 const open = () => {
-	isShowPop.value = true;
-}
+  isShowPop.value = true;
+};
 
 const chooseLocation = () => {
-	uni.chooseLocation({
-		success: (res) => {
-			console.log(res, "返回地址");
-			// that.ruleForm.address = res.address;
-			// that.ruleForm.latitude = res.latitude;
-			// that.ruleForm.longitude = res.longitude;
-			valueString.value = res.address;
-			emit("input", res.address);
+  uni.chooseLocation({
+    success: (res) => {
+      console.log(res, "返回地址");
+      // that.ruleForm.address = res.address;
+      // that.ruleForm.latitude = res.latitude;
+      // that.ruleForm.longitude = res.longitude;
+      valueString.value = res.address;
+      emit("input", res.address);
 
-			console.log(res, "返回地址");
-			emit("change", `${res.latitude},${res.longitude}`);
-		},
-		fail: function (e) {
-			console.log(e, "报错");
-		},
-	});
-}
+      console.log(res, "返回地址");
+      emit("change", `${res.latitude},${res.longitude}`);
+    },
+    fail: function (e) {
+      console.log(e, "报错");
+    },
+  });
+};
 
 // 暴露方法给父组件
 defineExpose({
-	open
-})
+  open,
+});
 </script>
 
 <style lang="scss" scoped>

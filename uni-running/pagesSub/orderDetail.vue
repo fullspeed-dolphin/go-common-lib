@@ -1,5 +1,5 @@
 <template>
-  <div class="page">
+  <view class="page">
     <u-navbar autoBack placeholder title="第四届十全十美欢乐跑"></u-navbar>
     <view class="header">
       <view class="title">
@@ -102,7 +102,7 @@
         </view>
       </view>
     </CommonDialog>
-  </div>
+  </view>
 </template>
 
 <script setup>

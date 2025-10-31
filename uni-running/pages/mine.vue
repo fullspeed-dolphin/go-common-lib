@@ -51,11 +51,7 @@
         <u-cell
           title="我的赛事"
           class="nav-cell"
-          @click="
-            routeTo(
-              `pagesSub/groupDetail?from=mine&group_id=${userInfo.running_group}`
-            )
-          "
+          @click="routeTo(`pagesSub/orderList`)"
           :border="false"
           isLink
         >
