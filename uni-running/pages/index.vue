@@ -300,14 +300,13 @@ const menus = ref([
     top: 0;
     left: 0;
     width: 100%;
-    height: 288rpx;
     background: linear-gradient(180deg, #ff8c00 0%, #fafafa 100%);
     z-index: 11;
     .header-content {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 20rpx 34rpx;
+      padding: 20rpx 34rpx 18rpx 34rpx;
       .user {
         display: flex;
         align-items: center;
@@ -365,7 +364,7 @@ const menus = ref([
     }
   }
   .content {
-    margin-top: 320rpx;
+    padding-top: 320rpx;
     background: #fafafa;
   }
 

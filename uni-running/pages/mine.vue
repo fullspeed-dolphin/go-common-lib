@@ -1,5 +1,5 @@
 <template>
-  <view class="">
+  <view class="page">
     <Navbar title="个人中心" :bgHeight="370" :back="false" />
     <view class="page-content">
       <view class="rel section-user">
@@ -250,6 +250,9 @@ const logout = () => {
 </script>
 
 <style lang="less" scoped>
+.page {
+  background: #fafafa;
+}
 .img-box {
   position: relative;
   .gender {

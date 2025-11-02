@@ -1,5 +1,5 @@
 <template>
-  <view>
+  <view class="page">
     <Navbar title="运动" :bgHeight="370" :back="false" />
 
     <view class="content">
@@ -114,6 +114,9 @@ const goToRunMap = () => {
 </script>
 
 <style lang="less" scoped>
+.page {
+  background: #fafafa;
+}
 .content {
   padding: 34rpx;
 }
