@@ -48,7 +48,10 @@
         </view>
       </view>
     </view>
-    <view class="content" style="position: relative">
+    <view
+      class="content"
+      :style="{ paddingTop: `${contentPaddingTop}rpx`, position: 'relative' }"
+    >
       <view class="section-banner">
         <swiper
           class="swiper"
@@ -204,11 +207,32 @@ const GroupList = ref([]);
 // 计算属性
 const userInfo = computed(() => store.state.userInfo);
 
+// 计算 header 高度和 content padding
+const headerHeight = ref(196); // navbar placeholder 88 + header-content 90 + 18 = 196
+const contentPaddingTop = computed(() => headerHeight.value + 30);
+
 // 页面加载
 onLoad((options) => {
   // #ifdef MP-WEIXIN
   wx.showShareMenu();
   // #endif
+
+  // 动态计算 header 高度
+  setTimeout(() => {
+    uni
+      .createSelectorQuery()
+      .select(".header")
+      .boundingClientRect((rect) => {
+        console.log(rect, "header rect");
+        if (rect && rect.height) {
+          // px 转 rpx: rpx = px * (750 / windowWidth)
+          const systemInfo = uni.getSystemInfoSync();
+          const pxRatio = 750 / systemInfo.windowWidth;
+          headerHeight.value = rect.height * pxRatio;
+        }
+      })
+      .exec();
+  }, 0);
 });
 
 // 页面显示
@@ -364,7 +388,6 @@ const menus = ref([
     }
   }
   .content {
-    padding-top: 320rpx;
     background: #fafafa;
   }
 
