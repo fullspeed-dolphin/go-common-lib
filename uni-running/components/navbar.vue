@@ -65,7 +65,7 @@ onUnmounted(() => {
   overflow: visible;
   .navbar-bg {
     width: 100%;
-    background: linear-gradient(180deg, #ff8c00 0%, #fafafa 100%);
+    background: linear-gradient(180deg, #ffe8cc 0%, #fafafa 100%);
   }
 }
 </style>

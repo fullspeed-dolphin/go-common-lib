@@ -73,14 +73,16 @@
           </swiper-item>
         </swiper>
       </view>
-      <view class="menu">
-        <view class="menu-item" v-for="(item, index) in menus" :key="index">
-          <image
-            class="menu-item-icon"
-            :src="item.icon"
-            mode="aspectFill"
-          ></image>
-          <view class="menu-item-title">{{ item.title }}</view>
+      <view class="container">
+        <view class="menu">
+          <view class="menu-item" v-for="(item, index) in menus" :key="index">
+            <image
+              class="menu-item-icon"
+              :src="item.icon"
+              mode="aspectFill"
+            ></image>
+            <view class="menu-item-title">{{ item.title }}</view>
+          </view>
         </view>
       </view>
 
@@ -311,6 +313,11 @@ const menus = ref([
   },
   {
     icon: "/static/images/华为运动健康@2x.png",
+    title: "跑团风采",
+    url: "pagesSub/groupList",
+  },
+  {
+    icon: "/static/images/华为运动健康@2x.png",
     title: "全速天使",
     url: "pagesSub/groupList",
   },
@@ -324,7 +331,7 @@ const menus = ref([
     top: 0;
     left: 0;
     width: 100%;
-    background: linear-gradient(180deg, #ff8c00 0%, #fafafa 100%);
+    background: linear-gradient(180deg, #ffe8cc 0%, #fafafa 100%);
     z-index: 11;
     .header-content {
       display: flex;
@@ -478,21 +485,24 @@ const menus = ref([
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 34rpx;
+  padding: 24rpx 22rpx;
   margin-top: 40rpx;
+  background: #ffffff;
+  border-radius: 16rpx 16rpx 16rpx 16rpx;
+  border: 2rpx solid rgba(0, 0, 0, 0.06);
   .menu-item {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 16rpx;
     .menu-item-icon {
-      width: 100rpx;
-      height: 100rpx;
+      width: 84rpx;
+      height: 84rpx;
       border-radius: 50%;
     }
     .menu-item-title {
       font-weight: 800;
-      font-size: 28rpx;
+      font-size: 22rpx;
       color: #000000;
     }
   }
