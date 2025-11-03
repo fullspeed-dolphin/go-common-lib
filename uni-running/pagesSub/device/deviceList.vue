@@ -1,5 +1,5 @@
 <template>
-  <view class="" style="padding-top: 50rpx">
+  <view class="">
     <Navbar title="智能设备" :bgHeight="370" />
     <view
       v-if="!deviceList.length"

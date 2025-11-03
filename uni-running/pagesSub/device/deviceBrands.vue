@@ -1,5 +1,5 @@
 <template>
-  <view class="pt30">
+  <view>
     <Navbar title="添加设备" :bgHeight="370" />
     <view class="">
       <view

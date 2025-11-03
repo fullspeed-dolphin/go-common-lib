@@ -60,8 +60,8 @@
           indicator-active-color="#FF8C00"
           :autoplay="true"
           :interval="3000"
-          :previous-margin="10"
-          :next-margin="10"
+          :previous-margin="12"
+          :next-margin="12"
         >
           <swiper-item v-for="(item, index) in bannerList" :key="index">
             <image
@@ -367,7 +367,7 @@ const menus = ref([
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 20rpx;
+        gap: 28rpx;
         ::v-deep {
           .u-search {
             width: 342rpx;
@@ -380,8 +380,8 @@ const menus = ref([
         }
         .message {
           .img {
-            width: 58rpx;
-            height: 48rpx;
+            width: 48rpx;
+            height: 42rpx;
           }
         }
       }
@@ -440,11 +440,11 @@ const menus = ref([
     }
     .img {
       display: block;
-      width: calc(100% - 20rpx);
+      width: calc(100% - 24rpx);
       height: 270rpx;
       border-radius: 16rpx !important;
       overflow: hidden;
-      margin: 0 10rpx;
+      margin: 0 12rpx;
     }
   }
   .section-title {
