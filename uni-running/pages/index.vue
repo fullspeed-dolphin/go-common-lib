@@ -101,7 +101,7 @@
       >
         <swiper-item v-for="(item, index) in bannerEventList" :key="index">
           <view class="event-swiper-item">
-            <EventItem :item="item" :key="index" />
+            <EventItem :item="item" :key="index" height="514rpx" />
           </view>
         </swiper-item>
       </swiper>
@@ -123,7 +123,7 @@
       >
         <swiper-item v-for="(item, index) in bannerEventList" :key="index">
           <view class="event-swiper-item">
-            <EventItem :item="item" :key="index" />
+            <EventItem :item="item" :key="index" height="514rpx" />
           </view>
         </swiper-item>
       </swiper>
@@ -393,7 +393,7 @@ const menus = ref([
 
   .event-swiper {
     padding: 0 34rpx;
-    height: 488rpx;
+    height: 514rpx;
     background: #fafafa;
     .event-swiper-item {
       padding-right: 20rpx;

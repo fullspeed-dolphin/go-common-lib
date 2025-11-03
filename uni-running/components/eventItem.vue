@@ -1,5 +1,8 @@
 <template>
-  <view class="event-item" :style="{ flexDirection: direction }">
+  <view
+    class="event-item"
+    :style="{ flexDirection: direction, height: height }"
+  >
     <image
       class="event-item-image"
       :src="item.image_url"
@@ -16,10 +19,13 @@
     <view class="event-item-content">
       <view class="event-item-title">{{ item.description }}</view>
       <view class="event-item-meta">
-        <view>{{ item.created_at }}</view>
-        <view></view>
+        <view>{{ dayjs(item.created_at).format("YYYY-MM-DD HH:mm") }}</view>
+        <view v-if="direction === 'column'">333人报名</view>
       </view>
-      <view class="event-item-meta" v-if="showButton">
+      <view
+        class="event-item-meta event-item-button-container"
+        v-if="showButton"
+      >
         <view class="event-item-location">{{
           item.event_location || "线上跑"
         }}</view>
@@ -29,6 +35,7 @@
   </view>
 </template>
 <script setup>
+import dayjs from "dayjs";
 const props = defineProps({
   item: {
     type: Object,
@@ -41,6 +48,10 @@ const props = defineProps({
   direction: {
     type: String,
     default: "column",
+  },
+  height: {
+    type: String,
+    default: "auto",
   },
 });
 
@@ -86,6 +97,9 @@ const joinEvent = () => {
   font-weight: bold;
   font-size: 24rpx;
   color: #707070;
+}
+.event-item-button-container {
+  margin-top: 34rpx;
 }
 .event-item-button {
   display: flex;
