@@ -262,6 +262,14 @@
             "navigationBarTitleText": "报名成功",
             "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
           }
+        },
+        {
+          "path": "sport/list",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "运动记录",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
         }
       ]
     }
