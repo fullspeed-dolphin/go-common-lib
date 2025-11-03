@@ -124,7 +124,7 @@
         indicator-active-color="#FF8C00"
         :autoplay="true"
         :interval="3000"
-        :display-multiple-items="1.2"
+        :next-margin="126"
         v-if="onlineEventList && onlineEventList.length > 0"
       >
         <swiper-item v-for="(item, index) in onlineEventList" :key="index">

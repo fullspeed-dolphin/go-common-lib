@@ -1,7 +1,7 @@
 <template>
   <view
     class="event-item"
-    :style="{ flexDirection: direction, height: height }"
+    :style="{ flexDirection: direction, height: height, width: width }"
   >
     <image
       class="event-item-image"
@@ -41,6 +41,10 @@
 <script setup>
 import dayjs from "dayjs";
 const props = defineProps({
+  width: {
+    type: String,
+    default: "auto",
+  },
   item: {
     type: Object,
     default: () => {},
