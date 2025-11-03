@@ -1,12 +1,12 @@
 <template>
-  <view class="">
-    <u-navbar autoBack placeholder title="跑团招募"></u-navbar>
-    <section class="section-filter bgf">
+  <view class="page">
+    <Navbar title="跑团风采" :bgHeight="370" />
+    <section class="section-filter">
       <view class="section-search">
         <u-search
           v-model="searchTxt"
           @search="refreshList"
-          placeholder="搜索跑团"
+          placeholder="请输入名称或团号或地址"
           shape="round"
           bgColor="#fff"
           borderColor="#FF8C00"
@@ -14,25 +14,44 @@
         ></u-search>
       </view>
 
-      <!-- <u-tabs lineWidth="375rpx" lineHeight="2" :duration="0" 
-			:inactiveStyle="{color: '#000'}"
-			:activeStyle="{color: '#FF8C00'}"
-			:list="tabList" @change="changeTab" :scrollable="false" keyName="label" lineColor="#FF8C00" /> -->
+      <view class="section-tabs">
+        <u-tabs
+          lineHeight="2"
+          :duration="0"
+          :inactiveStyle="{ color: '#000' }"
+          :activeStyle="{ color: '#FF8C00' }"
+          :list="tabList"
+          @change="changeTab"
+          :scrollable="false"
+          keyName="label"
+          lineColor="#FF8C00"
+        />
+      </view>
     </section>
     <mescroll-uni
       ref="mescrollRef"
       @init="mescrollInit"
       @down="downCallback"
       @up="getList"
-      top="240"
+      top="370"
     >
-      <view class="" style="height: 40rpx"></view>
-      <GroupItem :item="item" v-for="(item, index) in dataList" :key="index" />
+      <view class="container group-list">
+        <GroupItem
+          :item="item"
+          variant="detail"
+          v-for="(item, index) in dataList"
+          :key="index"
+        />
+      </view>
     </mescroll-uni>
 
     <section v-if="!userInfo.running_group" class="section-bottom">
       <view style="padding: 0rpx 54rpx 20rpx">
-        <u-button type="primary" shape="circle" @click="openForm()"
+        <u-button
+          type="primary"
+          style="border-radius: 16rpx"
+          color="#FF8C00"
+          @click="openForm()"
           >创建跑团</u-button
         >
       </view>
@@ -50,6 +69,7 @@ import { getCurrentInstance } from "vue";
 import GroupItem from "@/components/GroupItem.vue";
 import UserLogin from "@/components/UserLogin.vue";
 import MescrollMixin from "@/uni_modules/mescroll-uni/components/mescroll-uni/mescroll-mixins.js";
+import Navbar from "@/components/navbar.vue";
 
 // 获取当前实例以访问全局属性
 const { proxy } = getCurrentInstance();
@@ -65,10 +85,10 @@ const mescrollRef = ref(null);
 const searchTxt = ref("");
 const tabActive = ref(0);
 const tabList = ref([
-  { label: "同城", value: 0 },
-  { label: "热门", value: 1 },
+  { label: "热门", value: 0 },
+  { label: "附近", value: 1 },
 ]);
-const curTab = ref({});
+const curTab = ref({ label: "热门", value: 0 });
 const dataList = ref([]);
 
 // 计算属性
@@ -109,9 +129,8 @@ const openForm = () => {
   uni.$u.route(`pagesSub/groupForm`);
 };
 
-const changeTab = (detail) => {
-  curTab.value = detail;
-  console.log(detail);
+const changeTab = (item) => {
+  curTab.value = item;
   refreshList();
 };
 
@@ -129,6 +148,7 @@ const getList = (page) => {
     pageIndex: page.num - 1,
     pageSize: 10,
     keyword: searchTxt.value,
+    type: curTab.value.value === 1 ? "nearby" : "hot", // 根据标签页类型传参
   };
   proxy.$axios
     .get(`/running-group/api/v1/groups/list`, data)
@@ -205,10 +225,24 @@ const downCallback = (mescroll) => {
   width: 100%;
   z-index: 10;
 }
+.section-tabs {
+  margin: 0 auto;
+  width: 500rpx;
+}
+
+.section-search {
+  padding: 20rpx 24rpx;
+}
 .section-bottom {
   position: fixed;
   bottom: 0px;
   width: 100%;
   z-index: 10;
+}
+.group-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  margin-top: 46rpx;
 }
 </style>

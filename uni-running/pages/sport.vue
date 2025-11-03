@@ -43,7 +43,7 @@
                 ></image>
               </view>
             </view>
-            <view class="section">
+            <view class="section" @click="goToRanking">
               <view class="section-content">
                 <view class="section-content-left">
                   <view class="section-content-title">跑量排行榜</view>
@@ -109,6 +109,13 @@ const userInfo = computed(() => store.state.userInfo);
 const goToRunMap = () => {
   uni.navigateTo({
     url: "/pagesSub/runMap",
+  });
+};
+
+// 跳转到排行榜页面
+const goToRanking = () => {
+  uni.navigateTo({
+    url: "/pagesSub/sport/top",
   });
 };
 </script>

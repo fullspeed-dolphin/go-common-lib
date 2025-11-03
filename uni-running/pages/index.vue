@@ -148,7 +148,10 @@
 
       <view class="section-title">
         <view class="section-title-left">跑团风采</view>
-        <view class="section-title-right">
+        <view
+          class="section-title-right"
+          @click="$u.route('pagesSub/groupList')"
+        >
           <view class="section-title-right-item">查看更多</view>
           <u-icon name="arrow-right" size="24rpx" color="#ff8c00"></u-icon>
         </view>
