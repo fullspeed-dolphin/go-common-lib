@@ -205,7 +205,7 @@ const getDetail = () => {
       res.eventItems = res.event_projects.split("、");
 
       // test
-      res.status = "ACT";
+      // res.status = "ACT";
       console.log("res", res);
 
       detail.value = res;

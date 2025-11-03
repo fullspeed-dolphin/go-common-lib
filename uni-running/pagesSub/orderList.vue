@@ -14,25 +14,72 @@
         lineColor="#FF8C00"
       />
     </view>
-    <view class="order-list">
-      <view
-        class="order-item"
-        v-for="order in orders"
-        :key="order.id"
-        @click="viewDetail(order)"
-      >
-        <EventItem :item="order.event" direction="row" :showButton="false" />
-        <view class="order-item-info">
-          <view class="order-item-info-name">
-            <text class="label">报名人：</text>
-            <text class="value">{{ order.name }}</text>
-          </view>
-          <view class="order-item-info-status">
-            {{ order.status }}
+    <mescroll-uni
+      ref="mescrollRef"
+      @init="mescrollInit"
+      @down="downCallback"
+      @up="getList"
+      top="300"
+    >
+      <view class="order-list">
+        <view
+          class="order-item"
+          v-for="order in orders"
+          :key="order.id"
+          @click="viewDetail(order)"
+        >
+          <EventItem
+            :item="order.event_info"
+            direction="row"
+            :showButton="false"
+          />
+          <view class="order-item-info">
+            <view class="order-item-info-name">
+              <text class="label">报名人：</text>
+              <text class="value">{{ order.name }}</text>
+            </view>
+            <view class="order-item-info-status">
+              <u-text
+                v-if="order.status == 'PND'"
+                size="14"
+                type="error"
+                text="待支付"
+              ></u-text>
+              <u-text
+                v-if="order.status == 'SUCC'"
+                size="14"
+                type="success"
+                text="已付款"
+              ></u-text>
+              <u-text
+                v-if="order.status == 'FAIL'"
+                size="14"
+                type="error"
+                text="失败"
+              ></u-text>
+              <u-text
+                v-if="order.status == 'RFND'"
+                size="14"
+                type="info"
+                text="已退款"
+              ></u-text>
+              <u-text
+                v-if="order.status == 'CXL'"
+                size="14"
+                type="info"
+                text="已取消"
+              ></u-text>
+              <u-text
+                v-if="order.status == 'EXP'"
+                size="14"
+                type="info"
+                text="已过期"
+              ></u-text>
+            </view>
           </view>
         </view>
       </view>
-    </view>
+    </mescroll-uni>
   </view>
 </template>
 
@@ -49,20 +96,21 @@ const { proxy } = getCurrentInstance();
 // 使用store
 const store = useStore();
 
-const orders = ref([
-  {
-    id: 1,
-    name: "黄永盛",
-    status: "报名成功",
-    event: {
-      id: 1,
-      image_url:
-        "https://ccrun.oss-cn-guangzhou.aliyuncs.com/images/2025/10/19/9806f1b0-61cb-4813-9623-c21339ed6d10.jpg",
-      description: "2025第四届十全十美欢乐跑暨“跑了没”启动仪式",
-      created_at: "2025-01-01",
-    },
-  },
-]);
+// const orders = ref([
+//   {
+//     id: 1,
+//     name: "黄永盛",
+//     status: "SUCC",
+//     event_info: {
+//       id: 1,
+//       image_url:
+//         "https://ccrun.oss-cn-guangzhou.aliyuncs.com/images/2025/10/19/9806f1b0-61cb-4813-9623-c21339ed6d10.jpg",
+//       description: "2025第四届十全十美欢乐跑暨“跑了没”启动仪式",
+//       created_at: "2025-01-01",
+//     },
+//   },
+// ]);
+const orders = ref([]);
 
 // 模板引用
 const mescrollRef = ref(null);
@@ -92,7 +140,7 @@ const mescrollInit = (mescrollInstance) => {
 // 方法定义
 const viewDetail = (item) => {
   uni.setStorageSync("orderDetail", item);
-  uni.$u.route(`/pagesSub/orderDetail`);
+  // uni.$u.route(`/pagesSub/orderDetail`);
 };
 
 const refreshList = () => {
@@ -108,7 +156,7 @@ const getList = (page) => {
   const data = {
     pageIndex: page.num - 1,
     pageSize: 10,
-    orderStatus: curTab.value.value,
+    orderStatus: "SUCC",
   };
   proxy.$axios
     .post(`/pay/order/statusByUser`, data)

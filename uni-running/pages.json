@@ -254,6 +254,14 @@
             "navigationBarTitleText": "退赛申请",
             "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
           }
+        },
+        {
+          "path": "orderSuccess",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "报名成功",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
         }
       ]
     }

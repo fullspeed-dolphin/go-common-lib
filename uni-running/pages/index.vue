@@ -108,7 +108,10 @@
         </swiper-item>
       </swiper>
 
-      <view class="section-title">
+      <view
+        class="section-title"
+        v-if="onlineEventList && onlineEventList.length > 0"
+      >
         <view class="section-title-left">线上赛事</view>
         <view class="section-title-right">
           <view class="section-title-right-item">查看更多</view>
@@ -122,8 +125,9 @@
         :autoplay="true"
         :interval="3000"
         :display-multiple-items="1.2"
+        v-if="onlineEventList && onlineEventList.length > 0"
       >
-        <swiper-item v-for="(item, index) in bannerEventList" :key="index">
+        <swiper-item v-for="(item, index) in onlineEventList" :key="index">
           <view class="event-swiper-item">
             <EventItem :item="item" :key="index" height="514rpx" />
           </view>
@@ -205,6 +209,7 @@ const eventList = ref([]);
 const bannerEventList = ref([]);
 const bannerList = ref([]);
 const GroupList = ref([]);
+const onlineEventList = ref([]);
 
 // 计算属性
 const userInfo = computed(() => store.state.userInfo);
@@ -242,6 +247,7 @@ onShow(() => {
   getGroupList();
   getEvents();
   getBannerList();
+  getOnlineEvents();
 });
 
 // 方法定义
@@ -268,7 +274,14 @@ const routeTo = (link) => {
 
 const getEvents = () => {
   proxy.$axios.get(`/event-api/getOfflineEventSwiper`).then((res) => {
-    bannerEventList.value = [...res, ...res, ...res];
+    bannerEventList.value = res;
+    uni.hideLoading();
+  });
+};
+
+const getOnlineEvents = () => {
+  proxy.$axios.get(`/event-api/getOnlineEventSwiper`).then((res) => {
+    onlineEventList.value = res;
     uni.hideLoading();
   });
 };
