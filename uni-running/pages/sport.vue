@@ -74,7 +74,7 @@
                 src="/static/images/icon-run@2x.png"
                 mode="aspectFill"
               ></image
-              >累计量程：7589.92公里</view
+              >累计里程：7589.92公里</view
             >
           </view>
         </view>
