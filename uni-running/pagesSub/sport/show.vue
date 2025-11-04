@@ -57,14 +57,14 @@
         </view>
 
         <view class="pace-indicator">
-          <view class="indicator-label">慢</view>
+          <view class="indicator-label slow">慢</view>
           <view class="indicator-bar">
             <view
               class="indicator-marker"
               :style="{ left: paceIndicatorPosition + '%' }"
             ></view>
           </view>
-          <view class="indicator-label">快</view>
+          <view class="indicator-label fast">快</view>
         </view>
 
         <view class="stats-grid">
@@ -541,16 +541,29 @@ onMounted(() => {
   }
 
   .pace-indicator {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 20rpx;
     margin: 30rpx 0 40rpx;
     position: relative;
 
     .indicator-label {
+      position: absolute;
+      z-index: 1;
       font-size: 24rpx;
-      color: #616161;
+      font-weight: 500;
       flex-shrink: 0;
+      background: #fff;
+      padding: 0 4rpx;
+      &.slow {
+        color: #94d243;
+        left: 56rpx;
+      }
+      &.fast {
+        color: #ff8c00;
+        position: absolute;
+        right: 56rpx;
+      }
     }
 
     .indicator-bar {
