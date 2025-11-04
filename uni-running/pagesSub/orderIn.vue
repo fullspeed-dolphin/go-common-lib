@@ -35,14 +35,14 @@
 
       <view class="cell flex-between-center" style="margin-bottom: 30rpx">
         <view class="">全速码</view>
-        <u--input
+        <u-input
           placeholder="全速码"
           maxlength="5"
           border="none"
           v-model="verifyCode"
           inputAlign="right"
         >
-        </u--input>
+        </u-input>
         <u-tag
           v-if="!!verifyCode.length"
           :text="computedCode.text"

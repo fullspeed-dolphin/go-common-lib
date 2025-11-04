@@ -52,36 +52,36 @@
             detail.order_no
           }}</u-cell>
           <u-cell title="订单状态" :isLink="false">
-            <u--text
+            <u-text
               v-if="detail.status == 'PND'"
               type="warning"
               text="待支付"
-            ></u--text>
-            <u--text
+            ></u-text>
+            <u-text
               v-if="detail.status == 'SUCC'"
               type="success"
               text="已付款"
-            ></u--text>
-            <u--text
+            ></u-text>
+            <u-text
               v-if="detail.status == 'FAIL'"
               type="error"
               text="失败"
-            ></u--text>
-            <u--text
+            ></u-text>
+            <u-text
               v-if="detail.status == 'RFND'"
               type="info"
               text="已退款"
-            ></u--text>
-            <u--text
+            ></u-text>
+            <u-text
               v-if="detail.status == 'CXL'"
               type="info"
               text="已取消"
-            ></u--text>
-            <u--text
+            ></u-text>
+            <u-text
               v-if="detail.status == 'EXP'"
               type="info"
               text="已过期"
-            ></u--text>
+            ></u-text>
           </u-cell>
           <u-cell title="创建时间" :isLink="false">{{
             detail.created_at

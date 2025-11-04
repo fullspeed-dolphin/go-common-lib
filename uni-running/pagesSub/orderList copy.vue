@@ -33,42 +33,42 @@
         <view class="pb20 flex-between-center">
           订单编号:{{ item.order_no }}
           <view class="">
-            <u--text
+            <u-text
               v-if="item.status == 'PND'"
               size="14"
               type="error"
               text="待支付"
-            ></u--text>
-            <u--text
+            ></u-text>
+            <u-text
               v-if="item.status == 'SUCC'"
               size="14"
               type="success"
               text="已付款"
-            ></u--text>
-            <u--text
+            ></u-text>
+            <u-text
               v-if="item.status == 'FAIL'"
               size="14"
               type="error"
               text="失败"
-            ></u--text>
-            <u--text
+            ></u-text>
+            <u-text
               v-if="item.status == 'RFND'"
               size="14"
               type="info"
               text="已退款"
-            ></u--text>
-            <u--text
+            ></u-text>
+            <u-text
               v-if="item.status == 'CXL'"
               size="14"
               type="info"
               text="已取消"
-            ></u--text>
-            <u--text
+            ></u-text>
+            <u-text
               v-if="item.status == 'EXP'"
               size="14"
               type="info"
               text="已过期"
-            ></u--text>
+            ></u-text>
           </view>
         </view>
         <view class="flex-row">

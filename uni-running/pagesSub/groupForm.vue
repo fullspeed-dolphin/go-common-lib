@@ -2,78 +2,76 @@
   <view class="page">
     <u-navbar autoBack placeholder title="创建跑团"></u-navbar>
     <view style="padding: 20rpx 34rpx">
-      <u--form
+      <up-form
         :model="form"
         ref="uForm"
         :rules="rules"
         labelPosition="top"
         labelWidth="auto"
       >
-        <view class="u--FileUploader">
-          <u-form-item :label="null" prop="poster">
+        <view class="u-FileUploader">
+          <up-form-item :label="null" prop="poster">
             <FileUploader v-model="form.poster" />
-          </u-form-item>
+          </up-form-item>
         </view>
 
-        <u-form-item label="跑团名称" prop="name" required>
+        <up-form-item label="跑团名称" prop="name" required>
           <u-input v-model="form.name" placeholder="请输入名称" />
-        </u-form-item>
-        <view class="u--textarea">
-          <u-form-item
-            label="跑团详情"
-            prop="description"
-            labelPosition="top"
-            required
-          >
-            <u--textarea
-              v-model="form.description"
-              :height="110"
-              maxlength="150"
-              placeholder="请填写跑团详情"
-              count
-            ></u--textarea>
-          </u-form-item>
-        </view>
-        <!-- <u-form-item label="跑团地址" prop="location" required>
+        </up-form-item>
+        <up-form-item
+          label="跑团详情"
+          prop="description"
+          labelPosition="top"
+          required
+        >
+          <u-textarea
+            v-model="form.description"
+            :height="110"
+            maxlength="150"
+            placeholder="请填写跑团详情"
+            count
+          ></u-textarea>
+        </up-form-item>
+        <!-- <up-form-item label="跑团地址" prop="location" required>
 					<u-input v-model="form.location" placeholder="请选择地址" />
-				</u-form-item> -->
-        <u-form-item label="跑团地址" prop="location" required>
+				</up-form-item> -->
+        <up-form-item label="跑团地址" prop="location" required>
           <PickerMap
             :title="null"
             v-model="form.location"
             placeholder="请选择地址"
           />
-        </u-form-item>
-        <u-form-item label="成立时间" prop="establish_time">
+        </up-form-item>
+        <up-form-item label="成立时间" prop="establish_time">
           <PickerTime
             v-model="form.establish_time"
             placeholder="请输入成立时间"
           />
           <!-- <u-input v-model="form.establish_time" placeholder="请输入创建时间" /> -->
-        </u-form-item>
-        <!-- <u-form-item label="成员数量" prop="amount" required>
+        </up-form-item>
+        <!-- <up-form-item label="成员数量" prop="amount" required>
 					<u-input v-model="form.amount" type="digit" placeholder="请输入成员数量" />
-				</u-form-item> -->
-        <u-form-item label="真实姓名" prop="fullName" required>
+				</up-form-item> -->
+        <up-form-item label="真实姓名" prop="fullName" required>
           <u-input v-model="form.fullName" placeholder="请输入您的真实姓名" />
-        </u-form-item>
-        <u-form-item label="联系电话" prop="phone" required>
+        </up-form-item>
+        <up-form-item label="联系电话" prop="phone" required>
           <u-input v-model="form.phone" placeholder="请输入您的联系电话" />
-        </u-form-item>
-      </u--form>
+        </up-form-item>
+      </up-form>
 
-      <view class="txt flex-start mt30 pt20">
-        <text @click="isAgree = !isAgree">
-          <u-icon
-            size="15"
-            :color="isAgree ? '#FF8C00' : '#999'"
-            :name="isAgree ? 'checkmark-circle-fill' : 'checkmark-circle'"
-          ></u-icon>
+      <view class="txt flex-start mt30 pt20" @click="isAgree = !isAgree">
+        <u-icon
+          size="15"
+          :color="isAgree ? '#FF8C00' : '#999'"
+          :name="isAgree ? 'checkmark-circle-fill' : 'checkmark-circle'"
+        ></u-icon>
+        <text>
           <text class="ml5">我已阅读并同意该</text>
         </text>
         <text
           style="color: #ff8c00"
-          @click="$u.route('pagesSub/settings/agreement?type=privy')"
+          @tap.stop="$u.route('pagesSub/settings/agreement?type=privy')"
           >《用户隐私协议》</text
         >
       </view>
@@ -256,7 +254,7 @@ const submitForm = () => {
 };
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .submit-btn {
   width: 682rpx;
   height: 72rpx;
@@ -349,7 +347,7 @@ const submitForm = () => {
   .u-form-item__body {
     padding: 10px 0 5px !important;
   }
-  .u--FileUploader {
+  .u-FileUploader {
     .u-form-item__body {
       box-shadow: none;
     }

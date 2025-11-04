@@ -2,7 +2,7 @@
   <view class="page">
     <Navbar title="完善信息" :bgHeight="280" />
     <view style="padding: 20rpx 34rpx">
-      <u--form
+      <u-form
         :model="form"
         ref="uForm"
         :rules="rules"
@@ -127,7 +127,7 @@
 				<u-form-item label="擅长的运动项目" prop="strengths">
 					<u-input v-model="form.strengths" placeholder="请填写您擅长的运动项目(如:徒步等)" />
 				</u-form-item> -->
-      </u--form>
+      </u-form>
 
       <u-action-sheet
         :actions="options_sheet"

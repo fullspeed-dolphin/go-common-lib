@@ -70,7 +70,7 @@ const props = defineProps({
     default: "label",
   },
   value: {
-    type: String | Number,
+    type: [String, Number],
     default: "",
   },
   columns: {
