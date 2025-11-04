@@ -294,6 +294,30 @@
             "navigationBarTitleText": "运动打卡记录",
             "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
           }
+        },
+        {
+          "path": "address/list",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "地址列表",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        {
+          "path": "address/create",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "添加地址",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
+        },
+        {
+          "path": "address/edit",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "编辑地址",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
         }
       ]
     }

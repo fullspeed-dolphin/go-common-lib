@@ -46,14 +46,14 @@
       </view>
     </mescroll-uni>
 
-    <section v-if="!userInfo.running_group" class="section-bottom">
+    <section class="section-bottom">
       <view style="padding: 0rpx 54rpx 20rpx">
         <u-button
           type="primary"
           style="border-radius: 16rpx"
           color="#FF8C00"
           @click="openForm()"
-          >创建跑团</u-button
+          >{{ userInfo.running_group ? "我的跑团" : "创建跑团" }}</u-button
         >
       </view>
     </section>
@@ -127,7 +127,16 @@ const openForm = () => {
     return refUserLogin.value.open();
   }
 
-  uni.$u.route(`pagesSub/groupForm`);
+  console.log(userInfo);
+
+  if (userInfo.value.running_group) {
+    uni.$u.route(
+      `pagesSub/groupDetail?group_id=${userInfo.value.running_group}`
+    );
+    return;
+  } else {
+    uni.$u.route(`pagesSub/groupForm`);
+  }
 };
 
 const changeTab = (item) => {
