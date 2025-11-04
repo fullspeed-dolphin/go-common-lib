@@ -75,10 +75,10 @@
             placeholder=""
             @blur="handlePasteRecognize"
           />
+          <view class="paste-section-bottom-text" @click="handlePaste"
+            >粘贴并识别地址</view
+          >
         </view>
-        <view class="paste-section-bottom-text" @click="handlePaste"
-          >粘贴并识别地址</view
-        >
       </view>
 
       <section class="section-bottom">
@@ -319,6 +319,7 @@ const handleSubmit = () => {
 }
 
 .paste-section {
+  position: relative;
   min-height: 200rpx;
   padding: 20rpx;
   position: relative;

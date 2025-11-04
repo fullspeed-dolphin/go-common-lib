@@ -619,7 +619,114 @@ function onCountryConfirm(e) {
   showCountryPicker.value = false;
 }
 
-// 监听省市区选择变化，同步到 form.region
+// 监听 form.region 变化，反向同步到省市区选择器（用于编辑时回显）
+// 使用一个标志来避免循环更新
+let isUpdatingFromRegion = false;
+watch(
+  () => form.region,
+  (region) => {
+    // 如果当前值已经匹配，跳过更新
+    const currentRegion = [
+      selectedProvince.value[0],
+      selectedCity.value[0],
+      selectedArea.value[0],
+    ]
+      .filter(Boolean)
+      .join(",");
+
+    if (currentRegion === region) {
+      return;
+    }
+
+    isUpdatingFromRegion = true;
+
+    if (!region) {
+      selectedProvince.value = [];
+      selectedCity.value = [];
+      selectedArea.value = [];
+      isUpdatingFromRegion = false;
+      return;
+    }
+
+    const parts = region.split(",");
+    const provinceCode = parts[0] || "";
+    const cityCode = parts[1] || "";
+    const areaCode = parts[2] || "";
+
+    // 设置省
+    if (provinceCode) {
+      const province = provinceOptions.value.find(
+        (p) => p.code === provinceCode
+      );
+      if (province) {
+        selectedProvince.value = [provinceCode];
+        const pIndex = provinceOptions.value.findIndex(
+          (p) => p.code === provinceCode
+        );
+        if (pIndex !== -1) {
+          provinceIndex.value = [pIndex];
+        }
+
+        // 加载该省的城市数据
+        const provinceDataItem = provinceData.find(
+          (p) => p.code === provinceCode
+        );
+        if (provinceDataItem) {
+          cityOptions.value = cityData
+            .filter((city) => city.province === provinceDataItem.province)
+            .map((city) => ({ code: city.code, name: city.name }));
+
+          // 设置市
+          if (cityCode) {
+            const cityItem = cityOptions.value.find((c) => c.code === cityCode);
+            if (cityItem) {
+              selectedCity.value = [cityCode];
+              const cIndex = cityOptions.value.findIndex(
+                (c) => c.code === cityCode
+              );
+              if (cIndex !== -1) {
+                cityIndex.value = [cIndex];
+              }
+
+              // 加载该市的区数据
+              const cityDataItem = cityData.find((c) => c.code === cityCode);
+              if (cityDataItem) {
+                areaOptions.value = areaData
+                  .filter(
+                    (area) =>
+                      area.province === cityDataItem.province &&
+                      area.city === cityDataItem.city
+                  )
+                  .map((area) => ({ code: area.code, name: area.name }));
+
+                // 设置区
+                if (areaCode) {
+                  const areaItem = areaOptions.value.find(
+                    (a) => a.code === areaCode
+                  );
+                  if (areaItem) {
+                    selectedArea.value = [areaCode];
+                    const aIndex = areaOptions.value.findIndex(
+                      (a) => a.code === areaCode
+                    );
+                    if (aIndex !== -1) {
+                      areaIndex.value = [aIndex];
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    isUpdatingFromRegion = false;
+  },
+  { immediate: true }
+);
+
+// 修改省市区选择变化的watch，避免循环
 watch(
   [
     () => selectedProvince.value,
@@ -627,6 +734,8 @@ watch(
     () => selectedArea.value,
   ],
   ([province, city, area]) => {
+    if (isUpdatingFromRegion) return;
+
     const parts = [];
     if (province && province.length > 0) parts.push(province[0]);
     if (city && city.length > 0) parts.push(city[0]);
