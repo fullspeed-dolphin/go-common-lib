@@ -286,6 +286,14 @@
             "navigationBarTitleText": "排行榜",
             "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
           }
+        },
+        {
+          "path": "sport/checkIn",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "运动打卡记录",
+            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+          }
         }
       ]
     }

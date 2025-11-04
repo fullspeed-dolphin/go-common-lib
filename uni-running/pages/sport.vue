@@ -27,13 +27,11 @@
             </view>
           </view>
           <view class="col">
-            <view class="section">
+            <view class="section" @click="goToRunCheckIn">
               <view class="section-content">
                 <view class="section-content-left">
-                  <view class="section-content-title">运动记录</view>
-                  <view class="section-content-description"
-                    >查看你的运动记录</view
-                  >
+                  <view class="section-content-title">运动打卡记录</view>
+                  <view class="section-content-description">记录美好生活~</view>
                 </view>
                 <image
                   class="section-content-icon"
@@ -53,15 +51,15 @@
                 </view>
                 <image
                   class="section-content-icon"
-                  style="width: 53rpx; height: 68rpx"
-                  src="/static/images/icon-record@2x.png"
+                  style="width: 71rpx; height: 69rpx"
+                  src="/static/images/icon-sport-top@2x.png"
                   mode="aspectFill"
                 ></image>
               </view>
             </view>
           </view>
         </view>
-        <view class="section">
+        <view class="section" @click="goToRunRecord">
           <view class="section-header">
             <view class="section-header-title">运动记录</view>
             <view class="section-header-more"
@@ -116,6 +114,20 @@ const goToRunMap = () => {
 const goToRanking = () => {
   uni.navigateTo({
     url: "/pagesSub/sport/top",
+  });
+};
+
+// 跳转到运动记录页面
+const goToRunRecord = () => {
+  uni.navigateTo({
+    url: "/pagesSub/sport/list",
+  });
+};
+
+// 跳转到运动打卡页面
+const goToRunCheckIn = () => {
+  uni.navigateTo({
+    url: "/pagesSub/sport/checkIn",
   });
 };
 </script>
