@@ -16,7 +16,9 @@
       <view class="group-name">{{ item.name || item.group_name }}</view>
       <view class="group-info-row">
         <text class="label">团长</text>
-        <text class="value">{{ item.creator_real_name || "--" }}</text>
+        <text class="value">{{
+          item.creator_real_name || item.leader_name || item.captain || "--"
+        }}</text>
       </view>
       <view class="group-info-row">
         <text class="label">成员数量</text>
@@ -47,6 +49,10 @@
       <view class="group-info-row">{{
         item.establish_location || item.address || item.location || "--"
       }}</view>
+    </view>
+    <!-- 排名图标 -->
+    <view v-if="rankIcon" class="rank-icon">
+      <image :src="rankIcon" mode="aspectFit" class="rank-icon-img"></image>
     </view>
   </view>
 
@@ -91,6 +97,10 @@ const props = defineProps({
     type: String,
     default: "simple", // 'simple' 简单样式（首页使用） | 'detail' 详细样式（groupList使用）
   },
+  rankIcon: {
+    type: String,
+    default: "", // 排名图标路径，用于显示名次（如前三名的奖牌图标）
+  },
 });
 
 // Emits
@@ -121,6 +131,7 @@ const formatDistance = (distance) => {
 <style lang="scss" scoped>
 // 详细样式（groupList使用）
 .group-item-detail {
+  position: relative;
   display: flex;
   align-items: flex-start;
   background: #fff;
@@ -183,6 +194,23 @@ const formatDistance = (distance) => {
     line-height: 34rpx;
     margin-top: 8rpx;
     word-break: break-all;
+  }
+
+  .rank-icon {
+    position: absolute;
+    top: 16rpx;
+    right: 16rpx;
+    width: 60rpx;
+    height: 60rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+
+    .rank-icon-img {
+      width: 60rpx;
+      height: 60rpx;
+    }
   }
 }
 

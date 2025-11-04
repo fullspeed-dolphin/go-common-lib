@@ -30,6 +30,13 @@
         >
           <!-- 排名 -->
           <view class="ranking-number">
+            <view v-if="index < 3" class="medal-wrapper">
+              <image
+                :class="['medal-icon', `medal-${index + 1}`]"
+                :src="getMedalIcon(index + 1)"
+                mode="aspectFit"
+              ></image>
+            </view>
             <text v-if="index >= 3" class="rank-text">{{ index + 1 }}</text>
           </view>
           <!-- 头像和奖牌 -->
@@ -39,13 +46,6 @@
               :src="item.avatar || '/static/run.png'"
               mode="aspectFill"
             ></image>
-            <view v-if="index < 3" class="medal-wrapper">
-              <image
-                :class="['medal-icon', `medal-${index + 1}`]"
-                :src="getMedalIcon(index + 1)"
-                mode="aspectFit"
-              ></image>
-            </view>
           </view>
           <!-- 名称 -->
           <view class="name">{{ item.name || item.user_name || "用户" }}</view>
@@ -60,77 +60,13 @@
 
       <!-- 团队跑量列表 -->
       <view v-if="tab.active === 1" class="team-list">
-        <view
-          class="team-item"
+        <GroupItem
           v-for="(item, index) in dataList"
           :key="item.id || item.group_id || index"
-          @click="viewTeamDetail(item)"
-        >
-          <view class="team-item-content">
-            <!-- 团队图片 -->
-            <image
-              class="team-image"
-              :src="item.image || item.group_image || '/static/run.png'"
-              mode="aspectFill"
-            ></image>
-            <!-- 团队信息 -->
-            <view class="team-info">
-              <!-- 团队名称 -->
-              <view class="team-name">{{
-                item.name || item.group_name || "跑团"
-              }}</view>
-              <!-- 团长 -->
-              <view class="team-leader">
-                <text class="label">团长</text>
-                <text class="value">{{
-                  item.leader_name || item.captain || "--"
-                }}</text>
-              </view>
-              <!-- 成员数量 -->
-              <view class="team-member-count">
-                <text class="label">成员数量</text>
-                <text class="value highlight"
-                  >{{ item.member_count || item.members || 0 }}人</text
-                >
-              </view>
-              <!-- 上月总跑量 -->
-              <view class="team-total-distance">
-                <text class="label">上月总跑量</text>
-                <text class="value highlight"
-                  >{{
-                    formatDistance(
-                      item.last_month_distance || item.total_distance || 0
-                    )
-                  }}km</text
-                >
-              </view>
-              <!-- 周人均跑量 -->
-              <view class="team-avg-distance">
-                <text class="label">周人均跑</text>
-                <text class="value highlight"
-                  >{{
-                    formatDistance(
-                      item.weekly_avg_distance || item.avg_distance || 0
-                    )
-                  }}km</text
-                >
-              </view>
-              <!-- 地址 -->
-              <view class="team-address">{{
-                item.address || item.location || "--"
-              }}</view>
-            </view>
-            <!-- 奖牌图标 -->
-            <view class="team-medal">
-              <image
-                v-if="index < 3"
-                :class="['team-medal-icon', `team-medal-${index + 1}`]"
-                :src="getMedalIcon(index + 1)"
-                mode="aspectFit"
-              ></image>
-            </view>
-          </view>
-        </view>
+          :item="item"
+          variant="detail"
+          :rankIcon="index < 3 ? getMedalIcon(index + 1, true) : ''"
+        />
       </view>
     </mescroll-uni>
   </view>
@@ -141,6 +77,7 @@ import { ref, computed, nextTick } from "vue";
 import { useStore } from "vuex";
 import { getCurrentInstance } from "vue";
 import Navbar from "@/components/navbar.vue";
+import GroupItem from "@/components/GroupItem.vue";
 
 // 获取当前实例以访问全局属性
 const { proxy } = getCurrentInstance();
@@ -178,12 +115,7 @@ const changeTab = (detail) => {
   refreshList();
 };
 
-// 方法定义
-const viewTeamDetail = (item) => {
-  if (item.group_id) {
-    uni.$u.route(`pagesSub/groupDetail?group_id=${item.group_id}`);
-  }
-};
+// 方法定义（viewTeamDetail 已由 GroupItem 组件内部处理，无需单独定义）
 
 // 格式化距离（米转公里，保留2位小数）
 const formatDistance = (distance) => {
@@ -194,15 +126,26 @@ const formatDistance = (distance) => {
 };
 
 // 获取奖牌图标
-const getMedalIcon = (rank) => {
+const getMedalIcon = (rank, isTeam = false) => {
   // 这里可以使用实际的奖牌图标路径
   // 1: 金牌, 2: 银牌, 3: 铜牌
   const medalMap = {
-    1: "/static/images/icon-top5@2x.png", // 金牌，可以用实际路径替换
-    2: "/static/images/icon-top5@2x.png", // 银牌
-    3: "/static/images/icon-top5@2x.png", // 铜牌
+    1: isTeam
+      ? "/static/images/icon-group-top1@2x.png"
+      : "/static/images/icon-top1@2x.png", // 金牌，可以用实际路径替换
+    2: isTeam
+      ? "/static/images/icon-group-top2@2x.png"
+      : "/static/images/icon-top2@2x.png", // 银牌
+    3: isTeam
+      ? "/static/images/icon-group-top3@2x.png"
+      : "/static/images/icon-top3@2x.png", // 铜牌
   };
-  return medalMap[rank] || "/static/images/icon-top5@2x.png";
+  return (
+    medalMap[rank] ||
+    (isTeam
+      ? "/static/images/icon-group-top3@2x.png"
+      : "/static/images/icon-top3@2x.png")
+  );
 };
 
 const refreshList = () => {
@@ -325,16 +268,17 @@ const downCallback = (mescroll) => {
   padding: 0 34rpx;
 
   .ranking-item {
+    position: relative;
     display: flex;
     align-items: center;
     background: #ffffff;
     border-radius: 16rpx;
     border: 2rpx solid rgba(0, 0, 0, 0.06);
-    padding: 32rpx 24rpx;
+    padding: 10rpx 26rpx;
     margin-bottom: 20rpx;
 
     .ranking-number {
-      width: 80rpx;
+      width: 40rpx;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -342,8 +286,20 @@ const downCallback = (mescroll) => {
 
       .rank-text {
         font-weight: bold;
-        font-size: 32rpx;
-        color: #000000;
+        font-size: 30rpx;
+        color: #707070;
+      }
+      .medal-wrapper {
+        position: absolute;
+        top: 0;
+        width: 50rpx;
+        height: 50rpx;
+        z-index: 2;
+
+        .medal-icon {
+          width: 38rpx;
+          height: 51rpx;
+        }
       }
     }
 
@@ -354,38 +310,24 @@ const downCallback = (mescroll) => {
       flex-shrink: 0;
 
       .avatar {
-        width: 80rpx;
-        height: 80rpx;
+        width: 100rpx;
+        height: 100rpx;
         border-radius: 50%;
         border: 2rpx solid rgba(0, 0, 0, 0.06);
-      }
-
-      .medal-wrapper {
-        position: absolute;
-        top: -15rpx;
-        left: -15rpx;
-        width: 50rpx;
-        height: 50rpx;
-        z-index: 2;
-
-        .medal-icon {
-          width: 50rpx;
-          height: 50rpx;
-        }
       }
     }
 
     .name {
       flex: 1;
-      font-weight: 500;
-      font-size: 30rpx;
+      font-weight: bold;
+      font-size: 28rpx;
       color: #000000;
       margin-right: 20rpx;
     }
 
     .distance {
       font-weight: bold;
-      font-size: 30rpx;
+      font-size: 24rpx;
       color: #000000;
       flex-shrink: 0;
     }
@@ -400,86 +342,9 @@ const downCallback = (mescroll) => {
   box-sizing: border-box;
   padding: 0 34rpx;
 
-  .team-item {
+  :deep(.group-item) {
     margin-bottom: 20rpx;
-
-    .team-item-content {
-      position: relative;
-      background: #ffffff;
-      border-radius: 16rpx;
-      border: 2rpx solid rgba(0, 0, 0, 0.06);
-      padding: 32rpx;
-      display: flex;
-      gap: 24rpx;
-
-      .team-image {
-        width: 160rpx;
-        height: 160rpx;
-        border-radius: 16rpx;
-        flex-shrink: 0;
-        border: 2rpx solid rgba(0, 0, 0, 0.06);
-      }
-
-      .team-info {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 12rpx;
-
-        .team-name {
-          font-weight: bold;
-          font-size: 32rpx;
-          color: #000000;
-          margin-bottom: 8rpx;
-        }
-
-        .team-leader,
-        .team-member-count,
-        .team-total-distance,
-        .team-avg-distance {
-          display: flex;
-          align-items: center;
-          font-size: 26rpx;
-          color: #666666;
-
-          .label {
-            margin-right: 12rpx;
-          }
-
-          .value {
-            color: #000000;
-
-            &.highlight {
-              color: #ff8c00;
-              font-weight: 500;
-            }
-          }
-        }
-
-        .team-address {
-          font-size: 24rpx;
-          color: #999999;
-          margin-top: 8rpx;
-          line-height: 1.5;
-        }
-      }
-
-      .team-medal {
-        position: absolute;
-        top: 16rpx;
-        right: 16rpx;
-        width: 60rpx;
-        height: 60rpx;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        .team-medal-icon {
-          width: 60rpx;
-          height: 60rpx;
-        }
-      }
-    }
+    border: 2rpx solid rgba(0, 0, 0, 0.06);
   }
 }
 </style>
