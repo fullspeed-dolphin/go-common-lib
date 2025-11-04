@@ -1,32 +1,31 @@
 <template>
   <view class="page">
-    <Navbar title="运动记录详情" :bgHeight="370" />
-
+    <u-navbar title="" autoBack bgColor="transparent" />
+    <section class="section-map">
+      <view class="map-container">
+        <map
+          v-if="isValidCoordinate(mapCenter.latitude, mapCenter.longitude)"
+          id="runMap"
+          :latitude="mapCenter.latitude"
+          :longitude="mapCenter.longitude"
+          :scale="16"
+          :markers="markers"
+          :polyline="polylines"
+          :show-location="false"
+          :enable-3D="false"
+          :enable-overlooking="false"
+          :enable-zoom="false"
+          :enable-scroll="false"
+          :enable-rotate="false"
+          class="map"
+        ></map>
+        <view v-else class="map-placeholder">
+          <text>地图加载中...</text>
+        </view>
+      </view>
+    </section>
     <view class="container">
       <!-- 1. 地图部分 - 跑步路线 -->
-      <section class="section-map">
-        <view class="map-container">
-          <map
-            v-if="isValidCoordinate(mapCenter.latitude, mapCenter.longitude)"
-            id="runMap"
-            :latitude="mapCenter.latitude"
-            :longitude="mapCenter.longitude"
-            :scale="16"
-            :markers="markers"
-            :polyline="polylines"
-            :show-location="false"
-            :enable-3D="false"
-            :enable-overlooking="false"
-            :enable-zoom="true"
-            :enable-scroll="true"
-            :enable-rotate="false"
-            class="map"
-          ></map>
-          <view v-else class="map-placeholder">
-            <text>地图加载中...</text>
-          </view>
-        </view>
-      </section>
 
       <!-- 2. 运动详情数据 -->
       <section class="section-detail">
@@ -139,31 +138,32 @@
             <view class="pace-col pace-col-wide">配速/公里</view>
             <view class="pace-col time-col">累计用时</view>
           </view>
-          <view class="pace-row" v-for="(item, index) in paceData" :key="index">
-            <view class="pace-col km-col">{{ item.km }}</view>
-            <view class="pace-col pace-col-wide">
-              <view
-                class="pace-bar-wrapper"
-                :class="{ fastest: item.isFastest }"
-              >
-                <view
-                  class="pace-bar"
-                  :style="{ width: getPaceBarWidth(item.pace) + '%' }"
-                ></view>
-                <text class="pace-text">{{ formatPace(item.pace) }}</text>
-              </view>
-            </view>
-            <view class="pace-col time-col">{{
-              formatTime(item.cumulativeTime)
-            }}</view>
-          </view>
-          <view
-            class="pace-subtotal"
-            v-for="(subtotal, index) in paceSubtotals"
-            :key="'subtotal-' + index"
+          <template
+            v-for="(item, index) in paceDataWithSubtotals"
+            :key="item.key"
           >
-            <text class="subtotal-text">{{ subtotal.text }}</text>
-          </view>
+            <view v-if="item.type === 'data'" class="pace-row">
+              <view class="pace-col km-col">{{ item.km }}</view>
+              <view class="pace-col pace-col-wide">
+                <view
+                  class="pace-bar-wrapper"
+                  :class="{ fastest: item.isFastest }"
+                >
+                  <view
+                    class="pace-bar"
+                    :style="{ width: getPaceBarWidth(item.pace) + '%' }"
+                  ></view>
+                  <text class="pace-text">{{ formatPace(item.pace) }}</text>
+                </view>
+              </view>
+              <view class="pace-col time-col">{{
+                formatTime(item.cumulativeTime)
+              }}</view>
+            </view>
+            <view v-else-if="item.type === 'subtotal'" class="pace-subtotal">
+              <text class="subtotal-text">{{ item.text }}</text>
+            </view>
+          </template>
         </view>
       </section>
     </view>
@@ -235,6 +235,35 @@ const paceSubtotals = computed(() => {
     subtotals.push({ text: `15公里累计用时 ${formatTime(km15Time)}` });
   }
   return subtotals;
+});
+
+// 将配速数据和累计用时小计混合在一起，每5条记录后插入一个subtotal
+const paceDataWithSubtotals = computed(() => {
+  const result = [];
+  const data = paceData.value;
+
+  for (let i = 0; i < data.length; i++) {
+    // 添加数据项
+    result.push({
+      type: "data",
+      key: `data-${i}`,
+      ...data[i],
+    });
+
+    // 每5条记录后插入subtotal
+    if ((i + 1) % 5 === 0 && i < data.length) {
+      const km = (i + 1) * 1; // 公里数：5, 10, 15...
+      const cumulativeTime = data[i].cumulativeTime;
+
+      result.push({
+        type: "subtotal",
+        key: `subtotal-${km}`,
+        text: `${km}公里累计用时 ${formatTime(cumulativeTime)}`,
+      });
+    }
+  }
+
+  return result;
 });
 
 // 配速指示器位置 (0-100%)
@@ -390,14 +419,16 @@ onMounted(() => {
 }
 
 .container {
+  position: relative;
+  z-index: 10;
+  margin-top: -319rpx;
   padding-bottom: 40rpx;
 }
 
 // 1. 地图部分
 .section-map {
   width: 100%;
-  height: 370rpx;
-  margin-top: -370rpx;
+  height: 100vh;
   position: relative;
   z-index: 0;
 
@@ -426,9 +457,9 @@ onMounted(() => {
 
 // 2. 运动详情数据部分
 .section-detail {
-  margin: 0 32rpx;
+  position: relative;
   margin-top: 20rpx;
-  padding: 40rpx 32rpx;
+  padding: 20rpx 16rpx;
   background: #ffffff;
   border-radius: 16rpx;
   border: 2rpx solid rgba(0, 0, 0, 0.06);
@@ -443,8 +474,9 @@ onMounted(() => {
       flex: 1;
 
       .distance-label {
+        font-weight: 500;
         font-size: 30rpx;
-        color: #000000;
+        color: #999999;
         margin-bottom: 10rpx;
       }
 
@@ -454,48 +486,55 @@ onMounted(() => {
 
         .amount {
           font-weight: bold;
-          font-size: 64rpx;
+          font-size: 100rpx;
           color: #000000;
           line-height: 1;
         }
 
         .unit {
-          font-size: 32rpx;
-          color: #000000;
+          font-weight: 500;
+          font-size: 30rpx;
+          color: #999999;
           margin-left: 8rpx;
-          margin-bottom: 4rpx;
+          margin-bottom: 10rpx;
         }
       }
     }
 
     .user-info {
+      position: static;
       display: flex;
       align-items: center;
       gap: 16rpx;
       flex-shrink: 0;
+      margin-top: 50rpx;
 
       .avatar {
-        width: 80rpx;
-        height: 80rpx;
-        border-radius: 50%;
+        position: absolute;
+        top: -56rpx;
+        right: 20rpx;
+        width: 112rpx;
+        height: 112rpx;
         border: 2rpx solid rgba(0, 0, 0, 0.06);
+        border-radius: 50%;
       }
 
       .user-text {
         display: flex;
         flex-direction: column;
+        align-items: flex-end;
 
         .user-name {
           font-weight: 500;
-          font-size: 28rpx;
+          font-size: 30rpx;
           color: #000000;
-          line-height: 40rpx;
         }
 
         .activity-time {
+          font-weight: 500;
           font-size: 24rpx;
           color: #999999;
-          margin-top: 4rpx;
+          margin-top: 10rpx;
         }
       }
     }
@@ -548,8 +587,8 @@ onMounted(() => {
       padding: 0 10rpx;
 
       .stats-value {
+        font-size: 44rpx;
         font-weight: bold;
-        font-size: 50rpx;
         color: #000000;
         line-height: 1.2;
         margin-bottom: 16rpx;
@@ -557,8 +596,8 @@ onMounted(() => {
       }
 
       .stats-label {
-        font-size: 24rpx;
-        color: #666666;
+        font-size: 30rpx;
+        color: #999999;
         text-align: center;
       }
     }
@@ -567,8 +606,8 @@ onMounted(() => {
 
 // 3. 配速数据部分
 .section-pace {
-  margin: 30rpx 32rpx 0;
-  padding: 30rpx 32rpx;
+  margin: 30rpx 0;
+  padding: 20rpx 16rpx;
   background: #ffffff;
   border-radius: 16rpx;
   border: 2rpx solid rgba(0, 0, 0, 0.06);
@@ -577,16 +616,16 @@ onMounted(() => {
     margin-bottom: 30rpx;
 
     .pace-title {
-      font-weight: 500;
-      font-size: 32rpx;
+      font-weight: 800;
+      font-size: 34rpx;
       color: #000000;
-      margin-bottom: 10rpx;
+      margin-bottom: 28rpx;
     }
 
     .pace-summary {
-      font-size: 24rpx;
-      color: #666666;
-      line-height: 34rpx;
+      font-weight: bold;
+      font-size: 26rpx;
+      color: #000000;
     }
   }
 
@@ -594,23 +633,22 @@ onMounted(() => {
     .pace-row {
       display: flex;
       align-items: center;
-      padding: 16rpx 0;
-      border-bottom: 1rpx solid #f0f0f0;
+      padding: 6rpx 0;
 
       &.pace-header-row {
-        border-bottom: 2rpx solid #e7e7e7;
         padding-bottom: 20rpx;
         margin-bottom: 10rpx;
 
         .pace-col {
-          font-weight: 500;
-          font-size: 24rpx;
-          color: #666666;
+          font-weight: bold;
+          font-size: 26rpx;
+          color: #43a047;
         }
       }
 
       .pace-col {
-        font-size: 28rpx;
+        font-weight: 800;
+        font-size: 26rpx;
         color: #000000;
 
         &.km-col {
@@ -636,15 +674,17 @@ onMounted(() => {
         height: 40rpx;
         display: flex;
         align-items: center;
+        background: #f1f2f6;
+        border-radius: 20rpx;
 
         .pace-bar {
           position: absolute;
           left: 0;
           top: 50%;
           transform: translateY(-50%);
-          height: 28rpx;
+          height: 40rpx;
           background: #ff8c00;
-          border-radius: 4rpx;
+          border-radius: 20rpx;
           min-width: 40rpx;
         }
 
@@ -653,7 +693,7 @@ onMounted(() => {
           z-index: 1;
           margin-left: 10rpx;
           font-size: 24rpx;
-          color: #000000;
+          color: #fff;
           white-space: nowrap;
         }
 
@@ -663,7 +703,7 @@ onMounted(() => {
           }
 
           .pace-text {
-            color: #ff4444;
+            color: #fff;
             font-weight: bold;
           }
         }
@@ -671,12 +711,13 @@ onMounted(() => {
     }
 
     .pace-subtotal {
-      padding: 20rpx 0 10rpx;
-      text-align: center;
+      padding: 24rpx 0;
+      text-align: left;
 
       .subtotal-text {
+        font-weight: 800;
         font-size: 24rpx;
-        color: #999999;
+        color: #000000;
       }
     }
   }

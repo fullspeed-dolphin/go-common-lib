@@ -34,6 +34,7 @@
       @down="downCallback"
       @up="getList"
       top="370"
+      bottom="180"
     >
       <view class="container group-list">
         <GroupItem
