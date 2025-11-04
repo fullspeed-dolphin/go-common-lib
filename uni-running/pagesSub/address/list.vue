@@ -44,7 +44,17 @@ import { onShow } from "@dcloudio/uni-app";
 import Navbar from "@/components/navbar.vue";
 import request from "@/utils/request.js";
 
-const addressList = ref([]);
+const addressList = ref([
+  {
+    name: "张三",
+    phone: "13800138000",
+    region: "北京市",
+    detailAddress: "北京市海淀区",
+    postalCode: "100000",
+    latitude: 39.9042,
+    longitude: 116.4074,
+  },
+]);
 
 // 获取地址列表
 const getAddressList = async () => {
@@ -52,10 +62,9 @@ const getAddressList = async () => {
     // 这里应该调用实际的API接口
     // const res = await request.get('/address/list');
     // addressList.value = res || [];
-
     // 临时使用本地存储模拟数据
-    const stored = uni.getStorageSync("addressList") || [];
-    addressList.value = stored;
+    // const stored = uni.getStorageSync("addressList") || [];
+    // addressList.value = stored;
   } catch (error) {
     console.error("获取地址列表失败:", error);
     uni.showToast({
@@ -165,12 +174,12 @@ onShow(() => {
 }
 
 .address-item {
-  background: #faf8f5;
+  background: #fff;
   border-radius: 16rpx;
-  padding: 30rpx;
+  padding: 24rpx 20rpx;
   margin-bottom: 20rpx;
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: space-between;
   position: relative;
 }
@@ -182,14 +191,14 @@ onShow(() => {
 }
 
 .address-name {
-  font-size: 36rpx;
+  font-size: 30rpx;
   font-weight: bold;
   color: #000000;
   margin-bottom: 12rpx;
 }
 
 .address-region {
-  font-size: 26rpx;
+  font-size: 24rpx;
   color: #999999;
   margin-bottom: 8rpx;
   line-height: 1.4;
