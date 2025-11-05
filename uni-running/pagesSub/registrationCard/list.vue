@@ -17,14 +17,12 @@
         :key="item.id || index"
       >
         <view class="name">
-          <view class="name-text">{{ item.full_name || item.name }}</view>
-          <view class="name-owner" v-if="item.is_self || item.isOwner"
-            >本人</view
-          >
+          <view class="name-text">{{ item.full_name }}</view>
+          <view class="name-owner" v-if="item.is_self">本人</view>
         </view>
         <view class="id-card-number">
           <view class="id-card-number-text">{{
-            formatIdCard(item.cert_number || item.idCardNumber || "")
+            formatIdCard(item.cert_number || "")
           }}</view>
           <view class="id-card-number-separator">|</view>
           <view class="id-card-number-type"> 成人 </view>
@@ -34,18 +32,20 @@
             <up-checkbox
               shape="circle"
               activeColor="#8CC63E"
-              :checked="item.is_self == 1 || item.isOwner"
+              :checked="item.is_self == 1"
               size="14"
             ></up-checkbox>
             设为本人
           </view>
-          <view class="card-item-actions-item" @click="handleEdit(item)">
-            <u-icon name="edit-pen" size="20" color="#999999"></u-icon>
-            修改
-          </view>
-          <view class="card-item-actions-item" @click="handleDelete(item)">
-            <u-icon name="trash" size="20" color="#999999"></u-icon>
-            删除
+          <view class="card-item-actions-item-group">
+            <view class="card-item-actions-item" @click="handleEdit(item)">
+              <u-icon name="edit-pen" size="20" color="#999999"></u-icon>
+              修改
+            </view>
+            <view class="card-item-actions-item" @click="handleDelete(item)">
+              <u-icon name="trash" size="20" color="#999999"></u-icon>
+              删除
+            </view>
           </view>
         </view>
       </view>
@@ -243,6 +243,11 @@ onShow(() => {
       align-items: center;
       margin-top: 20rpx;
       padding-top: 20rpx;
+      .card-item-actions-item-group {
+        display: flex;
+        align-items: center;
+        gap: 20rpx;
+      }
       .card-item-actions-item {
         display: flex;
         align-items: center;

@@ -1,12 +1,6 @@
 <template>
-  <view
-    class="pb30"
-    style="background: #f5f5f5"
-    :class="{
-      isFixedNavbar: isFixedNavbar,
-      isLoadedPage: isLoadedPage,
-    }"
-  >
+  <Navbar :bgHeight="0" title="" :placeholder="false" />
+  <view class="pb30" style="background: #f5f5f5">
     <view class="event-status flex-center" v-if="detail.status === 'ACT'">
       活动进行中
     </view>
@@ -127,6 +121,7 @@ import {
 import { useStore } from "vuex";
 import { getCurrentInstance } from "vue";
 import PhoneLogin from "@/components/common/PhoneLogin.vue";
+import Navbar from "@/components/navbar.vue";
 
 // 获取当前实例以访问全局属性
 const { proxy } = getCurrentInstance();

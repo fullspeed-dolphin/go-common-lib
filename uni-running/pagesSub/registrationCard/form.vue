@@ -21,7 +21,8 @@
                 />
                 <view class="owner">
                   <up-checkbox
-                    v-model="form.isOwner"
+                    v-model:checked="form.isOwner"
+                    :usedAlone="true"
                     shape="circle"
                     activeColor="#8CC63E"
                     size="16"
@@ -92,30 +93,27 @@
             </up-form-item>
 
             <up-form-item label="出生日期" prop="birthday">
-              <up-datetime-picker
-                hasInput
-                v-model="form.birthday"
-                v-model:show="showBirthday"
+              <picker
                 mode="date"
-                cancelText="取消"
-                confirmText="确认"
-                confirmColor="#FF8C00"
-                minDate="1920-01-01"
-                maxDate="2025-12-31"
+                :value="form.birthday"
+                :start="startDate"
+                :end="endDate"
+                @change="onBirthdayChange"
               >
-                <template #trigger="{ value }">
+                <view class="picker-view">
                   <up-input
-                    :modelValue="value || ''"
+                    :modelValue="form.birthday || ''"
                     placeholder="请选择"
                     border="none"
                     inputAlign="right"
+                    readonly
                   >
                     <template #suffix>
                       <up-icon name="arrow-right" size="18" color="#999" />
                     </template>
                   </up-input>
-                </template>
-              </up-datetime-picker>
+                </view>
+              </picker>
             </up-form-item>
 
             <up-form-item label="手机号码" prop="mobile">
@@ -362,9 +360,10 @@
 </template>
 
 <script setup>
-import { reactive, ref, watch, computed } from "vue";
+import { reactive, ref, watch, computed, nextTick } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import Navbar from "@/components/navbar.vue";
+import dayjs from "dayjs";
 import provinceData from "@/static/jsons/province.json";
 import cityData from "@/static/jsons/city.json";
 import areaData from "@/static/jsons/area.json";
@@ -377,7 +376,9 @@ const emit = defineEmits(["update:modelValue", "submit"]);
 
 const formRef = ref(null);
 const submitting = ref(false);
-const showBirthday = ref(false);
+// 日期选择器的开始和结束日期
+const startDate = "1920-01-01";
+const endDate = "2025-12-31";
 const showIdTypePicker = ref(false);
 const idTypeIndex = ref([0]);
 const selectedIdType = ref([]);
@@ -864,16 +865,49 @@ const rules = {
     { required: true, message: "请填写证件号码", trigger: ["blur", "change"] },
   ],
   birthday: [
-    { required: true, message: "请选择出生日期", trigger: ["change"] },
+    {
+      required: true,
+      message: "请选择出生日期",
+      trigger: ["change"],
+      validator: (rule, value, callback) => {
+        // 验证字符串格式的日期（YYYY-MM-DD）或空值
+        if (!value || value === "") {
+          callback(new Error("请选择出生日期"));
+        } else if (typeof value === "string") {
+          // 验证格式是否为 YYYY-MM-DD
+          const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+          if (dateRegex.test(value) && dayjs(value).isValid()) {
+            callback();
+          } else {
+            callback(new Error("请选择出生日期"));
+          }
+        } else {
+          callback(new Error("请选择出生日期"));
+        }
+      },
+    },
   ],
   mobile: [
     { required: true, message: "请填写手机号码", trigger: ["blur", "change"] },
   ],
 };
 
-function onDateConfirm(e) {
-  // up-datetime-picker 已经双向绑定，这里兜底格式化
-  if (typeof e?.value === "string") form.birthday = e.value;
+// 处理日期选择器变化事件
+function onBirthdayChange(e) {
+  // 原生 picker 组件的 change 事件返回的 e.detail.value 就是选中的日期字符串 "YYYY-MM-DD"
+  const dateStr = e.detail.value;
+
+  if (dateStr) {
+    // 确保格式为 YYYY-MM-DD
+    form.birthday = dateStr;
+
+    // 手动触发验证
+    nextTick(() => {
+      if (formRef.value) {
+        formRef.value.validateField("birthday", () => {}, "change");
+      }
+    });
+  }
 }
 
 function onSubmit() {
@@ -947,5 +981,8 @@ onLoad(() => {});
   bottom: env(safe-area-inset-bottom);
   width: 100%;
   z-index: 9;
+}
+.picker-view {
+  width: 100%;
 }
 </style>
