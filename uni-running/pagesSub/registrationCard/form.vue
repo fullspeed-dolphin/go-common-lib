@@ -229,12 +229,20 @@
               />
             </up-form-item>
             <up-form-item label="详细地址" prop="address">
-              <up-input
-                v-model="form.address"
-                placeholder="请填写详细地址"
-                border="none"
-                inputAlign="right"
-              />
+              <view class="address-input-wrapper">
+                <up-input
+                  v-model="form.address"
+                  placeholder="请填写详细地址"
+                  border="none"
+                  inputAlign="right"
+                />
+                <view
+                  class="address-icon-wrapper"
+                  @click="handleChooseLocation"
+                >
+                  <up-icon name="map" size="20" color="#FF8C00" />
+                </view>
+              </view>
             </up-form-item>
           </up-form>
         </view>
@@ -503,9 +511,9 @@ const idTypeOptions = [
 ];
 
 const countryOptions = [
-  { id: "China", name: "中国(China)" },
-  { id: "HongKong", name: "中国香港(HongKong)" },
-  { id: "Macau", name: "中国澳门(Macau)" },
+  { id: "中国", name: "中国(China)" },
+  { id: "中国香港", name: "中国香港(HongKong)" },
+  { id: "中国澳门", name: "中国澳门(Macau)" },
 ];
 
 const bloodTypeOptions = [
@@ -910,6 +918,280 @@ function onBirthdayChange(e) {
   }
 }
 
+// 根据地址字符串解析省市区
+function parseAddressToRegion(addressStr) {
+  if (!addressStr) return null;
+
+  let provinceName = "";
+  let cityName = "";
+  let areaName = "";
+  let country = "中国";
+
+  // 检查是否是香港或澳门
+  if (
+    addressStr.includes("香港") ||
+    addressStr.includes("HongKong") ||
+    addressStr.includes("Hong Kong")
+  ) {
+    country = "中国香港";
+    provinceName = "香港特别行政区";
+    cityName = "香港特别行政区";
+    areaName = "香港特别行政区";
+  } else if (
+    addressStr.includes("澳门") ||
+    addressStr.includes("Macau") ||
+    addressStr.includes("Macao")
+  ) {
+    country = "中国澳门";
+    provinceName = "澳门特别行政区";
+    cityName = "澳门特别行政区";
+    areaName = "澳门特别行政区";
+  } else {
+    // 解析中国大陆地址
+    // 首先尝试从已知省份数据中精确匹配
+    for (const province of provinceData) {
+      if (addressStr.includes(province.name)) {
+        provinceName = province.name;
+        break;
+      }
+    }
+
+    // 如果精确匹配失败，尝试正则匹配
+    if (!provinceName) {
+      const provincePatterns = [
+        /([^省]+省)/,
+        /([^自治区]+自治区)/,
+        /([^市]+(?:市|特别行政区))/,
+      ];
+
+      for (const pattern of provincePatterns) {
+        const match = addressStr.match(pattern);
+        if (match) {
+          const matched = match[1];
+          // 验证是否是有效的省份名称
+          const found = provinceData.find((p) => p.name === matched);
+          if (found) {
+            provinceName = matched;
+            break;
+          }
+        }
+      }
+    }
+
+    // 匹配市
+    if (provinceName) {
+      const province = provinceData.find((p) => p.name === provinceName);
+      if (province) {
+        // 先加载该省的所有城市数据
+        const provinceCities = cityData.filter(
+          (c) => c.province === province.province
+        );
+
+        // 尝试精确匹配城市
+        for (const city of provinceCities) {
+          if (addressStr.includes(city.name)) {
+            cityName = city.name;
+            break;
+          }
+        }
+
+        // 如果是直辖市，市名和省名相同
+        const directCities = ["北京市", "天津市", "上海市", "重庆市"];
+        if (directCities.includes(provinceName) && !cityName) {
+          cityName = provinceName;
+        }
+
+        // 如果没有精确匹配到，尝试正则匹配
+        if (!cityName) {
+          const cityPatterns = [
+            /([^市县]+(?:市|州|盟))(?=市|县|区|街道|路|街)/,
+          ];
+
+          for (const pattern of cityPatterns) {
+            const match = addressStr.match(pattern);
+            if (match) {
+              const matched = match[1];
+              const found = provinceCities.find((c) => c.name === matched);
+              if (found) {
+                cityName = matched;
+                break;
+              }
+            }
+          }
+        }
+
+        // 匹配区/县
+        if (cityName) {
+          const city = cityData.find(
+            (c) => c.name === cityName && c.province === province.province
+          );
+          if (city) {
+            // 先加载该市的所有区数据
+            const cityAreas = areaData.filter(
+              (a) => a.province === city.province && a.city === city.city
+            );
+
+            // 尝试精确匹配区
+            for (const area of cityAreas) {
+              if (addressStr.includes(area.name)) {
+                areaName = area.name;
+                break;
+              }
+            }
+
+            // 如果没有精确匹配到，尝试正则匹配
+            if (!areaName) {
+              const areaPatterns = [
+                /([^区县旗市]+(?:区|县|旗|市))(?=街道|路|街|镇|乡|村|号)/,
+              ];
+
+              for (const pattern of areaPatterns) {
+                const match = addressStr.match(pattern);
+                if (match) {
+                  const matched = match[1];
+                  // 排除省名和市名
+                  if (
+                    matched !== provinceName &&
+                    matched !== cityName &&
+                    !matched.includes(
+                      provinceName.replace(/省|自治区|特别行政区/, "")
+                    ) &&
+                    !matched.includes(cityName.replace(/市|州|盟/, ""))
+                  ) {
+                    const found = cityAreas.find((a) => a.name === matched);
+                    if (found) {
+                      areaName = matched;
+                      break;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 查找对应的代码
+  let provinceCode = "";
+  let cityCode = "";
+  let areaCode = "";
+
+  if (provinceName) {
+    const province = provinceData.find((p) => p.name === provinceName);
+    if (province) {
+      provinceCode = province.code;
+
+      // 加载城市数据
+      if (cityName) {
+        const city = cityData.find(
+          (c) => c.name === cityName && c.province === province.province
+        );
+        if (city) {
+          cityCode = city.code;
+
+          // 加载区数据
+          if (areaName) {
+            const area = areaData.find(
+              (a) =>
+                a.name === areaName &&
+                a.province === city.province &&
+                a.city === city.city
+            );
+            if (area) {
+              areaCode = area.code;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return {
+    country,
+    provinceCode,
+    cityCode,
+    areaCode,
+  };
+}
+
+// 选择地址位置
+function handleChooseLocation() {
+  uni.chooseLocation({
+    success: (res) => {
+      console.log("选择地址成功:", res);
+
+      // 获取完整地址字符串用于解析
+      const fullAddress = res.address || "";
+
+      // 将选择的地址填充到详细地址字段
+      // 优先使用 name（具体地点名称），如果没有则使用 address
+      if (res.name) {
+        form.address = res.name;
+      } else if (fullAddress) {
+        form.address = fullAddress;
+      }
+
+      // 根据地址解析省市区
+      if (fullAddress) {
+        const regionInfo = parseAddressToRegion(fullAddress);
+
+        if (regionInfo) {
+          // 设置国家
+          if (regionInfo.country) {
+            form.country = regionInfo.country;
+
+            // 如果是香港或澳门，需要同步设置 selectedCountry
+            const countryIdx = countryOptions.findIndex(
+              (c) => c.id === regionInfo.country
+            );
+            if (countryIdx !== -1) {
+              countryIndex.value = [countryIdx];
+              selectedCountry.value = [regionInfo.country];
+            }
+          }
+
+          // 设置省市区（通过更新 form.region，会触发 watch 自动设置 selectedProvince 等）
+          if (regionInfo.provinceCode) {
+            const regionParts = [];
+            regionParts.push(regionInfo.provinceCode);
+            if (regionInfo.cityCode) {
+              regionParts.push(regionInfo.cityCode);
+              if (regionInfo.areaCode) {
+                regionParts.push(regionInfo.areaCode);
+              }
+            }
+            form.region = regionParts.join(",");
+          }
+        }
+      }
+
+      // 手动触发验证
+      nextTick(() => {
+        if (formRef.value) {
+          formRef.value.validateField("address", () => {}, "change");
+          if (form.country) {
+            formRef.value.validateField("country", () => {}, "change");
+          }
+          if (form.region) {
+            formRef.value.validateField("region", () => {}, "change");
+          }
+        }
+      });
+    },
+    fail: (err) => {
+      console.error("选择地址失败:", err);
+      if (err.errMsg && !err.errMsg.includes("cancel")) {
+        uni.showToast({
+          title: "选择地址失败",
+          icon: "none",
+        });
+      }
+    },
+  });
+}
+
 function onSubmit() {
   if (!form.agreed) return;
   formRef.value?.validate().then(() => {
@@ -984,5 +1266,21 @@ onLoad(() => {});
 }
 .picker-view {
   width: 100%;
+}
+.address-input-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  padding-right: 80rpx;
+}
+.address-icon-wrapper {
+  position: absolute;
+  right: 20rpx;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  pointer-events: auto;
 }
 </style>
