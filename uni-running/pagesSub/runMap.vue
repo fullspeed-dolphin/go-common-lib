@@ -12,7 +12,7 @@
         :scale="16"
         :markers="markers"
         :polyline="polylines"
-        :show-location="true"
+        :show-location="false"
         :enable-3D="false"
         :enable-overlooking="false"
         :enable-zoom="true"
@@ -137,6 +137,9 @@ const mapContext = ref(null);
 const lastMoveTime = ref(0);
 const MOVE_INTERVAL = 500; // 最小移动间隔（毫秒）
 
+// 设备方向（罗盘）
+const deviceHeading = ref(0); // 设备朝向角度（0-360度，0度为正北）
+
 // 弹窗
 const showSuccessModal = ref(false);
 
@@ -183,10 +186,12 @@ onMounted(() => {
   // 创建地图上下文
   mapContext.value = uni.createMapContext("runMap");
   initLocation();
+  startCompass();
 });
 
 onUnmounted(() => {
   stopRunning();
+  stopCompass();
 });
 
 // 验证坐标是否有效
@@ -201,6 +206,48 @@ const isValidCoordinate = (latitude, longitude) => {
     longitude >= -180 &&
     longitude <= 180
   );
+};
+
+// 开始监听罗盘
+const startCompass = () => {
+  try {
+    uni.onCompassChange((res) => {
+      // res.direction 是设备朝向角度（0-360度，0度为正北）
+      deviceHeading.value = res.direction;
+      // 更新当前位置标记的旋转角度
+      updateCurrentLocationMarkerRotation();
+    });
+    console.log("罗盘监听已启动");
+  } catch (error) {
+    console.warn("罗盘功能不支持或启动失败:", error);
+  }
+};
+
+// 停止监听罗盘
+const stopCompass = () => {
+  try {
+    uni.offCompassChange();
+    console.log("罗盘监听已停止");
+  } catch (error) {
+    console.warn("停止罗盘监听失败:", error);
+  }
+};
+
+// 更新当前位置标记的旋转角度
+const updateCurrentLocationMarkerRotation = () => {
+  // 图标初始朝向正西（270度），要让图标指向设备朝向（deviceHeading）
+  // 旋转角度 = 设备朝向 - 图标初始朝向 = deviceHeading - 270
+  // 为了保持正值范围，加上 360 度取模：rotate = (deviceHeading - 270 + 360) % 360
+  // 简化后：rotate = (deviceHeading + 90) % 360
+  const rotation = (deviceHeading.value + 90) % 360;
+
+  // 更新 markers 中 id 为 0 的当前位置标记
+  const currentMarker = markers.value.find((m) => m.id === 0);
+  if (currentMarker) {
+    currentMarker.rotate = rotation;
+    // 触发响应式更新
+    markers.value = [...markers.value];
+  }
 };
 
 // 检查位置权限
@@ -288,18 +335,21 @@ const initLocation = async () => {
       };
 
       // 添加当前位置标记
-      // markers.value = [
-      //   {
-      //     id: 0,
-      //     latitude: res.latitude,
-      //     longitude: res.longitude,
-      //     title: "当前位置",
-      //     // iconPath: '/static/location.png',
-      //     width: 30,
-      //     height: 30,
-      //     anchor: { x: 0.5, y: 0.5 },
-      //   },
-      // ];
+      // 图标初始朝向正西（270度），要让图标指向设备朝向
+      // 旋转角度 = (deviceHeading + 90) % 360
+      markers.value = [
+        {
+          id: 0,
+          latitude: res.latitude,
+          longitude: res.longitude,
+          title: "当前位置",
+          iconPath: "/static/images/icon-map-location@2x.png",
+          width: 30,
+          height: 30,
+          anchor: { x: 0.5, y: 0.5 },
+          rotate: (deviceHeading.value + 90) % 360, // 初始旋转角度
+        },
+      ];
     } else {
       console.warn("获取到的坐标无效，使用默认坐标", JSON.stringify(res));
       // 使用默认坐标（北京）
@@ -612,16 +662,19 @@ const updateMapTrack = () => {
     }
 
     // 添加当前位置标记
-    // newMarkers.push({
-    //   id: 0,
-    //   latitude: lastPoint.latitude,
-    //   longitude: lastPoint.longitude,
-    //   title: "当前位置",
-    //   // iconPath: '/static/location.png',
-    //   width: 30,
-    //   height: 30,
-    //   anchor: { x: 0.5, y: 0.5 },
-    // });
+    // 图标初始朝向正西（270度），要让图标指向设备朝向
+    // 旋转角度 = (deviceHeading + 90) % 360
+    newMarkers.push({
+      id: 0,
+      latitude: lastPoint.latitude,
+      longitude: lastPoint.longitude,
+      title: "当前位置",
+      iconPath: "/static/images/icon-map-location@2x.png",
+      width: 30,
+      height: 30,
+      anchor: { x: 0.5, y: 0.5 },
+      rotate: (deviceHeading.value + 90) % 360, // 根据设备方向旋转
+    });
 
     markers.value = newMarkers;
 
