@@ -50,7 +50,7 @@ import Navbar from "@/components/navbar.vue";
 // 响应式数据
 const deviceList = ref([
   // {
-  // 	img: '/static/images/华为运动健康@2x.png',
+  // 	img: 'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/华为运动健康@2x.png',
   // 	label: '华为运动健康',
   // 	value: '',
   // 	model: '设备型号：HUAWEI GT5',
@@ -58,7 +58,7 @@ const deviceList = ref([
   // 	bindTime: '绑定时间：2025-10-14 ',
   // },
   // {
-  // 	img: '/static/images/佳明@2x.png',
+  // 	img: 'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/佳明@2x.png',
   // 	label: '佳明',
   // 	value: '',
   // 	model: '设备型号：HUAWEI GT5',
@@ -66,7 +66,7 @@ const deviceList = ref([
   // 	bindTime: '绑定时间：2025-10-14 ',
   // },
   // {
-  // 	img: '/static/images/高驰@2x.png',
+  // 	img: 'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/高驰@2x.png',
   // 	label: '高驰',
   // 	value: '',
   // 	model: '设备型号：HUAWEI GT5',

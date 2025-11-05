@@ -4,7 +4,7 @@
       <view class="poster mr10 flex-center">
         <image
           class="icon"
-          src="../static/checkicon@2x.png"
+          src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/checkicon@2x.png"
           mode="aspectFill"
         ></image>
       </view>

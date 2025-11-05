@@ -42,7 +42,10 @@
           <view class="user-info">
             <image
               class="avatar"
-              :src="activityData.userAvatar || '/static/run.png'"
+              :src="
+                activityData.userAvatar ||
+                'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
+              "
               mode="aspectFill"
             ></image>
             <view class="user-text">
@@ -301,8 +304,8 @@ const createMarker = (id, latitude, longitude, type) => {
     height: 40,
     anchor: { x: 0.5, y: 0.5 },
     iconPath: isStart
-      ? "/static/images/go@2x.png"
-      : "/static/images/end@2x.png",
+      ? "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/go@2x.png"
+      : "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/end@2x.png",
     title: isStart ? "起" : "终",
   };
 };

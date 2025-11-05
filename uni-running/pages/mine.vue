@@ -8,7 +8,10 @@
             <view class="img-box">
               <image
                 class="avatar"
-                :src="userInfo.avatar_url || '../static/run.png'"
+                :src="
+                  userInfo.avatar_url ||
+                  'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
+                "
                 mode="aspectFill"
               ></image>
               <view class="gender">
@@ -59,7 +62,7 @@
             <image
               class="nav-icon"
               style="width: 32rpx; height: 40rpx"
-              src="/static/images/icon-mine-event@2x.png"
+              src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-mine-event@2x.png"
             ></image>
           </template>
         </u-cell>
@@ -78,7 +81,7 @@
             <image
               class="nav-icon"
               style="width: 40rpx; height: 40rpx"
-              src="/static/images/icon-mine-group@2x.png"
+              src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-mine-group@2x.png"
             ></image>
           </template>
         </u-cell>
@@ -92,7 +95,7 @@
           <template #icon>
             <image
               class="nav-icon"
-              src="/static/images/icon-mine-user@2x.png"
+              src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-mine-user@2x.png"
             ></image>
           </template>
         </u-cell>
@@ -108,7 +111,7 @@
             <image
               class="nav-icon"
               style="width: 28rpx; height: 46rpx"
-              src="/static/images/icon-mine-device@2x.png"
+              src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-mine-device@2x.png"
             ></image>
           </template>
         </u-cell>
@@ -124,7 +127,7 @@
             <image
               class="nav-icon"
               style="width: 40rpx; height: 40rpx"
-              src="/static/images/icon-mine-coin@2x.png"
+              src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-mine-coin@2x.png"
             ></image>
           </template>
         </u-cell>
@@ -136,7 +139,7 @@
                 <view class="icon">
                   <image
                     class="nav-icon"
-                    src="/static/images/icon-mine-customer@2x.png"
+                    src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-mine-customer@2x.png"
                   ></image>
                 </view>
                 联系客服
@@ -147,7 +150,7 @@
 
           <!-- <u-cell :title="null" class=" nav-cell" isLink>
 						<template #icon>
-							<image class="nav-icon" src="/static/images/我的消息Icon@2x.png"></image>
+							<image class="nav-icon" src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/我的消息Icon@2x.png"></image>
 						</template>
 						<button class="u-reset-button" open-type="contact">
 						      联系客服
@@ -157,7 +160,7 @@
 
         <!-- <u-cell title="意见反馈" class="nav-cell" @click="routeTo('/pagesSub/settings/feedback')" :border="false" isLink>
 					<template #icon>
-						<image class="nav-icon" src="/static/images/帮助反馈Icon@2x.png"></image>
+						<image class="nav-icon" src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/帮助反馈Icon@2x.png"></image>
 					</template>
 				</u-cell> -->
       </view>

@@ -16,7 +16,10 @@
         <view class="img-box">
           <image
             class="img"
-            :src="item.avatar_url || '../static/run.png'"
+            :src="
+              item.avatar_url ||
+              'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
+            "
             mode="aspectFill"
           ></image>
         </view>

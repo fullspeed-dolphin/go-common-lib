@@ -5,12 +5,12 @@
     <view class="col content">
       <image
         class="bg1"
-        src="/static/images/bg-run-coin@2x.png"
+        src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/bg-run-coin@2x.png"
         mode="aspectFill"
       ></image>
       <image
         class="bg2"
-        src="/static/images/icon-coin-lg@2x.png"
+        src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-coin-lg@2x.png"
         mode="aspectFill"
       ></image>
       <view class="row">
@@ -52,7 +52,7 @@
                   }}</view>
                   <image
                     class="check-in-item-icon"
-                    src="/static/images/icon-coin-check-in@2x.png"
+                    src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-coin-check-in@2x.png"
                     mode="aspectFill"
                   ></image>
                 </view>
@@ -72,7 +72,7 @@
               <view class="task-item-left">
                 <image
                   class="task-item-icon"
-                  src="/static/images/icon-coin-check-in@2x.png"
+                  src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-coin-check-in@2x.png"
                   mode="aspectFill"
                 ></image>
                 <view class="task-item-content">
@@ -82,7 +82,7 @@
                       <text>+100</text>
                       <image
                         class="task-item-title-reward-icon"
-                        src="/static/images/icon-coin-check-in@2x.png"
+                        src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-coin-check-in@2x.png"
                         mode="aspectFill"
                       ></image>
                       <text>封顶</text>

@@ -13,7 +13,10 @@
         <view class="user">
           <image
             class="avatar"
-            :src="userInfo.avatar_url || '../static/run.png'"
+            :src="
+              userInfo.avatar_url ||
+              'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
+            "
             mode="aspectFill"
           ></image>
           <view class="user-info">
@@ -21,7 +24,7 @@
             <view class="money"
               ><image
                 class="img"
-                src="/static/images/icon-coin@2x.png"
+                src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-coin@2x.png"
                 mode="aspectFill"
               ></image>
               0</view
@@ -41,7 +44,7 @@
           <view class="message">
             <image
               class="img"
-              src="/static/images/message@2x.png"
+              src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/message@2x.png"
               mode="aspectFill"
             ></image>
           </view>
@@ -313,27 +316,27 @@ const getGroupList = () => {
 
 const menus = ref([
   {
-    icon: "/static/images/华为运动健康@2x.png",
+    icon: "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/华为运动健康@2x.png",
     title: "线上赛事",
     url: "pagesSub/groupList",
   },
   {
-    icon: "/static/images/华为运动健康@2x.png",
+    icon: "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/华为运动健康@2x.png",
     title: "跑团风采",
     url: "pagesSub/groupList",
   },
   {
-    icon: "/static/images/华为运动健康@2x.png",
+    icon: "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/华为运动健康@2x.png",
     title: "最美跑者",
     url: "pagesSub/groupList",
   },
   {
-    icon: "/static/images/华为运动健康@2x.png",
+    icon: "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/华为运动健康@2x.png",
     title: "跑团风采",
     url: "pagesSub/groupList",
   },
   {
-    icon: "/static/images/华为运动健康@2x.png",
+    icon: "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/华为运动健康@2x.png",
     title: "全速天使",
     url: "pagesSub/groupList",
   },

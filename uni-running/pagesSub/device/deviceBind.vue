@@ -10,19 +10,19 @@
         <image
           v-if="options.value.includes('华为')"
           class="poster"
-          src="/static/images/华为运动健康@2x.png"
+          src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/华为运动健康@2x.png"
           mode="aspectFill"
         ></image>
         <image
           v-if="options.value.includes('佳明')"
           class="poster"
-          src="/static/images/佳明@2x.png"
+          src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/佳明@2x.png"
           mode="aspectFill"
         ></image>
         <image
           v-if="options.value.includes('高驰')"
           class="poster"
-          src="/static/images/高驰@2x.png"
+          src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/高驰@2x.png"
           mode="aspectFill"
         ></image>
       </view>

@@ -62,7 +62,10 @@
             <view class="task-icon-wrapper">
               <image
                 class="task-icon"
-                :src="task.icon || '/static/images/icon-run@2x.png'"
+                :src="
+                  task.icon ||
+                  'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-run@2x.png'
+                "
                 mode="aspectFill"
               ></image>
             </view>
@@ -79,7 +82,7 @@
               <text class="reward-amount">+{{ task.reward }}</text>
               <image
                 class="reward-icon"
-                src="/static/images/icon-coin-check-in@2x.png"
+                src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-coin-check-in@2x.png"
                 mode="aspectFill"
               ></image>
             </view>
@@ -269,7 +272,7 @@ const taskList = ref([
     progress: "12.42m",
     description: "跑步达3km以上(有效次数1次)",
     reward: 100,
-    icon: "/static/images/icon-run@2x.png",
+    icon: "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-run@2x.png",
   },
 ]);
 

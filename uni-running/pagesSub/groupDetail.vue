@@ -15,7 +15,10 @@
       <section class="section-card flex-col-center">
         <image
           class="img"
-          :src="detail.avatar_url || '../static/run.png'"
+          :src="
+            detail.avatar_url ||
+            'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
+          "
           mode="aspectFill"
         ></image>
         <view class="name ellipsis2">{{ detail.name }}</view>
@@ -61,7 +64,10 @@
             <view class="img-box">
               <image
                 class="img"
-                :src="memberLeader.avatar_url || '../static/run.png'"
+                :src="
+                  memberLeader.avatar_url ||
+                  'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
+                "
                 mode="aspectFill"
               ></image>
             </view>
@@ -108,7 +114,10 @@
             <view class="img-box">
               <image
                 class="img"
-                :src="item.avatar_url || '../static/run.png'"
+                :src="
+                  item.avatar_url ||
+                  'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
+                "
                 mode="aspectFill"
               ></image>
             </view>
@@ -129,7 +138,7 @@
       <section class="section-intro panel">
         <view class="h4"
           >成员跑量排行榜<image
-            src="/static/images/icon-top5@2x.png"
+            src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-top5@2x.png"
             style="width: 77rpx; height: 23rpx"
             mode="aspectFill"
           ></image
@@ -146,7 +155,10 @@
                 <view class="img-box">
                   <image
                     class="img"
-                    :src="item.avatar_url || '../static/run.png'"
+                    :src="
+                      item.avatar_url ||
+                      'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
+                    "
                     mode="aspectFill"
                   ></image>
                 </view>

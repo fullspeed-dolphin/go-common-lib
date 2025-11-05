@@ -74,7 +74,10 @@
         <view class="flex-row">
           <image
             class="poster"
-            :src="item.event_info.background_image_url || '../static/run.png'"
+            :src="
+              item.event_info.background_image_url ||
+              'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
+            "
             mode="aspectFill"
           ></image>
           <view class="text">

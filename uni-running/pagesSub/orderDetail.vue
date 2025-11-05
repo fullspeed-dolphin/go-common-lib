@@ -9,7 +9,10 @@
       >
         <image
           class="poster"
-          :src="detail.event_info.background_image_url || '../static/run.png'"
+          :src="
+            detail.event_info.background_image_url ||
+            'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
+          "
           mode="aspectFill"
         ></image>
         <view class="text">

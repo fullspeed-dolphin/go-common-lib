@@ -8,19 +8,22 @@
           <view class="section user">
             <image
               class="bg"
-              src="/static/images/shoes@2x.png"
+              src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/shoes@2x.png"
               mode="aspectFill"
             ></image>
             <image
               class="avatar"
-              :src="userInfo.avatar_url || '../static/run.png'"
+              :src="
+                userInfo.avatar_url ||
+                'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
+              "
               mode="aspectFill"
             ></image>
             <view class="money"
               ><image
                 class="img"
                 style="width: 88rpx; height: 78rpx"
-                src="/static/images/icon-coin@2x.png"
+                src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-coin@2x.png"
                 mode="aspectFill"
               ></image>
               <view class="money-text"> 0 </view>
@@ -36,7 +39,7 @@
                 <image
                   class="section-content-icon"
                   style="width: 53rpx; height: 68rpx"
-                  src="/static/images/icon-record@2x.png"
+                  src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-record@2x.png"
                   mode="aspectFill"
                 ></image>
               </view>
@@ -52,7 +55,7 @@
                 <image
                   class="section-content-icon"
                   style="width: 71rpx; height: 69rpx"
-                  src="/static/images/icon-sport-top@2x.png"
+                  src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-sport-top@2x.png"
                   mode="aspectFill"
                 ></image>
               </view>
@@ -71,7 +74,7 @@
               ><image
                 class="section-content-title-icon"
                 style="width: 68rpx; height: 68rpx"
-                src="/static/images/icon-run@2x.png"
+                src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-run@2x.png"
                 mode="aspectFill"
               ></image
               >累计里程：7589.92公里</view

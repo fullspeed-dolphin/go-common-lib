@@ -43,7 +43,10 @@
           <view class="avatar-wrapper">
             <image
               class="avatar"
-              :src="item.avatar || '/static/run.png'"
+              :src="
+                item.avatar ||
+                'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
+              "
               mode="aspectFill"
             ></image>
           </view>
@@ -131,20 +134,20 @@ const getMedalIcon = (rank, isTeam = false) => {
   // 1: 金牌, 2: 银牌, 3: 铜牌
   const medalMap = {
     1: isTeam
-      ? "/static/images/icon-group-top1@2x.png"
-      : "/static/images/icon-top1@2x.png", // 金牌，可以用实际路径替换
+      ? "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-group-top1@2x.png"
+      : "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-top1@2x.png", // 金牌，可以用实际路径替换
     2: isTeam
-      ? "/static/images/icon-group-top2@2x.png"
-      : "/static/images/icon-top2@2x.png", // 银牌
+      ? "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-group-top2@2x.png"
+      : "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-top2@2x.png", // 银牌
     3: isTeam
-      ? "/static/images/icon-group-top3@2x.png"
-      : "/static/images/icon-top3@2x.png", // 铜牌
+      ? "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-group-top3@2x.png"
+      : "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-top3@2x.png", // 铜牌
   };
   return (
     medalMap[rank] ||
     (isTeam
-      ? "/static/images/icon-group-top3@2x.png"
-      : "/static/images/icon-top3@2x.png")
+      ? "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-group-top3@2x.png"
+      : "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-top3@2x.png")
   );
 };
 
@@ -215,7 +218,8 @@ const getMockData = () => {
       id: i + 1,
       name: "嘉王府",
       user_name: "嘉王府",
-      avatar: "/static/run.png",
+      avatar:
+        "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png",
       distance: 21.84 - i * 0.5,
       run_distance: 21.84 - i * 0.5,
     }));
@@ -226,8 +230,9 @@ const getMockData = () => {
       group_id: i + 1,
       name: "广州凤凰悦跑团",
       group_name: "广州凤凰悦跑团",
-      image: "/static/run.png",
-      group_image: "/static/run.png",
+      image: "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png",
+      group_image:
+        "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png",
       leader_name: "阿雄",
       captain: "阿雄",
       member_count: 316 - i * 10,

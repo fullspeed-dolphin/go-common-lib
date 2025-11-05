@@ -8,7 +8,10 @@
     <image
       class="poster"
       :src="
-        item.avatar_url || item.image || item.group_image || '/static/run.png'
+        item.avatar_url ||
+        item.image ||
+        item.group_image ||
+        'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
       "
       mode="aspectFill"
     ></image>
@@ -64,7 +67,10 @@
   >
     <image
       class="poster"
-      :src="item.avatar_url || '../static/run.png'"
+      :src="
+        item.avatar_url ||
+        'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
+      "
       mode="aspectFill"
     ></image>
     <view class="group-item-content col">

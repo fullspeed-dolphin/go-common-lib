@@ -94,12 +94,12 @@
         <view class="flex-between-center method-cell">
           <image
             class="icon"
-            src="/static/images/微信支付@2x.png"
+            src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/微信支付@2x.png"
             mode="aspectFill"
           ></image>
           <image
             class="dot-icon"
-            src="/static/images/icon-dot@2x.png"
+            src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-dot@2x.png"
             mode="aspectFill"
           ></image>
         </view>

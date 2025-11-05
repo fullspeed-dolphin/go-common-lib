@@ -49,24 +49,30 @@ const tabList = ref([
     name: "index",
     pagePath: "/pages/index",
     icon: "icon-shouye",
-    normal: "../static/tab_00.png",
-    active: "../static/tab_01.png",
+    normal:
+      "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/tab_00.png",
+    active:
+      "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/tab_01.png",
   },
   {
     text: "运动",
     name: "sport",
     pagePath: "/pages/sport",
     icon: "icon-huabi-",
-    normal: "../static/tab_00.png",
-    active: "../static/tab_01.png",
+    normal:
+      "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/tab_00.png",
+    active:
+      "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/tab_01.png",
   },
   {
     text: "我的",
     name: "mine",
     icon: "icon-wenzi",
     pagePath: "/pages/mine",
-    normal: "../static/tab_20.png",
-    active: "../static/tab_21.png",
+    normal:
+      "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/tab_20.png",
+    active:
+      "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/tab_21.png",
   },
 ]);
 

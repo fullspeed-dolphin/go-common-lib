@@ -39,7 +39,7 @@
           :disabled="isLoading"
         >
           <image
-            src="/static/images/icon-run-start@2x.png"
+            src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-run-start@2x.png"
             mode="widthFix"
             style="width: 40rpx; height: 40rpx"
           ></image>
@@ -53,7 +53,7 @@
             :disabled="isLoading"
           >
             <image
-              src="/static/images/icon-run-stop@2x.png"
+              src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-run-stop@2x.png"
               mode="widthFix"
               style="width: 40rpx; height: 40rpx"
             ></image>
@@ -64,7 +64,7 @@
             :disabled="isLoading"
           >
             <image
-              src="/static/images/icon-run-pause@2x.png"
+              src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-run-pause@2x.png"
               mode="widthFix"
               style="width: 40rpx; height: 40rpx"
             ></image>
@@ -79,7 +79,7 @@
             :disabled="isLoading"
           >
             <image
-              src="/static/images/icon-run-stop@2x.png"
+              src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-run-stop@2x.png"
               mode="widthFix"
               style="width: 40rpx; height: 40rpx"
             ></image>
@@ -90,7 +90,7 @@
             :disabled="isLoading"
           >
             <image
-              src="/static/images/icon-run-start@2x.png"
+              src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-run-start@2x.png"
               mode="widthFix"
               style="width: 40rpx; height: 40rpx"
             ></image>
@@ -227,8 +227,8 @@ const createMarker = (id, latitude, longitude, type) => {
     height: MARKER_CONFIG.height,
     anchor: MARKER_CONFIG.anchor,
     iconPath: isStart
-      ? "/static/images/go@2x.png"
-      : "/static/images/end@2x.png",
+      ? "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/go@2x.png"
+      : "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/end@2x.png",
   };
 
   // 设置title用于调试
@@ -465,7 +465,8 @@ const initLocation = async () => {
           latitude: res.latitude,
           longitude: res.longitude,
           title: "当前位置",
-          iconPath: "/static/images/icon-map-location@2x.png",
+          iconPath:
+            "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-map-location@2x.png",
           width: 30,
           height: 30,
           anchor: { x: 0.5, y: 0.5 },
@@ -875,7 +876,8 @@ const updateMapTrack = () => {
       latitude: lastPoint.latitude,
       longitude: lastPoint.longitude,
       title: "当前位置",
-      iconPath: "/static/images/icon-map-location@2x.png",
+      iconPath:
+        "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-map-location@2x.png",
       width: 30,
       height: 30,
       anchor: { x: 0.5, y: 0.5 },
