@@ -139,6 +139,9 @@ const MOVE_INTERVAL = 500; // 最小移动间隔（毫秒）
 
 // 设备方向（罗盘）
 const deviceHeading = ref(0); // 设备朝向角度（0-360度，0度为正北）
+const compassAvailable = ref(false); // 罗盘是否可用
+const lastRotation = ref(null); // 上一次的旋转角度
+// const rotationUpdateTimer = ref(null); // 旋转更新定时器
 
 // 弹窗
 const showSuccessModal = ref(false);
@@ -192,6 +195,11 @@ onMounted(() => {
 onUnmounted(() => {
   stopRunning();
   stopCompass();
+  // 清理旋转更新定时器
+  // if (rotationUpdateTimer.value) {
+  //   clearTimeout(rotationUpdateTimer.value);
+  //   rotationUpdateTimer.value = null;
+  // }
 });
 
 // 验证坐标是否有效
@@ -211,29 +219,56 @@ const isValidCoordinate = (latitude, longitude) => {
 // 开始监听罗盘
 const startCompass = () => {
   try {
-    uni.onCompassChange((res) => {
-      // res.direction 是设备朝向角度（0-360度，0度为正北）
-      deviceHeading.value = res.direction;
-      // 更新当前位置标记的旋转角度
-      updateCurrentLocationMarkerRotation();
+    // 先启动罗盘
+    uni.startCompass({
+      success: () => {
+        console.log("罗盘启动成功");
+        compassAvailable.value = true;
+        // 启动成功后，监听罗盘变化
+        uni.onCompassChange((res) => {
+          // res.direction 是设备朝向角度（0-360度，0度为正北）
+          if (res.direction !== undefined && res.direction !== null) {
+            deviceHeading.value = res.direction;
+            // 更新当前位置标记的旋转角度
+            updateCurrentLocationMarkerRotation();
+          }
+        });
+        console.log("罗盘监听已启动");
+      },
+      fail: (error) => {
+        console.warn("罗盘启动失败:", error);
+        compassAvailable.value = false;
+        // 罗盘失败不影响其他功能，只记录日志，不显示错误提示
+        // 尝试从位置信息中获取方向（如果可用）
+        console.log("罗盘不可用，将尝试使用位置信息中的方向");
+      },
     });
-    console.log("罗盘监听已启动");
   } catch (error) {
     console.warn("罗盘功能不支持或启动失败:", error);
+    compassAvailable.value = false;
   }
 };
 
 // 停止监听罗盘
 const stopCompass = () => {
   try {
+    // 先停止监听
     uni.offCompassChange();
-    console.log("罗盘监听已停止");
+    // 再停止罗盘
+    uni.stopCompass({
+      success: () => {
+        console.log("罗盘已停止");
+      },
+      fail: (error) => {
+        console.warn("停止罗盘失败:", error);
+      },
+    });
   } catch (error) {
     console.warn("停止罗盘监听失败:", error);
   }
 };
 
-// 更新当前位置标记的旋转角度
+// 更新当前位置标记的旋转角度（带节流和变化检测）
 const updateCurrentLocationMarkerRotation = () => {
   // 图标初始朝向正西（270度），要让图标指向设备朝向（deviceHeading）
   // 旋转角度 = 设备朝向 - 图标初始朝向 = deviceHeading - 270
@@ -241,13 +276,43 @@ const updateCurrentLocationMarkerRotation = () => {
   // 简化后：rotate = (deviceHeading + 90) % 360
   const rotation = (deviceHeading.value + 90) % 360;
 
-  // 更新 markers 中 id 为 0 的当前位置标记
-  const currentMarker = markers.value.find((m) => m.id === 0);
-  if (currentMarker) {
-    currentMarker.rotate = rotation;
-    // 触发响应式更新
-    markers.value = [...markers.value];
+  // 如果旋转角度没有变化（或变化很小），跳过更新
+  // if (lastRotation.value !== null) {
+  //   const diff = Math.abs(rotation - lastRotation.value);
+  //   // 处理角度跨越0度/360度的情况
+  //   const minDiff = Math.min(diff, 360 - diff);
+  //   // 如果角度变化小于3度，跳过更新（避免微小变化导致的闪烁）
+  //   if (minDiff < 3) {
+  //     return;
+  //   }
+  // }
+
+  // 清除之前的定时器
+  // if (rotationUpdateTimer.value) {
+  //   clearTimeout(rotationUpdateTimer.value);
+  // }
+
+  // 使用节流，延迟更新（每500ms最多更新一次）
+  // rotationUpdateTimer.value = setTimeout(() => {
+  const index = markers.value.findIndex((m) => m.id === 0);
+  if (index !== -1) {
+    // 检查角度是否真的变化了
+    if (markers.value[index].rotate !== rotation) {
+      // 在 uni-app 中，需要重新创建数组才能触发地图组件更新
+      // 但我们可以只更新需要更新的 marker，其他保持不变
+      const newMarkers = markers.value.map((marker, i) => {
+        if (i === index) {
+          // 只更新当前位置标记的旋转角度
+          return { ...marker, rotate: rotation };
+        }
+        return marker; // 其他标记保持不变
+      });
+      markers.value = newMarkers;
+      lastRotation.value = rotation;
+    }
   }
+  //   rotationUpdateTimer.value = null;
+  // }, 500);
 };
 
 // 检查位置权限
@@ -588,6 +653,17 @@ const handleLocationUpdate = (location) => {
   if (!isValidCoordinate(location.latitude, location.longitude)) {
     console.warn("接收到无效坐标，跳过此次更新");
     return;
+  }
+
+  // 如果罗盘不可用，尝试从位置信息中获取方向（heading）
+  if (
+    !compassAvailable.value &&
+    location.heading !== undefined &&
+    location.heading !== null
+  ) {
+    // heading 是移动方向（0-360度，0度为正北），可以作为设备朝向的参考
+    deviceHeading.value = location.heading;
+    updateCurrentLocationMarkerRotation();
   }
 
   // 计算距离
