@@ -2,6 +2,7 @@
   <view
     class="event-item"
     :style="{ flexDirection: direction, height: height, width: width }"
+    @click="joinEvent"
   >
     <image
       class="event-item-image"
@@ -29,7 +30,7 @@
         <view class="event-item-location">{{
           item.event_location || "线上跑"
         }}</view>
-        <view class="event-item-button" @click="joinEvent">
+        <view class="event-item-button">
           <block v-if="item.status === 'ACT'">立即报名</block>
           <block v-if="item.status === 'PND'">活动暂未开始</block>
           <block v-if="item.status === 'EXP'">查看报名详情</block>
