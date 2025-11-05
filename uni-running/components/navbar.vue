@@ -3,7 +3,7 @@
     class="navbar-box"
     :style="{ height: placeholder ? navbarBoxHeight : 0 }"
   >
-    <view class="navbar-bg" :style="{ height: `${bgHeight}rpx` }"></view>
+    <!-- <view class="navbar-bg" :style="{ height: `${bgHeight}rpx` }"></view> -->
     <view class="navbar-bg-overlay" :style="bgOverlayStyle"></view>
     <view
       v-if="back"
@@ -208,7 +208,8 @@ onUnmounted(() => {
     background-color: #ffffff;
     border-radius: 999px;
     padding: 0 6px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    // box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
     .navbar-back-btn,
     .navbar-home-btn {

@@ -1,6 +1,6 @@
 <template>
   <view class="page">
-    <u-navbar autoBack placeholder title="跑步轨迹"></u-navbar>
+    <Navbar title="跑步轨迹" />
 
     <!-- 地图容器 -->
     <view class="map-container">
@@ -103,6 +103,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
 // import runningApi from '@/utils/runningApi.js'
+import Navbar from "@/components/navbar.vue";
 
 // 地图相关
 const mapCenter = ref({
@@ -1004,7 +1005,6 @@ const clearTestTrack = () => {
   background: white;
   padding: 20rpx;
   box-sizing: border-box;
-  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.1);
 }
 
 .data-display {
