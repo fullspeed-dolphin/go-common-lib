@@ -130,6 +130,13 @@ const lastLocation = ref(null); // 上一个位置点
 const timer = ref(null);
 const locationTimer = ref(null);
 
+// 地图上下文
+const mapContext = ref(null);
+
+// 地图移动节流（避免过于频繁的移动）
+const lastMoveTime = ref(0);
+const MOVE_INTERVAL = 500; // 最小移动间隔（毫秒）
+
 // 弹窗
 const showSuccessModal = ref(false);
 
@@ -173,6 +180,8 @@ const progressPercent = computed(() => {
 });
 
 onMounted(() => {
+  // 创建地图上下文
+  mapContext.value = uni.createMapContext("runMap");
   initLocation();
 });
 
@@ -581,15 +590,13 @@ const updateMapTrack = () => {
     },
   ];
 
-  // 更新地图中心到当前位置
+  // 更新地图中心到当前位置（平滑移动）
   const lastPoint = validPoints[validPoints.length - 1];
   if (isValidCoordinate(lastPoint.latitude, lastPoint.longitude)) {
-    mapCenter.value = {
-      latitude: lastPoint.latitude,
-      longitude: lastPoint.longitude,
-    };
+    const now = Date.now();
+    const shouldMove = now - lastMoveTime.value >= MOVE_INTERVAL;
 
-    // 更新markers：起始点 + 当前位置
+    // 更新markers：起始点 + 当前位置（始终更新）
     const newMarkers = [];
 
     // 添加起始点标记
@@ -617,6 +624,51 @@ const updateMapTrack = () => {
     });
 
     markers.value = newMarkers;
+
+    // 节流控制：避免过于频繁的移动
+    if (!shouldMove) {
+      return;
+    }
+
+    lastMoveTime.value = now;
+
+    // 使用地图上下文平滑移动中心点
+    if (mapContext.value) {
+      try {
+        mapContext.value.moveToLocation({
+          latitude: lastPoint.latitude,
+          longitude: lastPoint.longitude,
+          success: () => {
+            // 移动成功后更新中心点坐标（用于同步状态）
+            mapCenter.value = {
+              latitude: lastPoint.latitude,
+              longitude: lastPoint.longitude,
+            };
+          },
+          fail: (err) => {
+            console.warn("地图移动失败，使用直接更新:", err);
+            // 如果移动失败，直接更新中心点
+            mapCenter.value = {
+              latitude: lastPoint.latitude,
+              longitude: lastPoint.longitude,
+            };
+          },
+        });
+      } catch (error) {
+        // 如果 moveToLocation 方法不存在或不支持，直接更新
+        console.warn("地图移动方法不支持，使用直接更新:", error);
+        mapCenter.value = {
+          latitude: lastPoint.latitude,
+          longitude: lastPoint.longitude,
+        };
+      }
+    } else {
+      // 如果地图上下文未创建，直接更新中心点
+      mapCenter.value = {
+        latitude: lastPoint.latitude,
+        longitude: lastPoint.longitude,
+      };
+    }
   }
 };
 
