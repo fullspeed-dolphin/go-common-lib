@@ -93,16 +93,20 @@
             </up-form-item>
 
             <up-form-item label="出生日期" prop="birthday">
-              <picker
+              <up-datetime-picker
+                hasInput
+                v-model="birthdayTimestamp"
                 mode="date"
-                :value="form.birthday"
-                :start="startDate"
-                :end="endDate"
-                @change="onBirthdayChange"
+                cancelText="取消"
+                confirmText="确认"
+                confirmColor="#FF8C00"
+                :minDate="startDate"
+                :maxDate="endDate"
+                @confirm="onBirthdayConfirm"
               >
-                <view class="picker-view">
+                <template #trigger="{ value }">
                   <up-input
-                    :modelValue="form.birthday || ''"
+                    :modelValue="value || ''"
                     placeholder="请选择"
                     border="none"
                     inputAlign="right"
@@ -112,8 +116,8 @@
                       <up-icon name="arrow-right" size="18" color="#999" />
                     </template>
                   </up-input>
-                </view>
-              </picker>
+                </template>
+              </up-datetime-picker>
             </up-form-item>
 
             <up-form-item label="手机号码" prop="mobile">
@@ -384,9 +388,9 @@ const emit = defineEmits(["update:modelValue", "submit"]);
 
 const formRef = ref(null);
 const submitting = ref(false);
-// 日期选择器的开始和结束日期
-const startDate = "1920-01-01";
-const endDate = "2025-12-31";
+// 日期选择器的开始和结束日期（时间戳格式，供 up-datetime-picker 使用）
+const startDate = dayjs("1950-01-01").valueOf();
+const endDate = dayjs().valueOf();
 const showIdTypePicker = ref(false);
 const idTypeIndex = ref([0]);
 const selectedIdType = ref([]);
@@ -878,6 +882,7 @@ const rules = {
       message: "请选择出生日期",
       trigger: ["change"],
       validator: (rule, value, callback) => {
+        console.log(value, "出生日期1111");
         // 验证字符串格式的日期（YYYY-MM-DD）或空值
         if (!value || value === "") {
           callback(new Error("请选择出生日期"));
@@ -900,22 +905,23 @@ const rules = {
   ],
 };
 
-// 处理日期选择器变化事件
-function onBirthdayChange(e) {
-  // 原生 picker 组件的 change 事件返回的 e.detail.value 就是选中的日期字符串 "YYYY-MM-DD"
-  const dateStr = e.detail.value;
+const birthdayTimestamp = computed(() => {
+  return form.birthday ? dayjs(form.birthday).valueOf() : "";
+});
 
-  if (dateStr) {
-    // 确保格式为 YYYY-MM-DD
-    form.birthday = dateStr;
+// 处理日期选择器确认事件
+function onBirthdayConfirm(e) {
+  // up-datetime-picker 的 confirm 事件返回的是时间戳（number）
+  // 需要转换为 YYYY-MM-DD 格式的字符串
+  console.log(form.birthday, e, "form.birthday");
+  form.birthday = dayjs(e.value || startDate).format("YYYY-MM-DD");
 
-    // 手动触发验证
-    nextTick(() => {
-      if (formRef.value) {
-        formRef.value.validateField("birthday", () => {}, "change");
-      }
-    });
-  }
+  // 手动触发验证
+  nextTick(() => {
+    if (formRef.value) {
+      formRef.value.validateField("birthday", () => {}, "change");
+    }
+  });
 }
 
 // 根据地址字符串解析省市区
