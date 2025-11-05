@@ -29,8 +29,76 @@
 
     <!-- 控制面板 -->
     <view class="control-panel">
+      <!-- 开始/暂停/继续/停止按钮 -->
+      <view class="button-container">
+        <!-- 未开始状态：显示开始按钮 -->
+        <button
+          v-if="!isRunning && !isPaused"
+          class="button start-button"
+          @click="startRunning"
+          :disabled="isLoading"
+        >
+          <image
+            src="/static/images/icon-run-start@2x.png"
+            mode="widthFix"
+            style="width: 40rpx; height: 40rpx"
+          ></image>
+        </button>
+
+        <!-- 运行中状态：显示暂停和停止按钮 -->
+        <template v-else-if="isRunning && !isPaused">
+          <button
+            class="button pause-button"
+            @click="pauseRunning"
+            :disabled="isLoading"
+          >
+            <image
+              src="/static/images/icon-run-pause@2x.png"
+              mode="widthFix"
+              style="width: 40rpx; height: 40rpx"
+            ></image>
+          </button>
+          <button
+            class="button stop-button"
+            @click="stopRunning"
+            :disabled="isLoading"
+          >
+            <image
+              src="/static/images/icon-run-stop@2x.png"
+              mode="widthFix"
+              style="width: 40rpx; height: 40rpx"
+            ></image>
+          </button>
+        </template>
+
+        <!-- 暂停状态：显示继续和停止按钮 -->
+        <template v-else-if="isPaused">
+          <button
+            class="button resume-button"
+            @click="resumeRunning"
+            :disabled="isLoading"
+          >
+            <image
+              src="/static/images/icon-run-start@2x.png"
+              mode="widthFix"
+              style="width: 40rpx; height: 40rpx"
+            ></image>
+          </button>
+          <button
+            class="button stop-button"
+            @click="stopRunning"
+            :disabled="isLoading"
+          >
+            <image
+              src="/static/images/icon-run-stop@2x.png"
+              mode="widthFix"
+              style="width: 40rpx; height: 40rpx"
+            ></image>
+          </button>
+        </template>
+      </view>
       <!-- 跑步数据展示 -->
-      <view class="data-display" v-if="isRunning || hasTrack">
+      <view class="data-display">
         <view class="data-item">
           <text class="data-value">{{ formatDistance(totalDistance) }}</text>
           <text class="data-label">距离</text>
@@ -45,21 +113,8 @@
         </view>
       </view>
 
-      <!-- 开始/停止按钮 -->
-      <view class="button-container">
-        <button
-          class="start-button"
-          :class="{ 'stop-button': isRunning }"
-          @click="toggleRunning"
-          :disabled="isLoading"
-        >
-          <text v-if="!isRunning">开始跑步</text>
-          <text v-else>停止跑步</text>
-        </button>
-      </view>
-
       <!-- 测试按钮 -->
-      <view class="test-buttons" v-if="!isRunning && debug">
+      <view class="test-buttons" v-if="!isRunning && !isPaused && debug">
         <button class="test-button" @click="drawTestTrack">绘制测试轨迹</button>
         <button class="test-button" @click="clearTestTrack" v-if="hasTrack">
           清除轨迹
@@ -67,14 +122,14 @@
       </view>
 
       <!-- 进度提示 -->
-      <view class="progress-tip" v-if="isRunning && totalDistance > 0">
+      <view class="progress-tip">
         <text>目标: 10km | 当前: {{ formatDistance(totalDistance) }}</text>
-        <view class="progress-bar">
+        <!-- <view class="progress-bar">
           <view
             class="progress-fill"
             :style="{ width: progressPercent + '%' }"
           ></view>
-        </view>
+        </view> -->
       </view>
     </view>
 
@@ -115,6 +170,7 @@ const polylines = ref([]);
 
 // 跑步状态
 const isRunning = ref(false);
+const isPaused = ref(false);
 const isLoading = ref(false);
 const hasTrack = ref(false);
 
@@ -446,10 +502,12 @@ const initLocation = async () => {
   }
 };
 
-// 切换跑步状态
+// 切换跑步状态（保留以兼容旧代码，但推荐使用新的方法）
 const toggleRunning = async () => {
-  if (isRunning.value) {
-    stopRunning();
+  if (isRunning.value && !isPaused.value) {
+    pauseRunning();
+  } else if (isPaused.value) {
+    resumeRunning();
   } else {
     startRunning();
   }
@@ -535,6 +593,7 @@ const startRunning = async () => {
 
     // 重置数据
     isRunning.value = true;
+    isPaused.value = false;
     hasTrack.value = true;
     totalDistance.value = 0;
     runningTime.value = 0;
@@ -590,9 +649,79 @@ const startRunning = async () => {
   }
 };
 
+// 暂停跑步
+const pauseRunning = () => {
+  isPaused.value = true;
+  isRunning.value = false;
+
+  // 停止后台定位
+  uni.stopLocationUpdate();
+  uni.offLocationChange();
+
+  // 停止计时器
+  if (timer.value) {
+    clearInterval(timer.value);
+    timer.value = null;
+  }
+
+  uni.showToast({
+    title: "已暂停",
+    icon: "success",
+  });
+};
+
+// 继续跑步
+const resumeRunning = async () => {
+  isLoading.value = true;
+
+  try {
+    // 重新启动后台定位
+    await uni.startLocationUpdateBackground({
+      success: () => {
+        console.log("后台定位重新启动成功");
+      },
+      fail: (error) => {
+        console.error("后台定位重新启动失败:", error);
+        uni.showToast({
+          title: "定位服务启动失败",
+          icon: "none",
+        });
+        isLoading.value = false;
+        return;
+      },
+    });
+
+    // 重新监听位置变化
+    uni.onLocationChange((res) => {
+      handleLocationUpdate(res);
+    });
+
+    // 恢复状态
+    isPaused.value = false;
+    isRunning.value = true;
+
+    // 重新开始计时
+    startTimer();
+
+    uni.showToast({
+      title: "继续跑步",
+      icon: "success",
+    });
+  } catch (error) {
+    console.error("继续跑步失败:", error);
+    uni.showToast({
+      title: "继续跑步失败",
+      icon: "none",
+    });
+  } finally {
+    isLoading.value = false;
+  }
+};
+
 // 停止跑步
 const stopRunning = () => {
   isRunning.value = false;
+  isPaused.value = false;
 
   // 停止后台定位
   uni.stopLocationUpdate();
@@ -648,7 +777,7 @@ const stopRunning = () => {
 
 // 处理位置更新
 const handleLocationUpdate = (location) => {
-  if (!isRunning.value || !lastLocation.value) return;
+  if (!isRunning.value || isPaused.value || !lastLocation.value) return;
 
   // 验证新位置坐标是否有效
   if (!isValidCoordinate(location.latitude, location.longitude)) {
@@ -1003,16 +1132,17 @@ const clearTestTrack = () => {
   bottom: 0;
   width: 100%;
   background: white;
-  padding: 20rpx;
   box-sizing: border-box;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 20rpx);
+  padding-top: 20rpx;
 }
 
 .data-display {
   display: flex;
   justify-content: space-around;
   margin-bottom: 30rpx;
+  margin-top: 64rpx;
   padding: 20rpx 0;
-  border-bottom: 1rpx solid #eee;
 }
 
 .data-item {
@@ -1022,44 +1152,58 @@ const clearTestTrack = () => {
 }
 
 .data-value {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
+  font-weight: 800;
+  font-size: 30rpx;
+  color: #000000;
   margin-bottom: 8rpx;
 }
 
 .data-label {
+  font-weight: bold;
   font-size: 24rpx;
-  color: #666;
+  color: #999999;
 }
 
 .button-container {
+  position: absolute;
+  top: -66rpx;
+  left: 0;
   display: flex;
+  width: 100%;
   justify-content: center;
+  gap: 60rpx;
+  align-items: center;
+  .button {
+    width: 132rpx;
+    height: 132rpx;
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+    margin: 0;
+    &:active {
+      transform: scale(0.95);
+    }
+  }
 }
 
 .start-button {
-  width: 200rpx;
-  height: 80rpx;
-  background: linear-gradient(135deg, #ff8c00, #ffa500);
-  color: white;
-  border: none;
-  border-radius: 40rpx;
-  font-size: 28rpx;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4rpx 15rpx rgba(255, 140, 0, 0.3);
-  transition: all 0.3s ease;
+  background: #43a047;
+}
+
+.pause-button {
+  background: #ffb300;
+}
+
+.resume-button {
+  background: #43a047;
 }
 
 .stop-button {
-  background: linear-gradient(135deg, #e67e00, #ff8c00);
-}
-
-.start-button:active {
-  transform: scale(0.95);
+  background: #e53935;
 }
 
 .test-buttons {
@@ -1090,14 +1234,14 @@ const clearTestTrack = () => {
 }
 
 .progress-tip {
-  margin-top: 20rpx;
+  margin-top: 24rpx;
   text-align: center;
 }
 
 .progress-tip text {
-  font-size: 24rpx;
-  color: #666;
-  margin-bottom: 10rpx;
+  font-weight: bold;
+  font-size: 20rpx;
+  color: #d1d5db;
   display: block;
 }
 
