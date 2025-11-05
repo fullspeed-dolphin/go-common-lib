@@ -372,13 +372,15 @@
 </template>
 
 <script setup>
-import { reactive, ref, watch, computed, nextTick } from "vue";
+import { reactive, ref, watch, computed, nextTick, onMounted } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import Navbar from "@/components/navbar.vue";
 import dayjs from "dayjs";
-import provinceData from "@/static/jsons/province.json";
-import cityData from "@/static/jsons/city.json";
-import areaData from "@/static/jsons/area.json";
+import {
+  loadProvinceData,
+  loadCityData,
+  loadAreaData,
+} from "@/utils/regionData.js";
 
 const props = defineProps({
   modelValue: { type: Object, default: () => ({}) },
@@ -413,6 +415,12 @@ const selectedArea = ref([]);
 const provinceOptions = ref([]);
 const cityOptions = ref([]);
 const areaOptions = ref([]);
+
+// 原始省市区数据（从网络加载）
+const provinceData = ref([]);
+const cityData = ref([]);
+const areaData = ref([]);
+const regionDataLoaded = ref(false);
 
 // 血型 picker 状态
 const showBloodTypePicker = ref(false);
@@ -554,11 +562,34 @@ const buttonCustomStyle = computed(() => {
   }`;
 });
 
-// 初始化省市区数据
-provinceOptions.value = provinceData.map((p) => ({
-  code: p.code,
-  name: p.name,
-}));
+// 加载省市区数据
+async function initRegionData() {
+  try {
+    const [province, city, area] = await Promise.all([
+      loadProvinceData(),
+      loadCityData(),
+      loadAreaData(),
+    ]);
+
+    provinceData.value = province;
+    cityData.value = city;
+    areaData.value = area;
+
+    // 初始化省份选项
+    provinceOptions.value = province.map((p) => ({
+      code: p.code,
+      name: p.name,
+    }));
+
+    regionDataLoaded.value = true;
+  } catch (error) {
+    console.error("加载省市区数据失败:", error);
+    uni.showToast({
+      title: "加载地址数据失败",
+      icon: "none",
+    });
+  }
+}
 
 // 监听 idType 变化，设置默认 index 和 selectedIdType
 watch(
@@ -681,11 +712,11 @@ watch(
         }
 
         // 加载该省的城市数据
-        const provinceDataItem = provinceData.find(
+        const provinceDataItem = provinceData.value.find(
           (p) => p.code === provinceCode
         );
         if (provinceDataItem) {
-          cityOptions.value = cityData
+          cityOptions.value = cityData.value
             .filter((city) => city.province === provinceDataItem.province)
             .map((city) => ({ code: city.code, name: city.name }));
 
@@ -702,9 +733,11 @@ watch(
               }
 
               // 加载该市的区数据
-              const cityDataItem = cityData.find((c) => c.code === cityCode);
+              const cityDataItem = cityData.value.find(
+                (c) => c.code === cityCode
+              );
               if (cityDataItem) {
-                areaOptions.value = areaData
+                areaOptions.value = areaData.value
                   .filter(
                     (area) =>
                       area.province === cityDataItem.province &&
@@ -766,11 +799,11 @@ function onProvinceConfirm(e) {
   showProvincePicker.value = false;
   // 选择省后，加载该省的城市数据
   if (selectedProvince.value && selectedProvince.value.length > 0) {
-    const province = provinceData.find(
+    const province = provinceData.value.find(
       (p) => p.code === selectedProvince.value[0]
     );
     if (province) {
-      cityOptions.value = cityData
+      cityOptions.value = cityData.value
         .filter((city) => city.province === province.province)
         .map((city) => ({ code: city.code, name: city.name }));
 
@@ -786,9 +819,9 @@ function onCityConfirm(e) {
   showCityPicker.value = false;
   // 选择市后，加载该市的区数据
   if (selectedCity.value && selectedCity.value.length > 0) {
-    const city = cityData.find((c) => c.code === selectedCity.value[0]);
+    const city = cityData.value.find((c) => c.code === selectedCity.value[0]);
     if (city) {
-      areaOptions.value = areaData
+      areaOptions.value = areaData.value
         .filter(
           (area) => area.province === city.province && area.city === city.city
         )
@@ -955,7 +988,7 @@ function parseAddressToRegion(addressStr) {
   } else {
     // 解析中国大陆地址
     // 首先尝试从已知省份数据中精确匹配
-    for (const province of provinceData) {
+    for (const province of provinceData.value) {
       if (addressStr.includes(province.name)) {
         provinceName = province.name;
         break;
@@ -975,7 +1008,7 @@ function parseAddressToRegion(addressStr) {
         if (match) {
           const matched = match[1];
           // 验证是否是有效的省份名称
-          const found = provinceData.find((p) => p.name === matched);
+          const found = provinceData.value.find((p) => p.name === matched);
           if (found) {
             provinceName = matched;
             break;
@@ -986,10 +1019,10 @@ function parseAddressToRegion(addressStr) {
 
     // 匹配市
     if (provinceName) {
-      const province = provinceData.find((p) => p.name === provinceName);
+      const province = provinceData.value.find((p) => p.name === provinceName);
       if (province) {
         // 先加载该省的所有城市数据
-        const provinceCities = cityData.filter(
+        const provinceCities = cityData.value.filter(
           (c) => c.province === province.province
         );
 
@@ -1028,12 +1061,12 @@ function parseAddressToRegion(addressStr) {
 
         // 匹配区/县
         if (cityName) {
-          const city = cityData.find(
+          const city = cityData.value.find(
             (c) => c.name === cityName && c.province === province.province
           );
           if (city) {
             // 先加载该市的所有区数据
-            const cityAreas = areaData.filter(
+            const cityAreas = areaData.value.filter(
               (a) => a.province === city.province && a.city === city.city
             );
 
@@ -1085,13 +1118,13 @@ function parseAddressToRegion(addressStr) {
   let areaCode = "";
 
   if (provinceName) {
-    const province = provinceData.find((p) => p.name === provinceName);
+    const province = provinceData.value.find((p) => p.name === provinceName);
     if (province) {
       provinceCode = province.code;
 
       // 加载城市数据
       if (cityName) {
-        const city = cityData.find(
+        const city = cityData.value.find(
           (c) => c.name === cityName && c.province === province.province
         );
         if (city) {
@@ -1099,7 +1132,7 @@ function parseAddressToRegion(addressStr) {
 
           // 加载区数据
           if (areaName) {
-            const area = areaData.find(
+            const area = areaData.value.find(
               (a) =>
                 a.name === areaName &&
                 a.province === city.province &&
@@ -1207,6 +1240,11 @@ function onSubmit() {
 }
 
 onLoad(() => {});
+
+// 组件挂载时加载省市区数据
+onMounted(() => {
+  initRegionData();
+});
 </script>
 
 <style lang="less" scoped>

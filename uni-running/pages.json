@@ -328,21 +328,15 @@
     "list": [
       {
         "text": "首页",
-        "pagePath": "pages/index",
-        "iconPath": "./static/tab_00.png",
-        "selectedIconPath": "./static/tab_00.png"
+        "pagePath": "pages/index"
       },
       {
         "text": "",
-        "pagePath": "pages/sport",
-        "iconPath": "./static/tab_00.png",
-        "selectedIconPath": "./static/tab_00.png"
+        "pagePath": "pages/sport"
       },
       {
         "text": "",
-        "pagePath": "pages/mine",
-        "iconPath": "./static/tab_00.png",
-        "selectedIconPath": "./static/tab_00.png"
+        "pagePath": "pages/mine"
       }
     ]
   },

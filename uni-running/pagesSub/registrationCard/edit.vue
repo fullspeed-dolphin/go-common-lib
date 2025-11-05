@@ -7,25 +7,32 @@ import { ref, onMounted } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import RegistrationCardForm from "./form.vue";
 import request from "@/utils/request.js";
-import provinceData from "@/static/jsons/province.json";
-import cityData from "@/static/jsons/city.json";
-import areaData from "@/static/jsons/area.json";
+import {
+  loadProvinceData,
+  loadCityData,
+  loadAreaData,
+} from "@/utils/regionData.js";
 
 const form = ref({});
 const cardId = ref(null);
+
+// 省市区数据
+const provinceData = ref([]);
+const cityData = ref([]);
+const areaData = ref([]);
 
 // 根据code查找名称
 function codeToName(code, type) {
   if (!code) return "";
 
   if (type === "province") {
-    const item = provinceData.find((p) => p.code === code);
+    const item = provinceData.value.find((p) => p.code === code);
     return item ? item.name : code;
   } else if (type === "city") {
-    const item = cityData.find((c) => c.code === code);
+    const item = cityData.value.find((c) => c.code === code);
     return item ? item.name : code;
   } else if (type === "area") {
-    const item = areaData.find((a) => a.code === code);
+    const item = areaData.value.find((a) => a.code === code);
     return item ? item.name : code;
   }
   return code;
@@ -36,13 +43,13 @@ function nameToCode(name, type) {
   if (!name) return "";
 
   if (type === "province") {
-    const item = provinceData.find((p) => p.name === name);
+    const item = provinceData.value.find((p) => p.name === name);
     return item ? item.code : name;
   } else if (type === "city") {
-    const item = cityData.find((c) => c.name === name);
+    const item = cityData.value.find((c) => c.name === name);
     return item ? item.code : name;
   } else if (type === "area") {
-    const item = areaData.find((a) => a.name === name);
+    const item = areaData.value.find((a) => a.name === name);
     return item ? item.code : name;
   }
   return name;
@@ -178,7 +185,27 @@ onLoad((options) => {
   }
 });
 
-onMounted(() => {
+// 加载省市区数据
+async function loadRegionData() {
+  try {
+    const [province, city, area] = await Promise.all([
+      loadProvinceData(),
+      loadCityData(),
+      loadAreaData(),
+    ]);
+    provinceData.value = province;
+    cityData.value = city;
+    areaData.value = area;
+  } catch (error) {
+    console.error("加载省市区数据失败:", error);
+  }
+}
+
+onMounted(async () => {
+  // 先加载省市区数据
+  await loadRegionData();
+
+  // 然后加载卡片详情
   if (cardId.value) {
     getCardDetail(cardId.value);
   }

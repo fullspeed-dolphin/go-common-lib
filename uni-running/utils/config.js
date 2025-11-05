@@ -17,3 +17,6 @@ console.log(envVersion, baseUrl, 'envVersion, baseUrl');
 export const baseLink = baseUrl
 
 export const isRelease =['release'].includes(envVersion);
+
+// 静态资源基础 URL（OSS）
+export const staticBaseUrl = 'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static';

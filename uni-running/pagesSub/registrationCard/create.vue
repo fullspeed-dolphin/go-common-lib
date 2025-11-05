@@ -3,28 +3,35 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import RegistrationCardForm from "./form.vue";
 import request from "@/utils/request.js";
-import provinceData from "@/static/jsons/province.json";
-import cityData from "@/static/jsons/city.json";
-import areaData from "@/static/jsons/area.json";
+import {
+  loadProvinceData,
+  loadCityData,
+  loadAreaData,
+} from "@/utils/regionData.js";
 
 const form = ref({});
+
+// 省市区数据
+const provinceData = ref([]);
+const cityData = ref([]);
+const areaData = ref([]);
 
 // 根据code查找名称
 function codeToName(code, type) {
   if (!code) return "";
 
   if (type === "province") {
-    const item = provinceData.find((p) => p.code === code);
+    const item = provinceData.value.find((p) => p.code === code);
     return item ? item.name : code;
   } else if (type === "city") {
-    const item = cityData.find((c) => c.code === code);
+    const item = cityData.value.find((c) => c.code === code);
     return item ? item.name : code;
   } else if (type === "area") {
-    const item = areaData.find((a) => a.code === code);
+    const item = areaData.value.find((a) => a.code === code);
     return item ? item.name : code;
   }
   return code;
@@ -80,7 +87,27 @@ async function handleSubmit(payload) {
   }
 }
 
+// 加载省市区数据
+async function loadRegionData() {
+  try {
+    const [province, city, area] = await Promise.all([
+      loadProvinceData(),
+      loadCityData(),
+      loadAreaData(),
+    ]);
+    provinceData.value = province;
+    cityData.value = city;
+    areaData.value = area;
+  } catch (error) {
+    console.error("加载省市区数据失败:", error);
+  }
+}
+
 onLoad(() => {});
+
+onMounted(() => {
+  loadRegionData();
+});
 </script>
 
 <style scoped></style>
