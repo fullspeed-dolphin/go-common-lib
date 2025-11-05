@@ -48,6 +48,17 @@
         <!-- 运行中状态：显示暂停和停止按钮 -->
         <template v-else-if="isRunning && !isPaused">
           <button
+            class="button stop-button"
+            @click="stopRunning"
+            :disabled="isLoading"
+          >
+            <image
+              src="/static/images/icon-run-stop@2x.png"
+              mode="widthFix"
+              style="width: 40rpx; height: 40rpx"
+            ></image>
+          </button>
+          <button
             class="button pause-button"
             @click="pauseRunning"
             :disabled="isLoading"
@@ -58,6 +69,10 @@
               style="width: 40rpx; height: 40rpx"
             ></image>
           </button>
+        </template>
+
+        <!-- 暂停状态：显示继续和停止按钮 -->
+        <template v-else-if="isPaused">
           <button
             class="button stop-button"
             @click="stopRunning"
@@ -69,10 +84,6 @@
               style="width: 40rpx; height: 40rpx"
             ></image>
           </button>
-        </template>
-
-        <!-- 暂停状态：显示继续和停止按钮 -->
-        <template v-else-if="isPaused">
           <button
             class="button resume-button"
             @click="resumeRunning"
@@ -80,17 +91,6 @@
           >
             <image
               src="/static/images/icon-run-start@2x.png"
-              mode="widthFix"
-              style="width: 40rpx; height: 40rpx"
-            ></image>
-          </button>
-          <button
-            class="button stop-button"
-            @click="stopRunning"
-            :disabled="isLoading"
-          >
-            <image
-              src="/static/images/icon-run-stop@2x.png"
               mode="widthFix"
               style="width: 40rpx; height: 40rpx"
             ></image>
@@ -771,8 +771,8 @@ const stopRunning = () => {
   // 检查是否达到目标
   if (totalDistance.value >= targetDistance.value) {
     showSuccessModal.value = true;
-    submitRunningData();
   }
+  submitRunningData();
 };
 
 // 处理位置更新
@@ -1020,6 +1020,11 @@ const submitRunningData = async () => {
       title: "打卡成功！",
       icon: "success",
     });
+    setTimeout(() => {
+      uni.navigateTo({
+        url: "/pagesSub/sport/show?id=" + userInfo.value.id,
+      });
+    }, 1000);
   } catch (error) {
     console.error("提交跑步数据失败:", error);
     uni.showToast({
