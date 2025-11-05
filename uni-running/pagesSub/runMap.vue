@@ -288,18 +288,18 @@ const initLocation = async () => {
       };
 
       // 添加当前位置标记
-      markers.value = [
-        {
-          id: 0,
-          latitude: res.latitude,
-          longitude: res.longitude,
-          title: "当前位置",
-          // iconPath: '/static/location.png',
-          width: 30,
-          height: 30,
-          anchor: { x: 0.5, y: 0.5 },
-        },
-      ];
+      // markers.value = [
+      //   {
+      //     id: 0,
+      //     latitude: res.latitude,
+      //     longitude: res.longitude,
+      //     title: "当前位置",
+      //     // iconPath: '/static/location.png',
+      //     width: 30,
+      //     height: 30,
+      //     anchor: { x: 0.5, y: 0.5 },
+      //   },
+      // ];
     } else {
       console.warn("获取到的坐标无效，使用默认坐标", JSON.stringify(res));
       // 使用默认坐标（北京）
@@ -612,16 +612,16 @@ const updateMapTrack = () => {
     }
 
     // 添加当前位置标记
-    newMarkers.push({
-      id: 0,
-      latitude: lastPoint.latitude,
-      longitude: lastPoint.longitude,
-      title: "当前位置",
-      // iconPath: '/static/location.png',
-      width: 30,
-      height: 30,
-      anchor: { x: 0.5, y: 0.5 },
-    });
+    // newMarkers.push({
+    //   id: 0,
+    //   latitude: lastPoint.latitude,
+    //   longitude: lastPoint.longitude,
+    //   title: "当前位置",
+    //   // iconPath: '/static/location.png',
+    //   width: 30,
+    //   height: 30,
+    //   anchor: { x: 0.5, y: 0.5 },
+    // });
 
     markers.value = newMarkers;
 
