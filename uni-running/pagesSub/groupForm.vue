@@ -9,7 +9,7 @@
         labelPosition="top"
         labelWidth="auto"
       >
-        <view class="u-FileUploader">
+        <view class="form-item-uploader">
           <up-form-item :label="null" prop="poster">
             <FileUploader v-model="form.poster" />
           </up-form-item>
@@ -76,7 +76,11 @@
         >
       </view>
       <view class="" style="padding: 60rpx 8rpx 30rpx">
-        <u-button type="primary" shape="circle" @click="submitForm()"
+        <u-button
+          type="primary"
+          color="#FF8C00"
+          style="border-radius: 16rpx"
+          @click="submitForm()"
           >{{ group_id ? "更新跑团" : "创建跑团" }}
         </u-button>
       </view>
@@ -264,6 +268,10 @@ const submitForm = () => {
   font-size: 30rpx;
   color: #ff8c00;
   background: rgba(255, 255, 255, 0.2);
+}
+.form-item-uploader {
+  display: flex;
+  justify-content: center;
 }
 
 ::v-deep {
