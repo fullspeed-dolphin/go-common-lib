@@ -159,6 +159,7 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 // import runningApi from '@/utils/runningApi.js'
 import Navbar from "@/components/navbar.vue";
+import request from "@/utils/request.js";
 
 // 地图相关
 const mapCenter = ref({
@@ -182,6 +183,12 @@ const avgPace = ref(0); // 平均配速(秒/公里)
 // 轨迹数据
 const trackPoints = ref([]); // 轨迹点数组
 const lastLocation = ref(null); // 上一个位置点
+const startTime = ref(null); // 跑步开始时间
+
+// 每千米分段数据
+const kmSplits = ref([]); // 每千米分段数据数组
+const currentKmStartDistance = ref(0); // 当前千米段的开始距离（米）
+const currentKmStartTime = ref(null); // 当前千米段的开始时间
 
 // 定时器
 const timer = ref(null);
@@ -207,7 +214,7 @@ const showSuccessModal = ref(false);
 const targetDistance = ref(10000); // 10km = 10000米
 
 // 调试模式
-const debug = ref(false); // 设置为true显示测试功能
+const debug = ref(true); // 设置为true显示测试功能
 
 // 标记配置常量
 const MARKER_CONFIG = {
@@ -600,6 +607,10 @@ const startRunning = async () => {
     runningTime.value = 0;
     trackPoints.value = [];
     polylines.value = [];
+    startTime.value = new Date(); // 记录开始时间
+    kmSplits.value = []; // 重置千米分段数据
+    currentKmStartDistance.value = 0; // 重置当前千米段开始距离
+    currentKmStartTime.value = startTime.value; // 设置当前千米段开始时间
 
     // 获取起始位置
     const startLocation = await uni.getLocation({
@@ -610,8 +621,13 @@ const startRunning = async () => {
 
     // 验证起始位置坐标
     if (isValidCoordinate(startLocation.latitude, startLocation.longitude)) {
-      lastLocation.value = startLocation;
-      trackPoints.value.push(startLocation);
+      // 确保起始位置点有时间戳
+      const startPoint = {
+        ...startLocation,
+        timestamp: startLocation.timestamp || startTime.value.getTime(),
+      };
+      lastLocation.value = startPoint;
+      trackPoints.value.push(startPoint);
 
       // 设置起始点marker
       markers.value = [
@@ -811,9 +827,38 @@ const handleLocationUpdate = (location) => {
   // 更新总距离
   totalDistance.value += distance;
 
-  // 更新轨迹点
-  trackPoints.value.push(location);
-  lastLocation.value = location;
+  // 更新轨迹点，确保有时间戳
+  const trackPoint = {
+    ...location,
+    timestamp: location.timestamp || Date.now(), // 如果没有时间戳，使用当前时间
+  };
+  trackPoints.value.push(trackPoint);
+  lastLocation.value = trackPoint;
+
+  // 检查是否跨过了新的千米点（每1000米）
+  const currentKm = Math.floor(totalDistance.value / 1000);
+  const previousKm = Math.floor((totalDistance.value - distance) / 1000);
+
+  if (currentKm > previousKm && currentKmStartTime.value) {
+    // 完成了一千米，保存这一千米的数据
+    const kmEndTime = new Date(trackPoint.timestamp);
+    const kmDistance = 1000; // 正好1000米
+    const kmSeconds =
+      (kmEndTime.getTime() - currentKmStartTime.value.getTime()) / 1000;
+    const kmPace = kmSeconds; // 秒/公里
+
+    kmSplits.value.push({
+      meters: kmDistance,
+      seconds: kmSeconds,
+      seconds_per_km: kmPace,
+      start_time: currentKmStartTime.value.toISOString(),
+      end_time: kmEndTime.toISOString(),
+    });
+
+    // 开始新的千米段
+    currentKmStartDistance.value = currentKm * 1000;
+    currentKmStartTime.value = kmEndTime;
+  }
 
   // 更新地图轨迹
   updateMapTrack();
@@ -1004,35 +1049,115 @@ const formatPace = (pace) => {
 // 提交跑步数据到后端
 const submitRunningData = async () => {
   try {
-    const runningData = {
-      distance: totalDistance.value,
-      time: runningTime.value,
-      pace: avgPace.value,
-      trackPoints: trackPoints.value,
-      startTime: new Date().toISOString(),
-      endTime: new Date().toISOString(),
+    // 如果没有轨迹数据，不提交
+    if (!trackPoints.value || trackPoints.value.length === 0) {
+      console.log("没有轨迹数据，跳过提交");
+      return;
+    }
+
+    // 计算结束时间（使用最后一个轨迹点的时间，如果没有则使用当前时间）
+    const lastPoint = trackPoints.value[trackPoints.value.length - 1];
+    const endTime =
+      lastPoint && lastPoint.timestamp
+        ? new Date(lastPoint.timestamp)
+        : new Date();
+    const startTimeISO = startTime.value
+      ? startTime.value.toISOString()
+      : new Date(Date.now() - runningTime.value * 1000).toISOString();
+    const endTimeISO = endTime.toISOString();
+
+    // 转换轨迹点格式：从 {latitude, longitude, timestamp} 转换为 {lat, lon, time}
+    const tracks = trackPoints.value
+      .filter((point) => isValidCoordinate(point.latitude, point.longitude))
+      .map((point) => {
+        // 使用轨迹点的时间戳（已经确保每个点都有时间戳）
+        const timeStr = new Date(point.timestamp || Date.now()).toISOString();
+
+        return {
+          lat: point.latitude,
+          lon: point.longitude,
+          time: timeStr,
+        };
+      });
+
+    // 处理最后一千米（如果还有未完成的千米段）
+    const finalKmSplits = [...kmSplits.value];
+    if (currentKmStartTime.value && trackPoints.value.length > 0) {
+      // 计算最后一千米的距离
+      const lastKmDistance = totalDistance.value - currentKmStartDistance.value;
+      if (lastKmDistance > 0) {
+        // 获取最后一个轨迹点的时间
+        const lastPoint = trackPoints.value[trackPoints.value.length - 1];
+        const lastKmEndTime = new Date(
+          lastPoint.timestamp || endTime.getTime()
+        );
+        const lastKmSeconds =
+          (lastKmEndTime.getTime() - currentKmStartTime.value.getTime()) / 1000;
+        const lastKmPace =
+          lastKmDistance > 0 ? lastKmSeconds / (lastKmDistance / 1000) : null;
+
+        finalKmSplits.push({
+          meters: Math.round(lastKmDistance),
+          seconds: lastKmSeconds,
+          seconds_per_km: lastKmPace,
+          start_time: currentKmStartTime.value.toISOString(),
+          end_time: lastKmEndTime.toISOString(),
+        });
+      }
+    }
+
+    // 构建请求数据
+    const requestData = {
+      meters: Math.round(totalDistance.value), // 距离（米）
+      seconds: runningTime.value, // 时间（秒）
+      seconds_per_km: avgPace.value > 0 ? avgPace.value : null, // 配速（秒/公里）
+      geojson: {
+        tracks: tracks,
+      },
+      sport_started_at: startTimeISO,
+      sport_ended_at: endTimeISO,
+      km_splits: finalKmSplits, // 每千米分段数据
     };
 
-    // 调用后端接口
-    // await runningApi.submitRunningData(runningData)
+    console.log("提交跑步数据:", requestData);
 
-    console.log("跑步数据提交成功:", runningData);
+    // 调用后端接口
+    uni.showLoading({
+      title: "保存中...",
+      mask: true,
+    });
+
+    const response = await request.post("/sport-api/api/manual", requestData);
+
+    uni.hideLoading();
+    console.log("跑步数据提交成功:", response);
 
     uni.showToast({
       title: "打卡成功！",
       icon: "success",
     });
+
+    // 延迟跳转，让用户看到成功提示
     setTimeout(() => {
+      // 如果接口返回了id，使用返回的id；否则使用默认值
+      const sportId = response?.id || "111";
       uni.navigateTo({
-        url: "/pagesSub/sport/show?id=111",
+        url: `/pagesSub/sport/show?id=${sportId}`,
       });
     }, 1000);
   } catch (error) {
+    uni.hideLoading();
     console.error("提交跑步数据失败:", error);
-    uni.showToast({
-      title: "数据提交失败",
-      icon: "none",
-    });
+
+    // 错误信息已经在 request.js 中处理了，这里只记录日志
+    // 如果需要，可以显示更详细的错误信息
+    if (error.msg) {
+      uni.showToast({
+        title: error.msg || "数据提交失败",
+        icon: "none",
+        duration: 2000,
+      });
+    }
   }
 };
 
@@ -1044,7 +1169,7 @@ const handleSuccessConfirm = () => {
 };
 
 // 绘制测试轨迹
-const drawTestTrack = () => {
+const drawTestTrack = async () => {
   // 测试轨迹点（以当前位置为中心的复杂路径）
   const centerLat = mapCenter.value.latitude;
   const centerLng = mapCenter.value.longitude;
@@ -1053,6 +1178,12 @@ const drawTestTrack = () => {
   const testPoints = [];
   const radius = 0.0008; // 大约80米的半径
   const pointCount = 40;
+
+  // 设置开始时间（用于计算时间戳）
+  const testStartTime = new Date();
+  if (!startTime.value) {
+    startTime.value = testStartTime;
+  }
 
   for (let i = 0; i < pointCount; i++) {
     const t = (i / pointCount) * 4 * Math.PI; // 两个完整的圆
@@ -1065,7 +1196,7 @@ const drawTestTrack = () => {
       accuracy: 5,
       altitude: 0,
       speed: 2.5 + Math.random() * 1, // 随机速度
-      timestamp: Date.now() + i * 1000,
+      timestamp: testStartTime.getTime() + i * (300000 / pointCount), // 平均分配5分钟的时间
     });
   }
 
@@ -1074,6 +1205,20 @@ const drawTestTrack = () => {
   totalDistance.value = 1000; // 1km测试轨迹
   runningTime.value = 300; // 5分钟
   hasTrack.value = true;
+
+  // 设置千米分段数据（测试轨迹是1km，所以生成一个完整的千米分段）
+  const testEndTime = new Date(testPoints[testPoints.length - 1].timestamp);
+  kmSplits.value = [
+    {
+      meters: 1000,
+      seconds: 300,
+      seconds_per_km: 300,
+      start_time: testStartTime.toISOString(),
+      end_time: testEndTime.toISOString(),
+    },
+  ];
+  currentKmStartDistance.value = 1000;
+  currentKmStartTime.value = testEndTime;
 
   // 更新地图显示
   updateMapTrack();
@@ -1085,6 +1230,9 @@ const drawTestTrack = () => {
     title: "测试轨迹已绘制",
     icon: "success",
   });
+
+  // 自动调用保存打卡记录接口
+  await submitRunningData();
 };
 
 // 清除测试轨迹
@@ -1096,6 +1244,10 @@ const clearTestTrack = () => {
   hasTrack.value = false;
   polylines.value = [];
   markers.value = [];
+  kmSplits.value = [];
+  currentKmStartDistance.value = 0;
+  currentKmStartTime.value = null;
+  startTime.value = null;
 
   uni.showToast({
     title: "轨迹已清除",
