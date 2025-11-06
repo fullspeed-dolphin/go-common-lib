@@ -83,46 +83,46 @@
             }}</view>
             <view class="stats-label">平均配速</view>
           </view>
-          <view class="stats-item">
+          <!-- <view class="stats-item">
             <view class="stats-value">{{
               activityData.avgHeartRate || "--"
             }}</view>
             <view class="stats-label">平均心率(bpm)</view>
-          </view>
-          <view class="stats-item">
+          </view> -->
+          <!-- <view class="stats-item">
             <view class="stats-value">{{
               activityData.avgCadence || "--"
             }}</view>
             <view class="stats-label">平均步频</view>
-          </view>
-          <view class="stats-item">
+          </view> -->
+          <!-- <view class="stats-item">
             <view class="stats-value">{{
               activityData.avgStrideLength || "--"
             }}</view>
             <view class="stats-label">平均步幅(cm)</view>
-          </view>
-          <view class="stats-item">
+          </view> -->
+          <!-- <view class="stats-item">
             <view class="stats-value">{{
               activityData.elevationGain || "--"
             }}</view>
             <view class="stats-label">累计爬升(m)</view>
-          </view>
+          </view> -->
           <view class="stats-item">
             <view class="stats-value">{{
               formatPace(activityData.fastestKm)
             }}</view>
             <view class="stats-label">最快1公里</view>
           </view>
-          <view class="stats-item">
+          <!-- <view class="stats-item">
             <view class="stats-value">{{
               activityData.totalSteps || "--"
             }}</view>
             <view class="stats-label">总步数</view>
-          </view>
-          <view class="stats-item">
+          </view> -->
+          <!-- <view class="stats-item">
             <view class="stats-value">{{ activityData.calories || "--" }}</view>
             <view class="stats-label">大卡</view>
-          </view>
+          </view> -->
         </view>
       </section>
 
