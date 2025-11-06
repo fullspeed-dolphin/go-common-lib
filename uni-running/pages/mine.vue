@@ -144,7 +144,7 @@
                 </view>
                 <text class="service-text">联系客服</text>
               </view>
-              <u-icon name="arrow-right" size="14"></u-icon>
+              <u-icon name="arrow-right" color="#909399" size="16"></u-icon>
             </view>
           </button>
 
@@ -289,9 +289,9 @@ const logout = () => {
       align-items: center;
     }
     .service-text {
-      font-size: 34rpx;
-      font-weight: 600;
+      font-size: 15px;
       color: #303133;
+      font-weight: normal;
     }
     .u-cell__body__content {
       flex: unset;
