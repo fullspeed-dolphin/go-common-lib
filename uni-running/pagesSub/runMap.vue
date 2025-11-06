@@ -214,7 +214,7 @@ const showSuccessModal = ref(false);
 const targetDistance = ref(10000); // 10km = 10000米
 
 // 调试模式
-const debug = ref(true); // 设置为true显示测试功能
+const debug = ref(false); // 设置为true显示测试功能
 
 // 标记配置常量
 const MARKER_CONFIG = {
@@ -1140,7 +1140,7 @@ const submitRunningData = async () => {
     // 延迟跳转，让用户看到成功提示
     setTimeout(() => {
       // 如果接口返回了id，使用返回的id；否则使用默认值
-      const sportId = response?.id || "111";
+      const sportId = response?.id;
       uni.navigateTo({
         url: `/pagesSub/sport/show?id=${sportId}`,
       });
@@ -1174,10 +1174,12 @@ const drawTestTrack = async () => {
   const centerLat = mapCenter.value.latitude;
   const centerLng = mapCenter.value.longitude;
 
-  // 生成复杂轨迹点（8字形路径）
+  // 生成复杂轨迹点（8字形路径，20公里）
   const testPoints = [];
   const radius = 0.0008; // 大约80米的半径
-  const pointCount = 40;
+  const pointCount = 1000; // 增加到1000个点，生成更密集的轨迹
+  const targetDistance = 20000; // 20公里 = 20000米
+  const targetTime = 6000; // 100分钟 = 6000秒（假设配速5分钟/公里）
 
   // 设置开始时间（用于计算时间戳）
   const testStartTime = new Date();
@@ -1185,8 +1187,9 @@ const drawTestTrack = async () => {
     startTime.value = testStartTime;
   }
 
+  // 生成更长的轨迹路径（多个8字形循环）
   for (let i = 0; i < pointCount; i++) {
-    const t = (i / pointCount) * 4 * Math.PI; // 两个完整的圆
+    const t = (i / pointCount) * 20 * Math.PI; // 10个完整的圆，形成更长的路径
     const lat = centerLat + radius * Math.sin(t);
     const lng = centerLng + radius * Math.sin(2 * t) * 0.5; // 8字形
 
@@ -1196,28 +1199,40 @@ const drawTestTrack = async () => {
       accuracy: 5,
       altitude: 0,
       speed: 2.5 + Math.random() * 1, // 随机速度
-      timestamp: testStartTime.getTime() + i * (300000 / pointCount), // 平均分配5分钟的时间
+      timestamp:
+        testStartTime.getTime() + i * ((targetTime * 1000) / pointCount), // 平均分配时间
     });
   }
 
   // 设置测试数据
   trackPoints.value = testPoints;
-  totalDistance.value = 1000; // 1km测试轨迹
-  runningTime.value = 300; // 5分钟
+  totalDistance.value = targetDistance; // 20km测试轨迹
+  runningTime.value = targetTime; // 100分钟
   hasTrack.value = true;
 
-  // 设置千米分段数据（测试轨迹是1km，所以生成一个完整的千米分段）
+  // 设置千米分段数据（生成20个千米分段）
   const testEndTime = new Date(testPoints[testPoints.length - 1].timestamp);
-  kmSplits.value = [
-    {
+  const kmSplitsData = [];
+  const secondsPerKm = targetTime / 20; // 每公里时间（秒）
+  const timePerKm = (targetTime * 1000) / 20; // 每公里时间（毫秒）
+
+  for (let km = 1; km <= 20; km++) {
+    const kmStartTime = new Date(
+      testStartTime.getTime() + (km - 1) * timePerKm
+    );
+    const kmEndTime = new Date(testStartTime.getTime() + km * timePerKm);
+
+    kmSplitsData.push({
       meters: 1000,
-      seconds: 300,
-      seconds_per_km: 300,
-      start_time: testStartTime.toISOString(),
-      end_time: testEndTime.toISOString(),
-    },
-  ];
-  currentKmStartDistance.value = 1000;
+      seconds: secondsPerKm,
+      seconds_per_km: secondsPerKm,
+      start_time: kmStartTime.toISOString(),
+      end_time: kmEndTime.toISOString(),
+    });
+  }
+
+  kmSplits.value = kmSplitsData;
+  currentKmStartDistance.value = targetDistance;
   currentKmStartTime.value = testEndTime;
 
   // 更新地图显示
@@ -1227,7 +1242,7 @@ const drawTestTrack = async () => {
   calculateAvgPace();
 
   uni.showToast({
-    title: "测试轨迹已绘制",
+    title: "测试轨迹已绘制（20km）",
     icon: "success",
   });
 

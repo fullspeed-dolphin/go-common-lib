@@ -175,8 +175,12 @@
 
 <script setup>
 import Navbar from "@/components/navbar.vue";
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, getCurrentInstance } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
+import request from "@/utils/request.js";
+import store from "@/store/index.js";
+
+const { proxy } = getCurrentInstance();
 
 // 地图相关
 const mapCenter = ref({
@@ -186,41 +190,22 @@ const mapCenter = ref({
 const markers = ref([]);
 const polylines = ref([]);
 
+// 加载状态
+const loading = ref(false);
+
 // 活动数据
 const activityData = ref({
-  totalDistance: 12420, // 米
-  duration: 5431, // 秒 (01:30:31)
-  avgPace: 437.2, // 秒/公里 (约7'17")
-  avgHeartRate: 117,
-  avgCadence: 184,
-  avgStrideLength: 75,
-  elevationGain: 36,
-  fastestKm: 401, // 秒/公里 (约6'41")
-  totalSteps: 7500,
-  calories: 200,
-  userName: "广州凤凰悦跑团 - 阿雄",
-  dateTime: "2025-09-03 18:14",
+  totalDistance: 0, // 米
+  duration: 0, // 秒
+  avgPace: 0, // 秒/公里
+  fastestKm: 0, // 秒/公里
+  userName: "",
+  dateTime: "",
   userAvatar: "",
 });
 
-// 配速数据 (示例数据，应该从后端获取)
-const paceData = ref([
-  { km: 1, pace: 504, cumulativeTime: 504, isFastest: false }, // 8'24"
-  { km: 2, pace: 479, cumulativeTime: 983, isFastest: false }, // 7'59"
-  { km: 3, pace: 453, cumulativeTime: 1436, isFastest: false }, // 7'33"
-  { km: 4, pace: 432, cumulativeTime: 1868, isFastest: false }, // 7'12"
-  { km: 5, pace: 605, cumulativeTime: 2473, isFastest: false }, // 10'05"
-  { km: 6, pace: 449, cumulativeTime: 2922, isFastest: false }, // 7'29"
-  { km: 7, pace: 414, cumulativeTime: 3336, isFastest: false }, // 6'54"
-  { km: 8, pace: 424, cumulativeTime: 3760, isFastest: false }, // 7'04"
-  { km: 9, pace: 480, cumulativeTime: 4240, isFastest: false }, // 8'00"
-  { km: 10, pace: 423, cumulativeTime: 4663, isFastest: false }, // 7'03"
-  { km: 11, pace: 418, cumulativeTime: 5081, isFastest: false }, // 6'58"
-  { km: 12, pace: 442, cumulativeTime: 5523, isFastest: false }, // 7'22"
-  { km: 13, pace: 467, cumulativeTime: 5990, isFastest: false }, // 7'47"
-  { km: 14, pace: 489, cumulativeTime: 6479, isFastest: false }, // 8'09"
-  { km: 15, pace: 401, cumulativeTime: 6880, isFastest: true }, // 6'41" 最快
-]);
+// 配速数据
+const paceData = ref([]);
 
 const paceSubtotals = computed(() => {
   const subtotals = [];
@@ -311,20 +296,16 @@ const createMarker = (id, latitude, longitude, type) => {
 };
 
 // 初始化地图
-const initMap = () => {
-  // 生成示例轨迹点（实际应该从后端获取）
-  const centerLat = mapCenter.value.latitude;
-  const centerLng = mapCenter.value.longitude;
-  const radius = 0.001; // 约100米的半径
-  const pointCount = 30;
-
-  const trackPoints = [];
-  for (let i = 0; i < pointCount; i++) {
-    const angle = (i / pointCount) * 2 * Math.PI;
-    const lat = centerLat + radius * Math.cos(angle);
-    const lng = centerLng + radius * Math.sin(angle);
-    trackPoints.push({ latitude: lat, longitude: lng });
+const initMap = (tracks) => {
+  if (!tracks || tracks.length === 0) {
+    return;
   }
+
+  // 转换轨迹点格式
+  const trackPoints = tracks.map((track) => ({
+    latitude: track.lat,
+    longitude: track.lon,
+  }));
 
   if (trackPoints.length > 0) {
     // 设置地图中心为第一个点
@@ -360,6 +341,114 @@ const initMap = () => {
         borderWidth: 2,
       },
     ];
+  }
+};
+
+// 格式化日期时间
+const formatDateTime = (dateString) => {
+  if (!dateString) return "--";
+  try {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+  } catch (e) {
+    return dateString;
+  }
+};
+
+// 计算两个时间之间的秒数差
+const getSecondsBetween = (startTime, endTime) => {
+  if (!startTime || !endTime) return 0;
+  try {
+    const start = new Date(startTime).getTime();
+    const end = new Date(endTime).getTime();
+    return Math.floor((end - start) / 1000);
+  } catch (e) {
+    return 0;
+  }
+};
+
+// 加载运动数据
+const loadSportData = async (id) => {
+  if (!id) {
+    proxy.$toast("缺少运动记录ID");
+    return;
+  }
+
+  loading.value = true;
+  uni.showLoading({
+    title: "加载中...",
+    mask: true,
+  });
+
+  try {
+    const res = await request.get(`/sport-api/api/manual`, { id });
+
+    // 处理活动数据
+    activityData.value = {
+      totalDistance: res.meters || 0,
+      duration: res.seconds || 0,
+      avgPace: res.seconds_per_km || 0,
+      fastestKm: 0, // 稍后从 km_splits 计算
+      userName: store.state.userInfo?.nickname || "用户",
+      dateTime: formatDateTime(res.sport_started_at),
+      userAvatar: store.state.userInfo?.avatar_url || "",
+    };
+
+    // 处理配速数据
+    if (res.km_splits && res.km_splits.length > 0) {
+      let cumulativeTime = 0;
+      let fastestPace = Infinity;
+      let fastestIndex = -1;
+
+      paceData.value = res.km_splits.map((split, index) => {
+        cumulativeTime += split.seconds || 0;
+        const pace = split.seconds_per_km || 0;
+
+        // 找到最快配速（只考虑有效的配速值）
+        if (pace > 0 && pace < fastestPace) {
+          fastestPace = pace;
+          fastestIndex = index;
+        }
+
+        return {
+          km: index + 1,
+          pace: pace,
+          cumulativeTime: cumulativeTime,
+          isFastest: false, // 稍后设置
+        };
+      });
+
+      // 标记最快配速
+      if (fastestIndex >= 0 && fastestPace !== Infinity) {
+        paceData.value[fastestIndex].isFastest = true;
+        activityData.value.fastestKm = fastestPace;
+      } else if (res.seconds_per_km > 0) {
+        // 如果没有分段数据，使用平均配速作为最快配速
+        activityData.value.fastestKm = res.seconds_per_km;
+      }
+    } else {
+      paceData.value = [];
+      // 如果没有分段数据，使用平均配速作为最快配速
+      if (res.seconds_per_km > 0) {
+        activityData.value.fastestKm = res.seconds_per_km;
+      }
+    }
+
+    // 处理地图轨迹
+    if (res.geojson && res.geojson.tracks && res.geojson.tracks.length > 0) {
+      initMap(res.geojson.tracks);
+    }
+  } catch (error) {
+    console.error("加载运动数据失败:", error);
+    proxy.$toast("加载数据失败");
+  } finally {
+    loading.value = false;
+    uni.hideLoading();
   }
 };
 
@@ -405,13 +494,13 @@ const getPaceBarWidth = (pace) => {
 };
 
 onLoad((options) => {
-  // 从路由参数或全局状态获取活动ID，然后加载数据
-  // 这里使用示例数据
-  console.log("页面参数:", options);
-});
-
-onMounted(() => {
-  initMap();
+  // 从路由参数获取活动ID
+  const id = options.id;
+  if (id) {
+    loadSportData(id);
+  } else {
+    proxy.$toast("缺少运动记录ID");
+  }
 });
 </script>
 

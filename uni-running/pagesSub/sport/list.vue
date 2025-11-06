@@ -102,19 +102,20 @@ const toggleExpand = (index) => {
   height: 376rpx;
   margin: 44rpx auto 0 auto;
   padding: 50rpx 16rpx 0;
-  background: linear-gradient(180deg, #ff8c00 0%, #fafafa 100%);
+  background: linear-gradient(180deg, #feeed9 0%, #ffffff 100%);
   border-radius: 16rpx 16rpx 16rpx 16rpx;
   border: 2rpx solid #e7e7e7;
   .h1 {
-    font-weight: 500;
+    font-weight: 400;
     font-size: 34rpx;
     color: #000000;
+    line-height: 48rpx;
   }
   .bar {
     width: 650rpx;
     height: 90rpx;
     margin: 20rpx 0 40rpx;
-    background: rgba(255, 255, 255, 0.3);
+    background: #fff;
     padding-left: 30rpx;
     border-radius: 16rpx 16rpx 16rpx 16rpx;
     font-size: 24rpx;

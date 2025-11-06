@@ -57,7 +57,7 @@
               :class="{ empty: !totalDistance }"
               ><image
                 class="section-content-title-icon"
-                style="width: 68rpx; height: 68rpx"
+                style="width: 50rpx; height: 54rpx"
                 src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-run@2x.png"
                 mode="aspectFill"
               ></image
@@ -297,12 +297,12 @@ onMounted(() => {
     }
   }
   .section-content-title-icon {
-    width: 68rpx;
-    height: 68rpx;
+    width: 50rpx;
+    height: 54rpx;
     background: #ff8c00;
     border-radius: 16rpx;
-    padding: 10rpx;
-    box-sizing: border-box;
+    padding: 13rpx 15rpx;
+    box-sizing: content-box;
   }
   .section-content-description {
     font-weight: 500;
