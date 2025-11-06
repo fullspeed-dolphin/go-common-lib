@@ -26,23 +26,51 @@
         </view>
 
         <view class="panel-item">
-          <view class="label">报名时间</view>
+          <view class="label">
+            <image
+              class="icon"
+              :src="staticBaseUrl + '/images/icon-event-time@2x.png'"
+              mode="aspectFill"
+            ></image>
+            <text>报名时间：</text>
+          </view>
           <view class="value">{{ detail.registration_time }}</view>
         </view>
 
         <view class="panel-item">
-          <view class="label">活动时间</view>
+          <view class="label">
+            <image
+              class="icon"
+              :src="staticBaseUrl + '/images/icon-event-date@2x.png'"
+              mode="aspectFill"
+            ></image>
+            <text>活动时间：</text>
+          </view>
           <view class="value">{{ detail.event_time }}</view>
         </view>
         <view class="panel-item">
-          <view class="label">活动地点：</view>
+          <view class="label">
+            <image
+              class="icon"
+              :src="staticBaseUrl + '/images/icon-event-location@2x.png'"
+              mode="aspectFill"
+            ></image>
+            <text>活动地点：</text>
+          </view>
           <view class="value" @click="copyText(detail.event_location)">{{
             detail.event_location
           }}</view>
         </view>
 
         <view class="cell flex-row1 pl20">
-          <view class="label">活动项目：</view>
+          <view class="label">
+            <image
+              class="icon"
+              :src="staticBaseUrl + '/images/icon-event-item@2x.png'"
+              mode="aspectFill"
+            ></image>
+            <text>活动项目：</text>
+          </view>
           <view class="flex-row flex-wrap">
             <view
               class="event-item flex-center"
@@ -54,26 +82,32 @@
           </view>
         </view>
 
-        <view class="cell flex-start pl20">
+        <view class="cell flex-start pl20 customer-phone">
           <view class="label">客服电话：</view>
           <view class="value flex-start">
             <view
-              style="color: #1989fa; margin-right: 10rpx"
+              style="color: #43a047; margin-right: 10rpx"
               @click="callPhone('19927709895')"
               >19927709895</view
             >
-            <!-- 	<u-button type="primary" color="#19be6b" shape="circle" size="mini" @click="copyText('Qsty2025')">
-						  复制微信号 Qsty2025
-					  </u-button> -->
           </view>
+          <u-button
+            type="primary"
+            color="#43A047"
+            shape="circle"
+            size="mini"
+            @click="copyText('19927709895')"
+            class="copy-btn"
+            customStyle="min-width: 76rpx; width: 76rpx;height: 34rpx; padding: 0; margin-left: 20rpx; font-weight: bold;font-size: 24rpx;color: #FFFFFF;"
+          >
+            复制
+          </u-button>
         </view>
       </section>
 
       <section class="panel" style="padding: 20rpx 0 0">
-        <view class="cell" style="margin-top: 0">
-          <view class="label pl20 pb20" style="font-size: 28rpx"
-            >活动说明：</view
-          >
+        <view class="cell event-description" style="margin-top: 0">
+          <view class="label" style="font-size: 28rpx">活动说明：</view>
         </view>
         <rich-text :nodes="detail.text"></rich-text>
       </section>
@@ -116,6 +150,7 @@
 </template>
 <script setup>
 import { ref, computed } from "vue";
+import { staticBaseUrl } from "@/utils/config.js";
 import {
   onLoad,
   onUnload,
@@ -298,17 +333,28 @@ const callPhone = (phoneNumber) => {
   font-size: 32rpx;
 }
 .panel-item {
-  padding: 20rpx;
-  margin: 20rpx 0;
-  background: #f7fafb;
+  padding: 18rpx 14rpx;
+  margin-top: 20rpx;
+  background: #f6fafb;
   border-radius: 16rpx;
   .label {
-    margin-bottom: 15rpx;
-    font-size: 24rpx;
-    color: #666;
+    margin-bottom: 10rpx;
+    font-weight: bold;
+    font-size: 28rpx;
+    color: #707070;
+    display: flex;
+    align-items: center;
+    .icon {
+      width: 44rpx;
+      height: 44rpx;
+      margin-right: 10rpx;
+    }
   }
   .value {
-    line-height: 1.3;
+    font-weight: bold;
+    font-size: 28rpx;
+    color: #000000;
+    line-height: 40rpx;
   }
 }
 .offlineEvents {
@@ -333,6 +379,33 @@ const callPhone = (phoneNumber) => {
   line-height: 34rpx;
   .label {
     min-width: 120rpx;
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    font-size: 28rpx;
+    color: #707070;
+    line-height: 40rpx;
+    .icon {
+      width: 44rpx;
+      height: 44rpx;
+      margin-right: 10rpx;
+    }
+  }
+}
+.customer-phone {
+  display: flex;
+  align-items: center;
+  .label {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    font-size: 28rpx;
+    color: #707070;
+  }
+}
+.event-description {
+  .label {
+    padding: 16rpx 20rpx 14rpx 20rpx;
   }
 }
 
