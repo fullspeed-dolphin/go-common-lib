@@ -85,7 +85,7 @@
     <view class="floating-button" @click="goToRunMap">
       <image
         class="floating-button-icon"
-        style="width: 40rpx; height: 40rpx"
+        style="width: 138rpx; height: 70rpx"
         src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/run-white@2x.png"
         mode="aspectFill"
       ></image>
