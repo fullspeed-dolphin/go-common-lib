@@ -9,46 +9,16 @@
         bgColor="transparent"
         placeholder
       ></u-navbar>
-      <view class="header-content">
-        <view class="user">
-          <image
-            class="avatar"
-            :src="
-              userInfo.avatar_url ||
-              'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
-            "
-            mode="aspectFill"
-          ></image>
-          <view class="user-info">
-            <view class="nickname">{{ userInfo.nickname || "微信用户" }}</view>
-            <view class="money"
-              ><image
-                class="img"
-                src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-coin@2x.png"
-                mode="aspectFill"
-              ></image>
-              0</view
-            >
-          </view>
-        </view>
-        <view class="search-box">
-          <u-search
-            class="search"
-            :disabled="true"
-            placeholder=""
-            shape="round"
-            bgColor="#fff"
-            :showAction="false"
-            @click="$u.route('pagesSub/groupList')"
-          ></u-search>
-          <view class="message">
-            <image
-              class="img"
-              src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/message@2x.png"
-              mode="aspectFill"
-            ></image>
-          </view>
-        </view>
+      <view class="search-box">
+        <u-search
+          class="search"
+          :disabled="true"
+          placeholder="请输入名称或团号或地址"
+          shape="round"
+          bgColor="#fff"
+          :showAction="false"
+          @click="$u.route('pagesSub/groupList')"
+        ></u-search>
       </view>
     </view>
     <view
@@ -350,65 +320,20 @@ const menus = ref([
     top: 0;
     left: 0;
     width: 100%;
-    background: linear-gradient(180deg, #ffe8cc 0%, #fafafa 100%);
+    background: #fafafa;
+    // background: linear-gradient(180deg, #ffe8cc 0%, #fafafa 100%);
     z-index: 11;
-    .header-content {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20rpx 34rpx 18rpx 34rpx;
-      .user {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10rpx;
-        .avatar {
-          width: 90rpx;
-          height: 90rpx;
-          border-radius: 50%;
-        }
-        .user-info {
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          gap: 10rpx;
-          .nickname {
-            font-size: 24rpx;
-            font-weight: bold;
-          }
-          .money {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-weight: 800;
-            font-size: 32rpx;
-            .img {
-              width: 44rpx;
-              height: 38rpx;
-            }
-          }
-        }
-      }
-      .search-box {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 28rpx;
-        ::v-deep {
-          .u-search {
-            width: 342rpx;
-            height: 72rpx;
-          }
-          .u-search__content {
-            width: 342rpx;
-            height: 72rpx;
-          }
-        }
-        .message {
-          .img {
-            width: 48rpx;
-            height: 42rpx;
-          }
+
+    .search-box {
+      width: 682rpx;
+      margin: 0rpx auto 26rpx auto;
+      border-radius: 36rpx 36rpx 36rpx 36rpx;
+      border: 2rpx solid #f58700;
+      box-sizing: border-box;
+      ::v-deep {
+        .u-search__content {
+          width: 682rpx;
+          height: 68rpx;
         }
       }
     }
@@ -466,7 +391,7 @@ const menus = ref([
     }
     .img {
       display: block;
-      width: 682rpx;
+      width: calc(100% - 24rpx);
       height: 344rpx;
       border-radius: 16rpx !important;
       overflow: hidden;

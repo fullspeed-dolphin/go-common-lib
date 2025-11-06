@@ -275,6 +275,9 @@ const logout = () => {
     height: 52rpx;
     margin-right: 22rpx !important;
   }
+  .u-cell__title-text {
+    font-family: PingFang SC-Bold;
+  }
   .service-cell {
     .icon {
       display: flex;
@@ -292,6 +295,7 @@ const logout = () => {
       font-size: 15px;
       color: #303133;
       font-weight: normal;
+      font-family: PingFang SC-Bold;
     }
     .u-cell__body__content {
       flex: unset;
