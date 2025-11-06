@@ -91,12 +91,24 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
-::v-deep {
-  .van-cell__title {
-    max-width: 200rpx;
-    min-width: 130rpx;
-    margin-right: 10rpx;
-    flex: none;
+.pickermap {
+  width: 100%;
+  max-width: 100%;
+  display: block;
+  box-sizing: border-box;
+  ::v-deep {
+    .u-cell {
+      width: 100% !important;
+      max-width: 100% !important;
+      display: block !important;
+      box-sizing: border-box !important;
+    }
+    .van-cell__title {
+      max-width: 200rpx;
+      min-width: 130rpx;
+      margin-right: 10rpx;
+      flex: none;
+    }
   }
 }
 </style>

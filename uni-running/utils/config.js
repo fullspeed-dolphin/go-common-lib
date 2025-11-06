@@ -20,3 +20,5 @@ export const isRelease =['release'].includes(envVersion);
 
 // 静态资源基础 URL（OSS）
 export const staticBaseUrl = 'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static';
+
+export const uploadToken = '9c029c96952e5298efb5c09b081fa0a7';

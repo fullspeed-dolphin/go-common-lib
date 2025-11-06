@@ -400,12 +400,12 @@ const loadSportData = async (id) => {
     };
 
     // 处理配速数据
-    if (res.km_splits && res.km_splits.length > 0) {
+    if (res.geojson.km_splits && res.geojson.km_splits.length > 0) {
       let cumulativeTime = 0;
       let fastestPace = Infinity;
       let fastestIndex = -1;
 
-      paceData.value = res.km_splits.map((split, index) => {
+      paceData.value = res.geojson.km_splits.map((split, index) => {
         cumulativeTime += split.seconds || 0;
         const pace = split.seconds_per_km || 0;
 

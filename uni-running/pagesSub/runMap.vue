@@ -1113,10 +1113,11 @@ const submitRunningData = async () => {
       seconds_per_km: avgPace.value > 0 ? avgPace.value : null, // 配速（秒/公里）
       geojson: {
         tracks: tracks,
+        km_splits: finalKmSplits,
       },
       sport_started_at: startTimeISO,
       sport_ended_at: endTimeISO,
-      km_splits: finalKmSplits, // 每千米分段数据
+      // km_splits: finalKmSplits, // 每千米分段数据
     };
 
     console.log("提交跑步数据:", requestData);

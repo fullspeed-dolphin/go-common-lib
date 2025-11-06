@@ -36,18 +36,40 @@
 					<u-input v-model="form.location" placeholder="请选择地址" />
 				</up-form-item> -->
         <up-form-item label="跑团地址" prop="location" required>
-          <PickerMap
-            :title="null"
-            v-model="form.location"
-            placeholder="请选择地址"
-          />
+          <view class="select" @click="handleChooseLocation">
+            <u-input
+              v-model="form.location"
+              readonly
+              placeholder="请选择地址"
+            />
+            <view class="arrow-right">
+              <u-icon name="arrow-right" size="20" color="#707070" />
+            </view>
+          </view>
         </up-form-item>
         <up-form-item label="成立时间" prop="establish_time">
-          <PickerTime
-            v-model="form.establish_time"
-            placeholder="请输入成立时间"
-          />
-          <!-- <u-input v-model="form.establish_time" placeholder="请输入创建时间" /> -->
+          <up-datetime-picker
+            hasInput
+            v-model="establishTimeTimestamp"
+            mode="date"
+            cancelText="取消"
+            confirmText="确认"
+            confirmColor="#FF8C00"
+            @confirm="onEstablishTimeConfirm"
+          >
+            <template #trigger="{ value }">
+              <view class="select">
+                <u-input
+                  :modelValue="value || ''"
+                  placeholder="请选择成立时间"
+                  readonly
+                />
+                <view class="arrow-right">
+                  <u-icon name="arrow-right" size="20" color="#707070" />
+                </view>
+              </view>
+            </template>
+          </up-datetime-picker>
         </up-form-item>
         <!-- <up-form-item label="成员数量" prop="amount" required>
 					<u-input v-model="form.amount" type="digit" placeholder="请输入成员数量" />
@@ -88,13 +110,11 @@
   </view>
 </template>
 <script setup>
-import { ref } from "vue";
+import { ref, computed, watch, nextTick } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { useStore } from "vuex";
 import { getCurrentInstance } from "vue";
 import FileUploader from "@/components/common/fileUploader.vue";
-import PickerMap from "@/components/common/PickerMap.vue";
-import PickerTime from "@/components/common/PickerTime.vue";
 import dayjs from "dayjs";
 
 // 获取当前实例以访问全局属性
@@ -120,6 +140,22 @@ const form = ref({
   establish_time: dayjs().valueOf(),
 });
 const isAgree = ref(false);
+
+// 监听 poster 变化，自动触发验证
+watch(
+  () => form.value.poster,
+  (newVal) => {
+    if (newVal) {
+      // 延迟触发验证，确保值已更新
+      nextTick(() => {
+        if (uForm.value) {
+          uForm.value.validateField("poster", () => {}, "change");
+        }
+      });
+    }
+  }
+);
+
 const rules = ref({
   poster: [
     {
@@ -203,6 +239,36 @@ const getDetail = (page) => {
     });
 };
 
+const handleChooseLocation = () => {
+  uni.chooseLocation({
+    success: (res) => {
+      console.log(res, "返回地址");
+      form.value.location = res.address;
+    },
+    fail: (e) => {
+      console.log(e, "选择地址失败");
+    },
+  });
+};
+
+// 成立时间时间戳（用于日期选择器）
+const establishTimeTimestamp = computed({
+  get: () => {
+    return form.value.establish_time
+      ? form.value.establish_time
+      : dayjs().valueOf();
+  },
+  set: (val) => {
+    form.value.establish_time = val;
+  },
+});
+
+// 处理成立时间确认事件
+const onEstablishTimeConfirm = (e) => {
+  // up-datetime-picker 的 confirm 事件返回的是时间戳（number）
+  form.value.establish_time = e.value || dayjs().valueOf();
+};
+
 const submitForm = () => {
   uForm.value.validate().then((res) => {
     const token = uni.getStorageSync("token");
@@ -275,25 +341,78 @@ const submitForm = () => {
 }
 
 ::v-deep {
+  .u-form-item__body__right__content__slot {
+    width: 100% !important;
+    display: block !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+  .u-form-item__body__right {
+    width: 100% !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+  .u-form-item__body__right__content {
+    width: 100% !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
   .pickerTime {
-    width: 100%;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block !important;
+    box-sizing: border-box !important;
     .u-cell {
+      display: block !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
       border: 0;
       min-height: 88rpx;
       background: rgba(255, 255, 255);
       border-radius: 16rpx;
       background: #ffffff;
-      box-shadow: 0rpx 4rpx 10rpx 2rpx rgba(0, 0, 0, 0.16);
+      border: 2rpx solid rgba(0, 0, 0, 0.06);
     }
     .u-cell__body {
       padding-right: 20rpx;
+      width: 100% !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    .u-cell__body__content {
+      flex: none;
+    }
+    .u-cell__value {
+      text-align: left !important;
+      margin-left: 0 !important;
+      font-weight: bold;
+      font-size: 26rpx;
+      color: #707070;
     }
   }
   .pickermap {
-    width: 100%;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block !important;
+    box-sizing: border-box !important;
     overflow: hidden;
+    .u-cell {
+      display: block !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+      border: 0;
+      min-height: 88rpx;
+      background: #ffffff;
+      border-radius: 16rpx;
+      border: 2rpx solid rgba(0, 0, 0, 0.06);
+    }
     .u-cell__body {
       padding-right: 20rpx;
+      width: 100% !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
     }
     .u-cell__body__content {
       flex: none;
@@ -301,6 +420,11 @@ const submitForm = () => {
     .u-cell__value {
       flex: 1 !important;
       max-width: 100% !important;
+      text-align: left !important;
+      margin-left: 0 !important;
+      font-weight: bold;
+      font-size: 26rpx;
+      color: #707070;
     }
   }
   .u-form-item__body__left__content__label {
@@ -336,11 +460,10 @@ const submitForm = () => {
   .u-textarea,
   .u-input {
     border: 0;
-    min-height: 88rpx;
-    background: rgba(255, 255, 255);
     border-radius: 16rpx;
+    min-height: 100rpx;
     background: #ffffff;
-    box-shadow: 0rpx 4rpx 10rpx 2rpx rgba(0, 0, 0, 0.16);
+    border: 2rpx solid rgba(0, 0, 0, 0.06);
   }
 
   // .u-form-item__body{
@@ -351,6 +474,14 @@ const submitForm = () => {
   // 	background: #FFFFFF;
   // 	box-shadow: 0rpx 4rpx 10rpx 2rpx rgba(0,0,0,0.16);
   // }
+  .u-textarea__field {
+    color: #000000 !important;
+    font-size: 28rpx !important;
+  }
+  .u-input__content__field-wrapper__field {
+    color: #000000 !important;
+    font-size: 28rpx !important;
+  }
 
   .u-form-item__body {
     padding: 10px 0 5px !important;
@@ -371,8 +502,25 @@ const submitForm = () => {
     }
   }
   .input-placeholder {
-    font-size: 24rpx;
-    color: rgb(192, 196, 204);
+    font-weight: bold !important;
+    font-size: 26rpx !important;
+    color: #707070 !important;
+  }
+  .textarea-placeholder {
+    font-weight: bold !important;
+    font-size: 26rpx !important;
+    color: #707070 !important;
+  }
+}
+.select {
+  position: relative;
+  display: flex;
+  align-items: center;
+  .arrow-right {
+    position: absolute;
+    right: 8rpx;
+    top: 50%;
+    transform: translateY(-50%);
   }
 }
 </style>

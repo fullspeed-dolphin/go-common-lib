@@ -552,3 +552,19 @@ cover-view {
   font-size: 32rpx !important;
   font-weight: bold;
 }
+
+.u-upload__button {
+  width: 232rpx !important;
+  height: 232rpx !important;
+  background: #d8d8d8 !important;
+  border-radius: 16rpx !important;
+  .u-icon__icon {
+    font-size: 98rpx !important;
+    color: #fff !important;
+  }
+}
+.u-form-item__body__left__content__label {
+  font-weight: bold !important;
+  font-size: 30rpx !important;
+  color: #000000 !important;
+}

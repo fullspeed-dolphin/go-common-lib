@@ -96,6 +96,7 @@ import { useStore } from "vuex";
 import { getCurrentInstance } from "vue";
 import Navbar from "@/components/navbar.vue";
 import { staticBaseUrl } from "@/utils/config";
+import request from "@/utils/request.js";
 
 // 获取当前实例以访问全局属性
 const { proxy } = getCurrentInstance();
@@ -285,6 +286,25 @@ const loadTaskList = async () => {
   }
 };
 
+// 加载运动数据
+const loadSportData = async () => {
+  uni.showLoading({
+    title: "加载中...",
+    mask: true,
+  });
+
+  try {
+    const res = await request.get(`/sport-api/api/manual`);
+
+    console.log("res======>", res);
+  } catch (error) {
+    console.error("加载运动数据失败:", error);
+    proxy.$toast("加载数据失败");
+  } finally {
+    uni.hideLoading();
+  }
+};
+
 // 导航栏右侧按钮点击
 const handleMenuClick = () => {
   console.log("点击菜单");
@@ -311,6 +331,7 @@ onMounted(() => {
   computeNavbarBoxHeight();
   loadCheckInData();
   loadTaskList();
+  loadSportData();
 });
 </script>
 

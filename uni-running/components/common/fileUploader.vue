@@ -13,6 +13,7 @@
       :disable-preview="disablePreview"
       :deletable="deletable"
       @fail="fail"
+      upload-icon="plus"
     />
     <!-- </u-cell> -->
   </view>
@@ -21,6 +22,7 @@
 import { ref, watch } from "vue";
 import { asyncAlls } from "@/utils/util.js";
 import { baseLink } from "@/utils/config.js";
+import { uploadToken } from "../../utils/config";
 
 // Props定义
 const props = defineProps({
@@ -82,7 +84,7 @@ const props = defineProps({
 });
 
 // Emits
-const emit = defineEmits(["input"]);
+const emit = defineEmits(["input", "update:modelValue"]);
 
 // 响应式数据
 const fileList = ref([]);
@@ -124,7 +126,9 @@ watch(
 const deleteFile = (event) => {
   const index = fileList.value.findIndex((i) => i === event.tempFilePath);
   fileList.value.splice(index, 1);
-  emit("input", listToString(fileList.value));
+  const value = listToString(fileList.value);
+  emit("input", value);
+  emit("update:modelValue", value);
 };
 
 const afterRead = async (event) => {
@@ -156,7 +160,9 @@ const afterRead = async (event) => {
 
     console.log("fileList===========>", fileList.value);
     uni.hideLoading();
-    emit("input", listToString(fileList.value));
+    const value = listToString(fileList.value);
+    emit("input", value);
+    emit("update:modelValue", value);
   } catch (e) {
     console.error(e);
   }
@@ -194,13 +200,14 @@ const compressImage = (src) => {
 
 const uploadFile = async (file) => {
   const filePath = await compressImage(file.url);
+  console.log("filePath===========>", filePath);
   return new Promise((resolve, reject) => {
     uni.uploadFile({
       url: baseLink + `/basic-service/image/upload`,
       filePath: filePath,
       name: "image",
       header: {
-        Authorization: uni.getStorageSync("token"),
+        Authorization: uploadToken,
         "content-type": "application/json",
       },
       success(res) {
