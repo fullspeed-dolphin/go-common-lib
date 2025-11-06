@@ -76,7 +76,7 @@
     <view class="group-item-content col">
       <view class="row">
         <view class="name ellipsis">{{ item.name }}</view>
-        <view class="gray">{{ item.total_members }}人</view>
+        <view class="gray total">{{ item.total_members }}人</view>
       </view>
       <view class="row justify-start">
         <u-icon name="map" size="24rpx" color="#FF8C00" class="gray"></u-icon>
@@ -261,6 +261,12 @@ const formatDistance = (distance) => {
     line-height: 44rpx;
   }
 
+  .total {
+    font-weight: bold;
+    font-size: 24rpx;
+    color: #979797;
+  }
+
   .justify-start {
     justify-content: flex-start;
   }
@@ -274,6 +280,7 @@ const formatDistance = (distance) => {
   }
 
   .desc {
+    font-weight: bold;
     font-size: 20rpx;
     line-height: 28rpx;
     height: 28rpx;

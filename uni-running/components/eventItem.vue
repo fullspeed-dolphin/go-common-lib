@@ -28,12 +28,12 @@
         v-if="showButton"
       >
         <view class="event-item-location">{{
-          item.event_location || "线上跑"
+          item.is_online ? "线上跑" : item.event_location
         }}</view>
         <view class="event-item-button">
           <block v-if="item.status === 'ACT'">立即报名</block>
-          <block v-if="item.status === 'PND'">活动暂未开始</block>
-          <block v-if="item.status === 'EXP'">查看报名详情</block>
+          <block v-if="item.status === 'PND'">暂未开始</block>
+          <block v-if="item.status === 'EXP'">查看详情</block>
         </view>
       </view>
     </view>

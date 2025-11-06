@@ -399,14 +399,14 @@ const menus = ref([
     }
   }
   .section-title {
-    margin: 40rpx 0;
+    margin: 40rpx 0 30rpx 0;
     padding: 0 34rpx;
     display: flex;
     justify-content: space-between;
     align-items: center;
     position: relative;
     font-weight: 800;
-    font-size: 40rpx;
+    font-size: 36rpx;
     color: #000000;
     line-height: 48rpx;
     .txt {
