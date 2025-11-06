@@ -1024,7 +1024,7 @@ const submitRunningData = async () => {
     });
     setTimeout(() => {
       uni.navigateTo({
-        url: "/pagesSub/sport/show?id=" + userInfo.value.id,
+        url: "/pagesSub/sport/show?id=111",
       });
     }, 1000);
   } catch (error) {
