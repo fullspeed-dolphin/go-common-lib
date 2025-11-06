@@ -27,7 +27,7 @@
           <view class="cell-item">跑团ID {{ detail.group_id }}</view>
         </view>
         <view class="cell-item flex-row c9 b">
-          <u-icon name="map" size="14" color="#999"></u-icon>
+          <u-icon name="map" size="12" color="#999"></u-icon>
           <view class="flex-1">
             {{ detail.establish_location }}
           </view>
@@ -41,11 +41,26 @@
           </view>
           成员人数
         </view>
-        <view class="flex-1 flex-col-center u-border-left">
+        <view class="divider"></view>
+        <view class="flex-1 flex-col-center">
           <view class="number">
             {{ detail.gender_ratio }}
           </view>
           男女比例
+        </view>
+        <view class="divider"></view>
+        <view class="flex-1 flex-col-center">
+          <view class="number">
+            {{ detail.total_members }}
+          </view>
+          上月总跑量
+        </view>
+        <view class="divider"></view>
+        <view class="flex-1 flex-col-center">
+          <view class="number">
+            {{ detail.total_members }}
+          </view>
+          周人均跑量
         </view>
       </section>
 
@@ -435,13 +450,19 @@ const callPhone = (phoneNumber) => {
 .section-summary {
   height: 126rpx;
   font-weight: bold;
-  font-size: 22rpx;
+  font-size: 20rpx;
   color: #999999;
   .number {
-    font-size: 36rpx;
+    font-size: 30rpx;
     color: #000000;
     line-height: 50rpx;
     margin-bottom: 10rpx;
+  }
+  .divider {
+    width: 1rpx;
+    height: 58rpx;
+    background-color: #f3f3f3;
+    align-self: center;
   }
 }
 .bar {
@@ -483,6 +504,7 @@ const callPhone = (phoneNumber) => {
 .cell-item {
   min-width: 120rpx;
   padding: 6rpx 10rpx 10rpx 0;
+  font-size: 24rpx;
 }
 .leader-item {
   padding: 16rpx 0 28rpx;
@@ -551,7 +573,7 @@ const callPhone = (phoneNumber) => {
     color: #000000;
     line-height: 50rpx;
     margin-top: 16rpx;
-    margin-bottom: 10rpx;
+    margin-bottom: 18rpx;
   }
   .text {
     font-weight: 500;

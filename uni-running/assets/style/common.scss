@@ -534,9 +534,17 @@ cover-view {
   margin: 30rpx 34rpx 30rpx;
   padding: 20rpx;
   border-radius: 16rpx;
-  box-shadow: 0rpx 4rpx 10rpx 2rpx rgba(0, 0, 0, 0.16);
+  border: 2rpx solid rgba(0, 0, 0, 0.06);
 }
 
 .u-icon {
   display: inline-flex !important;
+}
+.u-button {
+  &::after {
+    border: none;
+  }
+  &::before {
+    border: none;
+  }
 }

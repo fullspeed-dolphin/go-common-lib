@@ -46,9 +46,9 @@
           </view>
         </view>
 
-        <view class="setting" @click="routeTo('pagesSub/signerForm')">
+        <!-- <view class="setting" @click="routeTo('pagesSub/signerForm')">
           <u-icon name="setting-fill" size="20"></u-icon>
-        </view>
+        </view> -->
       </view>
       <view class="section-box">
         <u-cell
