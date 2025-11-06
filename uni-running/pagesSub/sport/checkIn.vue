@@ -62,10 +62,7 @@
             <view class="task-icon-wrapper">
               <image
                 class="task-icon"
-                :src="
-                  task.icon ||
-                  'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-run@2x.png'
-                "
+                :src="task.icon"
                 mode="aspectFill"
               ></image>
             </view>
@@ -98,6 +95,7 @@ import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
 import { getCurrentInstance } from "vue";
 import Navbar from "@/components/navbar.vue";
+import { staticBaseUrl } from "@/utils/config";
 
 // 获取当前实例以访问全局属性
 const { proxy } = getCurrentInstance();
@@ -272,7 +270,7 @@ const taskList = ref([
     progress: "12.42m",
     description: "跑步达3km以上(有效次数1次)",
     reward: 100,
-    icon: "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-run@2x.png",
+    icon: `${staticBaseUrl}/images/task@2x.png `,
   },
 ]);
 
