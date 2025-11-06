@@ -14,88 +14,92 @@
       ></image>
     </section>
 
-    <section
-      class="section-event panel bgf"
-      style="position: relative; z-index: 10"
-    >
-      <view class="h2">
-        <view class="ellipsis2">
-          {{ detail.name }}
-        </view>
-      </view>
-
-      <view class="panel-item">
-        <view class="label">报名时间</view>
-        <view class="value">{{ detail.registration_time }}</view>
-      </view>
-
-      <view class="panel-item">
-        <view class="label">活动时间</view>
-        <view class="value">{{ detail.event_time }}</view>
-      </view>
-      <view class="panel-item">
-        <view class="label">活动地点：</view>
-        <view class="value" @click="copyText(detail.event_location)">{{
-          detail.event_location
-        }}</view>
-      </view>
-
-      <view class="cell flex-row1 pl20">
-        <view class="label">活动项目：</view>
-        <view class="flex-row flex-wrap">
-          <view
-            class="event-item flex-center"
-            v-for="(item, index) in detail.eventItems"
-            :key="index"
-          >
-            {{ item }}
+    <view class="container">
+      <section
+        class="section-event panel bgf"
+        style="position: relative; z-index: 10"
+      >
+        <view class="h2">
+          <view class="ellipsis2">
+            {{ detail.name }}
           </view>
         </view>
-      </view>
 
-      <view class="cell flex-start pl20">
-        <view class="label">客服电话：</view>
-        <view class="value flex-start">
-          <view
-            style="color: #1989fa; margin-right: 10rpx"
-            @click="callPhone('19927709895')"
-            >19927709895</view
-          >
-          <!-- 	<u-button type="primary" color="#19be6b" shape="circle" size="mini" @click="copyText('Qsty2025')">
+        <view class="panel-item">
+          <view class="label">报名时间</view>
+          <view class="value">{{ detail.registration_time }}</view>
+        </view>
+
+        <view class="panel-item">
+          <view class="label">活动时间</view>
+          <view class="value">{{ detail.event_time }}</view>
+        </view>
+        <view class="panel-item">
+          <view class="label">活动地点：</view>
+          <view class="value" @click="copyText(detail.event_location)">{{
+            detail.event_location
+          }}</view>
+        </view>
+
+        <view class="cell flex-row1 pl20">
+          <view class="label">活动项目：</view>
+          <view class="flex-row flex-wrap">
+            <view
+              class="event-item flex-center"
+              v-for="(item, index) in detail.eventItems"
+              :key="index"
+            >
+              {{ item }}
+            </view>
+          </view>
+        </view>
+
+        <view class="cell flex-start pl20">
+          <view class="label">客服电话：</view>
+          <view class="value flex-start">
+            <view
+              style="color: #1989fa; margin-right: 10rpx"
+              @click="callPhone('19927709895')"
+              >19927709895</view
+            >
+            <!-- 	<u-button type="primary" color="#19be6b" shape="circle" size="mini" @click="copyText('Qsty2025')">
 						  复制微信号 Qsty2025
 					  </u-button> -->
+          </view>
         </view>
-      </view>
-    </section>
+      </section>
 
-    <section class="panel" style="padding: 20rpx 0 0">
-      <view class="cell" style="margin-top: 0">
-        <view class="label pl20 pb20" style="font-size: 28rpx">活动说明：</view>
-      </view>
-      <rich-text :nodes="detail.text"></rich-text>
-    </section>
+      <section class="panel" style="padding: 20rpx 0 0">
+        <view class="cell" style="margin-top: 0">
+          <view class="label pl20 pb20" style="font-size: 28rpx"
+            >活动说明：</view
+          >
+        </view>
+        <rich-text :nodes="detail.text"></rich-text>
+      </section>
 
-    <view class="section-bottom">
-      <!-- <view class="txt">
+      <view class="section-bottom">
+        <!-- <view class="txt">
 				  {{isSignUp ? '取消' : ''}}报名截止：2025.09.30 9:00
 			  </view> -->
-      <view
-        class="u-border-top1"
-        :class="{ isSignUp: isSignUp }"
-        style="padding: 26rpx 20rpx 0"
-      >
-        <u-button
-          type="primary"
-          color="#FF8C00"
-          customStyle="border-radius: 16rpx;height: 80rpx;"
-          @click="routeTo()"
+        <view
+          class="u-border-top1"
+          :class="{ isSignUp: isSignUp }"
+          style="padding: 26rpx 20rpx 0"
         >
-          <block v-if="detail.status === 'ACT'">{{
-            isSignUp ? "取消报名" : "活动报名"
-          }}</block>
-          <block v-if="detail.status === 'PND'">活动暂未开始</block>
-          <block v-if="detail.status === 'EXP'">查看报名详情</block>
-        </u-button>
+          <u-button
+            type="primary"
+            color="#FF8C00"
+            customStyle="border-radius: 16rpx;height: 80rpx;"
+            @click="routeTo()"
+          >
+            <block v-if="detail.status === 'ACT'">{{
+              isSignUp ? "取消报名" : "活动报名"
+            }}</block>
+            <block v-if="detail.status === 'PND'">活动暂未开始</block>
+            <block v-if="detail.status === 'EXP'">查看报名详情</block>
+          </u-button>
+        </view>
       </view>
     </view>
 
@@ -311,7 +315,6 @@ const callPhone = (phoneNumber) => {
   padding: 34rpx;
 }
 .panel {
-  width: 710rpx;
   margin: 30rpx auto;
   padding: 20rpx;
   border-radius: 26rpx;
@@ -349,7 +352,7 @@ const callPhone = (phoneNumber) => {
 }
 .section-event {
   // transform: translateY(0%);
-  margin-top: 0;
+  margin-top: -110rpx;
 }
 
 .isLoadedPage {
