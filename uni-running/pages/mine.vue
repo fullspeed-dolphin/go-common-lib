@@ -144,7 +144,7 @@
                 </view>
                 <text class="service-text">联系客服</text>
               </view>
-              <u-icon name="arrow-right" color="#909399" size="16"></u-icon>
+              <u-icon name="arrow-right" color="#909399" size="26rpx"></u-icon>
             </view>
           </button>
 
@@ -271,20 +271,25 @@ const logout = () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 52rpx;
-    height: 52rpx;
+    width: 26rpx;
+    height: 26rpx;
     margin-right: 22rpx !important;
   }
   .u-cell__title-text {
-    font-family: PingFang SC-Bold;
+    font-weight: bold;
+    font-size: 30rpx !important;
+    color: rgba(0, 0, 0, 0.8);
+  }
+  .u-icon__icon {
+    font-size: 26rpx !important;
   }
   .service-cell {
     .icon {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 52rpx;
-      height: 52rpx;
+      width: 26rpx;
+      height: 26rpx;
       margin-right: 22rpx;
     }
     .service-content {
@@ -292,10 +297,9 @@ const logout = () => {
       align-items: center;
     }
     .service-text {
-      font-size: 15px;
-      color: #303133;
-      font-weight: normal;
-      font-family: PingFang SC-Bold;
+      font-weight: bold;
+      font-size: 30rpx;
+      color: rgba(0, 0, 0, 0.8);
     }
     .u-cell__body__content {
       flex: unset;
@@ -341,6 +345,7 @@ const logout = () => {
   width: 34rpx;
   height: 34rpx;
   display: block;
+  flex-shrink: 0;
 }
 .user-box {
   height: 210rpx;
