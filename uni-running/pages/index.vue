@@ -455,19 +455,19 @@ const menus = ref([
   }
 
   .section-banner {
-    min-height: 270rpx;
+    min-height: 344rpx;
     width: 100%;
     margin: 0 auto;
     border-radius: 16rpx !important;
     overflow: hidden;
 
     .swiper {
-      height: 270rpx;
+      height: 344rpx;
     }
     .img {
       display: block;
-      width: calc(100% - 24rpx);
-      height: 270rpx;
+      width: 682rpx;
+      height: 344rpx;
       border-radius: 16rpx !important;
       overflow: hidden;
       margin: 0 12rpx;

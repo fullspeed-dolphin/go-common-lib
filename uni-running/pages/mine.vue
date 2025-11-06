@@ -135,14 +135,14 @@
         <view class="service-cell u-cell u-cell__body" @click="showLoading()">
           <button class="u-reset-button" open-type="contact">
             <view class="flex-row" style="width: 100%">
-              <view class="flex-start flex-1">
+              <view class="flex-start flex-1 service-content">
                 <view class="icon">
                   <image
                     class="nav-icon"
                     src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-mine-customer@2x.png"
                   ></image>
                 </view>
-                联系客服
+                <text class="service-text">联系客服</text>
               </view>
               <u-icon name="arrow-right" size="14"></u-icon>
             </view>
@@ -284,6 +284,15 @@ const logout = () => {
       height: 52rpx;
       margin-right: 22rpx;
     }
+    .service-content {
+      display: flex;
+      align-items: center;
+    }
+    .service-text {
+      font-size: 34rpx;
+      font-weight: 600;
+      color: #303133;
+    }
     .u-cell__body__content {
       flex: unset;
     }
@@ -293,18 +302,27 @@ const logout = () => {
       max-width: 100%;
     }
     .u-reset-button {
-      height: 120rpx;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      border: none;
+      background: transparent;
       text-align: left;
-      font-size: 15px;
-      line-height: 22px;
-      color: #303133;
       display: flex;
       flex-direction: row;
       box-sizing: border-box;
-      padding: 10px 15px;
-      font-size: 15px;
-      color: #303133;
       align-items: center;
+      &::after {
+        border: none;
+      }
+      .flex-row {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        padding: 0 15px;
+        box-sizing: border-box;
+      }
     }
   }
 }
