@@ -52,11 +52,12 @@
       <view style="padding: 48rpx 54rpx">
         <u-button
           type="primary"
-          style="border-radius: 16rpx"
+          height="80rpx"
+          customStyle="border-radius: 16rpx; height: 80rpx"
           color="#FF8C00"
           @click="openForm()"
-          >{{ userInfo.running_group ? "我的跑团" : "创建跑团" }}</u-button
-        >
+          >{{ userInfo.running_group ? "我的跑团" : "创建跑团" }}
+        </u-button>
       </view>
     </section>
 

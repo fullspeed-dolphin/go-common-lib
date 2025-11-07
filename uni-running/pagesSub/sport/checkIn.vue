@@ -51,7 +51,7 @@
       </view>
 
       <!-- 任务模块 -->
-      <view class="task-section">
+      <view class="task-section" v-if="sportId" @click="goToSportDetail">
         <view class="task-title">赚得跑币</view>
         <view class="task-list">
           <view
@@ -97,6 +97,7 @@ import { getCurrentInstance } from "vue";
 import Navbar from "@/components/navbar.vue";
 import { staticBaseUrl } from "@/utils/config";
 import request from "@/utils/request.js";
+import dayjs from "dayjs";
 
 // 获取当前实例以访问全局属性
 const { proxy } = getCurrentInstance();
@@ -142,14 +143,7 @@ const currentYear = computed(() => currentDate.value.getFullYear());
 const currentMonth = computed(() => currentDate.value.getMonth());
 
 // 打卡记录数据（示例数据，实际应从API获取）
-const checkInRecords = ref([
-  // 格式: 'YYYY-MM-DD'
-  "2025-11-21",
-  "2025-11-15",
-  "2025-11-10",
-  "2025-10-25",
-  "2025-10-20",
-]);
+const checkInRecords = ref([]);
 
 // 计算日历天数
 const calendarDays = computed(() => {
@@ -259,6 +253,17 @@ const loadCheckInData = async () => {
     //   month: currentMonth.value + 1
     // });
     // checkInRecords.value = res.data || [];
+    const res = await request.get(`/sport-api/api/manual/getRecordByMonth`, {
+      month: `${currentYear.value}-${String(currentMonth.value + 1).padStart(
+        2,
+        "0"
+      )}`,
+    });
+    checkInRecords.value = res?.map((item) =>
+      dayjs(item.created_at).format("YYYY-MM-DD")
+    );
+
+    console.log("checkInRecords======>", res, checkInRecords.value);
   } catch (error) {
     console.error("加载打卡数据失败:", error);
   }
@@ -286,6 +291,7 @@ const loadTaskList = async () => {
   }
 };
 
+const sportId = ref(null);
 // 加载运动数据
 const loadSportData = async () => {
   uni.showLoading({
@@ -294,15 +300,25 @@ const loadSportData = async () => {
   });
 
   try {
-    const res = await request.get(`/sport-api/api/manual`);
+    const res = await request.get(`/sport-api/api/manual/getRecordByDate`, {
+      date: dayjs().format("YYYY-MM-DD"),
+    });
 
-    console.log("res======>", res);
+    sportId.value = res?.length ? res[0]?.id : null;
+
+    console.log("sportId======>", sportId.value, res);
   } catch (error) {
     console.error("加载运动数据失败:", error);
     proxy.$toast("加载数据失败");
   } finally {
     uni.hideLoading();
   }
+};
+
+const goToSportDetail = () => {
+  uni.navigateTo({
+    url: `/pagesSub/sport/show?id=${sportId.value}`,
+  });
 };
 
 // 导航栏右侧按钮点击
