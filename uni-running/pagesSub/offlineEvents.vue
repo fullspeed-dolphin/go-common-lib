@@ -1,5 +1,10 @@
 <template>
-  <Navbar :bgHeight="0" title="" :placeholder="false" />
+  <Navbar
+    :bgHeight="0"
+    :title="detail?.name || ''"
+    :placeholder="true"
+    bgColor="#fff"
+  />
   <view
     class="pb30"
     style="background: #f5f5f5"

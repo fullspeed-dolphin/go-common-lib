@@ -19,7 +19,7 @@
       </view>
     </view>
     <view v-if="title" class="navbar-title" :style="titleStyle">
-      {{ title }}
+      <text class="navbar-title-text">{{ title }}</text>
     </view>
   </view>
 </template>
@@ -44,9 +44,13 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  bgColor: {
+    type: String,
+    default: "transparent",
+  },
 });
 
-const bgColor = ref("transparent");
+const bgColor = ref(props.bgColor);
 const navbarBoxHeight = ref("0px");
 const menuButtonInfo = ref(null);
 const statusBarHeight = ref(0);
@@ -155,7 +159,7 @@ const handleScroll = (e) => {
   if (scrollTop >= 5) {
     bgColor.value = "#ffffff";
   } else {
-    bgColor.value = "transparent";
+    bgColor.value = props.bgColor;
   }
 };
 
@@ -263,23 +267,29 @@ onUnmounted(() => {
 
   .navbar-title {
     position: fixed;
-    left: 0;
-    right: 0;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 10;
+    pointer-events: none; // 标题不阻挡点击事件
+    // 确保标题不会被左侧按钮和右侧胶囊按钮遮挡
+    padding: 0 120px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
-    font-weight: 500;
-    color: #000;
-    text-align: center;
-    // 左右padding确保标题不会被左侧按钮和右侧胶囊按钮遮挡
-    padding: 0 120px;
-    box-sizing: border-box;
-    pointer-events: none; // 标题不阻挡点击事件
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    line-height: inherit;
+
+    .navbar-title-text {
+      font-size: 32rpx;
+      font-weight: 500;
+      color: #000;
+      text-align: center;
+      // 限制文本最大宽度为 400rpx
+      max-width: 325rpx;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: block;
+    }
   }
 }
 </style>
