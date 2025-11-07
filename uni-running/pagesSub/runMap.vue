@@ -206,6 +206,7 @@ const deviceHeading = ref(0); // 设备朝向角度（0-360度，0度为正北�
 const compassAvailable = ref(false); // 罗盘是否可用
 const lastRotation = ref(null); // 上一次的旋转角度
 const rotationUpdateTimer = ref(null); // 旋转更新定时器
+const pendingRotation = ref(null); // 待更新的旋转角度值（用于节流）
 
 // 弹窗
 const showSuccessModal = ref(false);
@@ -215,6 +216,75 @@ const targetDistance = ref(10000); // 10km = 10000米
 
 // 调试模式
 const debug = ref(false); // 设置为true显示测试功能
+
+// 卡尔曼滤波配置
+const useKalmanFilter = ref(true); // 是否启用卡尔曼滤波
+
+// 简化的卡尔曼滤波器类（用于GPS坐标平滑）
+class SimpleKalmanFilter {
+  constructor(processNoise = 0.01, measurementNoise = 5.0) {
+    // processNoise: 过程噪声（预测不确定性），越小越信任预测
+    // measurementNoise: 观测噪声（GPS测量不确定性），越小越信任观测
+    this.processNoise = processNoise;
+    this.measurementNoise = measurementNoise;
+
+    // 状态：latitude, longitude
+    this.state = null; // {lat: number, lng: number}
+
+    // 协方差（不确定性），初始值设大一点
+    this.uncertainty = 1.0;
+  }
+
+  // 初始化滤波器
+  init(lat, lng) {
+    this.state = { lat, lng };
+    this.uncertainty = 1.0;
+  }
+
+  // 预测步骤（简化：假设匀速运动，预测值就是上一状态）
+  predict() {
+    // 简化版：预测值等于上一状态，不确定性增加
+    this.uncertainty += this.processNoise;
+    return this.state;
+  }
+
+  // 更新步骤（结合观测值）
+  update(observedLat, observedLng) {
+    if (!this.state) {
+      // 第一次初始化
+      this.init(observedLat, observedLng);
+      return { lat: observedLat, lng: observedLng };
+    }
+
+    // 预测
+    this.predict();
+
+    // 计算卡尔曼增益
+    // 增益 = 不确定性 / (不确定性 + 观测噪声)
+    const gain = this.uncertainty / (this.uncertainty + this.measurementNoise);
+
+    // 更新状态：预测值 + 增益 * (观测值 - 预测值)
+    const predictedLat = this.state.lat;
+    const predictedLng = this.state.lng;
+
+    this.state.lat = predictedLat + gain * (observedLat - predictedLat);
+    this.state.lng = predictedLng + gain * (observedLng - predictedLng);
+
+    // 更新不确定性
+    this.uncertainty = (1 - gain) * this.uncertainty;
+
+    return { lat: this.state.lat, lng: this.state.lng };
+  }
+
+  // 重置滤波器
+  reset() {
+    this.state = null;
+    this.uncertainty = 1.0;
+  }
+}
+
+// 创建卡尔曼滤波器实例
+const kalmanFilter = new SimpleKalmanFilter(0.01, 5.0); // 可调整参数
 
 // 标记配置常量
 const MARKER_CONFIG = {
@@ -340,42 +410,59 @@ const updateCurrentLocationMarkerRotation = () => {
   // 简化后：rotate = (deviceHeading + 90) % 360
   const rotation = (deviceHeading.value + 90) % 360;
 
+  // 保存最新的旋转角度值（用于定时器回调）
+  pendingRotation.value = rotation;
+
   // 如果旋转角度没有变化（或变化很小），跳过更新
   if (lastRotation.value !== null) {
     const diff = Math.abs(rotation - lastRotation.value);
     // 处理角度跨越0度/360度的情况
     const minDiff = Math.min(diff, 360 - diff);
+    if (debug.value) {
+      uni.showToast({
+        title: `minDiff======>${minDiff}, rotation======>${rotation}, lastRotation.value======>${lastRotation.value}`,
+        icon: "none",
+      });
+    }
     // 如果角度变化小于3度，跳过更新（避免微小变化导致的闪烁）
     if (minDiff < 3) {
       return;
     }
   }
 
-  // 清除之前的定时器
+  // 如果已经有定时器在运行，不创建新的（节流：限制执行频率）
   if (rotationUpdateTimer.value) {
-    clearTimeout(rotationUpdateTimer.value);
+    return;
   }
 
   // 使用节流，延迟更新（每300ms最多更新一次）
   rotationUpdateTimer.value = setTimeout(() => {
-    const index = markers.value.findIndex((m) => m.id === 0);
-    if (index !== -1) {
-      // 检查角度是否真的变化了
-      if (markers.value[index].rotate !== rotation) {
-        // 在 uni-app 中，需要重新创建数组才能触发地图组件更新
-        // 但我们可以只更新需要更新的 marker，其他保持不变
-        const newMarkers = markers.value.map((marker, i) => {
-          if (i === index) {
-            // 只更新当前位置标记的旋转角度
-            return { ...marker, rotate: rotation };
-          }
-          return marker; // 其他标记保持不变
-        });
-        markers.value = newMarkers;
-        lastRotation.value = rotation;
+    // 使用最新的待更新角度值
+    const rotationToUpdate = pendingRotation.value;
+
+    if (rotationToUpdate !== null) {
+      const index = markers.value.findIndex((m) => m.id === 0);
+      if (index !== -1) {
+        // 检查角度是否真的变化了（与当前显示的值比较）
+        if (markers.value[index].rotate !== rotationToUpdate) {
+          // 在 uni-app 中，需要重新创建数组才能触发地图组件更新
+          // 但我们可以只更新需要更新的 marker，其他保持不变
+          const newMarkers = markers.value.map((marker, i) => {
+            if (i === index) {
+              // 只更新当前位置标记的旋转角度
+              return { ...marker, rotate: rotationToUpdate };
+            }
+            return marker; // 其他标记保持不变
+          });
+          markers.value = newMarkers;
+          lastRotation.value = rotationToUpdate;
+        }
       }
     }
+
+    // 清除定时器标识，允许下次更新
     rotationUpdateTimer.value = null;
+    pendingRotation.value = null;
   }, 300);
 };
 
@@ -612,6 +699,9 @@ const startRunning = async () => {
     currentKmStartDistance.value = 0; // 重置当前千米段开始距离
     currentKmStartTime.value = startTime.value; // 设置当前千米段开始时间
 
+    // 重置卡尔曼滤波器
+    kalmanFilter.reset();
+
     // 获取起始位置
     const startLocation = await uni.getLocation({
       isHighAccuracy: true,
@@ -621,6 +711,11 @@ const startRunning = async () => {
 
     // 验证起始位置坐标
     if (isValidCoordinate(startLocation.latitude, startLocation.longitude)) {
+      // 初始化卡尔曼滤波器
+      if (useKalmanFilter.value) {
+        kalmanFilter.init(startLocation.latitude, startLocation.longitude);
+      }
+
       // 确保起始位置点有时间戳
       const startPoint = {
         ...startLocation,
@@ -824,12 +919,112 @@ const handleLocationUpdate = (location) => {
   // 过滤掉距离过近的点(小于5米)
   if (distance < 5) return;
 
-  // 更新总距离
-  totalDistance.value += distance;
+  // 过滤漂移点：检查距离和时间，计算速度
+  const currentTimestamp = location.timestamp || Date.now();
+  const lastTimestamp = lastLocation.value.timestamp || currentTimestamp;
+  const timeDiff = (currentTimestamp - lastTimestamp) / 1000; // 时间差（秒）
 
-  // 更新轨迹点，确保有时间戳
+  // 如果时间差为0或负数，跳过（数据异常）
+  if (timeDiff <= 0) {
+    console.warn("时间戳异常，跳过此次更新");
+    return;
+  }
+
+  // 计算瞬时速度（米/秒）
+  const speed = distance / timeDiff;
+
+  // 漂移点判断标准：
+  // 1. 距离超过100米，且速度超过10 m/s（36 km/h，跑步速度上限）
+  // 2. 距离超过50米，且速度超过15 m/s（54 km/h，明显不合理的速度）
+  // 3. 距离超过200米（无论速度如何，都是明显异常）
+  const MAX_DISTANCE_THRESHOLD = 200; // 最大距离阈值（米）
+  const HIGH_SPEED_THRESHOLD = 15; // 高速阈值（米/秒）
+  const MODERATE_DISTANCE_THRESHOLD = 100; // 中等距离阈值（米）
+  const MODERATE_SPEED_THRESHOLD = 10; // 中等速度阈值（米/秒）
+
+  if (
+    distance > MAX_DISTANCE_THRESHOLD ||
+    (distance > MODERATE_DISTANCE_THRESHOLD &&
+      speed > MODERATE_SPEED_THRESHOLD) ||
+    (distance > 50 && speed > HIGH_SPEED_THRESHOLD)
+  ) {
+    console.warn(
+      `检测到漂移点，已过滤。距离: ${distance.toFixed(
+        2
+      )}m, 速度: ${speed.toFixed(2)}m/s, 时间间隔: ${timeDiff.toFixed(2)}s`
+    );
+    return;
+  }
+
+  // 如果有多个轨迹点，进一步检查方向变化（防止突然大幅转向）
+  if (trackPoints.value.length >= 2) {
+    const secondLastPoint = trackPoints.value[trackPoints.value.length - 2];
+    const lastPoint = lastLocation.value;
+
+    // 计算上一段的方向（从倒数第二个点到上一个点）
+    const lastBearing = calculateBearing(
+      secondLastPoint.latitude,
+      secondLastPoint.longitude,
+      lastPoint.latitude,
+      lastPoint.longitude
+    );
+
+    // 计算当前段的方向（从上一点到当前点）
+    const currentBearing = calculateBearing(
+      lastPoint.latitude,
+      lastPoint.longitude,
+      location.latitude,
+      location.longitude
+    );
+
+    // 计算方向变化角度
+    let bearingDiff = Math.abs(currentBearing - lastBearing);
+    // 处理角度跨越0度/360度的情况
+    if (bearingDiff > 180) {
+      bearingDiff = 360 - bearingDiff;
+    }
+
+    // 如果距离较大（超过30米）且方向变化超过150度，可能是漂移
+    if (distance > 30 && bearingDiff > 150) {
+      console.warn(
+        `检测到异常方向变化，已过滤。距离: ${distance.toFixed(
+          2
+        )}m, 方向变化: ${bearingDiff.toFixed(2)}度`
+      );
+      return;
+    }
+  }
+
+  // 使用卡尔曼滤波平滑坐标（可选）
+  let filteredLocation = location;
+  let actualDistance = distance; // 实际使用的距离
+
+  if (useKalmanFilter.value) {
+    const smoothed = kalmanFilter.update(location.latitude, location.longitude);
+    filteredLocation = {
+      ...location,
+      latitude: smoothed.lat,
+      longitude: smoothed.lng,
+    };
+
+    // 使用平滑后的坐标重新计算距离（更准确）
+    actualDistance = calculateDistance(
+      lastLocation.value.latitude,
+      lastLocation.value.longitude,
+      filteredLocation.latitude,
+      filteredLocation.longitude
+    );
+
+    // 更新总距离（使用平滑后的距离）
+    totalDistance.value += actualDistance;
+  } else {
+    // 不使用卡尔曼滤波，直接更新距离
+    totalDistance.value += distance;
+  }
+
+  // 更新轨迹点，确保有时间戳（使用平滑后的坐标）
   const trackPoint = {
-    ...location,
+    ...filteredLocation,
     timestamp: location.timestamp || Date.now(), // 如果没有时间戳，使用当前时间
   };
   trackPoints.value.push(trackPoint);
@@ -837,7 +1032,7 @@ const handleLocationUpdate = (location) => {
 
   // 检查是否跨过了新的千米点（每1000米）
   const currentKm = Math.floor(totalDistance.value / 1000);
-  const previousKm = Math.floor((totalDistance.value - distance) / 1000);
+  const previousKm = Math.floor((totalDistance.value - actualDistance) / 1000);
 
   if (currentKm > previousKm && currentKmStartTime.value) {
     // 完成了一千米，保存这一千米的数据
@@ -1009,9 +1204,30 @@ const calculateDistance = (lat1, lng1, lat2, lng2) => {
   return R * c;
 };
 
+// 计算两点间的方位角（方向角，0-360度，0度为正北）
+const calculateBearing = (lat1, lng1, lat2, lng2) => {
+  const dLng = toRadians(lng2 - lng1);
+  const lat1Rad = toRadians(lat1);
+  const lat2Rad = toRadians(lat2);
+
+  const y = Math.sin(dLng) * Math.cos(lat2Rad);
+  const x =
+    Math.cos(lat1Rad) * Math.sin(lat2Rad) -
+    Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(dLng);
+
+  const bearing = Math.atan2(y, x);
+  // 转换为度数（0-360度，0度为正北）
+  return (toDegrees(bearing) + 360) % 360;
+};
+
 // 角度转弧度
 const toRadians = (degrees) => {
   return degrees * (Math.PI / 180);
+};
+
+// 弧度转角度
+const toDegrees = (radians) => {
+  return radians * (180 / Math.PI);
 };
 
 // 格式化距离
@@ -1264,6 +1480,10 @@ const clearTestTrack = () => {
   currentKmStartDistance.value = 0;
   currentKmStartTime.value = null;
   startTime.value = null;
+  lastLocation.value = null;
+
+  // 重置卡尔曼滤波器
+  kalmanFilter.reset();
 
   uni.showToast({
     title: "轨迹已清除",
