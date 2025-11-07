@@ -33,9 +33,10 @@
       @init="mescrollInit"
       @down="downCallback"
       @up="getList"
-      top="360"
+      top="210"
       bottom="176"
       :safearea="true"
+      :fixed="false"
     >
       <view class="container group-list">
         <GroupItem
@@ -48,7 +49,7 @@
     </mescroll-uni>
 
     <section class="section-bottom">
-      <view style="padding: 48rpx 54rpx; background: #fafafa">
+      <view style="padding: 48rpx 54rpx">
         <u-button
           type="primary"
           style="border-radius: 16rpx"
@@ -235,6 +236,7 @@ const downCallback = (mescroll) => {
   position: fixed;
   width: 100%;
   z-index: 10;
+  background: #f5f5f5;
 }
 .section-tabs {
   margin: 0 auto;

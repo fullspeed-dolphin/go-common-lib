@@ -210,18 +210,14 @@
           <u-button
             type="primary"
             color="#f2f2f2"
-            textColor="#FF8C00"
-            width="320rpx"
-            customStyle="border-radius: 16rpx;height: 80rpx;"
+            customStyle="border-radius: 16rpx;height: 80rpx;width: 320rpx;color: #FF8C00;"
             @click="deleteGroup()"
             >删除跑团</u-button
           >
           <u-button
             type="primary"
             color="#f2f2f2"
-            textColor="#FF8C00"
-            width="320rpx"
-            customStyle="border-radius: 16rpx;height: 80rpx;"
+            customStyle="border-radius: 16rpx;height: 80rpx;width: 320rpx;color: #FF8C00;"
             @click="updateGroup()"
             >更新跑团</u-button
           >
