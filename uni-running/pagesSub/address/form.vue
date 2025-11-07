@@ -89,6 +89,7 @@
             :customStyle="buttonCustomStyle"
             :disabled="submitting"
             @click="handleSubmit"
+            shape="circle"
             >确定</u-button
           >
         </view>

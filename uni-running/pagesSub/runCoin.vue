@@ -97,7 +97,8 @@
                 type="primary"
                 size="small"
                 color="#FF8C00"
-                customStyle="border-radius: 16rpx;width:124rpx;height:60rpx;margin:0"
+                shape="circle"
+                customStyle="width:124rpx;height:60rpx;margin:0"
               >
                 去跑步
               </u-button>

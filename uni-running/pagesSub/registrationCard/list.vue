@@ -56,7 +56,7 @@
         <u-button
           type="primary"
           color="#FF8C00"
-          customStyle="border-radius: 16rpx;"
+          shape="circle"
           @click="$u.route('pagesSub/registrationCard/create')"
           >添加报名卡</u-button
         >

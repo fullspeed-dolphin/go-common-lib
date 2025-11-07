@@ -29,7 +29,7 @@
         <u-button
           type="primary"
           color="#FF8C00"
-          customStyle="border-radius: 16rpx;"
+          shape="circle"
           @click="handleAdd"
           >添加地址信息</u-button
         >

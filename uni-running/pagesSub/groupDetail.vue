@@ -197,7 +197,8 @@
           <u-button
             type="primary"
             color="#FF8C00"
-            customStyle="border-radius: 16rpx;height: 80rpx;"
+            shape="circle"
+            customStyle="height: 80rpx;"
             @click="joinGroup()"
             >加入跑团</u-button
           >
@@ -210,14 +211,16 @@
           <u-button
             type="primary"
             color="#f2f2f2"
-            customStyle="border-radius: 16rpx;height: 80rpx;width: 320rpx;color: #FF8C00;"
+            shape="circle"
+            customStyle="height: 80rpx;width: 320rpx;color: #FF8C00;"
             @click="deleteGroup()"
             >删除跑团</u-button
           >
           <u-button
             type="primary"
-            color="#f2f2f2"
-            customStyle="border-radius: 16rpx;height: 80rpx;width: 320rpx;color: #FF8C00;"
+            color="#FF8C00"
+            shape="circle"
+            customStyle="height: 80rpx;width: 320rpx;color: #FF8C00;"
             @click="updateGroup()"
             >更新跑团</u-button
           >
@@ -228,8 +231,9 @@
         <view style="padding: 56rpx 54rpx 40rpx">
           <u-button
             type="primary"
-            color="#f2f2f2"
-            customStyle="border-radius: 16rpx;height: 80rpx; color: #FF8C00;"
+            color="#FF8C00"
+            shape="circle"
+            customStyle="height: 80rpx; color: #FF8C00;"
             @click="leaveGroup()"
             >退出跑团</u-button
           >

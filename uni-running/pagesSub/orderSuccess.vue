@@ -81,7 +81,7 @@
         <u-button
           type="primary"
           color="#FF8C00"
-          customStyle="border-radius: 16rpx;"
+          shape="circle"
           @click="refundOrder(detail)"
         >
           申请退赛

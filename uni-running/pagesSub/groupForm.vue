@@ -101,7 +101,7 @@
         <u-button
           type="primary"
           color="#FF8C00"
-          style="border-radius: 16rpx"
+          shape="circle"
           @click="submitForm()"
           >{{ group_id ? "更新跑团" : "创建跑团" }}
         </u-button>

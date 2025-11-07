@@ -132,7 +132,8 @@
           <u-button
             type="primary"
             color="#FF8C00"
-            customStyle="border-radius: 16rpx;height: 80rpx;"
+            shape="circle"
+            customStyle="height: 80rpx;"
             @click="routeTo()"
           >
             <block v-if="detail.status === 'ACT'">{{

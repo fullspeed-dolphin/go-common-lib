@@ -53,7 +53,8 @@
         <u-button
           type="primary"
           height="80rpx"
-          customStyle="border-radius: 16rpx; height: 80rpx"
+          shape="circle"
+          customStyle="height: 80rpx"
           color="#FF8C00"
           @click="openForm()"
           >{{ userInfo.running_group ? "我的跑团" : "创建跑团" }}

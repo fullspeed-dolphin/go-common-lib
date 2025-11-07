@@ -36,7 +36,7 @@
         <u-button
           type="primary"
           color="#FF8C00"
-          customStyle="border-radius: 16rpx;"
+          shape="circle"
           @click="bindDevice()"
           >立即绑定</u-button
         >
@@ -70,6 +70,7 @@
         <view class="flex-between-center btns" style="padding: 40rpx">
           <u-button
             type="primary"
+            shape="circle"
             customStyle="border-radius: 16rpx;height: 72rpx; color: #707070;"
             color="#F2F2F2"
             @click="$refs.refCommonDialog.close()"
@@ -78,7 +79,8 @@
           <u-button
             type="primary"
             color="#FF8C00"
-            customStyle="border-radius: 16rpx;height: 72rpx;"
+            shape="circle"
+            customStyle="height: 72rpx;"
             @click="bindDevice()"
             >复制绑定链接</u-button
           >

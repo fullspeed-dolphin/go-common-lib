@@ -51,7 +51,11 @@
       </view>
 
       <!-- 任务模块 -->
-      <view class="task-section" v-if="sportId" @click="goToSportDetail">
+      <view
+        class="task-section"
+        v-if="sportId"
+        @click="goToSportDetail(sportId)"
+      >
         <view class="task-title">赚得跑币</view>
         <view class="task-list">
           <view
@@ -92,7 +96,6 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { useStore } from "vuex";
 import { getCurrentInstance } from "vue";
 import Navbar from "@/components/navbar.vue";
 import { staticBaseUrl } from "@/utils/config";
@@ -101,20 +104,6 @@ import dayjs from "dayjs";
 
 // 获取当前实例以访问全局属性
 const { proxy } = getCurrentInstance();
-
-// 使用store
-const store = useStore();
-
-// 导航栏相关
-const bgHeight = ref(370);
-const bgColor = ref("transparent");
-const navbarBoxHeight = ref("0px");
-
-const computeNavbarBoxHeight = () => {
-  const statusBarHeight =
-    (uni.getWindowInfo && uni.getWindowInfo().statusBarHeight) || 0;
-  navbarBoxHeight.value = `${44 + statusBarHeight}px`;
-};
 
 // 日历相关
 const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
@@ -190,7 +179,9 @@ const calendarDays = computed(() => {
     const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(
       i
     ).padStart(2, "0")}`;
-    const hasCheckin = checkInRecords.value.includes(dateStr);
+    const hasCheckin = checkInRecords.value.some(
+      (record) => record.date === dateStr
+    );
     days.push({
       date: i,
       otherMonth: false,
@@ -240,8 +231,14 @@ const nextMonth = () => {
 // 点击日期
 const handleDayClick = (day) => {
   if (day.otherMonth) return;
-  console.log("点击日期:", day.fullDate);
-  // 可以在这里添加点击日期的逻辑
+
+  const record = checkInRecords.value.find(
+    (item) => item.date === day.fullDate
+  );
+
+  if (record?.id) {
+    goToSportDetail(record.id);
+  }
 };
 
 // 加载打卡数据
@@ -259,9 +256,16 @@ const loadCheckInData = async () => {
         "0"
       )}`,
     });
-    checkInRecords.value = res?.map((item) =>
-      dayjs(item.created_at).format("YYYY-MM-DD")
-    );
+    const normalizedRecords = Array.isArray(res)
+      ? res
+          .map((item) => ({
+            id: item.id,
+            date: dayjs(item.created_at).format("YYYY-MM-DD"),
+          }))
+          .filter((item) => !!item.date)
+      : [];
+
+    checkInRecords.value = normalizedRecords;
 
     console.log("checkInRecords======>", res, checkInRecords.value);
   } catch (error) {
@@ -315,36 +319,16 @@ const loadSportData = async () => {
   }
 };
 
-const goToSportDetail = () => {
+const goToSportDetail = (id) => {
+  if (!id) {
+    return;
+  }
   uni.navigateTo({
-    url: `/pagesSub/sport/show?id=${sportId.value}`,
+    url: `/pagesSub/sport/show?id=${id}`,
   });
 };
 
-// 导航栏右侧按钮点击
-const handleMenuClick = () => {
-  console.log("点击菜单");
-  // 可以显示菜单选项
-};
-
-const handleEyeClick = () => {
-  console.log("点击眼睛图标");
-  // 可以切换显示模式
-};
-
-// 监听页面滚动
-const handleScroll = (e) => {
-  const scrollTop = e.scrollTop || 0;
-  if (scrollTop >= 5) {
-    bgColor.value = "#ffffff";
-  } else {
-    bgColor.value = "transparent";
-  }
-};
-
 onMounted(() => {
-  uni.$on("pageScroll", handleScroll);
-  computeNavbarBoxHeight();
   loadCheckInData();
   loadTaskList();
   loadSportData();
@@ -428,11 +412,12 @@ onMounted(() => {
 .calendar-days {
   display: flex;
   flex-wrap: wrap;
+  gap: 14rpx;
 }
 
 .calendar-day {
   position: relative;
-  width: calc(100% / 7);
+  width: calc(100% / 7 - 12rpx);
   aspect-ratio: 1;
   display: flex;
   flex-direction: column;

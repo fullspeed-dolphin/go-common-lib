@@ -118,7 +118,7 @@ const joinEvent = () => {
   height: 60rpx;
   color: #fff;
   background: #ff8c00;
-  border-radius: 16rpx 16rpx 16rpx 16rpx;
+  border-radius: 40rpx;
 }
 .event-item-button:active {
   background: #e67e00;

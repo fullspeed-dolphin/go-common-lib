@@ -17,7 +17,7 @@
         <u-button
           type="primary"
           color="#FF8C00"
-          customStyle="border-radius: 16rpx;"
+          shape="circle"
           @click="payOrder(detail)"
         >
           重新支付

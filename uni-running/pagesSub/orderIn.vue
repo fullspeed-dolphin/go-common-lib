@@ -134,7 +134,7 @@
         <u-button
           type="primary"
           color="#ff8c00"
-          customStyle="border-radius: 16rpx;"
+          shape="circle"
           @click="submitOrder()"
           >￥{{ activeType.price }} 支付</u-button
         >

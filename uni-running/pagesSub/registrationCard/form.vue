@@ -361,6 +361,7 @@
             type="primary"
             :color="form.agreed ? '#FF8C00' : '#F2F2F2'"
             :disabled="!form.agreed || submitting"
+            shape="circle"
             :customStyle="buttonCustomStyle"
             @click="onSubmit"
             >保存</u-button
@@ -557,7 +558,7 @@ const tshirtSizeDisplayName = computed(() => {
 });
 
 const buttonCustomStyle = computed(() => {
-  return `border-radius: 16rpx; font-weight: bold; font-size: 30rpx; ${
+  return `font-weight: bold; font-size: 30rpx; ${
     form.agreed ? "color: #ffffff;" : "color: #999999;"
   }`;
 });
