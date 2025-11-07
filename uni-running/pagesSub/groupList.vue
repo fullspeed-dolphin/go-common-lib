@@ -249,7 +249,7 @@ const downCallback = (mescroll) => {
 }
 .section-bottom {
   position: fixed;
-  bottom: env(safe-area-inset-bottom);
+  bottom: 0;
   width: 100%;
   z-index: 10;
 }

@@ -597,7 +597,7 @@ const callPhone = (phoneNumber) => {
 
 .section-bottom {
   position: fixed;
-  bottom: 0px;
+  bottom: 0;
   width: 100%;
   z-index: 10;
 }

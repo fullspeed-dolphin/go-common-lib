@@ -123,11 +123,7 @@
         <!-- <view class="txt">
 				  {{isSignUp ? '取消' : ''}}报名截止：2025.09.30 9:00
 			  </view> -->
-        <view
-          class="u-border-top1"
-          :class="{ isSignUp: isSignUp }"
-          style="padding: 26rpx 20rpx 0"
-        >
+        <view class="u-border-top1" :class="{ isSignUp: isSignUp }">
           <u-button
             type="primary"
             color="#FF8C00"
@@ -422,7 +418,7 @@ const callPhone = (phoneNumber) => {
   width: 100%;
   left: 0;
   z-index: 10;
-  padding: 0 34rpx 34rpx;
+  padding: 48rpx 54rpx;
   transform: translateY(100%);
   .txt {
     font-size: 24rpx;
