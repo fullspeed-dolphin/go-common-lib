@@ -435,7 +435,7 @@ const updateCurrentLocationMarkerRotation = () => {
     return;
   }
 
-  // 使用节流，延迟更新（每300ms最多更新一次）
+  // 使用节流，延迟更新
   rotationUpdateTimer.value = setTimeout(() => {
     // 使用最新的待更新角度值
     const rotationToUpdate = pendingRotation.value;
@@ -463,7 +463,7 @@ const updateCurrentLocationMarkerRotation = () => {
     // 清除定时器标识，允许下次更新
     rotationUpdateTimer.value = null;
     pendingRotation.value = null;
-  }, 300);
+  }, 500);
 };
 
 // 检查位置权限
