@@ -205,7 +205,7 @@ const MOVE_INTERVAL = 500; // 最小移动间隔（毫秒）
 const deviceHeading = ref(0); // 设备朝向角度（0-360度，0度为正北）
 const compassAvailable = ref(false); // 罗盘是否可用
 const lastRotation = ref(null); // 上一次的旋转角度
-// const rotationUpdateTimer = ref(null); // 旋转更新定时器
+const rotationUpdateTimer = ref(null); // 旋转更新定时器
 
 // 弹窗
 const showSuccessModal = ref(false);
@@ -260,10 +260,10 @@ onUnmounted(() => {
   stopRunning();
   stopCompass();
   // 清理旋转更新定时器
-  // if (rotationUpdateTimer.value) {
-  //   clearTimeout(rotationUpdateTimer.value);
-  //   rotationUpdateTimer.value = null;
-  // }
+  if (rotationUpdateTimer.value) {
+    clearTimeout(rotationUpdateTimer.value);
+    rotationUpdateTimer.value = null;
+  }
 });
 
 // 验证坐标是否有效
@@ -341,42 +341,42 @@ const updateCurrentLocationMarkerRotation = () => {
   const rotation = (deviceHeading.value + 90) % 360;
 
   // 如果旋转角度没有变化（或变化很小），跳过更新
-  // if (lastRotation.value !== null) {
-  //   const diff = Math.abs(rotation - lastRotation.value);
-  //   // 处理角度跨越0度/360度的情况
-  //   const minDiff = Math.min(diff, 360 - diff);
-  //   // 如果角度变化小于3度，跳过更新（避免微小变化导致的闪烁）
-  //   if (minDiff < 3) {
-  //     return;
-  //   }
-  // }
-
-  // 清除之前的定时器
-  // if (rotationUpdateTimer.value) {
-  //   clearTimeout(rotationUpdateTimer.value);
-  // }
-
-  // 使用节流，延迟更新（每500ms最多更新一次）
-  // rotationUpdateTimer.value = setTimeout(() => {
-  const index = markers.value.findIndex((m) => m.id === 0);
-  if (index !== -1) {
-    // 检查角度是否真的变化了
-    if (markers.value[index].rotate !== rotation) {
-      // 在 uni-app 中，需要重新创建数组才能触发地图组件更新
-      // 但我们可以只更新需要更新的 marker，其他保持不变
-      const newMarkers = markers.value.map((marker, i) => {
-        if (i === index) {
-          // 只更新当前位置标记的旋转角度
-          return { ...marker, rotate: rotation };
-        }
-        return marker; // 其他标记保持不变
-      });
-      markers.value = newMarkers;
-      lastRotation.value = rotation;
+  if (lastRotation.value !== null) {
+    const diff = Math.abs(rotation - lastRotation.value);
+    // 处理角度跨越0度/360度的情况
+    const minDiff = Math.min(diff, 360 - diff);
+    // 如果角度变化小于3度，跳过更新（避免微小变化导致的闪烁）
+    if (minDiff < 3) {
+      return;
     }
   }
-  //   rotationUpdateTimer.value = null;
-  // }, 500);
+
+  // 清除之前的定时器
+  if (rotationUpdateTimer.value) {
+    clearTimeout(rotationUpdateTimer.value);
+  }
+
+  // 使用节流，延迟更新（每300ms最多更新一次）
+  rotationUpdateTimer.value = setTimeout(() => {
+    const index = markers.value.findIndex((m) => m.id === 0);
+    if (index !== -1) {
+      // 检查角度是否真的变化了
+      if (markers.value[index].rotate !== rotation) {
+        // 在 uni-app 中，需要重新创建数组才能触发地图组件更新
+        // 但我们可以只更新需要更新的 marker，其他保持不变
+        const newMarkers = markers.value.map((marker, i) => {
+          if (i === index) {
+            // 只更新当前位置标记的旋转角度
+            return { ...marker, rotate: rotation };
+          }
+          return marker; // 其他标记保持不变
+        });
+        markers.value = newMarkers;
+        lastRotation.value = rotation;
+      }
+    }
+    rotationUpdateTimer.value = null;
+  }, 300);
 };
 
 // 检查位置权限
