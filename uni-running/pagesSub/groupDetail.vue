@@ -229,8 +229,7 @@
           <u-button
             type="primary"
             color="#f2f2f2"
-            textColor="#FF8C00"
-            customStyle="border-radius: 16rpx;height: 80rpx;"
+            customStyle="border-radius: 16rpx;height: 80rpx; color: #FF8C00;"
             @click="leaveGroup()"
             >退出跑团</u-button
           >

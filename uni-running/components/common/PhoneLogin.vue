@@ -44,8 +44,8 @@
               :customStyle="{ width: '440rpx' }"
               type="primary"
               color="#F2F2F2"
-              textColor="#000"
               shape="circle"
+              customStyle="color: #000000;"
             >
               取消
             </u-button>

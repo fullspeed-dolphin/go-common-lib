@@ -41,8 +41,8 @@
             type="primary"
             shape="circle"
             color="#F2F2F2"
-            textColor="#FF8C00"
             @click="unDevice()"
+            customStyle="color: #FF8C00;"
             >解除绑定</u-button
           >
         </view>
@@ -78,8 +78,8 @@
             type="primary"
             shape="circle"
             color="#F2F2F2"
-            textColor="#707070"
             @click="bindDevice()"
+            customStyle="color: #707070;"
             >取消</u-button
           >
           <u-button type="primary" shape="circle" @click="bindDevice()"

@@ -70,9 +70,8 @@
         <view class="flex-between-center btns" style="padding: 40rpx">
           <u-button
             type="primary"
-            customStyle="border-radius: 16rpx;height: 72rpx;"
+            customStyle="border-radius: 16rpx;height: 72rpx; color: #707070;"
             color="#F2F2F2"
-            textColor="#707070"
             @click="$refs.refCommonDialog.close()"
             >取消</u-button
           >
