@@ -92,6 +92,8 @@
     </view>
 
     <tabbar type="sport" />
+
+    <UserLogin ref="refUserLogin" />
   </view>
 </template>
 <script setup>
@@ -101,12 +103,16 @@ import { getCurrentInstance } from "vue";
 import { useStore } from "vuex";
 import tabbar from "@/components/tabBar.vue";
 import Navbar from "@/components/navbar.vue";
+import UserLogin from "@/components/UserLogin.vue";
 
 // 使用store
 const store = useStore();
 
 // 获取当前实例以访问全局属性
 const { proxy } = getCurrentInstance();
+
+// 模板引用
+const refUserLogin = ref(null);
 
 // 地图中心点坐标
 const latitude = ref(39.908823); // 默认北京坐标
@@ -183,6 +189,10 @@ const getLocation = async () => {
 };
 // 跳转到跑步轨迹页面
 const goToRunMap = () => {
+  if (!userInfo.value.id) {
+    return refUserLogin.value?.open();
+  }
+
   uni.navigateTo({
     url: "/pagesSub/runMap",
   });
@@ -190,6 +200,10 @@ const goToRunMap = () => {
 
 // 跳转到排行榜页面
 const goToRanking = () => {
+  if (!userInfo.value.id) {
+    return refUserLogin.value?.open();
+  }
+
   uni.navigateTo({
     url: "/pagesSub/sport/top",
   });
@@ -197,6 +211,10 @@ const goToRanking = () => {
 
 // 跳转到运动记录页面
 const goToRunRecord = () => {
+  if (!userInfo.value.id) {
+    return refUserLogin.value?.open();
+  }
+
   uni.navigateTo({
     url: "/pagesSub/sport/list",
   });
@@ -204,6 +222,10 @@ const goToRunRecord = () => {
 
 // 跳转到运动打卡页面
 const goToRunCheckIn = () => {
+  if (!userInfo.value.id) {
+    return refUserLogin.value?.open();
+  }
+
   uni.navigateTo({
     url: "/pagesSub/sport/checkIn",
   });

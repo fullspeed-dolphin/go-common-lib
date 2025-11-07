@@ -25,35 +25,40 @@
       class="content"
       :style="{ paddingTop: `${contentPaddingTop}rpx`, position: 'relative' }"
     >
-      <view class="section-banner">
-        <swiper
-          class="swiper"
-          circular
-          indicator-dots
-          indicator-active-color="#FF8C00"
-          :autoplay="true"
-          :interval="3000"
-          :previous-margin="12"
-          :next-margin="12"
-        >
-          <swiper-item v-for="(item, index) in bannerList" :key="index">
-            <image
-              class="img"
-              :src="item.image_url"
-              mode="aspectFill"
-              @click="clickSwiper(item)"
-            ></image>
-          </swiper-item>
-        </swiper>
+      <view class="container">
+        <view class="section-banner">
+          <swiper
+            class="swiper"
+            circular
+            indicator-dots
+            indicator-active-color="#FF8C00"
+            :autoplay="true"
+            :interval="3000"
+          >
+            <swiper-item v-for="(item, index) in bannerList" :key="index">
+              <image
+                class="img"
+                :src="item.image_url"
+                mode="aspectFill"
+                @click="clickSwiper(item)"
+              ></image>
+            </swiper-item>
+          </swiper>
+        </view>
       </view>
       <view class="container">
         <view class="menu">
           <view class="menu-item" v-for="(item, index) in menus" :key="index">
-            <image
-              class="menu-item-icon"
-              :src="item.icon"
-              mode="aspectFill"
-            ></image>
+            <view
+              class="menu-item-bg"
+              :style="{ background: item.backgroundColor }"
+            >
+              <image
+                class="menu-item-icon"
+                :src="item.icon"
+                mode="aspectFill"
+              ></image>
+            </view>
             <view class="menu-item-title">{{ item.title }}</view>
           </view>
         </view>
@@ -172,6 +177,7 @@ import { useStore } from "vuex";
 import tabbar from "@/components/tabBar.vue";
 import GroupItem from "@/components/GroupItem.vue";
 import EventItem from "@/components/EventItem.vue";
+import { staticBaseUrl } from "@/utils/config";
 
 // 使用store
 const store = useStore();
@@ -286,29 +292,39 @@ const getGroupList = () => {
 
 const menus = ref([
   {
-    icon: "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/华为运动健康@2x.png",
-    title: "线上赛事",
+    icon: `${staticBaseUrl}/images/icon-home-menu-photo@2x.png`,
+    title: "活动相册",
     url: "pagesSub/groupList",
+    backgroundColor: "linear-gradient( 180deg, #0074FF 0%, #2E95FE 100%)",
+    boxShadow: "0rpx 6rpx 12rpx 2rpx #C1DDF8",
   },
   {
-    icon: "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/华为运动健康@2x.png",
-    title: "跑团风采",
+    icon: `${staticBaseUrl}/images/icon-home-menu-message@2x.png`,
+    title: "社区交流",
     url: "pagesSub/groupList",
+    backgroundColor: "linear-gradient( 180deg, #FF3A5B 0%, #FF6B81 100%)",
+    boxShadow: "0rpx 6rpx 12rpx 2rpx #FDC6CA",
   },
   {
-    icon: "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/华为运动健康@2x.png",
-    title: "最美跑者",
+    icon: `${staticBaseUrl}/images/icon-home-menu-rabbit@2x.png`,
+    title: "陪兔服务",
     url: "pagesSub/groupList",
+    backgroundColor: "linear-gradient( 180deg, #FFA202 0%, #FFC526 100%)",
+    boxShadow: "0rpx 6rpx 12rpx 2rpx #FFE79E",
   },
   {
-    icon: "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/华为运动健康@2x.png",
-    title: "跑团风采",
+    icon: `${staticBaseUrl}/images/icon-home-menu-kol@2x.png`,
+    title: "KOL招募",
     url: "pagesSub/groupList",
+    backgroundColor: "linear-gradient( 180deg, #8BCF51 0%, #A5D650 100%)",
+    boxShadow: "0rpx 6rpx 12rpx 2rpx #DBFF9C",
   },
   {
-    icon: "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/华为运动健康@2x.png",
+    icon: `${staticBaseUrl}/images/icon-home-menu-group@2x.png`,
     title: "全速天使",
     url: "pagesSub/groupList",
+    backgroundColor: "linear-gradient( 180deg, #A844FE 0%, #C073FF 100%)",
+    boxShadow: "0rpx 6rpx 12rpx 2rpx #E5C5FF",
   },
 ]);
 </script>
@@ -391,11 +407,10 @@ const menus = ref([
     }
     .img {
       display: block;
-      width: calc(100% - 24rpx);
+      width: 100%;
       height: 344rpx;
       border-radius: 16rpx !important;
       overflow: hidden;
-      margin: 0 12rpx;
     }
   }
   .section-title {
@@ -439,10 +454,18 @@ const menus = ref([
     flex-direction: column;
     align-items: center;
     gap: 16rpx;
-    .menu-item-icon {
+    .menu-item-bg {
       width: 84rpx;
       height: 84rpx;
       border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .menu-item-icon {
+      margin-top: 8rpx;
+      width: 64rpx;
+      height: 64rpx;
     }
     .menu-item-title {
       font-weight: 800;
