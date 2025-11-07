@@ -1,6 +1,13 @@
 <template>
   <Navbar :bgHeight="0" title="" :placeholder="false" />
-  <view class="pb30" style="background: #f5f5f5">
+  <view
+    class="pb30"
+    style="background: #f5f5f5"
+    :class="{
+      isFixedNavbar: isFixedNavbar,
+      isLoadedPage: isLoadedPage,
+    }"
+  >
     <view class="event-status flex-center" v-if="detail.status === 'ACT'">
       活动进行中
     </view>
@@ -424,8 +431,8 @@ const callPhone = (phoneNumber) => {
   }
 }
 .section-event {
-  // transform: translateY(0%);
-  margin-top: -110rpx;
+  transform: translateY(0%);
+  // margin-top: -110rpx;
 }
 
 .isLoadedPage {
