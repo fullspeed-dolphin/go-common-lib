@@ -217,7 +217,7 @@ onUnmounted(() => {
       left: 0;
       right: 0;
       bottom: 0;
-      border: 1px solid rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(0, 0, 0, 0.1);
       border-radius: 999px;
       transform: scale(0.5);
       transform-origin: 0 0;
@@ -252,6 +252,8 @@ onUnmounted(() => {
       height: 60%;
       background-color: rgba(0, 0, 0, 0.1);
       flex-shrink: 0;
+      transform: scaleX(0.5);
+      transform-origin: left center;
     }
 
     .navbar-home-btn {
