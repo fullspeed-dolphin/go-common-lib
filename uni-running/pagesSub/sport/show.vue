@@ -14,8 +14,8 @@
           :show-location="false"
           :enable-3D="false"
           :enable-overlooking="false"
-          :enable-zoom="false"
-          :enable-scroll="false"
+          :enable-zoom="true"
+          :enable-scroll="true"
           :enable-rotate="false"
           class="map"
         ></map>
@@ -462,9 +462,10 @@ const formatDistance = (distance) => {
 // 格式化时间 (秒 -> HH:MM:SS 或 MM:SS)
 const formatTime = (seconds) => {
   if (!seconds || seconds <= 0) return "--";
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 60;
+  const totalSeconds = Math.round(seconds);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const secs = totalSeconds % 60;
 
   if (hours > 0) {
     return `${hours}:${minutes.toString().padStart(2, "0")}:${secs
@@ -478,8 +479,9 @@ const formatTime = (seconds) => {
 // 格式化配速 (秒/公里 -> M'SS")
 const formatPace = (pace) => {
   if (!pace || pace <= 0) return "--";
-  const minutes = Math.floor(pace / 60);
-  const seconds = Math.floor(pace % 60);
+  const totalSeconds = Math.round(pace);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
   return `${minutes}'${seconds.toString().padStart(2, "0")}"`;
 };
 
