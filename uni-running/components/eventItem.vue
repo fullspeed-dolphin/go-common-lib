@@ -19,10 +19,12 @@
     ></image>
     <view class="event-item-content">
       <view class="event-item-title">{{ item.description }}</view>
+      <!--
       <view class="event-item-meta">
         <view>{{ dayjs(item.created_at).format("YYYY-MM-DD HH:mm") }}</view>
         <view v-if="direction === 'column'">333人报名</view>
-      </view>
+      </view> 
+      -->
       <view
         class="event-item-meta event-item-button-container"
         v-if="showButton"
