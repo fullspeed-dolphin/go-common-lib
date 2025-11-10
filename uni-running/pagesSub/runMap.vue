@@ -225,6 +225,11 @@ const MARKER_CONFIG = {
   anchor: { x: 0.5, y: 0.5 },
 };
 
+// 漂移点检测阈值
+const MAX_REASONABLE_SPEED = 7; // m/s，约等于25km/h，超过此速度视为异常
+const MIN_DRIFT_DISTANCE = 15; // m，过短距离不做漂移判断，避免噪声
+const MIN_MOVEMENT_DISTANCE = 5; // m，距离过近视为噪声
+
 // 创建标记的通用方法
 const createMarker = (id, latitude, longitude, type) => {
   const isStart = type === "start";
@@ -280,6 +285,30 @@ const isValidCoordinate = (latitude, longitude) => {
     longitude >= -180 &&
     longitude <= 180
   );
+};
+
+// 判断是否为疑似漂移点
+const isDriftPoint = (distance, timeDiff) => {
+  if (!timeDiff || timeDiff <= 0) {
+    return true;
+  }
+
+  if (distance < MIN_DRIFT_DISTANCE) {
+    return false;
+  }
+
+  const speed = distance / timeDiff; // m/s
+
+  if (speed > MAX_REASONABLE_SPEED) {
+    console.warn(
+      `检测到疑似漂移点，速度: ${speed.toFixed(2)}m/s，距离: ${distance.toFixed(
+        2
+      )}m`
+    );
+    return true;
+  }
+
+  return false;
 };
 
 // 开始监听罗盘
@@ -846,6 +875,11 @@ const handleLocationUpdate = (location) => {
     location.longitude
   );
 
+  // 过滤距离过近的点
+  if (distance < MIN_MOVEMENT_DISTANCE) {
+    return;
+  }
+
   const currentTimestamp = location.timestamp || Date.now();
   const lastTimestamp = previousRawPoint.timestamp || currentTimestamp;
   const timeDiff = (currentTimestamp - lastTimestamp) / 1000; // 时间差（秒）
@@ -853,6 +887,11 @@ const handleLocationUpdate = (location) => {
   // 如果时间差为0或负数，跳过（数据异常）
   if (timeDiff <= 0) {
     console.warn("时间戳异常，跳过此次更新");
+    return;
+  }
+
+  // 漂移点过滤
+  if (isDriftPoint(distance, timeDiff)) {
     return;
   }
 
