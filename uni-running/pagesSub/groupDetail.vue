@@ -220,7 +220,7 @@
             type="primary"
             color="#FF8C00"
             shape="circle"
-            customStyle="height: 80rpx;width: 320rpx;color: #FF8C00;"
+            customStyle="height: 80rpx;width: 320rpx;"
             @click="updateGroup()"
             >更新跑团</u-button
           >
