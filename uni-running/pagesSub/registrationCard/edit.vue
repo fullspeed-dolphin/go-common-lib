@@ -73,9 +73,9 @@ function apiToForm(apiData) {
     }
   }
 
-  // 处理gender：API返回"1"或"2"，表单需要"male"或"female"
+  // 处理gender：API返回"male"或"female"，表单需要"male"或"female"
   let gender = "male";
-  if (apiData.gender === "2" || apiData.gender === "female") {
+  if (apiData.gender === "0" || apiData.gender === "female") {
     gender = "female";
   } else if (apiData.gender === "1" || apiData.gender === "male") {
     gender = "male";
@@ -111,8 +111,8 @@ function formToApi(formData) {
   const state = codeToName(provinceCode, "province");
   const city = codeToName(cityCode, "city");
 
-  // 处理gender：表单是"male"/"female"，API需要"1"/"2"
-  const gender = formData.gender === "female" ? "2" : "1";
+  // 处理gender：表单是"male"/"female"，API需要"1"/"0"
+  const gender = formData.gender === "female" ? "0" : "1";
 
   const apiData = {
     full_name: formData.name,

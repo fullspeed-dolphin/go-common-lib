@@ -1,6 +1,6 @@
 <template>
   <view class="">
-    <Navbar title="报名卡" :bgHeight="370" />
+    <Navbar :title="isSelectMode ? '请选择报名卡' : '报名卡'" :bgHeight="370" />
     <view
       v-if="!registrationCardList.length && !loading"
       class="flex-col-center section-empty"
@@ -13,8 +13,10 @@
     <view class="flex-row flex-wrap card">
       <view
         class="card-item"
+        :class="{ 'card-item-selectable': isSelectMode }"
         v-for="(item, index) in registrationCardList"
         :key="item.id || index"
+        @click="isSelectMode ? handleSelect(item) : null"
       >
         <view class="name">
           <view class="name-text">{{ item.full_name }}</view>
@@ -28,7 +30,10 @@
           <view class="id-card-number-type"> 成人 </view>
         </view>
         <view class="card-item-actions">
-          <view class="card-item-actions-item" @click="handleSetAsOwner(item)">
+          <view
+            class="card-item-actions-item"
+            @click.stop="handleSetAsOwner(item)"
+          >
             <up-checkbox
               shape="circle"
               activeColor="#8CC63E"
@@ -38,11 +43,14 @@
             设为本人
           </view>
           <view class="card-item-actions-item-group">
-            <view class="card-item-actions-item" @click="handleEdit(item)">
+            <view class="card-item-actions-item" @click.stop="handleEdit(item)">
               <u-icon name="edit-pen" size="20" color="#999999"></u-icon>
               修改
             </view>
-            <view class="card-item-actions-item" @click="handleDelete(item)">
+            <view
+              class="card-item-actions-item"
+              @click.stop="handleDelete(item)"
+            >
               <u-icon name="trash" size="20" color="#999999"></u-icon>
               删除
             </view>
@@ -74,6 +82,7 @@ import request from "@/utils/request.js";
 const registrationCardList = ref([]);
 const loading = ref(false);
 const options = ref({});
+const isSelectMode = ref(false);
 
 // 格式化身份证号显示
 const formatIdCard = (idCard) => {
@@ -161,9 +170,25 @@ const handleDelete = (item) => {
   });
 };
 
+// 选择报名卡（选择模式）
+const handleSelect = (item) => {
+  if (!item.id) {
+    uni.showToast({ title: "数据异常", icon: "none" });
+    return;
+  }
+
+  // 将选中的 id 存储到本地存储
+  uni.setStorageSync("selectedSignerId", item.id);
+
+  // 返回上一页
+  uni.navigateBack();
+};
+
 // 页面加载
 onLoad((optionsParam) => {
   options.value = optionsParam;
+  // 检查是否是选择模式
+  isSelectMode.value = optionsParam.selectMode === "1";
 });
 
 onMounted(() => {
@@ -258,6 +283,22 @@ onShow(() => {
         }
       }
     }
+  }
+  .card-item-selectable {
+    cursor: pointer;
+    transition: all 0.3s;
+    &:active {
+      opacity: 0.8;
+      transform: scale(0.98);
+    }
+  }
+  .card-item-select-hint {
+    margin-top: 20rpx;
+    padding-top: 20rpx;
+    border-top: 1rpx solid #e5e5e5;
+    text-align: center;
+    font-size: 26rpx;
+    color: #8cc63e;
   }
 }
 </style>

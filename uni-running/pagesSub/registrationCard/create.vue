@@ -46,8 +46,8 @@ function formToApi(formData) {
   const state = codeToName(provinceCode, "province");
   const city = codeToName(cityCode, "city");
 
-  // 处理gender：表单是"male"/"female"，API需要"1"/"2"
-  const gender = formData.gender === "female" ? "2" : "1";
+  // 处理gender：表单是"male"/"female"，API需要"1"/"0"
+  const gender = formData.gender === "female" ? "0" : "1";
 
   const apiData = {
     full_name: formData.name,

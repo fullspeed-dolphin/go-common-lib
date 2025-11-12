@@ -8,8 +8,8 @@
           报名卡 <u-icon name="star-fill" color="#E53935" size="8"></u-icon>
         </view>
         <view class="flex-start">
-          <view class="txt flex-row" :class="{ c70: !SignerInfo.id_card }">
-            {{ SignerInfo.id_card ? SignerInfo.full_name : "请选择报名卡" }}
+          <view class="txt flex-row" :class="{ c70: !SignerInfo.id }">
+            {{ SignerInfo.id ? SignerInfo.full_name : "请选择报名卡" }}
           </view>
           <u-icon
             name="arrow-right"
@@ -35,14 +35,19 @@
 
       <view class="cell flex-between-center" style="margin-bottom: 30rpx">
         <view class="">全速码</view>
-        <u-input
-          placeholder="全速码"
-          maxlength="5"
-          border="none"
-          v-model="verifyCode"
-          inputAlign="right"
-        >
-        </u-input>
+        <view class="verify-code-input-wrapper">
+          <u-input
+            placeholder="请输入全速码"
+            maxlength="5"
+            border="none"
+            v-model="verifyCode"
+            inputAlign="right"
+            color="#000000"
+            fontSize="30rpx"
+            :placeholderStyle="'font-size: 26rpx; color: #999999;font-weight: 700;'"
+          >
+          </u-input>
+        </view>
         <u-tag
           v-if="!!verifyCode.length"
           :text="computedCode.text"
@@ -51,10 +56,24 @@
           :type="computedCode.isOk ? 'success' : 'error'"
         ></u-tag>
       </view>
+      <view class="cell flex-between-center">
+        <view class="cell-label">参赛包领取地址</view>
+        <view class="flex-start" @click="openAddressPicker()">
+          <view class="txt" :class="{ c70: !selectedAddress }">
+            {{ selectedAddress || "请选择地址" }}
+          </view>
+          <u-icon
+            v-if="addressList.length > 0"
+            name="arrow-right"
+            size="34rpx"
+            color="rgba(0,0,0,.9)"
+          ></u-icon>
+        </view>
+      </view>
     </section>
 
     <view class="section">
-      <view class="section-title">选择距离</view>
+      <view class="section-title">选择套餐</view>
       <view class="section-content">
         <view class="price-list">
           <view
@@ -143,6 +162,18 @@
 
     <GroupList ref="refGroupList" @success="getUserGroup()" />
     <UserLogin ref="refUserLogin" />
+
+    <!-- 参赛包领取地址选择器 -->
+    <u-picker
+      :show="showAddressPicker"
+      :columns="[addressPickerColumns]"
+      keyName="label"
+      @confirm="confirmAddress"
+      @cancel="showAddressPicker = false"
+      title="请选择参赛包领取地址"
+      confirmText="确定"
+      cancelText="取消"
+    ></u-picker>
   </view>
 </template>
 <script setup>
@@ -176,6 +207,10 @@ const priceList = ref([]);
 const computedCode = ref({});
 const event_id = ref("");
 const isSubmitting = ref(false);
+const selectedAddress = ref("");
+const addressList = ref([]);
+const showAddressPicker = ref(false);
+const addressPickerColumns = ref([]);
 
 // 计算属性
 const userInfo = computed(() => store.state.userInfo);
@@ -193,6 +228,8 @@ watch(
 
     if (!verifyCode.value) return;
 
+    console.log("verifyCode.value", verifyCode.value);
+
     const reg = /^[0-9a-zA-Z]*$/g;
     if (!reg.test(verifyCode.value) || verifyCode.value.length !== 5) {
       return;
@@ -205,13 +242,14 @@ watch(
 // 页面加载
 onLoad((options) => {
   event_id.value = options.event_id;
+  getEventPrice();
+  getUserGroup();
+  getEventAddresses();
 });
 
 // 页面显示
 onShow(() => {
   getSignerInfo();
-  getEventPrice();
-  getUserGroup();
 });
 
 // 方法定义
@@ -219,6 +257,65 @@ const openGroupPop = () => {
   if (myGroup.value.group_id) return;
 
   refGroupList.value.open();
+};
+
+// 打开地址选择器
+const openAddressPicker = () => {
+  if (addressList.value.length === 0) {
+    proxy.$toast("暂无可用地址");
+    return;
+  }
+  showAddressPicker.value = true;
+};
+
+// 确认选择地址
+const confirmAddress = (detail) => {
+  if (detail && detail.value && detail.value[0]) {
+    const selected = detail.value[0];
+    selectedAddress.value = selected.label || selected;
+  }
+  showAddressPicker.value = false;
+};
+
+// 获取活动地址列表
+const getEventAddresses = async () => {
+  if (!event_id.value) return;
+
+  try {
+    const res = await proxy.$axios.get(
+      `/event-api/api/v1/events/${event_id.value}`
+    );
+
+    // request.js 已经提取了 response.data，所以 res 直接是事件对象
+    if (res && res.racekit_pickup_address) {
+      try {
+        // racekit_pickup_address 是 JSON 字符串，需要解析
+        const addressData =
+          typeof res.racekit_pickup_address === "string"
+            ? JSON.parse(res.racekit_pickup_address)
+            : res.racekit_pickup_address;
+
+        if (
+          addressData &&
+          addressData.addresses &&
+          Array.isArray(addressData.addresses)
+        ) {
+          addressList.value = addressData.addresses;
+          // 转换为 picker 需要的格式
+          addressPickerColumns.value = addressData.addresses.map(
+            (addr, index) => ({
+              label: addr,
+              value: index,
+            })
+          );
+        }
+      } catch (parseError) {
+        console.error("解析地址数据失败:", parseError);
+      }
+    }
+  } catch (error) {
+    console.error("获取活动地址失败:", error);
+  }
 };
 
 const getUserGroup = async () => {
@@ -246,18 +343,25 @@ const getUserGroup = async () => {
 };
 
 const getSignerInfo = () => {
+  // 如果有选中的报名卡 id，使用它；否则使用默认逻辑
+  const selectedSignerId = uni.getStorageSync("selectedSignerId");
+  if (!selectedSignerId) {
+    // 如果没有选中，保持原有逻辑或清空
+    SignerInfo.value = {};
+    return;
+  }
+
   const data = {
-    phone_number: userInfo.value.phone,
+    id: selectedSignerId,
   };
+  console.log("data", data);
   proxy.$axios
     .post("/booking-api/registration/getSignerInfo", data)
     .then((res) => {
-      SignerInfo.value = {
-        ...res,
-        ...(uni.getStorageSync("SignerInfo") || {}),
-      };
-
-      console.log(uni.getStorageSync("SignerInfo"), SignerInfo.value);
+      SignerInfo.value = res;
+    })
+    .catch((error) => {
+      console.error("获取报名卡信息失败:", error);
     });
 };
 
@@ -273,6 +377,8 @@ const getEventPrice = (spxcode = null) => {
     // proxy.$axios.post('/booking-api/user/price?test_for_fullspeed', data).then(res => {
     eventInfo.value = res;
 
+    console.log("res", res);
+
     if (res.spxcode_status === "ACT") {
       computedCode.value = {
         isOk: true,
@@ -286,26 +392,31 @@ const getEventPrice = (spxcode = null) => {
     }
 
     let priceListData = [];
-    Object.keys(res).forEach((i) => {
-      if (String(i).includes("km")) {
-        priceListData.push({
-          price: res[i],
-          label: i?.toUpperCase(),
-          km: parseFloat(i),
-        });
-      }
+    res?.tickets?.map((ticket) => {
+      Object.keys(ticket?.price || {}).forEach((i) => {
+        const data = {
+          price: ticket?.price[i],
+          label: i,
+        };
+        console.log("data", data, ticket?.price);
+        if (!activeType?.value?.label) {
+          activeType.value = data;
+        }
+        priceListData.push(data);
+      });
     });
 
     // 小距离在前
-    priceListData.sort((a, b) => a.km - b.km);
+    // priceListData.sort((a, b) => a.km - b.km);
 
-    activeType.value = priceListData[0];
+    // activeType.value = priceListData[0];
     priceList.value = priceListData;
   });
 };
 
 const selectSigner = () => {
-  uni.$u.route("/pagesSub/registrationCard/list");
+  // 传递 selectMode 参数，表示这是选择模式
+  uni.$u.route("/pagesSub/registrationCard/list?selectMode=1");
 };
 
 const changeTab = (item) => {
@@ -317,7 +428,7 @@ const submitOrder = () => {
     return refUserLogin.value.open();
   }
 
-  if (!SignerInfo.value.id_card) return proxy.$toast("请完善参赛者信息");
+  if (!SignerInfo.value.id) return proxy.$toast("请完善参赛者信息");
 
   const reg = /^[0-9a-zA-Z]*$/g;
   if (verifyCode.value) {
@@ -329,13 +440,20 @@ const submitOrder = () => {
   if (!isAgree.value) return proxy.$toast("请勾选同意协议");
 
   const data = {
-    ...SignerInfo.value,
-    running_km: parseFloat(activeType.value.label),
+    full_name: SignerInfo.value.full_name || null,
+    id_card: SignerInfo.value.cert_number || null,
+    gender: SignerInfo.value.gender || null,
+    phone_number: SignerInfo.value.phone_number || null,
+    tshirt_size: SignerInfo.value.tshirt_size || null,
+    email: SignerInfo.value.email || null,
+    blood_type: SignerInfo.value.blood_type || null,
+    package: activeType.value.label,
     payment_method: "wechat",
     event_id: event_id.value,
     payment_amount: activeType.value.price,
     spxcode: computedCode.value.isOk ? verifyCode.value : null,
     running_group: String(userInfo.value.running_group || ""),
+    racekit_pickup_address: selectedAddress.value || null,
   };
 
   delete data.updated_at;
@@ -416,6 +534,11 @@ const wxPay = (respay) => {
     },
   });
 };
+defineOptions({
+  options: {
+    styleIsolation: "shared",
+  },
+});
 </script>
 
 <style lang="less">
@@ -454,6 +577,11 @@ const wxPay = (respay) => {
 ::v-deep {
   .input-cell {
     padding: 0 !important;
+  }
+  .verify-code-input-wrapper {
+    .u-input__content__field-wrapper__field {
+      font-weight: bold !important;
+    }
   }
 }
 .section {
@@ -519,5 +647,9 @@ const wxPay = (respay) => {
       height: 32rpx;
     }
   }
+}
+.cell-label {
+  white-space: nowrap;
+  margin-right: 20rpx;
 }
 </style>

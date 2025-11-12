@@ -1305,7 +1305,7 @@ onMounted(() => {
 .section-bottom {
   margin-top: 48rpx;
   position: fixed;
-  bottom: env(safe-area-inset-bottom);
+  bottom: 0;
   width: 100%;
   z-index: 9;
 }
