@@ -327,6 +327,11 @@ const menus = ref([
     boxShadow: "0rpx 6rpx 12rpx 2rpx #E5C5FF",
   },
 ]);
+defineOptions({
+  options: {
+    styleIsolation: "shared",
+  },
+});
 </script>
 
 <style lang="less" scoped>
