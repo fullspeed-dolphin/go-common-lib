@@ -1,4 +1,5 @@
-import { staticBaseUrl } from './config.js';
+
+const staticBaseUrl = 'https://speexpay.com';
 
 // 缓存已加载的数据
 let provinceDataCache = null;
@@ -47,7 +48,7 @@ export async function loadProvinceData() {
     return provinceDataPromise;
   }
   
-  provinceDataPromise = loadJsonFromUrl(`${staticBaseUrl}/jsons/province.json`)
+  provinceDataPromise = loadJsonFromUrl(`${staticBaseUrl}/province.json`)
     .then((data) => {
       provinceDataCache = data;
       return data;
@@ -72,7 +73,7 @@ export async function loadCityData() {
     return cityDataPromise;
   }
   
-  cityDataPromise = loadJsonFromUrl(`${staticBaseUrl}/jsons/city.json`)
+  cityDataPromise = loadJsonFromUrl(`${staticBaseUrl}/city.json`)
     .then((data) => {
       cityDataCache = data;
       return data;
@@ -97,7 +98,7 @@ export async function loadAreaData() {
     return areaDataPromise;
   }
   
-  areaDataPromise = loadJsonFromUrl(`${staticBaseUrl}/jsons/area.json`)
+  areaDataPromise = loadJsonFromUrl(`${staticBaseUrl}/area.json`)
     .then((data) => {
       areaDataCache = data;
       return data;

@@ -6,7 +6,7 @@
   >
     <image
       class="event-item-image"
-      :src="item.image_url"
+      :src="item.image_url || item.background_image_url"
       mode="aspectFill"
       :style="
         direction === 'row'
@@ -19,12 +19,12 @@
     ></image>
     <view class="event-item-content">
       <view class="event-item-title">{{ item.description }}</view>
-      <!--
+
       <view class="event-item-meta">
         <view>{{ dayjs(item.created_at).format("YYYY-MM-DD HH:mm") }}</view>
-        <view v-if="direction === 'column'">333人报名</view>
-      </view> 
-      -->
+        <!-- <view v-if="direction === 'column'">333人报名</view> -->
+      </view>
+
       <view
         class="event-item-meta event-item-button-container"
         v-if="showButton"
@@ -68,7 +68,9 @@ const props = defineProps({
 
 const joinEvent = () => {
   console.log("joinEvent");
-  uni.$u.route(`pagesSub/offlineEvents?id=${props.item.event_id}`);
+  uni.$u.route(
+    `pagesSub/offlineEvents?id=${props.item.event_id || props.item.id}`
+  );
 };
 </script>
 

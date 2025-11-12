@@ -36,7 +36,7 @@
           <view class="order-item-info">
             <view class="order-item-info-name">
               <text class="label">报名人：</text>
-              <text class="value">{{ order.name }}</text>
+              <text class="value">{{ order.sign_info.full_name }}</text>
             </view>
             <view class="order-item-info-status">
               <u-text
@@ -125,6 +125,7 @@ const tab = ref({
 });
 const changeTab = (detail) => {
   tab.value.active = detail.index;
+  getList(1);
 };
 
 // 计算属性
@@ -151,6 +152,12 @@ const refreshList = () => {
 };
 
 const getList = (page) => {
+  if (tab.value.active === 0) {
+    orders.value = [];
+    uni.hideLoading();
+    mescroll.endBySize(0, 0);
+    return;
+  }
   uni.showLoading({ mask: true });
 
   const data = {
@@ -168,10 +175,10 @@ const getList = (page) => {
 
       //如果是第一页需手动制空列表
       if (page.num == 1) {
-        dataList.value = [];
+        orders.value = [];
       }
 
-      dataList.value = dataList.value.concat(res.orders); //追加新数据
+      orders.value = orders.value.concat(res.orders); //追加新数据
     })
     .catch((error) => {
       uni.hideLoading();
@@ -212,6 +219,11 @@ const downCallback = (mescroll) => {
   // 下拉刷新的回调
   mescroll.resetUpScroll();
 };
+defineOptions({
+  options: {
+    styleIsolation: "shared",
+  },
+});
 </script>
 
 <style lang="scss" scoped>
@@ -247,9 +259,12 @@ const downCallback = (mescroll) => {
         }
       }
       .order-item-info-status {
-        font-weight: bold;
-        font-size: 28rpx;
-        color: #43a047;
+        ::v-deep {
+          .u-text__value {
+            font-weight: bold !important;
+            font-size: 28rpx !important;
+          }
+        }
       }
     }
   }
