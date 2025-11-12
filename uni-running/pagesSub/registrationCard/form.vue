@@ -1237,6 +1237,7 @@ function onSubmit() {
   formRef.value?.validate().then(() => {
     submitting.value = true;
     emit("submit", { ...form });
+    submitting.value = false;
   });
 }
 
