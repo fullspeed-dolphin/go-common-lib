@@ -20,6 +20,8 @@ onPageScroll((e) => {
 // @import "@/uni_modules/uview-plus/theme.scss";
 // @import "@/uni_modules/uview-plus/index.scss";
 // @import './static/iconfont.css';
+@import "@/uni_modules/uview-plus/theme.scss";
+@import "@/uni_modules/uview-plus/index.scss";
 @import "./assets/style/common.scss";
 @import "./assets/style/theme.scss";
 

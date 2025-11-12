@@ -53,16 +53,18 @@
           </view>
           <view class="flex-between-center u-border-bottom input-line">
             <view class="h4">性别</view>
-            <u-radio-group v-model="formData.gender">
-              <u-radio
-                activeColor="#FF8C00"
-                v-for="(item, index) in radiolist"
-                :key="index"
-                :label="item.name"
-                :name="item.value"
-              >
-              </u-radio>
-            </u-radio-group>
+            <view class="flex-end">
+              <u-radio-group v-model="formData.gender">
+                <u-radio
+                  activeColor="#FF8C00"
+                  v-for="(item, index) in radiolist"
+                  :key="index"
+                  :label="item.name"
+                  :name="item.value"
+                >
+                </u-radio>
+              </u-radio-group>
+            </view>
           </view>
         </view>
         <view class="mt20 pt30" style="margin-top: 50rpx">
@@ -272,6 +274,19 @@ defineExpose({
 }
 .input-line {
   padding: 20rpx 0;
+
+  ::v-deep .u-radio-group {
+    justify-content: flex-end !important;
+    flex-grow: 0 !important;
+  }
+
+  ::v-deep .u-radio-group--row {
+    justify-content: flex-end !important;
+  }
+
+  ::v-deep .u-radio {
+    margin-left: 30rpx;
+  }
 }
 .avatar-wrapper {
   display: block;
@@ -303,17 +318,10 @@ defineExpose({
 }
 
 ::v-deep {
-  .u-radio {
-    margin-left: 30rpx;
-  }
-  .u-radio-group {
-    justify-content: flex-end;
-  }
   .u-button {
     height: 76rpx;
     border-color: #e2e2e2 !important;
   }
-
   .active {
     .u-button {
       border-color: #1989fa !important;
