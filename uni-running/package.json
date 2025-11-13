@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "dayjs": "^1.11.18"
+    "dayjs": "^1.11.18",
+    "pinyin-pro": "^3.27.0"
   }
 }

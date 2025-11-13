@@ -4,7 +4,7 @@
     <view class="header">
       <view class="title">
         <view>报名失败！</view>
-        <view class="btn">返回首页</view>
+        <view class="btn" @click="goHome">返回首页</view>
       </view>
       <view>抱歉，您的报名未成功！</view>
       <view>
@@ -48,6 +48,12 @@ onLoad(() => {
 
 const payOrder = () => {
   uni.$u.route("pagesSub/orderDetail?order_no=" + detail.value.order_no);
+};
+
+const goHome = () => {
+  uni.reLaunch({
+    url: "/pages/index",
+  });
 };
 </script>
 

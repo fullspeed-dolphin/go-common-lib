@@ -115,7 +115,10 @@ const emit = defineEmits(["join"]);
 // 方法定义
 const viewDetail = (item) => {
   // 搜索组件中不跳转详情，加入按钮控制交互
-  if (props.from === "search") return;
+  if (props.from === "search") {
+    joinGroup(item);
+    return;
+  }
 
   uni.setStorageSync("groupDetail", item);
   uni.$u.route(`pagesSub/groupDetail?group_id=${item.group_id}`);
