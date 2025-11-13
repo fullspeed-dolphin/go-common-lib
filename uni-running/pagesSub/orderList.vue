@@ -29,6 +29,7 @@
           @click="viewDetail(order)"
         >
           <EventItem
+            from="order"
             :item="order.event_info"
             direction="row"
             :showButton="false"
@@ -140,8 +141,7 @@ const mescrollInit = (mescrollInstance) => {
 
 // 方法定义
 const viewDetail = (item) => {
-  uni.setStorageSync("orderDetail", item);
-  // uni.$u.route(`/pagesSub/orderDetail`);
+  uni.$u.route(`pagesSub/orderSuccess?order_no=${item.order_no}`);
 };
 
 const refreshList = () => {
