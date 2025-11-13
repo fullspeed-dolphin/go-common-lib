@@ -58,7 +58,9 @@
             ></image>
             <text>活动时间：</text>
           </view>
-          <view class="value">{{ detail.event_time }}</view>
+          <view class="value">{{
+            dayjs(detail.event_time).format("YYYY-MM-DD HH:mm")
+          }}</view>
         </view>
         <view class="panel-item">
           <view class="label">
@@ -170,6 +172,7 @@ import { useStore } from "vuex";
 import { getCurrentInstance } from "vue";
 import PhoneLogin from "@/components/common/PhoneLogin.vue";
 import Navbar from "@/components/navbar.vue";
+import dayjs from "dayjs";
 
 // 获取当前实例以访问全局属性
 const { proxy } = getCurrentInstance();

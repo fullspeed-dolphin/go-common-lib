@@ -4,12 +4,12 @@
     <view class="header">
       <view class="title">
         <view>报名成功！</view>
-        <view class="btn">赛事详情</view>
+        <view class="btn" @click="viewEventDetail()">赛事详情</view>
       </view>
-      <view>距离活动开始还有1天8小时49分59秒</view>
+      <view v-if="countdownText">距离活动开始还有{{ countdownText }}</view>
+      <view v-else>距离活动开始还有--</view>
       <view>
-        报名后开始运动才能算有效成绩。先报名后开跑，该赛
-        事为线下赛，暂不支持历史完赛成绩
+        报名后开始运动才能算有效成绩。先报名后开跑，该赛事为线下赛，暂不支持历史完赛成绩
       </view>
     </view>
     <view class="section info">
@@ -18,29 +18,39 @@
         <view class="section-items">
           <view class="section-item">
             <text class="label">姓名：</text>
-            <text class="value">张三</text>
+            <text class="value">{{ detail.sign_info?.full_name || "--" }}</text>
           </view>
           <view class="section-item">
             <text class="label">报名时间：</text>
-            <text class="value">2025-01-01 12:00:00</text>
+            <text class="value">{{ detail.created_at || "--" }}</text>
           </view>
-          <view class="section-item">
+          <view class="section-item" v-if="detail.event_info?.package_name">
             <text class="label">报名套餐</text>
-            <text class="value">基本套餐</text>
+            <text class="value">{{ detail.event_info.package_name }}</text>
           </view>
-          <view class="section-item">
+          <view class="section-item" v-if="detail.event_info?.event_name">
             <text class="label">参赛项目</text>
-            <text class="value">10.10km欢乐跑</text>
+            <text class="value">{{ detail.event_info.event_name }}</text>
           </view>
         </view>
         <view class="section-actions">
           <u-button
+            v-if="detail?.bib_url"
+            type="primary"
+            shape="circle"
+            color="#FF8C00"
+            @click="viewBib()"
+            size="small"
+            >查看号码布</u-button
+          >
+          <u-button
+            v-if="!detail?.bib_url"
             type="primary"
             plain
             shape="circle"
             color="#FF8C00"
-            @click="payOrder(detail)"
             size="small"
+            @click="viewBib()"
             >查看号码布</u-button
           >
           <u-button
@@ -48,7 +58,7 @@
             plain
             shape="circle"
             color="#FF8C00"
-            @click="payOrder(detail)"
+            @click="viewCertificate(detail)"
             size="small"
             >查看完赛证书</u-button
           >
@@ -60,7 +70,11 @@
       <view class="refund-content">
         <view>
           <text>退赛服务截止时间：</text>
-          <text>2025-10-13 15:03:16</text>
+          <text>{{
+            dayjs(detail.created_at)
+              .add(24, "hour")
+              .format("YYYY-MM-DD HH:mm:ss")
+          }}</text>
         </view>
         <view> 规定： </view>
         <view>
@@ -106,10 +120,11 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onUnmounted, watch } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { getCurrentInstance } from "vue";
 import CommonDialog from "@/components/common/CommonDialog.vue";
+import dayjs from "dayjs";
 
 const refundDialogRef = ref(null);
 // 获取当前实例以访问全局属性
@@ -119,12 +134,159 @@ const { proxy } = getCurrentInstance();
 const detail = ref({
   event_info: {},
   sign_info: {},
+  order_no: "",
+  amount: 0,
+  amount_yuan: 0,
+  status: "",
+  created_at: "",
+  payment_params: {},
 });
+const order_no = ref("");
+const loading = ref(false);
+const countdownText = ref("");
+let countdownTimer = null;
+
+// 格式化倒计时显示
+const formatCountdown = (diff) => {
+  if (diff <= 0) {
+    return "活动已开始";
+  }
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+  let parts = [];
+
+  if (days > 0) {
+    parts.push(`${days}天`);
+  }
+  if (hours > 0 || days > 0) {
+    parts.push(`${hours}小时`);
+  }
+  if (minutes > 0 || hours > 0 || days > 0) {
+    parts.push(`${minutes}分`);
+  }
+  parts.push(`${seconds}秒`);
+
+  return parts.join("");
+};
+
+// 更新倒计时
+const updateCountdown = () => {
+  const eventTime = detail.value.event_info?.event_time;
+  if (!eventTime) {
+    countdownText.value = "";
+    return;
+  }
+
+  const now = new Date();
+  const diff = dayjs(eventTime).diff(dayjs(now));
+
+  countdownText.value = formatCountdown(diff);
+
+  // 如果倒计时结束，清除定时器
+  if (diff <= 0) {
+    if (countdownTimer) {
+      clearInterval(countdownTimer);
+      countdownTimer = null;
+    }
+  }
+};
+
+// 启动倒计时
+const startCountdown = () => {
+  // 清除旧的定时器
+  if (countdownTimer) {
+    clearInterval(countdownTimer);
+  }
+
+  // 立即更新一次
+  updateCountdown();
+
+  // 每秒更新一次
+  countdownTimer = setInterval(() => {
+    updateCountdown();
+  }, 1000);
+};
+
+// 监听 detail.event_info.event_time 变化
+watch(
+  () => detail.value.event_info?.event_time,
+  () => {
+    if (detail.value.event_info?.event_time) {
+      startCountdown();
+    }
+  },
+  { immediate: true }
+);
 
 // 页面加载
-onLoad(() => {
-  detail.value = uni.getStorageSync("orderDetail");
+onLoad((options) => {
+  order_no.value = options.order_no || "";
+  if (order_no.value) {
+    getOrderDetail();
+  } else {
+    // 兼容旧逻辑：从存储中获取
+    const storedDetail = uni.getStorageSync("orderDetail");
+    if (storedDetail) {
+      detail.value = storedDetail;
+      // 如果存储的数据中有事件时间，启动倒计时
+      if (storedDetail.event_info?.event_time) {
+        startCountdown();
+      }
+    }
+  }
 });
+
+// 获取订单详情
+const getOrderDetail = () => {
+  if (!order_no.value) {
+    proxy.$toast("订单号不能为空");
+    return;
+  }
+
+  loading.value = true;
+  uni.showLoading({
+    mask: true,
+    title: "加载中...",
+  });
+
+  const data = {
+    order_no: order_no.value,
+  };
+
+  proxy.$axios
+    .post(`/pay/order/status`, data)
+    .then((res) => {
+      console.log("订单详情 res", res);
+
+      detail.value = res;
+      // 确保 sign_info 存在
+      if (!detail.value.sign_info) {
+        detail.value.sign_info = {};
+      }
+      proxy.$axios
+        .get(`/event-api/api/v1/events/${res.event_id}`)
+        .then((eventRes) => {
+          detail.value.event_info = eventRes;
+          // 事件信息加载后启动倒计时
+          if (eventRes?.event_time) {
+            startCountdown();
+          }
+        });
+      uni.hideLoading();
+    })
+    .catch((err) => {
+      console.error("获取订单详情失败", err);
+      uni.hideLoading();
+      proxy.$toast(err.msg || "获取订单详情失败");
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+};
 
 const refundOrder = () => {
   refundDialogRef.value.open();
@@ -139,35 +301,33 @@ const closeRefund = () => {
   console.log("closeRefund");
 };
 
-// 方法定义
-const payOrder = (item) => {
-  const respay = item.payment_params;
-  // 触发微信支付
-  wx.requestPayment({
-    timeStamp: respay.timeStamp,
-    nonceStr: respay.nonceStr,
-    package: respay.package,
-    signType: respay.signType,
-    paySign: respay.paySign,
-    success: (res) => {
-      uni.hideLoading();
-      proxy.$toast("支付成功");
-      setTimeout(() => {
-        // uni.navigateBack()
-        uni.$u.route("pagesSub/signUpStatus?order_no=" + item.order_no);
-      }, 300);
-    },
-    fail: (res) => {
-      uni.hideLoading();
-      console.log("res======>", res);
-      proxy.$toast("支付未完成");
-      setTimeout(() => {
-        // uni.navigateBack()
-        uni.$u.route("pagesSub/signUpStatus?order_no=" + item.order_no);
-      }, 300);
-    },
-  });
+const viewBib = () => {
+  if (!detail.value.bib_url) {
+    return proxy.$toast("暂无号码布");
+  }
+  uni.$u.route(`pagesSub/settings/webView?link=${detail.value.bib_url}`);
 };
+
+const viewCertificate = () => {
+  if (!detail.value.certificate_url) {
+    return proxy.$toast("暂无完赛证书");
+  }
+  uni.$u.route(
+    `pagesSub/settings/webView?link=${detail.value.certificate_url}`
+  );
+};
+
+const viewEventDetail = () => {
+  uni.$u.route(`pagesSub/offlineEvents?id=${detail.value.event_id}`);
+};
+
+// 组件卸载时清除定时器
+onUnmounted(() => {
+  if (countdownTimer) {
+    clearInterval(countdownTimer);
+    countdownTimer = null;
+  }
+});
 </script>
 
 <style lang="less" scoped>

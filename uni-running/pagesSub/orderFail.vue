@@ -39,15 +39,90 @@ const { proxy } = getCurrentInstance();
 const detail = ref({
   event_info: {},
   sign_info: {},
+  order_no: "",
+  amount: 0,
+  amount_yuan: 0,
+  status: "",
+  created_at: "",
+  payment_params: {},
 });
+const order_no = ref("");
+const loading = ref(false);
 
 // 页面加载
-onLoad(() => {
-  detail.value = uni.getStorageSync("orderDetail");
+onLoad((options) => {
+  order_no.value = options.order_no || "";
+  if (order_no.value) {
+    getOrderDetail();
+  } else {
+    // 兼容旧逻辑：从存储中获取
+    const storedDetail = uni.getStorageSync("orderDetail");
+    if (storedDetail) {
+      detail.value = storedDetail;
+    }
+  }
 });
 
+// 获取订单详情
+const getOrderDetail = () => {
+  if (!order_no.value) {
+    proxy.$toast("订单号不能为空");
+    return;
+  }
+
+  loading.value = true;
+  uni.showLoading({
+    mask: true,
+    title: "加载中...",
+  });
+
+  const data = {
+    order_no: order_no.value,
+  };
+
+  proxy.$axios
+    .post(`/pay/order/status`, data)
+    .then((res) => {
+      console.log("订单详情 res", res);
+      detail.value = res;
+      // 确保 sign_info 存在
+      if (!detail.value.sign_info) {
+        detail.value.sign_info = {};
+      }
+      uni.hideLoading();
+    })
+    .catch((err) => {
+      console.error("获取订单详情失败", err);
+      uni.hideLoading();
+      proxy.$toast(err.msg || "获取订单详情失败");
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+};
+
 const payOrder = () => {
-  uni.$u.route("pagesSub/orderDetail?order_no=" + detail.value.order_no);
+  // 触发微信支付
+  wx.requestPayment({
+    timeStamp: detail.value.payment_params.timeStamp,
+    nonceStr: detail.value.payment_params.nonceStr,
+    package: detail.value.payment_params.package,
+    signType: detail.value.payment_params.signType,
+    paySign: detail.value.payment_params.paySign,
+    success: (res) => {
+      uni.hideLoading();
+      proxy.$toast("支付成功");
+      setTimeout(() => {
+        // uni.navigateBack()
+        uni.$u.route("pagesSub/orderSuccess?order_no=" + detail.value.order_no);
+      }, 300);
+    },
+    fail: (res) => {
+      uni.hideLoading();
+      console.log("res======>", res);
+      proxy.$toast("支付未完成");
+    },
+  });
 };
 
 const goHome = () => {
