@@ -52,7 +52,7 @@
       </view>
       <view class="section-box">
         <u-cell
-          title="我的赛事"
+          title="我的活动"
           class="nav-cell"
           @click="routeTo(`pagesSub/orderList`)"
           :border="false"

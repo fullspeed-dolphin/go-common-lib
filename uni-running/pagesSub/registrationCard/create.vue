@@ -110,4 +110,23 @@ onMounted(() => {
 });
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+	.txt_required{
+		color: #f56c6c;
+		line-height: 20px;
+		font-size: 20px;
+	}
+	:deep(.u-form-item__body__left__content){
+		flex-direction: row-reverse!important;
+		justify-content: flex-end!important;
+		.u-form-item__body__left__content__required{
+			position: static!important;
+			color: #f56c6c;
+			line-height: 20px;
+			font-size: 20px;
+		}
+		.u-form-item__body__left__content__label{
+			flex: none!important;
+		}
+	}
+</style>

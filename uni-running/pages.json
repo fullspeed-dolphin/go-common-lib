@@ -115,7 +115,7 @@
           "path": "myEvent",
           "style": {
             "navigationStyle": "custom",
-            "navigationBarTitleText": "我的赛事",
+            "navigationBarTitleText": "我的活动",
             "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
           }
         },

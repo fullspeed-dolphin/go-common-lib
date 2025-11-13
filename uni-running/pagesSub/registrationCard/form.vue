@@ -17,7 +17,8 @@
                   class="label-with-icon"
                   @click.stop="showTip('用于购买保险，必须实名')"
                 >
-                  <text>姓名</text>
+                  <text class="flex-row">姓名<text class="txt_required">*</text>
+									</text>
                   <up-icon
                     name="info-circle"
                     size="16"
@@ -270,7 +271,8 @@
 									<view
 									  class="label-with-icon"
 									>
-									  <text>详细地址</text>
+										<text class="flex-row">详细地址<text class="txt_required">*</text>
+										</text>
 									  <up-icon
 									    name="info-circle"
 									    size="16"
@@ -338,7 +340,8 @@
 									<view
 									  class="label-with-icon"
 									>
-									  <text>衣服尺寸</text>
+										<text class="flex-row">衣服尺寸<text class="txt_required">*</text>
+										</text>
 									  <up-icon
 									    name="info-circle"
 									    size="16"
@@ -1594,4 +1597,9 @@ onMounted(() => {
   cursor: pointer;
   flex-shrink: 0;
 }
+.txt_required{
+		color: #f56c6c;
+		line-height: 20px;
+		font-size: 20px;
+	}
 </style>

@@ -1,6 +1,6 @@
 <template>
   <view class="page">
-    <Navbar title="我的赛事" :bgHeight="370" />
+    <Navbar title="我的活动" :bgHeight="370" />
     <view class="tab-container">
       <u-tabs
         lineHeight="2"
@@ -121,7 +121,7 @@ const tab = ref({
   active: 0,
   items: [
     { label: "线上活动", value: "online" },
-    { label: "线下赛事", value: "offline" },
+    { label: "线下活动", value: "offline" },
   ],
 });
 const changeTab = (detail) => {
