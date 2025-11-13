@@ -46,7 +46,7 @@
           </swiper>
         </view>
       </view>
-      <view class="container">
+      <view class="container" style="display: none">
         <view class="menu">
           <view class="menu-item" v-for="(item, index) in menus" :key="index">
             <view
@@ -66,7 +66,10 @@
 
       <view class="section-title">
         <view class="section-title-left">线下活动</view>
-        <view class="section-title-right">
+        <view
+          class="section-title-right"
+          @click="$u.route('pagesSub/orderList')"
+        >
           <view class="section-title-right-item">查看更多</view>
           <u-icon name="arrow-right" size="24rpx" color="#ff8c00"></u-icon>
         </view>

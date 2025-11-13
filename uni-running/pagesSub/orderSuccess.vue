@@ -1,6 +1,10 @@
 <template>
   <view class="page">
-    <u-navbar autoBack placeholder title="第四届十全十美欢乐跑"></u-navbar>
+    <u-navbar
+      autoBack
+      placeholder
+      :title="detail.event_info?.name || ''"
+    ></u-navbar>
     <view class="header">
       <view class="title">
         <view>报名成功！</view>
@@ -20,17 +24,59 @@
             <text class="label">姓名：</text>
             <text class="value">{{ detail.sign_info?.full_name || "--" }}</text>
           </view>
+          <!-- <view class="section-item">
+            <text class="label">手机号码：</text>
+            <text class="value">{{
+              detail.sign_info?.phone_number || "--"
+            }}</text>
+          </view> -->
+          <view class="section-item">
+            <text class="label">性别：</text>
+            <text class="value">{{
+              detail.sign_info?.gender === "1" ? "男" : "女" || "--"
+            }}</text>
+          </view>
+          <!-- <view class="section-item">
+            <text class="label">身份证号码：</text>
+            <text class="value">{{ detail.sign_info?.id_card || "--" }}</text>
+          </view> -->
+          <view class="section-item">
+            <text class="label">血型：</text>
+            <text class="value">{{
+              detail.sign_info?.blood_type || "--"
+            }}</text>
+          </view>
+          <!-- <view class="section-item">
+            <text class="label">所在跑团：</text>
+            <text class="value">{{
+              detail.sign_info?.running_group || "--"
+            }}</text>
+          </view> -->
+          <view class="section-item">
+            <text class="label">T恤尺码：</text>
+            <text class="value">{{
+              detail.sign_info?.tshirt_size || "--"
+            }}</text>
+          </view>
+          <view class="section-item">
+            <text class="label">参赛包领取地址：</text>
+            <text class="value">{{
+              detail?.racekit_pickup_address || "--"
+            }}</text>
+          </view>
+          <view class="section-item" v-if="detail.sign_info?.package">
+            <text class="label">报名套餐：</text>
+            <text class="value">{{ detail.sign_info.package }}</text>
+          </view>
+          <view class="section-item" v-if="detail.event_info?.name">
+            <text class="label">参赛项目：</text>
+            <text class="value">{{ detail.event_info.name }}</text>
+          </view>
           <view class="section-item">
             <text class="label">报名时间：</text>
-            <text class="value">{{ detail.created_at || "--" }}</text>
-          </view>
-          <view class="section-item" v-if="detail.event_info?.package_name">
-            <text class="label">报名套餐</text>
-            <text class="value">{{ detail.event_info.package_name }}</text>
-          </view>
-          <view class="section-item" v-if="detail.event_info?.event_name">
-            <text class="label">参赛项目</text>
-            <text class="value">{{ detail.event_info.event_name }}</text>
+            <text class="value">{{
+              dayjs(detail.created_at).format("YYYY-MM-DD HH:mm:ss") || "--"
+            }}</text>
           </view>
         </view>
         <view class="section-actions">
@@ -394,7 +440,7 @@ onUnmounted(() => {
         align-items: center;
         gap: 24rpx;
         .label {
-          width: 200rpx;
+          width: 280rpx;
           flex-shrink: 0;
           letter-spacing: 2rpx;
         }
