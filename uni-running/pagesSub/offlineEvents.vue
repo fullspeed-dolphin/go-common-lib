@@ -167,6 +167,7 @@ import {
   onUnload,
   onPageScroll,
   onShareAppMessage,
+  onShareTimeline,
 } from "@dcloudio/uni-app";
 import { useStore } from "vuex";
 import { getCurrentInstance } from "vue";
@@ -200,7 +201,11 @@ let timer = null;
 // 页面加载
 onLoad((options) => {
   // #ifdef MP-WEIXIN
-  wx.showShareMenu();
+  // 启用分享给好友和分享到朋友圈
+  // 实现了 onShareTimeline 后，微信会自动在右上角菜单显示"分享到朋友圈"选项
+  wx.showShareMenu({
+    withShareTicket: true,
+  });
   // #endif
 
   routerParams.value = options;
@@ -225,12 +230,21 @@ onPageScroll((e) => {
   }, 100);
 });
 
-// 分享
+// 分享给好友
 onShareAppMessage(() => {
   return {
-    title: detail.value.name, // 分享标题
-    // path: '/pages/index/index',     // 分享路径（必须是已经存在的页面路径）
-    imageUrl: detail.value.background_image_url, // 可选：分享时显示的封面图（网络图片或本地图片）
+    title: detail.value.name || "活动详情", // 分享标题
+    path: `/pagesSub/offlineEvents?id=${routerParams.value.id}`, // 分享路径
+    imageUrl: detail.value.background_image_url || "", // 分享时显示的封面图
+  };
+});
+
+// 分享到朋友圈
+onShareTimeline(() => {
+  return {
+    title: detail.value.name || "活动详情", // 分享标题
+    query: `id=${routerParams.value.id}`, // 分享参数
+    imageUrl: detail.value.background_image_url || "", // 分享时显示的封面图
   };
 });
 
