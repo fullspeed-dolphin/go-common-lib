@@ -178,7 +178,12 @@ const getList = (page) => {
         orders.value = [];
       }
 
-      orders.value = orders.value.concat(res.orders); //追加新数据
+      orders.value = orders.value.concat(
+        res.orders?.map((order) => {
+          order.event_info.event_time = order.created_at;
+          return order;
+        })
+      ); //追加新数据
     })
     .catch((error) => {
       uni.hideLoading();
