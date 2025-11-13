@@ -34,7 +34,7 @@
         @init="mescrollInit"
         @down="downCallback"
         @up="getList"
-        top="210"
+        :top="230"
         bottom="246"
         :safearea="true"
         :fixed="false"
@@ -99,6 +99,7 @@ const tabList = ref([
 const curTab = ref({ label: "热门", value: 0 });
 const dataList = ref([]);
 const navbarHeight = ref(0);
+// section-filter 固定高度 230rpx，转换为 px
 
 // 计算属性
 const userInfo = computed(() => store.state.userInfo);
@@ -279,6 +280,7 @@ const downCallback = (mescroll) => {
   width: 100%;
   z-index: 10;
   background: #f5f5f5;
+  height: 230rpx;
 }
 .section-tabs {
   margin: 0 auto;
@@ -298,6 +300,6 @@ const downCallback = (mescroll) => {
   display: flex;
   flex-direction: column;
   gap: 24rpx;
-  margin-top: 46rpx;
+  padding-top: 32rpx;
 }
 </style>
