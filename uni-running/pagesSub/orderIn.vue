@@ -57,7 +57,13 @@
         ></u-tag>
       </view>
       <view class="cell flex-between-center">
-        <view class="cell-label">参赛包领取地址</view>
+        <view class="cell-label"
+          >参赛包领取地址<u-icon
+            name="star-fill"
+            color="#E53935"
+            size="8"
+          ></u-icon
+        ></view>
         <view class="flex-start" @click="openAddressPicker()">
           <view class="txt" :class="{ c70: !selectedAddress }">
             {{ selectedAddress || "请选择地址" }}
@@ -429,6 +435,8 @@ const submitOrder = () => {
   }
 
   if (!SignerInfo.value.id) return proxy.$toast("请完善参赛者信息");
+
+  if (!selectedAddress.value) return proxy.$toast("请选择参赛包领取地址");
 
   const reg = /^[0-9a-zA-Z]*$/g;
   if (verifyCode.value) {

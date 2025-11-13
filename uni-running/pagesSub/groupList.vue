@@ -1,7 +1,7 @@
 <template>
   <view class="page">
-    <Navbar title="跑团风采" :bgHeight="370" />
-    <section class="section-filter">
+    <Navbar title="跑团风采" :bgHeight="370" placeholder />
+    <section class="section-filter" :style="{ top: navbarHeight + 'px' }">
       <view class="section-search">
         <u-search
           v-model="searchTxt"
@@ -28,25 +28,28 @@
         />
       </view>
     </section>
-    <mescroll-uni
-      ref="mescrollRef"
-      @init="mescrollInit"
-      @down="downCallback"
-      @up="getList"
-      top="210"
-      bottom="176"
-      :safearea="true"
-      :fixed="false"
-    >
-      <view class="container group-list">
-        <GroupItem
-          :item="item"
-          variant="detail"
-          v-for="(item, index) in dataList"
-          :key="index"
-        />
-      </view>
-    </mescroll-uni>
+    <view class="mescroll-wrapper">
+      <mescroll-uni
+        ref="mescrollRef"
+        @init="mescrollInit"
+        @down="downCallback"
+        @up="getList"
+        top="210"
+        bottom="246"
+        :safearea="true"
+        :fixed="false"
+        height="100%"
+      >
+        <view class="container group-list">
+          <GroupItem
+            :item="item"
+            variant="detail"
+            v-for="(item, index) in dataList"
+            :key="index"
+          />
+        </view>
+      </mescroll-uni>
+    </view>
 
     <section class="section-bottom">
       <view style="padding: 48rpx 54rpx">
@@ -67,7 +70,7 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick } from "vue";
+import { ref, computed, nextTick, onMounted } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 import { useStore } from "vuex";
 import { getCurrentInstance } from "vue";
@@ -95,6 +98,7 @@ const tabList = ref([
 ]);
 const curTab = ref({ label: "热门", value: 0 });
 const dataList = ref([]);
+const navbarHeight = ref(0);
 
 // 计算属性
 const userInfo = computed(() => store.state.userInfo);
@@ -105,6 +109,32 @@ let mescroll = null;
 const mescrollInit = (mescrollInstance) => {
   mescroll = mescrollInstance;
 };
+
+// 计算 navbar 高度
+const computeNavbarHeight = () => {
+  const systemInfo = uni.getSystemInfoSync();
+  const statusBarHeight = systemInfo.statusBarHeight || 0;
+
+  // #ifdef MP-WEIXIN
+  const menuBtn = uni.getMenuButtonBoundingClientRect();
+  if (menuBtn) {
+    // 导航栏高度 = 胶囊底部 + (胶囊顶部 - 状态栏高度)
+    const navHeight = menuBtn.bottom + (menuBtn.top - statusBarHeight);
+    navbarHeight.value = navHeight;
+  } else {
+    navbarHeight.value = statusBarHeight + 44;
+  }
+  // #endif
+
+  // #ifndef MP-WEIXIN
+  navbarHeight.value = statusBarHeight + 44;
+  // #endif
+};
+
+// 页面挂载
+onMounted(() => {
+  computeNavbarHeight();
+});
 
 // 页面显示
 onShow(() => {
@@ -192,6 +222,16 @@ const downCallback = (mescroll) => {
 </script>
 
 <style lang="scss" scoped>
+.page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.mescroll-wrapper {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
 .group-item {
   padding: 10rpx 34rpx;
   .poster {
