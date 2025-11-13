@@ -1,6 +1,6 @@
 <template>
   <view class="page">
-    <u-navbar autoBack placeholder title="第四届十全十美欢乐跑"></u-navbar>
+    <Navbar :title="detail.event_info?.name || ''" placeholder />
     <view class="header">
       <view class="title">
         <view>报名失败！</view>
@@ -31,7 +31,7 @@
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { getCurrentInstance } from "vue";
-
+import Navbar from "@/components/navbar.vue";
 // 获取当前实例以访问全局属性
 const { proxy } = getCurrentInstance();
 
@@ -89,6 +89,11 @@ const getOrderDetail = () => {
       if (!detail.value.sign_info) {
         detail.value.sign_info = {};
       }
+      proxy.$axios
+        .get(`/event-api/api/v1/events/${res.event_id}`)
+        .then((eventRes) => {
+          detail.value.event_info = eventRes;
+        });
       uni.hideLoading();
     })
     .catch((err) => {

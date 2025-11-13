@@ -1,10 +1,6 @@
 <template>
   <view class="page">
-    <u-navbar
-      autoBack
-      placeholder
-      :title="detail.event_info?.name || ''"
-    ></u-navbar>
+    <Navbar :title="detail.event_info?.name || ''" placeholder />
     <view class="header">
       <view class="title">
         <view>报名成功！</view>
@@ -171,6 +167,7 @@ import { onLoad } from "@dcloudio/uni-app";
 import { getCurrentInstance } from "vue";
 import CommonDialog from "@/components/common/CommonDialog.vue";
 import dayjs from "dayjs";
+import Navbar from "@/components/navbar.vue";
 
 const refundDialogRef = ref(null);
 // 获取当前实例以访问全局属性

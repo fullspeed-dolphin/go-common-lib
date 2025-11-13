@@ -279,9 +279,9 @@ onUnmounted(() => {
     line-height: inherit;
 
     .navbar-title-text {
-      font-size: 32rpx;
-      font-weight: 500;
-      color: #000;
+      font-weight: bold;
+      font-size: 34rpx;
+      color: #000000;
       text-align: center;
       // 限制文本最大宽度为 400rpx
       max-width: 325rpx;

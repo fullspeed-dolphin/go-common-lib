@@ -1,6 +1,7 @@
 <template>
   <view class="page">
-    <u-navbar autoBack placeholder title="第四届十全十美欢乐跑"></u-navbar>
+    <Navbar :title="detail.event_info?.name || ''" placeholder />
+
     <view class="header">
       <view class="header-icon">
         <u-icon name="checkbox-mark" size="24" color="#8cc63e"></u-icon>
@@ -34,7 +35,7 @@
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { getCurrentInstance } from "vue";
-
+import Navbar from "@/components/navbar.vue";
 // 获取当前实例以访问全局属性
 const { proxy } = getCurrentInstance();
 
