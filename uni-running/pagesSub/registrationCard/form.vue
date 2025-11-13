@@ -11,7 +11,7 @@
             :rules="rules"
             labelWidth="260rpx"
           >
-            <up-form-item prop="name">
+            <up-form-item prop="name" required>
               <template #label>
                 <view
                   class="label-with-icon"
@@ -27,7 +27,7 @@
                   />
                 </view>
               </template>
-              <view class="row">
+              <view class="row" style="width:100%;padding-right:20rpx;">
                 <up-input
                   v-model="form.name"
                   placeholder="请填写您的真实姓名"
@@ -56,7 +56,7 @@
               />
             </up-form-item>
 
-            <up-form-item label="性别" prop="gender">
+            <up-form-item label="性别" prop="gender" required>
               <up-radio-group
                 v-model="form.gender"
                 activeColor="#8CC63E"
@@ -68,7 +68,7 @@
               </up-radio-group>
             </up-form-item>
 
-            <up-form-item label="证件类型" prop="idType">
+            <up-form-item label="证件类型" prop="idType" required>
               <view @click="showIdTypePicker = true">
                 <up-input
                   :modelValue="form.idType || ''"
@@ -98,7 +98,7 @@
               />
             </up-form-item>
 
-            <up-form-item label="证件号码" prop="idCardNumber">
+            <up-form-item label="证件号码" prop="idCardNumber" required>
               <template #label>
                 <view
                   class="label-with-icon"
@@ -152,7 +152,7 @@
               </up-datetime-picker>
             </up-form-item>
 
-            <up-form-item label="手机号码" prop="mobile">
+            <up-form-item label="手机号码" prop="mobile" required>
               <up-input
                 v-model="form.mobile"
                 placeholder="请输入手机号"
@@ -264,7 +264,22 @@
                 @close="showAreaPicker = false"
               />
             </up-form-item>
-            <up-form-item label="详细地址" prop="address">
+            <up-form-item label1="详细地址" prop="address" required>
+							<template #label>
+							  <div @click="showTip('邮寄需要')">
+									<view
+									  class="label-with-icon"
+									>
+									  <text>详细地址</text>
+									  <up-icon
+									    name="info-circle"
+									    size="16"
+									    color="#FF8C00"
+									    class="tip-icon"
+									  />
+									</view>
+								</div>
+							</template>
               <view class="address-input-wrapper">
                 <up-input
                   v-model="form.address"
@@ -317,8 +332,23 @@
                 @close="showBloodTypePicker = false"
               />
             </up-form-item>
-            <up-form-item label="衣服尺寸" prop="clothesSize">
-              <view @click="showTshirtSizePicker = true">
+            <up-form-item label1="衣服尺寸" prop="clothesSize" required>
+							<template #label>
+							  <div @click="showTip('参赛服所需')">
+									<view
+									  class="label-with-icon"
+									>
+									  <text>衣服尺寸</text>
+									  <up-icon
+									    name="info-circle"
+									    size="16"
+									    color="#FF8C00"
+									    class="tip-icon"
+									  />
+									</view>
+								</div>
+							</template>
+              <view style="width:100%;padding-right:20rpx;" @click="showTshirtSizePicker = true">
                 <up-input
                   :modelValue="tshirtSizeDisplayName"
                   placeholder="请选择"
@@ -346,7 +376,7 @@
                 @close="showTshirtSizePicker = false"
               />
             </up-form-item>
-            <up-form-item label="紧急联系人" prop="emergencyContact">
+            <up-form-item label="紧急联系人" prop="emergencyContact" required>
               <up-input
                 v-model="form.emergencyContact"
                 placeholder="请填写"
@@ -354,7 +384,7 @@
                 inputAlign="right"
               />
             </up-form-item>
-            <up-form-item label="紧急联系人电话" prop="emergencyPhone">
+            <up-form-item label="紧急联系人电话" prop="emergencyPhone" required>
               <up-input
                 v-model="form.emergencyPhone"
                 placeholder="请填写"
@@ -730,10 +760,12 @@ const bloodTypeDisplayName = computed(() => {
 
 const idTypeOptions = [
   { id: "身份证", name: "身份证" },
-  { id: "军官证", name: "军官证" },
-  { id: "护照", name: "护照" },
-  { id: "港澳居民往来大陆通行证", name: "港澳居民往来大陆通行证" },
-  { id: "台胞证", name: "台胞证" },
+  { id: "香港居民身份证", name: "香港居民身份证" },
+  { id: "澳门居民身份证", name: "澳门居民身份证" },
+  // { id: "军官证", name: "军官证" },
+  // { id: "护照", name: "护照" },
+  // { id: "港澳居民往来大陆通行证", name: "港澳居民往来大陆通行证" },
+  // { id: "台胞证", name: "台胞证" },
 ];
 
 const countryOptions = [
