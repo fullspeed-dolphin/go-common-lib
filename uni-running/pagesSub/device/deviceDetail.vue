@@ -42,7 +42,6 @@
             shape="circle"
             color="#F2F2F2"
             @click="unDevice()"
-            customStyle="color: #FF8C00;"
             >解除绑定</u-button
           >
         </view>

@@ -212,7 +212,7 @@
             type="primary"
             color="#f2f2f2"
             shape="circle"
-            customStyle="height: 80rpx;width: 320rpx;color: #FF8C00;"
+            customStyle="height: 80rpx;width: 320rpx;"
             @click="deleteGroup()"
             >删除跑团</u-button
           >
@@ -233,7 +233,7 @@
             type="primary"
             color="#FF8C00"
             shape="circle"
-            customStyle="height: 80rpx; color: #FF8C00;"
+            customStyle="height: 80rpx; "
             @click="leaveGroup()"
             >退出跑团</u-button
           >
