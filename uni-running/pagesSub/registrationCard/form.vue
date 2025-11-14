@@ -1,6 +1,7 @@
 <template>
   <view class="page">
     <Navbar :title="pageTitle" :bgHeight="370" />
+    <view class="form-tip">所有信息均为必填项</view>
     <view class="form">
       <view class="section">
         <view class="section-title">基本信息</view>
@@ -11,14 +12,15 @@
             :rules="rules"
             labelWidth="260rpx"
           >
-            <up-form-item prop="name" required>
+            <!-- <up-form-item prop="name" required> -->
+            <up-form-item prop="name">
               <template #label>
                 <view
                   class="label-with-icon"
                   @click.stop="showTip('用于购买保险，必须实名')"
                 >
-                  <text class="flex-row">姓名<text class="txt_required">*</text>
-									</text>
+                  <!-- <text class="flex-row">姓名<text class="txt_required">*</text></text> -->
+                  <text class="flex-row">姓名</text>
                   <up-icon
                     name="info-circle"
                     size="16"
@@ -57,7 +59,8 @@
               />
             </up-form-item>
 
-            <up-form-item label="性别" prop="gender" required>
+            <!-- <up-form-item label="性别" prop="gender" required> -->
+            <up-form-item label="性别" prop="gender">
               <up-radio-group
                 v-model="form.gender"
                 activeColor="#8CC63E"
@@ -69,7 +72,8 @@
               </up-radio-group>
             </up-form-item>
 
-            <up-form-item label="证件类型" prop="idType" required>
+            <!-- <up-form-item label="证件类型" prop="idType" required> -->
+            <up-form-item label="证件类型" prop="idType">
               <view @click="showIdTypePicker = true">
                 <up-input
                   :modelValue="form.idType || ''"
@@ -99,7 +103,8 @@
               />
             </up-form-item>
 
-            <up-form-item label="证件号码" prop="idCardNumber" required>
+            <!-- <up-form-item label="证件号码" prop="idCardNumber" required> -->
+            <up-form-item label="证件号码" prop="idCardNumber">
               <template #label>
                 <view
                   class="label-with-icon"
@@ -153,7 +158,8 @@
               </up-datetime-picker>
             </up-form-item>
 
-            <up-form-item label="手机号码" prop="mobile" required>
+            <!-- <up-form-item label="手机号码" prop="mobile" required> -->
+            <up-form-item label="手机号码" prop="mobile">
               <up-input
                 v-model="form.mobile"
                 placeholder="请输入手机号"
@@ -265,14 +271,15 @@
                 @close="showAreaPicker = false"
               />
             </up-form-item>
-            <up-form-item label1="详细地址" prop="address" required>
+            <!-- <up-form-item label1="详细地址" prop="address" required> -->
+            <up-form-item label1="详细地址" prop="address">
 							<template #label>
 							  <div @click="showTip('邮寄需要')">
 									<view
 									  class="label-with-icon"
 									>
-										<text class="flex-row">详细地址<text class="txt_required">*</text>
-										</text>
+										<!-- <text class="flex-row">详细地址<text class="txt_required">*</text></text> -->
+										<text class="flex-row">详细地址</text>
 									  <up-icon
 									    name="info-circle"
 									    size="16"
@@ -334,14 +341,15 @@
                 @close="showBloodTypePicker = false"
               />
             </up-form-item>
-            <up-form-item label1="衣服尺寸" prop="clothesSize" required>
+            <!-- <up-form-item label1="衣服尺寸" prop="clothesSize" required> -->
+            <up-form-item label1="衣服尺寸" prop="clothesSize">
 							<template #label>
 							  <div @click="showTip('参赛服所需')">
 									<view
 									  class="label-with-icon"
 									>
-										<text class="flex-row">衣服尺寸<text class="txt_required">*</text>
-										</text>
+										<!-- <text class="flex-row">衣服尺寸<text class="txt_required">*</text></text> -->
+										<text class="flex-row">衣服尺寸</text>
 									  <up-icon
 									    name="info-circle"
 									    size="16"
@@ -379,7 +387,8 @@
                 @close="showTshirtSizePicker = false"
               />
             </up-form-item>
-            <up-form-item label="紧急联系人" prop="emergencyContact" required>
+            <!-- <up-form-item label="紧急联系人" prop="emergencyContact" required> -->
+            <up-form-item label="紧急联系人" prop="emergencyContact">
               <up-input
                 v-model="form.emergencyContact"
                 placeholder="请填写"
@@ -387,7 +396,8 @@
                 inputAlign="right"
               />
             </up-form-item>
-            <up-form-item label="紧急联系人电话" prop="emergencyPhone" required>
+            <!-- <up-form-item label="紧急联系人电话" prop="emergencyPhone" required> -->
+            <up-form-item label="紧急联系人电话" prop="emergencyPhone">
               <up-input
                 v-model="form.emergencyPhone"
                 placeholder="请填写"
@@ -1490,11 +1500,22 @@ function showTip(title) {
 
 function onSubmit() {
   if (!form.agreed) return;
-  formRef.value?.validate().then(() => {
-    submitting.value = true;
-    emit("submit", { ...form });
-    submitting.value = false;
-  });
+  formRef.value
+    ?.validate()
+    .then(() => {
+      submitting.value = true;
+      emit("submit", { ...form });
+      submitting.value = false;
+    })
+    .catch((errors) => {
+      const firstError = Array.isArray(errors) ? errors[0] : errors;
+      const errMsg = firstError?.message || "请完善报名信息";
+      uni.showToast({
+        title: errMsg,
+        icon: "none",
+      });
+      console.error("报名卡校验失败:", errors);
+    });
 }
 
 onLoad(() => {});
@@ -1596,6 +1617,14 @@ onMounted(() => {
 .tip-icon {
   cursor: pointer;
   flex-shrink: 0;
+}
+.form-tip {
+  font-size: 24rpx;
+  color: #ff4d4f;
+  font-weight: 600;
+  text-align: center;
+  margin: 20rpx 0;
+  transform: translateY(2px);
 }
 .txt_required{
 		color: #f56c6c;
