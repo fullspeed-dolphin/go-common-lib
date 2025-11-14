@@ -225,19 +225,19 @@ const userInfo = computed(() => store.state.userInfo);
 watch(
   () => verifyCode.value,
   (newVal) => {
-    let codeState = {
-      isOk: false,
-      text: "全速码无效",
-    };
+    // let codeState = {
+    //   isOk: false,
+    //   text: "全速码无效",
+    // };
 
-    computedCode.value = codeState;
+    // computedCode.value = codeState;
 
     if (!verifyCode.value) return;
 
     console.log("verifyCode.value", verifyCode.value);
 
-    const reg = /^[0-9a-zA-Z]*$/g;
-    if (!reg.test(verifyCode.value) || verifyCode.value.length !== 5) {
+    // const reg = /^[0-9a-zA-Z]*$/g;
+    if (verifyCode.value.length !== 5) {
       return;
     }
 
@@ -438,12 +438,12 @@ const submitOrder = () => {
 
   if (!selectedAddress.value) return proxy.$toast("请选择参赛包领取地址");
 
-  const reg = /^[0-9a-zA-Z]*$/g;
-  if (verifyCode.value) {
-    if (!reg.test(verifyCode.value) || verifyCode.value.length !== 5) {
-      return proxy.$toast("全速码 格式有误");
-    }
-  }
+  // const reg = /^[0-9a-zA-Z]*$/g;
+  // if (verifyCode.value) {
+  //   if (!reg.test(verifyCode.value) || verifyCode.value.length !== 5) {
+  //     return proxy.$toast("全速码 格式有误");
+  //   }
+  // }
 
   if (!isAgree.value) return proxy.$toast("请勾选同意协议");
 
