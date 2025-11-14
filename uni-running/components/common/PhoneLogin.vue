@@ -141,16 +141,20 @@ const getPhoneNumber = async ({ detail }) => {
   try {
     const res = await proxy.$axios.post("/wechat-login/login", data);
 
-    if (res.avatarUrl) {
-      proxy.$toast("登录成功");
-      uni.setStorageSync("token", res.sessionToken);
-      await store.dispatch("getUserInfo");
-    } else {
-      store.commit("set", {
-        type: "globalToken",
-        data: res.sessionToken,
-      });
-    }
+    proxy.$toast("登录成功");
+    uni.setStorageSync("token", res.sessionToken);
+    await store.dispatch("getUserInfo");
+
+    // if (res.avatarUrl) {
+    //   proxy.$toast("登录成功");
+    //   uni.setStorageSync("token", res.sessionToken);
+    //   await store.dispatch("getUserInfo");
+    // } else {
+    //   store.commit("set", {
+    //     type: "globalToken",
+    //     data: res.sessionToken,
+    //   });
+    // }
 
     close();
 
