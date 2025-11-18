@@ -48,6 +48,10 @@ const props = defineProps({
     type: String,
     default: "auto",
   },
+  order_no: {
+    type: String,
+    default: "",
+  },
   item: {
     type: Object,
     default: () => {},

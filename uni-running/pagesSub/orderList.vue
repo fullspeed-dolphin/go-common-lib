@@ -26,57 +26,64 @@
           class="order-item"
           v-for="order in orders"
           :key="order.id"
-          @click="viewDetail(order)"
         >
-          <EventItem
-            from="order"
-            :item="order.event_info"
-            direction="row"
-            :showButton="false"
-          />
-          <view class="order-item-info">
-            <view class="order-item-info-name">
-              <text class="label">报名人：</text>
-              <text class="value">{{ order.sign_info.full_name }}</text>
-            </view>
-            <view class="order-item-info-status">
-              <u-text
-                v-if="order.status == 'PND'"
-                size="14"
-                type="error"
-                text="待支付"
-              ></u-text>
-              <u-text
-                v-if="order.status == 'SUCC'"
-                size="14"
-                type="success"
-                text="已付款"
-              ></u-text>
-              <u-text
-                v-if="order.status == 'FAIL'"
-                size="14"
-                type="error"
-                text="失败"
-              ></u-text>
-              <u-text
-                v-if="order.status == 'RFND'"
-                size="14"
-                type="info"
-                text="已退款"
-              ></u-text>
-              <u-text
-                v-if="order.status == 'CXL'"
-                size="14"
-                type="info"
-                text="已取消"
-              ></u-text>
-              <u-text
-                v-if="order.status == 'EXP'"
-                size="14"
-                type="info"
-                text="已过期"
-              ></u-text>
-            </view>
+					<view class="order-no flex-row" @click="setClipboardData(order.order_no)">
+						订单编号:
+						<text style="color: #666;">{{order.order_no}}</text> 
+						<!-- <text class="txt ml10 flex-center">复制</text> -->
+						<image class="copy" src="/static/copy.png" mode="widthFix"></image>
+					</view>
+          <view class="" @click="viewDetail(order)">
+          	<EventItem
+          	  from="order"
+          	  :item="order.event_info"
+          	  direction="row"
+          	  :showButton="false"
+          	/>
+          	<view class="order-item-info">
+          	  <view class="order-item-info-name">
+          	    <text class="label">报名人：</text>
+          	    <text class="value">{{ order.sign_info.full_name }}</text>
+          	  </view>
+          	  <view class="order-item-info-status">
+          	    <u-text
+          	      v-if="order.status == 'PND'"
+          	      size="14"
+          	      type="error"
+          	      text="待支付"
+          	    ></u-text>
+          	    <u-text
+          	      v-if="order.status == 'SUCC'"
+          	      size="14"
+          	      type="success"
+          	      text="已付款"
+          	    ></u-text>
+          	    <u-text
+          	      v-if="order.status == 'FAIL'"
+          	      size="14"
+          	      type="error"
+          	      text="失败"
+          	    ></u-text>
+          	    <u-text
+          	      v-if="order.status == 'RFND'"
+          	      size="14"
+          	      type="info"
+          	      text="已退款"
+          	    ></u-text>
+          	    <u-text
+          	      v-if="order.status == 'CXL'"
+          	      size="14"
+          	      type="info"
+          	      text="已取消"
+          	    ></u-text>
+          	    <u-text
+          	      v-if="order.status == 'EXP'"
+          	      size="14"
+          	      type="info"
+          	      text="已过期"
+          	    ></u-text>
+          	  </view>
+          	</view>
           </view>
         </view>
       </view>
@@ -138,6 +145,12 @@ let mescroll = null;
 const mescrollInit = (mescrollInstance) => {
   mescroll = mescrollInstance;
 };
+
+function setClipboardData(data) {
+	uni.setClipboardData({
+		data
+	})
+}
 
 // 方法定义
 const viewDetail = (item) => {
@@ -232,6 +245,23 @@ defineOptions({
 </script>
 
 <style lang="scss" scoped>
+	.order-no{
+		font-size: 26rpx;
+		padding-bottom: 26rpx;
+		.txt{
+			background: #1989fa;
+			border-radius: 99rpx;
+			color: #fff;
+			padding: 5rpx 10rpx;
+			font-size: 20rpx;
+		}
+		.copy{
+			width: 28rpx;
+			height: 28rpx;
+			margin-left: 5rpx;
+			margin-top:-3rpx;
+		}
+	}
 .page {
   background: #fafafa;
   padding-bottom: env(safe-area-inset-bottom);
