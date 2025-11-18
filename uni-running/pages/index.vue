@@ -247,7 +247,7 @@ onLoad((options) => {
 // 分享给朋友
 onShareAppMessage(() => {
   return {
-    title: '跑了没 - 发现精彩跑步活动',
+    title: '跑了没 - 跑，一切活力的泉源',
     path: '/pages/index',
     imageUrl: '', // 可以设置自定义分享图片，留空则使用当前页面截图
   };
@@ -256,7 +256,7 @@ onShareAppMessage(() => {
 // 分享到朋友圈
 onShareTimeline(() => {
   return {
-    title: '跑了没 - 发现精彩跑步活动',
+    title: '跑了没 - 跑，一切活力的泉源',
     query: '', // 可以携带参数
     imageUrl: '', // 可以设置自定义分享图片
   };
