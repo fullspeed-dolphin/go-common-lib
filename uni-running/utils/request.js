@@ -4,7 +4,16 @@ import { baseLink } from "@/utils/config.js"
 
 function fetch(options) {
 	return new Promise((resolve, reject) => {
-		let url = `${baseLink}${options.url}`;
+		let url = options.url;
+		// #ifdef MP-WEIXIN
+			url = baseLink + url
+		// #endif
+		
+		// #ifndef MP-WEIXIN
+			if (process.env.NODE_ENV == "development") {
+				url = location.origin + '/dev-api' + url
+			}
+		//  #endif
 		
 		var requestTask = uni.request({
 			url: url,

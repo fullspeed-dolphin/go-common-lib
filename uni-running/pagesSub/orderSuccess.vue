@@ -74,6 +74,10 @@
               dayjs(detail.created_at).format("YYYY-MM-DD HH:mm:ss") || "--"
             }}</text>
           </view>
+          <view v-if="detail.order_no" class="section-item">
+            <text class="label">订单编号：</text>
+            <text class="value">{{detail.order_no}}</text>
+          </view>
         </view>
         <view class="section-actions">
           <u-button
