@@ -175,7 +175,7 @@
 </template>
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import { onLoad, onShow, onPageScroll } from "@dcloudio/uni-app";
+import { onLoad, onShow, onPageScroll, onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
 import { getCurrentInstance } from "vue";
 import { useStore } from "vuex";
 import tabbar from "@/components/tabBar.vue";
@@ -220,7 +220,10 @@ const contentPaddingTop = computed(() => headerHeight.value + 30);
 // 页面加载
 onLoad((options) => {
   // #ifdef MP-WEIXIN
-  wx.showShareMenu();
+  wx.showShareMenu({
+    withShareTicket: true,
+    menus: ['shareAppMessage', 'shareTimeline'] // 开启分享给朋友和分享到朋友圈
+  });
   // #endif
 
   // 动态计算 header 高度
@@ -241,6 +244,24 @@ onLoad((options) => {
   }, 0);
 });
 
+// 分享给朋友
+onShareAppMessage(() => {
+  return {
+    title: '跑了没 - 发现精彩跑步活动',
+    path: '/pages/index',
+    imageUrl: '', // 可以设置自定义分享图片，留空则使用当前页面截图
+  };
+});
+
+// 分享到朋友圈
+onShareTimeline(() => {
+  return {
+    title: '跑了没 - 发现精彩跑步活动',
+    query: '', // 可以携带参数
+    imageUrl: '', // 可以设置自定义分享图片
+  };
+});
+
 // 页面显示
 onShow(() => {
   getGroupList();
@@ -252,6 +273,31 @@ onShow(() => {
 // 方法定义
 const clickSwiper = (item) => {
   if (!ensureLogin()) return;
+
+  // 判断是否是特定的轮播图，跳转到其他小程序
+  // 注意：这里假设后端返回的数据中有 id 或 banner_id 字段
+  // 如果字段名不同，请修改 item.id 为实际的字段名
+  if (item.id === '01KA8MPFAF0VBY1G35CVCNC1CW' || item.banner_id === '01KA8MPFAF0VBY1G35CVCNC1CW') {
+    // 跳转到其他小程序
+    uni.navigateToMiniProgram({
+      appId: 'wx42a8cf3627cc70a5',
+      path: '/pages/themes/t3/home/index?stage_code=xp6aC0kldn', // ⚠️ 这里需要替换为实际的页面路径
+      extraData: {},
+      envVersion: 'release', // 正式版：release，开发版：develop，体验版：trial
+      success: (res) => {
+        console.log('跳转成功', res);
+      },
+      fail: (err) => {
+        console.error('跳转失败', err);
+        uni.showToast({
+          title: '跳转失败',
+          icon: 'none',
+          duration: 2000
+        });
+      }
+    });
+    return;
+  }
 
   if (item.event_id) {
     uni.$u.route(`pagesSub/offlineEvents?id=${item.event_id}`);
