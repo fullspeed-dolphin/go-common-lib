@@ -3,15 +3,15 @@
     <Navbar :title="pageTitle" :bgHeight="370" />
     <view class="form-tip">所有信息均为必填项</view>
     <view class="form">
-      <view class="section">
-        <view class="section-title">基本信息</view>
-        <view class="section-content">
-          <up-form
-            ref="formRef"
-            :model="form"
-            :rules="rules"
-            labelWidth="260rpx"
-          >
+      <up-form
+        ref="formRef"
+        :model="form"
+        :rules="rules"
+        labelWidth="260rpx"
+      >
+        <view class="section">
+          <view class="section-title">基本信息</view>
+          <view class="section-content">
             <!-- <up-form-item prop="name" required> -->
             <up-form-item prop="name">
               <template #label>
@@ -177,14 +177,12 @@
                 inputAlign="right"
               />
             </up-form-item>
-          </up-form>
         </view>
       </view>
 
-      <view class="section">
-        <view class="section-title">常住地址</view>
-        <view class="section-content">
-          <up-form :model="form" labelWidth="260rpx">
+        <view class="section">
+          <view class="section-title">常住地址</view>
+          <view class="section-content">
             <up-form-item label="国家/地区" prop="country">
               <view @click="showCountryPicker = true">
                 <up-input
@@ -304,14 +302,12 @@
                 </view>
               </view>
             </up-form-item>
-          </up-form>
+          </view>
         </view>
-      </view>
 
-      <view class="section">
-        <view class="section-title">其他</view>
-        <view class="section-content">
-          <up-form :model="form" labelWidth="260rpx">
+        <view class="section">
+          <view class="section-title">其他</view>
+          <view class="section-content">
             <up-form-item label="血型" prop="bloodType">
               <view @click="showBloodTypePicker = true">
                 <up-input
@@ -406,9 +402,8 @@
                 inputAlign="right"
               />
             </up-form-item>
-          </up-form>
+          </view>
         </view>
-      </view>
 
       <view class="section">
         <view class="section-content agree">
@@ -443,6 +438,7 @@
           >
         </view>
       </section>
+      </up-form>
     </view>
   </view>
 </template>
@@ -1195,6 +1191,12 @@ const rules = {
   mobile: [
     { required: true, message: "请填写手机号码", trigger: ["blur", "change"] },
   ],
+  country:[{ required: true, message: "请填写国家或地区", trigger: ["blur", "change"] }],
+  region:[{ required: true, message: "请填写省份", trigger: ["blur", "change"] }],
+  address:[{ required: true, message: "请填写详细地址", trigger: ["blur", "change"] }],
+  clothesSize:[{ required: true, message: "请选择衣服尺寸", trigger: ["blur", "change"] }],
+  emergencyContact:[{ required: true, message: "请填写进击联系人姓名", trigger: ["blur", "change"] }],
+  emergencyPhone:[{ required: true, message: "请填写进击联系人手机号码", trigger: ["blur", "change"] }],
 };
 
 const birthdayTimestamp = computed(() => {
@@ -1498,6 +1500,15 @@ function showTip(title) {
   });
 }
 
+const showValidationError = (message) => {
+  uni.showModal({
+    title: "提示",
+    content: String(message || "请完善报名信息"),
+    showCancel: false,
+    confirmText: "我知道了",
+  });
+};
+
 function onSubmit() {
   if (!form.agreed) return;
   formRef.value
@@ -1510,10 +1521,7 @@ function onSubmit() {
     .catch((errors) => {
       const firstError = Array.isArray(errors) ? errors[0] : errors;
       const errMsg = firstError?.message || "请完善报名信息";
-      uni.showToast({
-        title: errMsg,
-        icon: "none",
-      });
+      showValidationError(errMsg);
       console.error("报名卡校验失败:", errors);
     });
 }

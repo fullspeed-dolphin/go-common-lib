@@ -77,6 +77,7 @@ import { ref, onMounted } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import Navbar from "@/components/navbar.vue";
 import request from "@/utils/request.js";
+import { showRequestError } from "./utils.js";
 
 // 响应式数据
 const registrationCardList = ref([]);
@@ -105,6 +106,7 @@ const getRegistrationCardList = async () => {
     }
   } catch (error) {
     console.error("获取报名卡列表失败:", error);
+    showRequestError(error, "获取报名卡失败");
     registrationCardList.value = [];
   } finally {
     loading.value = false;
@@ -130,6 +132,7 @@ const handleSetAsOwner = async (item) => {
     getRegistrationCardList();
   } catch (error) {
     console.error("设置失败:", error);
+    showRequestError(error, "设置失败");
   }
 };
 
@@ -164,6 +167,7 @@ const handleDelete = (item) => {
           getRegistrationCardList();
         } catch (error) {
           console.error("删除失败:", error);
+          showRequestError(error, "删除失败");
         }
       }
     },

@@ -170,6 +170,7 @@
     </view>
 
     <tabbar type="index" />
+    <UserLogin ref="refUserLogin" />
   </view>
 </template>
 <script setup>
@@ -180,6 +181,7 @@ import { useStore } from "vuex";
 import tabbar from "@/components/tabBar.vue";
 import GroupItem from "@/components/GroupItem.vue";
 import EventItem from "@/components/EventItem.vue";
+import UserLogin from "@/components/UserLogin.vue";
 import { staticBaseUrl } from "@/utils/config";
 
 // 使用store
@@ -195,9 +197,21 @@ const bannerEventList = ref([]);
 const bannerList = ref([]);
 const GroupList = ref([]);
 const onlineEventList = ref([]);
+const refUserLogin = ref(null);
 
 // 计算属性
 const userInfo = computed(() => store.state.userInfo);
+
+const ensureLogin = () => {
+  const token = uni.getStorageSync("token");
+  const hasLogin = !!(
+    token || (userInfo.value && Object.keys(userInfo.value).length)
+  );
+  if (hasLogin) return true;
+
+  refUserLogin.value?.open();
+  return false;
+};
 
 // 计算 header 高度和 content padding
 const headerHeight = ref(196); // navbar placeholder 88 + header-content 90 + 18 = 196
@@ -237,6 +251,8 @@ onShow(() => {
 
 // 方法定义
 const clickSwiper = (item) => {
+  if (!ensureLogin()) return;
+
   if (item.event_id) {
     uni.$u.route(`pagesSub/offlineEvents?id=${item.event_id}`);
     return;

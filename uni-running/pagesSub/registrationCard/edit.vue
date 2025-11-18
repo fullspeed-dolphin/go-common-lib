@@ -8,52 +8,18 @@ import { onLoad } from "@dcloudio/uni-app";
 import RegistrationCardForm from "./form.vue";
 import request from "@/utils/request.js";
 import {
-  loadProvinceData,
-  loadCityData,
-  loadAreaData,
-} from "@/utils/regionData.js";
+  useRegionData,
+  showRequestError,
+  registrationFieldOrder,
+} from "./utils.js";
 
 const form = ref({});
 const cardId = ref(null);
 
 // 省市区数据
-const provinceData = ref([]);
-const cityData = ref([]);
-const areaData = ref([]);
+const { loadRegionData, codeToName, nameToCode } = useRegionData();
 
-// 根据code查找名称
-function codeToName(code, type) {
-  if (!code) return "";
-
-  if (type === "province") {
-    const item = provinceData.value.find((p) => p.code === code);
-    return item ? item.name : code;
-  } else if (type === "city") {
-    const item = cityData.value.find((c) => c.code === code);
-    return item ? item.name : code;
-  } else if (type === "area") {
-    const item = areaData.value.find((a) => a.code === code);
-    return item ? item.name : code;
-  }
-  return code;
-}
-
-// 根据名称查找code
-function nameToCode(name, type) {
-  if (!name) return "";
-
-  if (type === "province") {
-    const item = provinceData.value.find((p) => p.name === name);
-    return item ? item.code : name;
-  } else if (type === "city") {
-    const item = cityData.value.find((c) => c.name === name);
-    return item ? item.code : name;
-  } else if (type === "area") {
-    const item = areaData.value.find((a) => a.name === name);
-    return item ? item.code : name;
-  }
-  return name;
-}
+// 根据code查找名称及根据名称查找code逻辑复用 utils.js
 
 // 将API数据转换为表单数据
 function apiToForm(apiData) {
@@ -166,6 +132,9 @@ async function handleSubmit(payload) {
     }, 400);
   } catch (error) {
     console.error("更新报名卡失败:", error);
+    showRequestError(error, "更新报名卡失败", {
+      fieldOrder: registrationFieldOrder,
+    });
   }
 }
 
@@ -186,21 +155,6 @@ onLoad((options) => {
 });
 
 // 加载省市区数据
-async function loadRegionData() {
-  try {
-    const [province, city, area] = await Promise.all([
-      loadProvinceData(),
-      loadCityData(),
-      loadAreaData(),
-    ]);
-    provinceData.value = province;
-    cityData.value = city;
-    areaData.value = area;
-  } catch (error) {
-    console.error("加载省市区数据失败:", error);
-  }
-}
-
 onMounted(async () => {
   // 先加载省市区数据
   await loadRegionData();

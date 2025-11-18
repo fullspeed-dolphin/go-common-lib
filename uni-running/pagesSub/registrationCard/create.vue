@@ -8,34 +8,17 @@ import { onLoad } from "@dcloudio/uni-app";
 import RegistrationCardForm from "./form.vue";
 import request from "@/utils/request.js";
 import {
-  loadProvinceData,
-  loadCityData,
-  loadAreaData,
-} from "@/utils/regionData.js";
+  useRegionData,
+  showRequestError,
+  registrationFieldOrder,
+} from "./utils.js";
 
 const form = ref({});
 
 // 省市区数据
-const provinceData = ref([]);
-const cityData = ref([]);
-const areaData = ref([]);
+const { loadRegionData, codeToName } = useRegionData();
 
-// 根据code查找名称
-function codeToName(code, type) {
-  if (!code) return "";
-
-  if (type === "province") {
-    const item = provinceData.value.find((p) => p.code === code);
-    return item ? item.name : code;
-  } else if (type === "city") {
-    const item = cityData.value.find((c) => c.code === code);
-    return item ? item.name : code;
-  } else if (type === "area") {
-    const item = areaData.value.find((a) => a.code === code);
-    return item ? item.name : code;
-  }
-  return code;
-}
+// 根据code查找名称逻辑复用 utils.js
 
 // 将表单数据转换为API数据
 function formToApi(formData) {
@@ -84,27 +67,15 @@ async function handleSubmit(payload) {
     }, 400);
   } catch (error) {
     console.error("创建报名卡失败:", error);
-  }
-}
-
-// 加载省市区数据
-async function loadRegionData() {
-  try {
-    const [province, city, area] = await Promise.all([
-      loadProvinceData(),
-      loadCityData(),
-      loadAreaData(),
-    ]);
-    provinceData.value = province;
-    cityData.value = city;
-    areaData.value = area;
-  } catch (error) {
-    console.error("加载省市区数据失败:", error);
+    showRequestError(error, "创建报名卡失败", {
+      fieldOrder: registrationFieldOrder,
+    });
   }
 }
 
 onLoad(() => {});
 
+// 加载省市区数据
 onMounted(() => {
   loadRegionData();
 });
