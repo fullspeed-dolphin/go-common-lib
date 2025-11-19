@@ -411,12 +411,19 @@ const getEventPrice = (spxcode = null) => {
         priceListData.push(data);
       });
     });
+		
+		console.log("priceListData======>", priceListData)
 
     // 小距离在前
     // priceListData.sort((a, b) => a.km - b.km);
 
     // activeType.value = priceListData[0];
     priceList.value = priceListData;
+		
+		// 如果有选中数据，更新选中的数据
+		if (activeType.value.label) {
+			activeType.value = priceListData.find(i => i.label === activeType.value.label) || {}
+		}
   });
 };
 
