@@ -232,16 +232,18 @@ watch(
 
     // computedCode.value = codeState;
 
-    if (!verifyCode.value) return;
+    // if (!verifyCode.value) return;
 
     console.log("verifyCode.value", verifyCode.value);
 
     // const reg = /^[0-9a-zA-Z]*$/g;
-    if (verifyCode.value.length !== 5) {
-      return;
-    }
-
-    getEventPrice();
+    // if (verifyCode.value.length !== 5) {
+    //   return;
+    // }
+		
+    uni.$u.debounce(() => {
+			getEventPrice()
+		}, 300);
   }
 );
 
@@ -372,9 +374,9 @@ const getSignerInfo = () => {
 };
 
 const getEventPrice = (spxcode = null) => {
-  uni.showLoading({
-    mask: true,
-  });
+  // uni.showLoading({
+  //   mask: true,
+  // });
   const data = {
     event_id: event_id.value,
     spxcode: verifyCode.value,
