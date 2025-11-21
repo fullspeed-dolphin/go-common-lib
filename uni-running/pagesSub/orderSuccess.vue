@@ -61,11 +61,11 @@
             }}</text>
           </view>
           <view class="section-item" v-if="detail.sign_info?.package">
-            <text class="label">报名套餐：</text>
+            <text class="label">报名项目：</text>
             <text class="value">{{ detail.sign_info.package }}</text>
           </view>
           <view class="section-item" v-if="detail.event_info?.name">
-            <text class="label">参赛项目：</text>
+            <text class="label">参赛活动：</text>
             <text class="value">{{ detail.event_info.name }}</text>
           </view>
           <view class="section-item">
