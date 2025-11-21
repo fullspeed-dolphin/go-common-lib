@@ -54,7 +54,7 @@
               detail.sign_info?.tshirt_size || "--"
             }}</text>
           </view>
-          <view class="section-item">
+          <view class="section-item address-item">
             <text class="label">参赛包领取地址：</text>
             <text class="value">{{
               detail?.racekit_pickup_address || "--"
@@ -74,7 +74,7 @@
               dayjs(detail.created_at).format("YYYY-MM-DD HH:mm:ss") || "--"
             }}</text>
           </view>
-          <view v-if="detail.order_no" class="section-item">
+          <view v-if="detail.order_no" class="section-item order-no-item">
             <text class="label">订单编号：</text>
             <text class="value">{{detail.order_no}}</text>
           </view>
@@ -86,7 +86,6 @@
             shape="circle"
             color="#FF8C00"
             @click="viewBib()"
-            size="small"
             >查看号码布</u-button
           >
           <u-button
@@ -95,7 +94,6 @@
             plain
             shape="circle"
             color="#FF8C00"
-            size="small"
             @click="viewBib()"
             >查看号码布</u-button
           >
@@ -105,7 +103,6 @@
             shape="circle"
             color="#FF8C00"
             @click="viewCertificate(detail)"
-            size="small"
             >查看完赛证书</u-button
           >
         </view>
@@ -402,7 +399,7 @@ onUnmounted(() => {
       justify-content: center;
       align-items: center;
       padding: 12rpx 28rpx;
-      border-radius: 30rpx 30rpx 30rpx 30rpx;
+      border-radius: 999rpx;
       border: 2rpx solid #ffffff;
       font-weight: bold;
       font-size: 24rpx;
@@ -444,6 +441,20 @@ onUnmounted(() => {
           width: 280rpx;
           flex-shrink: 0;
           letter-spacing: 2rpx;
+          line-height: 44rpx;
+        }
+        .value {
+          line-height: 44rpx;
+        }
+      }
+      // 长文本自动换行（地址、订单编号）
+      .address-item,
+      .order-no-item {
+        align-items: flex-start;
+        .value {
+          word-break: break-all;
+          white-space: normal;
+          flex: 1;
         }
       }
     }
