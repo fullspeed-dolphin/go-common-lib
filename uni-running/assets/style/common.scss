@@ -31,7 +31,6 @@ uni-view {
 }
 
 page,
-section,
 view,
 input,
 text,
@@ -41,8 +40,7 @@ rich-text,
 picker,
 scroll-view,
 cover-view,
-open-data,
-div {
+open-data{
   box-sizing: border-box;
 }
 
@@ -98,35 +96,6 @@ cover-view {
 
 .vam {
   vertical-align: middle;
-}
-
-// /widthpercent/
-.wp20 {
-  width: 20%;
-}
-
-.wp30 {
-  width: 30%;
-}
-
-.wp40 {
-  width: 40%;
-}
-
-.wp50 {
-  width: 50%;
-}
-
-.wp60 {
-  width: 60%;
-}
-
-.wp70 {
-  width: 70%;
-}
-
-.wp80 {
-  width: 80%;
 }
 
 .wp100 {
@@ -371,14 +340,6 @@ cover-view {
 
 .bgf0 {
   background-color: #f0f0f0;
-}
-
-.bgeb {
-  background-color: #ebebeb;
-}
-
-.bge0 {
-  background-color: #e0e0e0;
 }
 
 // / line-height /

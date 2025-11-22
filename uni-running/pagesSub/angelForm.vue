@@ -1,6 +1,6 @@
 <template>
-	<view class="p20 ml10 mr10">
-		<u-navbar autoBack placeholder title="全速天使招募"></u-navbar>
+	<view>
+		<u-navbar autoBack placeholder title="全速天使招募" />
 		<up-form :model="form" ref="refForm" :rules="rules" labelPosition="top" labelWidth="auto">
 			<up-form-item label="选择活动" prop="activity" required>
 				<PickerCell v-model="form.activity" placeholder="--选择活动--" :title="null" :border="false" :columns="options_events" />
@@ -18,8 +18,8 @@
 				<u-input v-model="form.phone" placeholder="请输入手机号码" />
 			</up-form-item>
 		</up-form>
-
-		<u-button type="primary" @click="submitForm()" customStyle="margin: 60rpx auto 30rpx" color="#FF8C00" shape="circle" >
+		
+		<u-button type="primary" @click="submitForm()" customStyle="width:690rpx; margin: 60rpx auto 30rpx" color="#FF8C00" shape="circle" >
 			提交申请
 		</u-button>
 	</view>
@@ -84,11 +84,6 @@
 		],
 	});
 
-	// 页面加载
-	onLoad((options) => {
-		console.log("option", options);
-	});
-
 	const submitForm = () => {
 		refForm.value.validate().then((res) => {
 			const token = uni.getStorageSync("token");
@@ -119,18 +114,10 @@
 </script>
 
 <style lang="less" scoped>
-	.submit-btn {
-		width: 682rpx;
-		height: 72rpx;
-		margin: 48rpx auto;
-		border-radius: 16rpx;
-		font-weight: bold;
-		font-size: 30rpx;
-		color: #ff8c00;
-		background: rgba(255, 255, 255, 0.2);
-	}
-
 	::v-deep {
+		.u-form{
+			padding: 10rpx 30rpx;
+		}
 		.picker-cell{
 			.u-cell__body__content{
 				display: none;
@@ -225,12 +212,6 @@
 		}
 
 		.input-placeholder {
-			font-weight: bold !important;
-			font-size: 26rpx !important;
-			color: #707070 !important;
-		}
-
-		.textarea-placeholder {
 			font-weight: bold !important;
 			font-size: 26rpx !important;
 			color: #707070 !important;

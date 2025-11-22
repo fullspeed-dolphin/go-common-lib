@@ -340,12 +340,14 @@
 		@each $short, $long in l left, t top, r right, b bottom {
 			// 缩写版，结果如： up-m-l-30
 			// 定义外边距
+			.u-m#{$short}-#{$i},
 			.u-m-#{$short}-#{$i},
 			.up-m-#{$short}-#{$i} {
 				margin-#{$long}: $i + rpx!important;
 			}
 			
 			// 定义内边距
+			.u-p#{$short}-#{$i},
 			.u-p-#{$short}-#{$i},
 			.up-p-#{$short}-#{$i} {
 				padding-#{$long}: $i + rpx!important;
