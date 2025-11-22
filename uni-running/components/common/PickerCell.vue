@@ -1,17 +1,16 @@
 <template>
-  <view>
-    <view class="cell-line">
-      <u-cell
-        :title="title + ':'"
-        :required="required"
-        :border="border"
-        :value="selected[valuekey] ? selected[valuekey] : placeholder"
-        @click="open()"
-        :isLink="!disabled && !rightIcon"
-      >
-      </u-cell>
-    </view>
+		<u-cell
+			customClass="picker-cell"
+			:title="title"
+			:required="required"
+			:border="border"
+			:value="selected[valuekey] ? selected[valuekey] : placeholder"
+			@click="open()"
+			:isLink="!disabled && !rightIcon"
+		>
+		</u-cell>
     <u-picker
+			round="14"
       :title="'请选择' + title"
       :show="isShowPop"
       :defaultIndex="defaultIndex"
@@ -20,7 +19,6 @@
       @confirm="confirm"
       @cancel="isShowPop = false"
     />
-  </view>
 </template>
 <script setup>
 import { ref, watch } from "vue";
@@ -115,7 +113,7 @@ watch(
 );
 
 // 方法定义
-const setDefaultValue = () => {
+function setDefaultValue () {
   if (String(props.value).length && props.columns?.length) {
     const index = props.columns.findIndex(
       (i) => String(i.value) === String(props.value)
@@ -140,7 +138,7 @@ const open = () => {
 
 const confirm = (detail) => {
   console.log("detail", detail);
-  selected.value = detail.value;
+  selected.value = detail.value[0];
   emit("input", String(detail.value[0].value));
 
   emit("change", detail.value[0], props.field);
