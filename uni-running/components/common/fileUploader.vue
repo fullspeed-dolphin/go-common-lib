@@ -14,7 +14,12 @@
       :deletable="deletable"
       @fail="fail"
       upload-icon="plus"
-    />
+    >
+			<template v-if="isCustom" #trigger>
+				<slot name="trigger"/>
+			</template>
+		</u-upload>
+		
     <!-- </u-cell> -->
   </view>
 </template>
@@ -26,6 +31,10 @@ import { uploadToken } from "../../utils/config";
 
 // Props定义
 const props = defineProps({
+	isCustom: {
+		type: Boolean,
+		default: false,
+	},
   title: {
     type: String,
     default: "",

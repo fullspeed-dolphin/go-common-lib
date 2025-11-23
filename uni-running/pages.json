@@ -20,6 +20,27 @@
     }
   ],
   "subpackages": [
+		{
+		  "root": "pagesSport",
+		  "pages": [
+		    {
+		      "path": "uploadCapture",
+		      "style": {
+		        // "navigationStyle": "custom",
+		        "navigationBarTitleText": "运动截图打卡",
+		        "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+		      }
+		    },
+		    {
+		      "path": "captureRule",
+		      "style": {
+		        // "navigationStyle": "custom",
+		        "navigationBarTitleText": "",
+		        "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
+		      }
+		    }
+			]
+		},
     {
       "root": "pagesSub",
       "pages": [

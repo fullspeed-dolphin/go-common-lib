@@ -104,7 +104,9 @@
 .up-flex-y.up-flex-reverse {
 	flex-direction: column-reverse !important;
 }
-
+.u-flex-1{
+	flex:1;
+}
 // 自动伸缩
 .u-flex-fill,
 .up-flex-fill {
@@ -284,6 +286,13 @@
 .u-flex-content-end,
 .up-flex-content-end {
 	align-content: flex-end !important;
+}
+
+.u-flex-between-center{
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
 }
 
 // 两端对齐
