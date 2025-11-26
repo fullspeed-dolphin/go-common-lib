@@ -23,22 +23,14 @@
 		{
 		  "root": "pagesSport",
 		  "pages": [
-		    {
-		      "path": "uploadCapture",
-		      "style": {
-		        // "navigationStyle": "custom",
-		        "navigationBarTitleText": "运动截图打卡",
-		        "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
-		      }
-		    },
-		    {
-		      "path": "captureRule",
-		      "style": {
-		        // "navigationStyle": "custom",
-		        "navigationBarTitleText": "",
-		        "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
-		      }
-		    }
+				{ "path": "uploadCapture","style": { "navigationBarTitleText": "运动截图打卡"} },
+		    { "path": "captureRule", "style": {  "navigationBarTitleText": "" } }
+			]
+		},
+		{
+		  "root": "pagesMine",
+		  "pages": [
+				{ "path": "PunchEvent","style": { "navigationBarTitleText": "现场签到"} }
 			]
 		},
     {
