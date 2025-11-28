@@ -157,6 +157,22 @@
 						</button>
 					</u-cell> -->
         </view>
+				
+				<u-cell
+				  title="现场签到"
+				  class="nav-cell"
+				  @click="routeTo('/pagesMine/PunchEvent')"
+				  :border="false"
+				  isLink
+				>
+				  <template #icon>
+				    <image
+				      class="nav-icon"
+				      style="width: 40rpx; height: 36rpx"
+				      src="/static/images/现场签到 @2x.png"
+				    ></image>
+				  </template>
+				</u-cell>
 
         <!-- <u-cell title="意见反馈" class="nav-cell" @click="routeTo('/pagesSub/settings/feedback')" :border="false" isLink>
 					<template #icon>

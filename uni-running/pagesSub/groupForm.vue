@@ -114,7 +114,7 @@ import { ref, computed, watch, nextTick } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { useStore } from "vuex";
 import { getCurrentInstance } from "vue";
-import FileUploader from "@/components/common/fileUploader.vue";
+import FileUploader from "@/components/common/FileUploader.vue";
 import dayjs from "dayjs";
 
 // 获取当前实例以访问全局属性
