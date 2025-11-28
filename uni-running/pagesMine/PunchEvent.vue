@@ -73,7 +73,7 @@
       </u-button>
     </view>
 		
-		<template v-if="selectedEvent.id">
+		<template v-if="selectedEvent.id && isEndEvent">
 			<view class="flex-center" style="margin-top:20px;color:#999;">
 				{{isInPunchArea ? '在签到范围' : '不在签到范围'}}
 			</view>
@@ -379,6 +379,10 @@ function isInRange(userLat, userLng, placeLat, placeLng, radius = 500) {
 }
 
 .sign-button-container {
+	position: absolute;
+	bottom : 250rpx;
+	left: 50%;
+	transform: translate(-50%);
   display: flex;
   justify-content: center;
   margin-top: 100rpx;
