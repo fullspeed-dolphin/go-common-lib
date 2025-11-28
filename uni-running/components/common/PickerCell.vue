@@ -1,6 +1,6 @@
 <template>
 		<u-cell
-			customClass="picker-cell"
+			:customClass="'picker-cell '+  (!selected[valuekey] ? 'placeholder' : '')"
 			:title="title"
 			:required="required"
 			:border="border"
@@ -11,7 +11,7 @@
 		</u-cell>
     <u-picker
 			round="14"
-      :title="'请选择' + title"
+      :title="'请选择' + (title || '')"
       :show="isShowPop"
       :defaultIndex="defaultIndex"
       :keyName="valuekey"
@@ -152,4 +152,13 @@ defineExpose({
 });
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+		.picker-cell{
+			&.placeholder{
+				.u-cell__value{
+					color: #BFBFBF;
+					font-size: 26rpx;
+				}
+			}
+		}
+</style>

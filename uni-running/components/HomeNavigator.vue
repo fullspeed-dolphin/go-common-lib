@@ -59,12 +59,12 @@
 
 			.menu-item-icon {
 				display: block;
-				width: 84rpx;
-				height: 84rpx;
+				width: 100rpx;
+				height: 100rpx;
 			}
 
 			.menu-item-title {
-				margin-top: -6rpx;
+				margin-top: -16rpx;
 				font-weight: 800;
 				font-size: 22rpx;
 				color: #000000;
