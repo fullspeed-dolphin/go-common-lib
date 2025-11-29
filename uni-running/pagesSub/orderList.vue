@@ -41,7 +41,7 @@
           	  :showButton="false"
           	/>
           	<view class="order-item-info">
-          	  <view class="order-item-info-name">
+          	  <view v-if="order.sign_info" class="order-item-info-name">
           	    <text class="label">报名人：</text>
           	    <text class="value">{{ order.sign_info.full_name }}</text>
           	  </view>
