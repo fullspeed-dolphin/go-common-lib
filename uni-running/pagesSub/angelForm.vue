@@ -1,60 +1,84 @@
 <template>
 	<view style="padding-bottom: 100rpx;">
-		<u-navbar autoBack placeholder title="全速天使招募" />
-		<up-form :model="form" ref="refForm" :rules="rules" labelPosition="top" labelWidth="auto">
-			<up-form-item label="选择活动" prop="activity" required>
-				<PickerCell v-model="form.activity" placeholder="--选择活动--" :title="null" :border="false"
-					:columns="options_events" />
-			</up-form-item>
-
-			<div class="userinfo-form">
-				<up-form-item label="姓名" prop="fullName" required>
-					<u-input v-model="form.fullName" placeholder="请输入名称" />
-				</up-form-item>
-				<u-form-item label="性别" prop="gender" :title="null" required>
-					<PickerCell v-model="form.gender" placeholder="--选择性别--" :border="false" :columns="options_gender" />
-				</u-form-item>
-				<u-form-item label="身份证号码" prop="id_card" required>
-					<u-input v-model="form.id_card" placeholder="请输入身份证号码" />
-				</u-form-item>
-				<up-form-item label="手机号码" prop="phone" required>
-					<u-input v-model="form.phone" placeholder="请输入手机号码" />
-				</up-form-item>
-			</div>
-		</up-form>
+		<!-- <u-navbar autoBack placeholder title="全速天使招募" /> -->
 		
-		<section class="payment-card">
-			<view class="amount-row">
-				<text class="amount">¥1</text>
-				<text class="desc">(该费用用于购买保险)</text>
+		<view v-if="submitSuccessfully" class="flex-col-center" style="padding-top:200rpx;">
+			<image style="width:300rpx;height:400rpx;" src="/static/images/wechat_2025-11-29_151550_391.min.png" mode="aspectFill"></image>
+			<view class="" style="font-weight: 500;
+				text-align: center;
+				font-size: 34rpx;
+				margin-top: 74rpx;
+				line-height: 48rpx;">
+				<view>我们已收到您的申请，</view>
+				<view>工作人员将在第一时间联系您</view>
+				<view>欢迎您成为全速大家庭的一份子！</view>
 			</view>
-	
-			<view class="title">选择支付方式</view>
-	
-			<view class="payment-methods">
-				<view class="method-item">
-					<image src="/static/images/微信支付@2x.png" class="icon" />
-					<u-radio v-model="selected" :value="'wechat'" activeColor="#FF8C00" />
+			
+			<view class="" style="font-weight: bold;
+				margin-top:40rpx;
+				font-size: 24rpx;
+				color: #BFBFBF;">
+				订单编号：{{paymentInfo.order_no}}
+			</view>
+		</view>
+		
+		<block v-if="!submitSuccessfully">
+			<up-form :model="form" ref="refForm" :rules="rules" labelPosition="top" labelWidth="auto">
+				<up-form-item label="选择活动" prop="event_id" required>
+					<PickerCell v-model="form.event_id" placeholder="--选择活动--" @change="changeEvent" :title="null" :border="false"
+						:columns="options_events" />
+				</up-form-item>
+
+				<div class="userinfo-form">
+					<up-form-item label="姓名" prop="full_name" required>
+						<u-input v-model="form.full_name" placeholder="请输入名称" />
+					</up-form-item>
+					<u-form-item label="性别" prop="gender" required>
+						<PickerCell v-model="form.gender" :title="null" @change="validateField('gender')" placeholder="--选择性别--" :border="false" :columns="options_gender" />
+					</u-form-item>
+					<u-form-item label="身份证号码" prop="id_card" required>
+						<u-input v-model="form.id_card" placeholder="请输入身份证号码" />
+					</u-form-item>
+					<up-form-item label="手机号码" prop="phone_number" required>
+						<u-input v-model="form.phone_number" placeholder="请输入手机号码" />
+					</up-form-item>
+				</div>
+			</up-form>
+			
+			<section v-if="priceInfo.spxAngel" class="payment-card">
+				<view  class="amount-row">
+					<text class="amount">¥{{priceInfo.spxAngel}}</text>
+					<text class="desc">(该费用用于购买保险)</text>
 				</view>
-			</view>
-		</section>
+					
+				<view class="title">选择支付方式</view>
+					
+				<view class="payment-methods">
+					<view class="method-item">
+						<image src="/static/images/微信支付@2x.png" class="icon" />
+						<!-- <u-radio v-model="selected" :value="'wechat'" activeColor="#FF8C00" /> -->
+						<up-checkbox shape="circle" activeColor="#FF8C00" v-model:checked="selected" usedAlone size="32rpx" />
+					</view>
+				</view>
+			</section>
 
-		<section class="section-bottom" style="width: 682rpx;margin: 48rpx auto;">
-			<view class="txt flex-start">
-				<up-checkbox shape="circle" activeColor="#8CC63E" v-model:checked="isAgree" :usedAlone="true"
-					:customStyle="{ marginRight: '-10rpx' }" size="32rpx" />
-				<text @click="isAgree = !isAgree">
-					<text class="ml5">我已阅读并同意该</text>
-				</text>
-				<text style="color: #ff8c00" @click="$u.route('pagesSub/settings/agreement?type=signUp')">《用户协议》</text>以及
-				<text style="color: #ff8c00" @click="$u.route('pagesSub/settings/agreement?type=baoxian')">《保险须知》</text>
-			</view>
-		</section>
+			<section class="section-bottom" style="width: 682rpx;margin: 48rpx auto;">
+				<view class="txt flex-start">
+					<up-checkbox shape="circle" activeColor="#8CC63E" v-model:checked="isAgree" :usedAlone="true"
+						:customStyle="{ marginRight: '-10rpx' }" size="32rpx" />
+					<text @click="isAgree = !isAgree">
+						<text class="ml5">我已阅读并同意该</text>
+					</text>
+					<text style="color: #ff8c00" @click="$u.route('pagesSub/settings/agreement?type=signUp')">《用户协议》</text>以及
+					<text style="color: #ff8c00" @click="$u.route('pagesSub/settings/agreement?type=baoxian')">《保险须知》</text>
+				</view>
+			</section>
 
-		<u-button type="primary" @click="submitForm()" customStyle="width:642rpx; margin: 0rpx auto" color="#FF8C00"
-			shape="circle">
-			立即支付
-		</u-button>
+			<u-button type="primary" @click="submitForm()" :disabled="!priceInfo.spxAngel" customStyle="width:642rpx; margin: 0rpx auto" color="#FF8C00"
+				shape="circle">
+				立即支付
+			</u-button>
+		</block>
 	</view>
 </template>
 <script setup>
@@ -64,8 +88,11 @@
 	import {
 		onLoad
 	} from "@dcloudio/uni-app";
+	import { useStore } from "vuex";
 	import PickerCell from "@/components/common/PickerCell.vue";
 	import request from "../utils/request";
+	// 使用store
+	const store = useStore();
 	
 	const selected = ref('wechat') // 默认微信支付
 	const isAgree = ref(false)
@@ -86,15 +113,19 @@
 			value: "2"
 		},
 	]);
-
+	
+	function validateField (field) {
+		refForm.value.validateField(field)
+	}
+	
 	const options_events = ref([]);
 
 	const form = ref({
 		gender: "",
-		activity: "",
-		fullName: "",
+		event_id: "",
+		full_name: "",
 		id_card: "",
-		phone: "",
+		phone_number: "",
 	});
 
 	const rules = ref({
@@ -103,12 +134,12 @@
 			message: '必填项',
 			trigger: ['change', 'blur']
 		}, ],
-		activity: [{
+		event_id: [{
 			required: true,
 			message: '必填项',
 			trigger: ['change', 'blur']
 		}, ],
-		fullName: [{
+		full_name: [{
 			required: true,
 			message: '必填项',
 			trigger: ['change', 'blur']
@@ -122,11 +153,11 @@
 				validator: (rule, value, callback) => {
 					return uni.$u.test.idCard(value);
 				},
-				message: '手机号码不正确',
+				message: '格式不正确',
 				trigger: ['change', 'blur'],
 			}
 		],
-		phone: [{
+		phone_number: [{
 				required: true,
 				message: '必填项',
 				trigger: ['change', 'blur']
@@ -136,12 +167,44 @@
 					// uni.$u.test.mobile()就是返回true或者false的
 					return uni.$u.test.mobile(value);
 				},
-				message: '手机号码不正确',
+				message: '格式不正确',
 				trigger: ['change', 'blur'],
 			}
 		],
 	});
-
+	
+	getEvents()
+	function getEvents() {
+		uni.showLoading({
+			mask: true
+		})
+		request.get(`/event-api/api/v1/events`).then((res) => {
+			options_events.value = res.events.map(item => ({
+				...item,
+				value: item.id,
+				label: item.name
+			}))
+		});
+	};
+	
+	const selectedEvent = ref({})
+	function changeEvent(e) {
+		console.log(e)
+		if (selectedEvent.value.id === e.id) return;
+		
+		selectedEvent.value = e
+		
+		getPriceInfo()
+	}
+	
+	const priceInfo = ref({})
+	function getPriceInfo() {
+		request.get(`/booking-api/spxAngel/price?event_id=${selectedEvent.value.id}`).then((res) => {
+			priceInfo.value = res
+		});
+	}
+	
+	const submitSuccessfully = ref(false)
 	const submitForm = () => {
 		refForm.value.validate().then((res) => {
 			const token = uni.getStorageSync("token");
@@ -152,22 +215,64 @@
 				}, 1000);
 				return;
 			}
+			
+			if (!isAgree.value) return uni.$u.toast('请勾选协议~')
 
 			const data = {
-				activity: form.value.activity,
+				...form.value,
+				"payment_method": "wechat",
+				"payment_amount": parseFloat(priceInfo.value.spxAngel)
 			};
 			uni.showLoading({
 				mask: true,
 			});
 
-			request.post(`/running-group/api/v1/groups/update`, data).then(async (res) => {
-				uni.$u.toast(group_id.value ? "更新成功" : "创建成功");
+			request.post(`/booking-api/spxAngel/SignIn`, data).then((res) => {
 
-				setTimeout(() => {
-					uni.navigateBack();
-				}, 500);
+				
+				createOrder(res)
 			});
 		});
+	};
+	
+	const paymentInfo = ref({})
+	function createOrder(payment) {
+		uni.showLoading({
+			mask: true
+		})
+		const userInfo = store.state.userInfo;
+		
+		const data = {
+			"reg_no": payment.reg_no,
+			"openid": userInfo.openid,
+			"event_id": form.value.event_id
+		}
+		
+		request.post(`/pay/spxAngel/wechatPay`, data).then((res) => {
+			paymentInfo.value = res;
+			wxPay(res)
+		});
+	};
+	
+	function wxPay (respay) {
+	  // 触发微信支付
+	  wx.requestPayment({
+	    timeStamp: respay.timeStamp,
+	    nonceStr: respay.nonceStr,
+	    package: respay.package,
+	    signType: respay.signType,
+	    paySign: respay.paySign,
+	    success: (res) => {
+	      uni.hideLoading();
+	      uni.$u.toast("提交成功");
+	      submitSuccessfully.value = true;
+	    },
+	    fail: (res) => {
+	      uni.hideLoading();
+	      console.log("res======>", res);
+	      uni.$u.toast("支付未完成");
+	    },
+	  });
 	};
 </script>
 
@@ -178,6 +283,13 @@
 		}
 
 		.picker-cell {
+			&.placeholder{
+				.u-cell__value {
+					color: #BFBFBF;
+					font-size: 26rpx;
+				}
+			}
+			
 			.u-cell__body__content {
 				display: none;
 			}
@@ -255,7 +367,7 @@
 			background: rgba(255, 255, 255);
 			border-radius: 16rpx;
 			background: #ffffff;
-			border: 2rpx solid rgba(0, 0, 0, 0.06);
+			border: 2rpx solid rgba(0, 0, 0, 0.06)!important;
 		}
 
 		.u-input__content__field-wrapper__field {
@@ -327,14 +439,10 @@
 			}
 		}
 		
-		
-		
 		.label {
 		  font-size: 28rpx;
 		  color: #333;
 		  margin-left: 10rpx;
 		}
 	}
-	
-	
 </style>

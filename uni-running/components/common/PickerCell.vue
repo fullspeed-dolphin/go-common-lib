@@ -1,24 +1,25 @@
 <template>
-		<u-cell
-			:customClass="'picker-cell '+  (!selected[valuekey] ? 'placeholder' : '')"
-			:title="title"
-			:required="required"
-			:border="border"
-			:value="selected[valuekey] ? selected[valuekey] : placeholder"
-			@click="open()"
-			:isLink="!disabled && !rightIcon"
-		>
-		</u-cell>
-    <u-picker
-			round="14"
-      :title="'请选择' + (title || '')"
-      :show="isShowPop"
-      :defaultIndex="defaultIndex"
-      :keyName="valuekey"
-      :columns="[columns]"
-      @confirm="confirm"
-      @cancel="isShowPop = false"
-    />
+		<view :class="'picker-cell ' + (!selected[valuekey] ? 'placeholder' : '')">
+			<u-cell
+				:title="title"
+				:required="required"
+				:border="border"
+				:value="selected[valuekey] ? selected[valuekey] : placeholder"
+				@click="open()"
+				:isLink="!disabled && !rightIcon"
+			>
+			</u-cell>
+			<u-picker
+				round="14"
+			  :title="'请选择' + (title || '')"
+			  :show="isShowPop"
+			  :defaultIndex="defaultIndex"
+			  :keyName="valuekey"
+			  :columns="[columns]"
+			  @confirm="confirm"
+			  @cancel="isShowPop = false"
+			/>
+		</view>
 </template>
 <script setup>
 import { ref, watch } from "vue";
@@ -80,7 +81,7 @@ const props = defineProps({
 });
 
 // Emits
-const emit = defineEmits(["input", "change"]);
+const emit = defineEmits(["update:modelValue", "change"]);
 
 // 响应式数据
 const isShowPop = ref(false);
@@ -139,26 +140,18 @@ const open = () => {
 const confirm = (detail) => {
   console.log("detail", detail);
   selected.value = detail.value[0];
-  emit("input", String(detail.value[0].value));
+  emit("update:modelValue", String(detail.value[0].value));
 
   emit("change", detail.value[0], props.field);
 
   isShowPop.value = false;
 };
 
-// 暴露方法给父组件
 defineExpose({
   open,
 });
 </script>
 
 <style lang="scss">
-		.picker-cell{
-			&.placeholder{
-				.u-cell__value{
-					color: #BFBFBF;
-					font-size: 26rpx;
-				}
-			}
-		}
+	
 </style>

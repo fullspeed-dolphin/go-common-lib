@@ -335,7 +335,7 @@
         {
           "path": "angelForm",
           "style": {
-            "navigationStyle": "custom",
+            // "navigationStyle": "custom",
             "navigationBarTitleText": "全速天使招募",
             "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
           }

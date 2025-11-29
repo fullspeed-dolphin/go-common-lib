@@ -19,7 +19,7 @@
 				</view>
 			</view>
 			
-			<!-- <HomeNavigator /> -->
+			<HomeNavigator />
 
 			<view class="section-title">
 				<view class="section-title-left">线下活动</view>
