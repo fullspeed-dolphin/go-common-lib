@@ -8,15 +8,15 @@
   "pages": [
     {
       "path": "pages/index",
-      "style": { "navigationStyle": "custom", "navigationBarTitleText": "首页" }
+      "style": { "navigationStyle": "custom", "navigationBarTitleText": "跑了没" }
     },
     {
       "path": "pages/sport",
-      "style": { "navigationStyle": "custom", "navigationBarTitleText": "" }
+      "style": { "navigationBarTitleText": "运动" }
     },
     {
       "path": "pages/mine",
-      "style": { "navigationStyle": "custom", "navigationBarTitleText": "" }
+      "style": { "navigationBarTitleText": "个人中心" }
     }
   ],
   "subpackages": [

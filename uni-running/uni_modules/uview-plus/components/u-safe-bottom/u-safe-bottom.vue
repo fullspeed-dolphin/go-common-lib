@@ -36,7 +36,8 @@
 				const style = {};
 				// #ifdef APP-NVUE || MP-TOUTIAO || MP-WEIXIN
 				// nvue下，高度使用js计算填充
-				style.height = addUnit(getWindowInfo().safeAreaInsets.bottom, 'px');
+				const bottom = getWindowInfo().safeAreaInsets.bottom
+				style.height = addUnit(bottom > 25 ?  bottom - 20 : bottom, 'px');
 				// #endif
 				return deepMerge(style, addStyle(this.customStyle));
 			},

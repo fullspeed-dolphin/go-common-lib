@@ -1,6 +1,5 @@
 <template>
   <view class="page">
-    <Navbar title="个人中心" :bgHeight="370" :back="false" />
     <view class="page-content">
       <view class="rel section-user">
         <view class="user-box" @click="handleUserClick">

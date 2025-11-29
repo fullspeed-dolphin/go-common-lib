@@ -1,7 +1,5 @@
 <template>
 	<view class="page">
-		<Navbar title="运动" :bgHeight="370" :back="false" />
-
 		<view class="content">
 			<view class="col">
 				<view class="row u-flex-wrap u-flex-wrap u-flex-row" style="gap:20rpx;">

@@ -1,13 +1,13 @@
 <template>
 	<view class="index-page">
 		<view class="header">
-			<u-navbar className="navbar" autoBack title="跑了没" :leftIcon="false" bgColor="transparent" placeholder></u-navbar>
-			<view class="search-box">
-				<u-search class="search" :disabled="true" placeholder="请输入名称或团号或地址" shape="round" bgColor="#fff"
-					:showAction="false" @click="$u.route('pagesSub/groupList')"></u-search>
+			<view class="plaeholder" :style="{height: menuBtnInfo.placeholder} " ></view>
+			<view class="search-box flex-start" :style="menuBtnInfo" @click="$u.route('pagesSub/groupList')">
+				<u-icon name="search" size="24"></u-icon>
+				<view class="ml5">请输入名称或团号或地址</view>
 			</view>
 		</view>
-		<view class="content" :style="{ paddingTop: `${contentPaddingTop}rpx`, position: 'relative' }">
+		<view class="content">
 			<view class="container">
 				<view class="section-banner">
 					<swiper class="swiper" circular indicator-dots indicator-active-color="#FF8C00" :autoplay="true"
@@ -137,13 +137,6 @@
 	// 使用store
 	const store = useStore();
 
-	// 获取当前实例以访问全局属性
-	const {
-		proxy
-	} = getCurrentInstance();
-
-	// 响应式数据
-	const searchTxt = ref("");
 	const eventList = ref([]);
 	const bannerEventList = ref([]);
 	const bannerList = ref([]);
@@ -152,6 +145,17 @@
 	const refUserLogin = ref(null);
 
 	// 计算属性
+	const menuBtnInfo = computed(() => {
+		const menuBtn = uni?.getMenuButtonBoundingClientRect?.() || {};
+		
+		return {
+			top: (menuBtn.top - 1) + 'px',
+			height: menuBtn.height + 1 + 'px',
+			width: menuBtn.left - 30 + 'px',
+			placeholder: menuBtn.top + menuBtn.height + 10 + 'px'
+		}
+	});
+	
 	const userInfo = computed(() => store.state.userInfo);
 
 	const ensureLogin = () => {
@@ -165,10 +169,6 @@
 		return false;
 	};
 
-	// 计算 header 高度和 content padding
-	const headerHeight = ref(196); // navbar placeholder 88 + header-content 90 + 18 = 196
-	const contentPaddingTop = computed(() => headerHeight.value + 30);
-
 	// 页面加载
 	onLoad((options) => {
 		// #ifdef MP-WEIXIN
@@ -177,23 +177,6 @@
 			menus: ['shareAppMessage', 'shareTimeline'] // 开启分享给朋友和分享到朋友圈
 		});
 		// #endif
-
-		// 动态计算 header 高度
-		setTimeout(() => {
-			uni
-				.createSelectorQuery()
-				.select(".header")
-				.boundingClientRect((rect) => {
-					console.log(rect, "header rect");
-					if (rect && rect.height) {
-						// px 转 rpx: rpx = px * (750 / windowWidth)
-						const systemInfo = uni.getSystemInfoSync();
-						const pxRatio = 750 / systemInfo.windowWidth;
-						headerHeight.value = rect.height * pxRatio;
-					}
-				})
-				.exec();
-		}, 0);
 	});
 
 	// 分享给朋友
@@ -236,7 +219,7 @@
 				path: '/pages/themes/t3/home/index?stage_code=xp6aC0kldn', // ⚠️ 这里需要替换为实际的页面路径
 				extraData: {},
 				envVersion: 'release', // 正式版：release，开发版：develop，体验版：trial
-				success: (res) => {
+				success: res => {
 					console.log('跳转成功', res);
 				},
 				fail: (err) => {
@@ -259,11 +242,6 @@
 			uni.$u.route(`pagesSub/settings/webView?link=${item.redirect_url}`);
 			return;
 		}
-		// uni.$u.route(`pagesSub/settings/webView?link=https://mp.weixin.qq.com/s/oNW0UYJCb78zrmzyoY0_Mg?token=1740573090&lang=zh_CN`)
-	};
-
-	const confirmSearch = () => {
-		const searchTxtValue = searchTxt.value.trim();
 	};
 
 	const routeTo = (link) => {
@@ -272,16 +250,14 @@
 	};
 
 	const getEvents = () => {
-		proxy.$axios.get(`/event-api/getOfflineEventSwiper`).then((res) => {
+		request.get(`/event-api/getOfflineEventSwiper`).then(res => {
 			bannerEventList.value = res;
-			uni.hideLoading();
 		});
 	};
 
 	const getOnlineEvents = () => {
-		proxy.$axios.get(`/event-api/getOnlineEventSwiper`).then((res) => {
+		request.get(`/event-api/getOnlineEventSwiper`).then(res => {
 			onlineEventList.value = res;
-			uni.hideLoading();
 		});
 	};
 
@@ -292,9 +268,8 @@
 			});
 		}
 
-		proxy.$axios.get(`/event-api/getTopSwiper`).then((res) => {
+		request.get(`/event-api/getTopSwiper`).then(res => {
 			bannerList.value = res;
-			uni.hideLoading();
 		});
 	};
 
@@ -304,45 +279,35 @@
 			pageSize: 5,
 			keyword: "",
 		};
-		proxy.$axios.get(`/running-group/api/v1/groups/list`, data).then((res) => {
+		request.get(`/running-group/api/v1/groups/list`, data).then(res => {
 			GroupList.value = res.data;
 		});
 	};
-
-	defineOptions({
-		options: {
-			styleIsolation: "shared",
-		},
-	});
 </script>
 
 <style lang="less" scoped>
-	.index-page {
-		.header {
+	.header {
+		.search-box {
 			position: fixed;
-			top: 0;
-			left: 0;
+			top: 100rpx;
+			left: 30rpx;
 			width: 100%;
-			background: #fafafa;
-			// background: linear-gradient(180deg, #ffe8cc 0%, #fafafa 100%);
+			padding: 0 20rpx;
+			color: #999;
+			background: rgba(250,250,250, .7);
 			z-index: 11;
-
-			.search-box {
-				width: 682rpx;
-				margin: 0rpx auto 26rpx auto;
-				border-radius: 36rpx 36rpx 36rpx 36rpx;
-				border: 2rpx solid #f58700;
-				box-sizing: border-box;
-
-				::v-deep {
-					.u-search__content {
-						width: 682rpx;
-						height: 68rpx;
-					}
+			border-radius: 36rpx 36rpx 36rpx 36rpx;
+			border: 2rpx solid #f58700;
+			box-sizing: border-box;
+	
+			::v-deep {
+				.u-search__content {
 				}
 			}
 		}
-
+	}
+	
+	.index-page {
 		.content {
 			background: #fafafa;
 		}

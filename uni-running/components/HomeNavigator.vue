@@ -34,7 +34,7 @@
 	}
 	
 	function routeTo(item) {
-		if (!item.path) return;
+		if (!item.path) return uni.$u.toast('功能筹备中，敬请期待...');
 		uni.$u.route(item.path)
 	}
 </script>

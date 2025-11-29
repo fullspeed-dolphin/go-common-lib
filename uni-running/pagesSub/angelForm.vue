@@ -24,10 +24,12 @@
 		
 		<block v-if="!submitSuccessfully">
 			<up-form :model="form" ref="refForm" :rules="rules" labelPosition="top" labelWidth="auto">
-				<up-form-item label="选择活动" prop="event_id" required>
-					<PickerCell v-model="form.event_id" placeholder="--选择活动--" @change="changeEvent" :title="null" :border="false"
-						:columns="options_events" />
-				</up-form-item>
+				<div class="userinfo-form">
+					<up-form-item label="选择活动" prop="event_id" required>
+						<PickerCell v-model="form.event_id" placeholder="--选择活动--" @change="changeEvent" :title="null" :border="false"
+							:columns="options_events" />
+					</up-form-item>
+				</div>
 
 				<div class="userinfo-form">
 					<up-form-item label="姓名" prop="full_name" required>
