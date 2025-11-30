@@ -40,12 +40,55 @@ function getLocation(resolve, reject) {
       resolve({ status: 'granted', location: res })
     },
     fail: (err) => {
+			console.error('err getLocation ', err);
+			// 手机系统定位被禁用
+			if (err.errMsg.includes('permission denied')) {
+				uni.showModal({
+					title: '定位权限被禁用',
+					content: '请到【设置】>【隐私】>【定位服务】中开启本应用的定位权限',
+					showCancel: false,
+					confirmText: '确定',
+					success: () => {}
+				})
+				
+				return resolve({ status: 'disabled', msg: '系统定位服务未开启' })
+			}
       // 常见错误码：
       // - err.errMsg 包含 "auth deny" → 用户拒绝
       // - err.errCode === 0 → 系统未开启 GPS（安卓常见）
-      if (err.errMsg.includes('auth deny') || err.errMsg.includes('unauthorized')) {
+			// 软件定位被禁用
+      if (err.errMsg.includes('auth deny') || err.errMsg.includes('unauthorized') ) {
+				uni.showModal({
+				  title: '定位权限被禁用',
+				  content: '请到开启本应用的定位权限',
+				  showCancel: true,
+				  confirmText: '去设置',
+				  success: (modalRes) => {
+				    if (modalRes.confirm) {
+				      // 跳转到设置页（仅部分平台支持）
+				      // #ifdef MP-WEIXIN
+				      uni.openSetting({
+				        success: (settingRes) => {
+				          if (settingRes.authSetting['scope.userLocation']) {
+				            console.log('用户已开启定位')
+				          }
+				        }
+				      })
+				      // #endif
+				    }
+				  }
+				})
+				
         resolve({ status: 'denied', msg: '用户拒绝授权' })
       } else if (err.errCode === 0) {
+				uni.showModal({
+					title: '定位权限被禁用',
+					content: '请到【设置】>【隐私】>【定位服务】中开启本应用的定位权限',
+					showCancel: false,
+					confirmText: '确定',
+					success: () => {}
+				})
+				
         resolve({ status: 'disabled', msg: '系统定位服务未开启' })
       } else {
         reject(err)
@@ -67,51 +110,6 @@ function requestLocationPermission(resolve, reject) {
       resolve({ status: 'denied', msg: '用户拒绝授权' })
     }
   })
-}
-
-const handleCheckLocation = async () => {
-  try {
-    const result = await checkLocationPermission()
-    console.log('定位权限状态:', result)
-
-    switch (result.status) {
-      case 'granted':
-        console.log('✅ 定位可用，坐标:', result.location)
-        // 执行打卡、地图等逻辑
-        break
-      case 'denied':
-        uni.showModal({
-          title: '定位权限被禁用',
-          content: '请到【设置】>【隐私】>【定位服务】中开启本应用的定位权限',
-          showCancel: true,
-          confirmText: '去设置',
-          success: (modalRes) => {
-            if (modalRes.confirm) {
-              // 跳转到设置页（仅部分平台支持）
-              // #ifdef MP-WEIXIN
-              uni.openSetting({
-                success: (settingRes) => {
-                  if (settingRes.authSetting['scope.userLocation']) {
-                    console.log('用户已开启定位')
-                  }
-                }
-              })
-              // #endif
-            }
-          }
-        })
-        break
-      case 'disabled':
-        uni.showToast({
-          title: '请开启手机定位服务',
-          icon: 'none'
-        })
-        break
-    }
-  } catch (error) {
-    console.error('定位检测异常:', error)
-    uni.showToast({ title: '定位功能异常', icon: 'error' })
-  }
 }
 
 /**

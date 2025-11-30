@@ -6,7 +6,9 @@
         <image :src="selectedEvent.background_image_url" class="avatar" />
         <view class="info">
           <view class="title">{{selectedEvent.name}}</view>
-          <view class="time">签到时间: {{selectedEvent.checkInRangeTime}}</view>
+          <view class="time" v-if="selectedEvent.checkin_start_time">
+						签到时间: {{selectedEvent.checkInRangeTime}}
+					</view>
         </view>
         <u-icon name="arrow-down" color="#999" size="36rpx" />
       </view>
@@ -73,7 +75,7 @@
 			  </u-button>
 			</view>
 			
-			<template v-if="selectedEvent.id && !isInCheckTime">
+			<template v-if="selectedEvent.id && isInCheckTime">
 				<view class="flex-center" style="margin-top:20px;color:#999;">
 					{{isInPunchArea ? '在签到范围' : '不在签到范围'}}
 				</view>
@@ -90,21 +92,24 @@
 </template>
 
 <script setup>
-	import dayjs from "dayjs";
+import dayjs from "dayjs";
 import { ref, onMounted, computed } from 'vue'
 import UserLogin from "@/components/UserLogin.vue";
 import request from "@/utils/request.js"
 import { asyncAlls } from "@/utils/util.js"
 import { getUserAreaScope } from "@/utils/location.js"
+import { checkLocationPermission } from '@/utils/location.js'
 import {
 	onLoad,
+	onUnload,
+	onShow
 } from "@dcloudio/uni-app";
 
 	import {
 		useStore
 	} from "vuex";
 // 使用store
-	const store = useStore();
+const store = useStore();
 const refUserLogin = ref(null);
 	
 const punchInStatus = ref('pending')
@@ -113,8 +118,10 @@ const selectedEvent = ref({})
 
 const currentTime = ref('')
 
+let timerClockTime = null
 function getClockTime() {
-	setInterval(() => {
+	clearInterval(timerClockTime)
+	timerClockTime = setInterval(() => {
 		currentTime.value = uni.$u.timeFormat(new Date(), 'hh:MM:ss');
 		
 		get_isInCheckTime()
@@ -134,7 +141,7 @@ function getEvents () {
 				...item,
 				checkin_start_time: start_time,
 				checkin_end_time: end_time,
-				checkInRangeTime: `${start_time}~${end_time?.slice(11, 16)}`
+				checkInRangeTime: start_time ? `${start_time}~${end_time?.slice(11, 16)}` : null
 			}
 		});
 		eventList.value = res
@@ -166,7 +173,7 @@ function changeEvent(e) {
 	selectedEvent.value = e
 	
 	getCurrentEventSigners()
-	getUserLocation()
+	handleCheckLocation()
 	isShowEventModal.value = false
 	punchInStatus.value = 'pending'
 }
@@ -239,23 +246,20 @@ function signApi (item) {
 }
 
 const isInPunchArea = ref(false)
-async function getUserLocation () {
-	const { checkin_address } =  selectedEvent.value
-	
-	const { lat, long } = checkin_address
-	// 获取起始位置
-	const userLocation = await uni?.getLocation({
-		isHighAccuracy: true,
-		type: "gcj02",
-		altitude: true,
-	});
-	
-	console.log('userLocation====>', userLocation)
-	
-	if (!userLocation.latitude) {
+async function getUserLocation (userLat, userLng) {
+	if (!userLat) {
 		return uni.$u.toast('获取不到用户定位信息')
 	}
-	const UserAreaScope = getUserAreaScope(userLocation.latitude, userLocation.longitude, lat, long)
+	
+	const { checkin_address } =  selectedEvent.value
+	
+	if (!checkin_address.lat) {
+		return console.error('获取不到活动经纬度信息')
+	}
+	
+	const { lat, long } = checkin_address
+	
+	const UserAreaScope = getUserAreaScope(userLat, userLng, lat, long)
 	if (UserAreaScope.isInRange) {
 		console.log("✅ 在打卡范围内（≤500米）");
 		// 触发打卡逻辑
@@ -267,17 +271,45 @@ async function getUserLocation () {
 	}
 }
 
-onLoad(async () => {
+const handleCheckLocation = async () => {
+  try {
+    const result = await checkLocationPermission()
+    console.log('定位权限状态:', result)
+
+    if (result.status === 'granted') {
+      console.log('✅ 定位可用，坐标:', result.location)
+      // 执行打卡、地图等逻辑
+      getUserLocation(result.location.latitude, result.location.longitude)
+    }
+  } catch (error) {
+    console.error('定位检测异常:', error)
+    uni.showToast({ title: '定位功能异常', icon: 'error' })
+  }
+}
+
+// 用户跳出页面开启定位后返回，直接再检查定位
+let isPageLoaded = false
+onShow(() => {
+	if (isPageLoaded) {
+		handleCheckLocation()
+	}
+	
+	isPageLoaded = true
+})
+
+onLoad(() => {
 	getEvents()
 	getClockTime()
+})
+
+onUnload(() => {
+	clearInterval(timerClockTime)
 })
 </script>
 
 <style scoped lang="scss">
 .sign-in-page {
   background-color: #f8f8f8;
-  min-height: 100vh;
-  padding-bottom: 100rpx;
 }
 
 .activity-card {
@@ -414,8 +446,8 @@ onLoad(async () => {
 	.disableButton{
 		::v-deep{
 			.u-button{
-				border-color: #F2F2F2;
-				background: #F2F2F2;
+				border-color: #ddd;
+				background: #ddd;
 				box-shadow: 0rpx 6rpx 12rpx 2rpx #F5F5F5;
 			}
 		}
