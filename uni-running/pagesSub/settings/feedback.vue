@@ -55,7 +55,6 @@
 <script setup>
 import { ref } from "vue";
 import { getCurrentInstance } from "vue";
-import FileUploader from "@/components/common/fileUploader.vue";
 
 // 获取当前实例以访问全局属性
 const { proxy } = getCurrentInstance();

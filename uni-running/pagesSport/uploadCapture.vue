@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<section class="section-form u-flex-row">
-			<FileUploader v-model="ruleForm.picture" isCustom>
+			<FileUpload v-model="ruleForm.picture" isCustom>
 				<template #trigger>
 					<view class="section-upload flex-col-center">
 						<view class="icon">
@@ -11,7 +11,7 @@
 						<view>(上传软件截图或照片)</view>
 					</view>
 				</template>
-			</FileUploader>
+			</FileUpload>
 			<view class="u-ml-30">
 				<view class="cell-item">
 					<view class="label">距离(KM)</view>
@@ -53,7 +53,7 @@
 <script setup>
 	import { ref } from "vue";
 	import { onLoad } from "@dcloudio/uni-app";
-	import FileUploader from "@/components/common/FileUploader.vue";
+	import FileUpload from "@/components/common/FileUpload.vue";
 	import request from "../utils/request";
 	
 	const exerciseInfo = ref({
