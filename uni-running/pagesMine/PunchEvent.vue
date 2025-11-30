@@ -6,7 +6,7 @@
         <image :src="selectedEvent.background_image_url" class="avatar" />
         <view class="info">
           <view class="title">{{selectedEvent.name}}</view>
-          <view v-if="selectedEvent.checkin_start_time" class="time">签到时间: {{selectedEvent.checkin_start_time}} ~ {{selectedEvent.checkin_end_time}}</view>
+          <view class="time">签到时间: {{selectedEvent.checkInRangeTime}}</view>
         </view>
         <u-icon name="arrow-down" color="#999" size="36rpx" />
       </view>
@@ -45,57 +45,68 @@
 		</view>
 
     <!-- 签到按钮 -->
-    <view v-if="selectedEvent.id" 
-			class="sign-button-container flex-center" 
-			:class="{
-				[punchInStatus]: true,
-				isEndEvent: isEndEvent
-			}">
-      <u-button
-				:disabled="isEndEvent"
-        type="primary"
-        shape="circle"
-        :custom-style="{ padding: '80rpx 0', fontSize: '40rpx' }"
-        @click="handleSign"
-      >
-        <view class="btn-text" >
-          <view class="highlight">活动</view>
-          <view class="highlight">
-						<block v-if="isEndEvent">
-							签到已结束
-						</block>
-						<block v-if="!isEndEvent">
-							{{punchInStatus === 'success' ? '签到成功' : '现场签到'}}
-						</block>
-					</view>
-          <view class="signtime">{{ currentTime }}</view>
-        </view>
-      </u-button>
-    </view>
-		
-		<template v-if="selectedEvent.id && isEndEvent">
-			<view class="flex-center" style="margin-top:20px;color:#999;">
-				{{isInPunchArea ? '在签到范围' : '不在签到范围'}}
+    <div class="sign-button-container flex-col-center" v-if="selectedEvent.id">
+			<view 
+				:class="{
+					[punchInStatus]: true,
+					disableButton: !isInCheckTime
+				}">
+			  <u-button
+					:disabled="!isInCheckTime"
+			    type="primary"
+			    shape="circle"
+			    :custom-style="{ padding: '80rpx 0', fontSize: '40rpx' }"
+			    @click="handleSign"
+			  >
+			    <view class="btn-text" >
+			      <view class="highlight">活动</view>
+			      <view class="highlight">
+							<block v-if="!isInCheckTime">
+								不在签到时间
+							</block>
+							<block v-if="isInCheckTime">
+								{{punchInStatus === 'success' ? '签到成功' : '现场签到'}}
+							</block>
+						</view>
+			      <view class="signtime">{{ currentTime }}</view>
+			    </view>
+			  </u-button>
 			</view>
-		</template>
-		
+			
+			<template v-if="selectedEvent.id && !isInCheckTime">
+				<view class="flex-center" style="margin-top:20px;color:#999;">
+					{{isInPunchArea ? '在签到范围' : '不在签到范围'}}
+				</view>
+			</template>
+		</div>
 		
 		<up-action-sheet round="16" 
 			@close="isShowEventModal = false"
 			:actions="eventList" title="请选择活动" 
-			:show="isShowEventModal" @select="changeEvent"></up-action-sheet>
+			:show="isShowEventModal" @select="changeEvent" />
+		
+		<UserLogin ref="refUserLogin" @success="getEvents()"/>
   </view>
 </template>
 
 <script setup>
 	import dayjs from "dayjs";
 import { ref, onMounted, computed } from 'vue'
+import UserLogin from "@/components/UserLogin.vue";
 import request from "@/utils/request.js"
 import { asyncAlls } from "@/utils/util.js"
+import { getUserAreaScope } from "@/utils/location.js"
 import {
 	onLoad,
 } from "@dcloudio/uni-app";
 
+	import {
+		useStore
+	} from "vuex";
+// 使用store
+	const store = useStore();
+const refUserLogin = ref(null);
+	
 const punchInStatus = ref('pending')
 const isShowEventModal = ref(false)
 const selectedEvent = ref({})
@@ -105,6 +116,8 @@ const currentTime = ref('')
 function getClockTime() {
 	setInterval(() => {
 		currentTime.value = uni.$u.timeFormat(new Date(), 'hh:MM:ss');
+		
+		get_isInCheckTime()
 	}, 1000)
 }
 
@@ -114,23 +127,31 @@ function getEvents () {
 		mask: true
 	})
 	request.get(`/event-api/api/v1/events`).then((res) => {
-		res = res.events.map(item => ({
-			...item,
-			checkin_start_time: item.checkin_start_time?.slice(0, 16).replace("T", " "),
-			checkin_end_time: item.checkin_end_time?.slice(11, 16)
-		}));
+		res = res.events.map(item => {
+			const start_time = item.checkin_start_time?.replace("T", " ").slice(0, 16)
+			const end_time = item.checkin_end_time?.replace("T", " ").slice(0, 16)
+			return {
+				...item,
+				checkin_start_time: start_time,
+				checkin_end_time: end_time,
+				checkInRangeTime: `${start_time}~${end_time?.slice(11, 16)}`
+			}
+		});
 		eventList.value = res
 		
 		changeEvent(res[0])
 	});
 };
 
-const isEndEvent = computed(() => {
-	const eventTime = selectedEvent.value.event_time?.slice(0, 16).replace("T", " ");
+// 自动监听时间，即使不刷新，到时间也会让按钮不可点击
+const isInCheckTime = ref(false)
+function get_isInCheckTime() {
+	const now = dayjs()
+	const isBefore = now.isBefore(selectedEvent.value.checkin_end_time)
+	const isAfter = now.isAfter(selectedEvent.value.checkin_start_time)
 	
-	return dayjs(eventTime).isBefore(dayjs())
-})
-
+	isInCheckTime.value = isBefore && isAfter
+}
 
 function selectSigner(item) {
 	item.checked = !item.checked
@@ -152,6 +173,9 @@ function changeEvent(e) {
 
 const participants = ref([])
 const getCurrentEventSigners = () => {
+	if (!store.state.userInfo.id) {
+		return refUserLogin.value.open();
+	}
 	uni.showLoading({
 		mask: true
 	})
@@ -164,6 +188,10 @@ const getCurrentEventSigners = () => {
 
 // 点击签到按钮
 const handleSign = async () => {
+	if (!store.state.userInfo.id) {
+		return refUserLogin.value.open();
+	}
+	
 	if (!isInPunchArea.value) return uni.$u.toast('不在签到范围');
 	
 	let checkedList = participants.value.filter(i => i.status === 'no_check_in').filter(i => i.checked)
@@ -224,13 +252,17 @@ async function getUserLocation () {
 	
 	console.log('userLocation====>', userLocation)
 	
-	if (isInRange(userLocation.latitude, userLocation.longitude, lat, long)) {
+	if (!userLocation.latitude) {
+		return uni.$u.toast('获取不到用户定位信息')
+	}
+	const UserAreaScope = getUserAreaScope(userLocation.latitude, userLocation.longitude, lat, long)
+	if (UserAreaScope.isInRange) {
 		console.log("✅ 在打卡范围内（≤500米）");
 		// 触发打卡逻辑
 		isInPunchArea.value = true;
 	} else {
 		isInPunchArea.value = false;
-		const dist = getDistance(userLocation.latitude, userLocation.longitude, lat, long);
+		const dist = UserAreaScope.distance;
 		console.log(`❌ 距离打卡点 ${dist.toFixed(1)} 米，不在范围内`);
 	}
 }
@@ -239,44 +271,6 @@ onLoad(async () => {
 	getEvents()
 	getClockTime()
 })
-
-/**
- * 计算两个经纬度之间的距离（单位：米）
- * @param {number} lat1 - 用户纬度
- * @param {number} lng1 - 用户经度
- * @param {number} lat2 - 地点纬度
- * @param {number} lng2 - 地点经度
- * @returns {number} 距离（米）
- */
-function getDistance(lat1, lng1, lat2, lng2) {
-  const R = 6371000; // 地球半径，单位：米
-  const toRad = (deg) => deg * Math.PI / 180;
-
-  const dLat = toRad(lat2 - lat1);
-  const dLng = toRad(lng2 - lng1);
-
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-    Math.sin(dLng / 2) * Math.sin(dLng / 2);
-
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c; // 返回距离（米）
-}
-
-/**
- * 判断用户是否在指定地点 500 米范围内
- * @param {number} userLat - 用户纬度
- * @param {number} userLng - 用户经度
- * @param {number} placeLat - 打卡地点纬度
- * @param {number} placeLng - 打卡地点经度
- * @param {number} radius - 半径（默认 500 米）
- * @returns {boolean}
- */
-function isInRange(userLat, userLng, placeLat, placeLng, radius = 500) {
-  const distance = getDistance(userLat, userLng, placeLat, placeLng);
-  return distance <= radius;
-}
 </script>
 
 <style scoped lang="scss">
@@ -398,7 +392,7 @@ function isInRange(userLat, userLng, placeLat, placeLng, radius = 500) {
 			box-shadow: 0rpx 6rpx 12rpx 2rpx #FF8C00;
 		}
 	}
-	&.pending{
+	.pending{
 		::v-deep{
 			.u-button{
 				border-color: #FF8C00;
@@ -407,7 +401,7 @@ function isInRange(userLat, userLng, placeLat, placeLng, radius = 500) {
 			}
 		}
 	}
-	&.success{
+	.success{
 		::v-deep{
 			.u-button{
 				border-color: #8CC63E;
@@ -416,7 +410,8 @@ function isInRange(userLat, userLng, placeLat, placeLng, radius = 500) {
 			}
 		}
 	}
-	&.isEndEvent{
+	
+	.disableButton{
 		::v-deep{
 			.u-button{
 				border-color: #F2F2F2;

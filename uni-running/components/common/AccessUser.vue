@@ -97,7 +97,7 @@ const { proxy } = getCurrentInstance();
 const store = useStore();
 
 // Emits
-const emit = defineEmits(["cancel"]);
+const emit = defineEmits(["cancel", 'success']);
 
 // 响应式数据
 const isShowPop = ref(false);
@@ -198,6 +198,8 @@ const submit = async () => {
     close();
 
     proxy.$toast("更新成功");
+		
+		emit('success')
   });
 };
 
