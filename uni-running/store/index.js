@@ -11,7 +11,6 @@ const store = createStore({
     },
     mutations: {
         set(state, payload) {
-            console.log('payload======>', payload)
             state[payload.type] = payload.data
             uni.setStorageSync(payload.type, payload.data)
         }

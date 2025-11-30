@@ -92,7 +92,6 @@ const props = defineProps({
   },
 });
 
-// Emits
 const emit = defineEmits(["input", "update:modelValue"]);
 
 // 响应式数据
@@ -170,7 +169,6 @@ const afterRead = async (event) => {
     console.log("fileList===========>", fileList.value);
     uni.hideLoading();
     const value = listToString(fileList.value);
-    emit("input", value);
     emit("update:modelValue", value);
   } catch (e) {
     console.error(e);
