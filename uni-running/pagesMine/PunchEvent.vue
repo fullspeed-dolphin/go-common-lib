@@ -48,13 +48,13 @@
 
     <!-- 签到按钮 -->
     <div class="sign-button-container flex-col-center" v-if="selectedEvent.id">
-			<view 
+			<view
 				:class="{
 					[punchInStatus]: true,
-					disableButton: !isInCheckTime
+					disableButton: !canSign
 				}">
 			  <u-button
-					:disabled="!isInCheckTime"
+					:disabled="!canSign"
 			    type="primary"
 			    shape="circle"
 			    :custom-style="{ padding: '80rpx 0', fontSize: '40rpx' }"
@@ -63,10 +63,10 @@
 			    <view class="btn-text" >
 			      <view class="highlight">活动</view>
 			      <view class="highlight">
-							<block v-if="!isInCheckTime">
-								不在签到时间
+							<block v-if="!canSign">
+								{{ disableReason }}
 							</block>
-							<block v-if="isInCheckTime">
+							<block v-else>
 								{{punchInStatus === 'success' ? '签到成功' : '现场签到'}}
 							</block>
 						</view>
@@ -74,10 +74,11 @@
 			    </view>
 			  </u-button>
 			</view>
-			
+
 			<template v-if="selectedEvent.id && isInCheckTime">
 				<view class="flex-center" style="margin-top:20px;color:#999;">
-					{{isInPunchArea ? '在签到范围' : '不在签到范围'}}
+					<template v-if="!locationGranted">未获取定位权限</template>
+					<template v-else>{{isInPunchArea ? '在签到范围' : '不在签到范围'}}</template>
 				</view>
 			</template>
 		</div>
@@ -115,6 +116,7 @@ const refUserLogin = ref(null);
 const punchInStatus = ref('pending')
 const isShowEventModal = ref(false)
 const selectedEvent = ref({})
+const locationGranted = ref(false)  // 位置权限是否已授予
 
 const currentTime = ref('')
 
@@ -156,9 +158,20 @@ function get_isInCheckTime() {
 	const now = dayjs()
 	const isBefore = now.isBefore(selectedEvent.value.checkin_end_time)
 	const isAfter = now.isAfter(selectedEvent.value.checkin_start_time)
-	
+
 	isInCheckTime.value = isBefore && isAfter
 }
+
+// 按钮是否可用：在签到时间内 + 已授权定位 + 在签到范围
+const canSign = computed(() => isInCheckTime.value && locationGranted.value && isInPunchArea.value)
+
+// 按钮不可用的原因提示
+const disableReason = computed(() => {
+	if (!isInCheckTime.value) return '不在签到时间'
+	if (!locationGranted.value) return '未授权定位'
+	if (!isInPunchArea.value) return '不在签到范围'
+	return ''
+})
 
 function selectSigner(item) {
 	item.checked = !item.checked
@@ -198,9 +211,7 @@ const handleSign = async () => {
 	if (!store.state.userInfo.id) {
 		return refUserLogin.value.open();
 	}
-	
-	if (!isInPunchArea.value) return uni.$u.toast('不在签到范围');
-	
+
 	let checkedList = participants.value.filter(i => i.status === 'no_check_in').filter(i => i.checked)
 	if (!checkedList.length) {
 		return uni.$u.toast('请勾选参赛人~')
@@ -278,11 +289,18 @@ const handleCheckLocation = async () => {
 
     if (result.status === 'granted') {
       console.log('✅ 定位可用，坐标:', result.location)
+      locationGranted.value = true
       // 执行打卡、地图等逻辑
       getUserLocation(result.location.latitude, result.location.longitude)
+    } else {
+      // 用户拒绝或未授权
+      locationGranted.value = false
+      isInPunchArea.value = false
     }
   } catch (error) {
     console.error('定位检测异常:', error)
+    locationGranted.value = false
+    isInPunchArea.value = false
     uni.showToast({ title: '定位功能异常', icon: 'error' })
   }
 }
