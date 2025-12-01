@@ -98,6 +98,15 @@
             >查看号码布</u-button
           >
           <u-button
+            v-if="detail?.certificate_url"
+            type="primary"
+            shape="circle"
+            color="#FF8C00"
+            @click="viewCertificate(detail)"
+            >查看完赛证书</u-button
+          >
+          <u-button
+            v-if="!detail?.certificate_url"
             type="primary"
             plain
             shape="circle"
