@@ -47,7 +47,7 @@ const props = defineProps({
     type: String,
     default: "",
   },
-  value: [String, Object, Array],
+  modelValue: [String, Object, Array],
   capture: {
     type: Array,
     default() {
@@ -98,14 +98,14 @@ const emit = defineEmits(["input", "update:modelValue"]);
 const fileList = ref([]);
 const fileTempList = ref([]);
 
-// 监听value变化
+// 监听modelValue变化
 watch(
-  () => props.value,
+  () => props.modelValue,
   (val) => {
     if (val) {
       let temp = 1;
       // 首先将值转为数组
-      const list = Array.isArray(val) ? val : props.value.split(",");
+      const list = Array.isArray(val) ? val : props.modelValue.split(",");
       // 然后将数组转为对象数组
       fileList.value = list.map((item) => {
         if (typeof item === "string") {
