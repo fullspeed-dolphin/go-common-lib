@@ -15,7 +15,7 @@
       @fail="fail"
       upload-icon="plus"
     >
-			<template v-if="isCustom" #trigger>
+			<template #trigger>
 				<slot name="trigger"/>
 			</template>
 		</u-upload>
