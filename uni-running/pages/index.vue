@@ -209,14 +209,11 @@
 	const clickSwiper = (item) => {
 		if (!ensureLogin()) return;
 
-		// 判断是否是特定的轮播图，跳转到其他小程序
-		// 注意：这里假设后端返回的数据中有 id 或 banner_id 字段
-		// 如果字段名不同，请修改 item.id 为实际的字段名
 		if (item.id === '01KA8MPFAF0VBY1G35CVCNC1CW' || item.banner_id === '01KA8MPFAF0VBY1G35CVCNC1CW') {
 			// 跳转到其他小程序
 			uni.navigateToMiniProgram({
 				appId: 'wx42a8cf3627cc70a5',
-				path: '/pages/themes/t3/home/index?stage_code=xp6aC0kldn', // ⚠️ 这里需要替换为实际的页面路径
+				path: '/pages/themes/t3/home/index?stage_code=xp6aC0kldn',
 				extraData: {},
 				envVersion: 'release', // 正式版：release，开发版：develop，体验版：trial
 				success: res => {
