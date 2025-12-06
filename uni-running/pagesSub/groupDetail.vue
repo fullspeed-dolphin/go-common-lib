@@ -153,7 +153,7 @@
 			<!-- 团长才可修改 -->
 			<section v-if="detail.user_role === 'creator'" class="section-bottom">
 				<view style="padding: 0rpx 30rpx 40rpx" class="flex-between-center">
-					<u-button type="primary" color="#f2f2f2" shape="circle" customStyle="height: 80rpx;width: 320rpx;"
+					<u-button type="primary" color="#f2f2f2" shape="circle" customStyle="height: 80rpx;width: 320rpx;color: #FF8C00;"
 						@click="deleteGroup()">删除跑团</u-button>
 					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 320rpx;"
 						@click="updateGroup()">更新跑团</u-button>
