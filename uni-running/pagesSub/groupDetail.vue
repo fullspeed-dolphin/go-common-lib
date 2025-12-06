@@ -276,6 +276,8 @@
 			.then((res) => {
 				res.establish_time = res.establish_time.slice(0, 10);
 				detail.value = res;
+				
+				isEmpty.value = false;
 
 				getMemberList();
 			});
@@ -346,7 +348,7 @@
 							`/running-group/api/v1/groups?group_id=${detail.value.group_id}`
 						)
 						.then((res) => {
-							proxy.$toast("删除成功！");
+							uni.$u.toast("删除成功！");
 
 							// 调用用户数据，检查参加或创建跑团标记
 							store.dispatch("getUserInfo");
@@ -354,7 +356,16 @@
 							setTimeout(() => {
 								uni.navigateBack();
 							}, 300);
-						});
+						}).catch(e => {
+							uni.hideLoading()
+							uni.showModal({
+							  title: '提示',
+							  content: e.msg,
+							  showCancel: false, // 如果不需要“取消”按钮
+							  confirmText: '我知道了'
+							});
+							console.log(e)
+						})
 				} else if (res.cancel) {
 					console.log("用户点击取消");
 				}

@@ -84,16 +84,10 @@
 	import {
 		useStore
 	} from "vuex";
-	import {
-		getCurrentInstance
-	} from "vue";
+
 	import FileUpload from "@/components/common/FileUpload.vue";
 	import dayjs from "dayjs";
-
-	// 获取当前实例以访问全局属性
-	const {
-		proxy
-	} = getCurrentInstance();
+	import request from "@/utils/request.js"
 
 	// 使用store
 	const store = useStore();
@@ -183,8 +177,7 @@
 	const getDetail = (page) => {
 		form.value.phone = store.state.userInfo.phone;
 		if (!group_id.value) return;
-		proxy.$axios
-			.get(`/running-group/api/v1/groups/info?group_id=${group_id.value}`)
+		request.get(`/running-group/api/v1/groups/info?group_id=${group_id.value}`)
 			.then((res) => {
 				form.value = {
 					poster: res.avatar_url,
@@ -235,14 +228,14 @@
 		uForm.value.validate().then((res) => {
 			const token = uni.getStorageSync("token");
 			if (!token) {
-				proxy.$toast("请先登录~");
+				uni.$u.toast("请先登录~");
 				setTimeout(() => {
-					proxy.$goUrl("/pagesSub/login");
+					uni.$u.route("/pagesSub/login");
 				}, 1000);
 				return;
 			}
 
-			if (!isAgree.value) return proxy.$toast("请勾选同意协议");
+			if (!isAgree.value) return uni.$u.toast("请勾选同意协议");
 
 			const data = {
 				avatar_url: form.value.poster,
@@ -264,10 +257,10 @@
 			if (group_id.value) {
 				url = "/running-group/api/v1/groups/update";
 			}
-			proxy.$axios.post(url, data).then(async (res) => {
+			request.post(url, data).then(async (res) => {
 				console.log(res);
 
-				proxy.$toast(group_id.value ? "更新成功" : "创建成功");
+				uni.$u.toast(group_id.value ? "更新成功" : "创建成功");
 
 				const res1 = await store.dispatch("getUserInfo");
 
@@ -281,7 +274,15 @@
 				setTimeout(() => {
 					uni.navigateBack();
 				}, 500);
-			});
+			}).catch(e => {
+				uni.hideLoading()
+				uni.showModal({
+				  title: '提示',
+				  content: e.msg,
+				  showCancel: false, // 如果不需要“取消”按钮
+				  confirmText: '我知道了'
+				});
+			})
 		});
 	};
 </script>
@@ -417,7 +418,6 @@
 		}
 
 		.u-form-item__body__left__content__required {
-			position: static !important;
 			top: 0 !important;
 		}
 
