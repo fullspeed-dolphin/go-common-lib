@@ -119,7 +119,6 @@
         {
           "path": "groupMemberList",
           "style": {
-            "navigationStyle": "custom",
             "navigationBarTitleText": "跑团成员",
             "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
           }

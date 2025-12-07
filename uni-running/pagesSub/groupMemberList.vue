@@ -1,27 +1,12 @@
 <template>
   <view class="">
-    <u-navbar autoBack placeholder title="跑团成员"></u-navbar>
-    <mescroll-uni
-      ref="mescrollRef"
-      @init="mescrollInit"
-      @down="downCallback"
-      @up="getList"
-      top="190"
-    >
-      <view
-        class="member-item flex-start"
-        v-for="(item, index) in dataList"
-        :key="index"
-      >
+    <mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="0">
+      <view class="member-item flex-start" v-for="(item, index) in dataList" :key="index">
         <view class="img-box">
-          <image
-            class="img"
-            :src="
+          <image class="img" :src="
               item.avatar_url ||
               'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
-            "
-            mode="aspectFill"
-          ></image>
+            " mode="aspectFill"></image>
         </view>
         <view class="">
           <view class="mb10" style="color: #222">{{
@@ -75,7 +60,7 @@ const getList = (page) => {
   uni.showLoading({ mask: true });
   const data = {
     pageIndex: page.num - 1,
-    pageSize: 10,
+    pageSize: 15,
     groupId: Number(group_id.value),
   };
 
