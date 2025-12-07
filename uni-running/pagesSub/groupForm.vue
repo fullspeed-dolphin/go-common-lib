@@ -5,7 +5,7 @@
 			<up-form :model="form" ref="uForm" :rules="rules" labelPosition="top" labelWidth="auto">
 				<view class="form-item-uploader">
 					<up-form-item :label="null" prop="poster">
-						<FileUpload v-model="form.poster" >
+						<FileUpload v-model="form.poster" @change="validateField('poster')">
 							<template #trigger>
 								<view class="section-upload flex-col-center">
 									<view class="icon">
@@ -18,26 +18,30 @@
 				</view>
 
 				<up-form-item label="跑团名称" prop="name" required>
-					<u-input v-model="form.name" placeholder="请输入名称" />
+					<input v-model="form.name" class="u-input" @input="validateField('name')" maxlength="50" placeholder="请输入名称" />
 				</up-form-item>
 				<up-form-item label="跑团详情" prop="description" labelPosition="top" required>
-					<u-textarea v-model="form.description" :height="110" maxlength="150" placeholder="请填写跑团详情" count></u-textarea>
+					<view class="" style="position: relative;">
+						<textarea v-model="form.description" class="u-input" @input="validateField('description')" :height="110" maxlength="150" placeholder="请填写跑团详情" count></textarea>
+						<view class="" style="position: absolute;right:10rpx;bottom:10rpx;font-size: 24rpx;color: #999;">
+							{{form.description.length}}/150
+						</view>
+					</view>
 				</up-form-item>
-
 				<up-form-item label="跑团地址" prop="location" required>
 					<view class="select" @click="handleChooseLocation">
-						<u-input v-model="form.location" readonly placeholder="请选择地址" />
+						<input v-model="form.location" class="u-input" readonly placeholder="请选择地址" />
 						<view class="arrow-right">
 							<u-icon name="arrow-right" size="20" color="#707070" />
 						</view>
 					</view>
 				</up-form-item>
 				<up-form-item label="成立时间" prop="establish_time">
-					<up-datetime-picker hasInput v-model="establishTimeTimestamp" mode="date" cancelText="取消" confirmText="确认"
+					<up-datetime-picker hasInput sharp="circle" v-model="establishTimeTimestamp" mode="date" cancelText="取消" confirmText="确认"
 						confirmColor="#FF8C00" @confirm="onEstablishTimeConfirm">
 						<template #trigger="{ value }">
 							<view class="select">
-								<u-input :modelValue="value || ''" placeholder="请选择成立时间" readonly />
+								<view placeholder="请选择成立时间" class="u-input flex-start" readonly >{{value || '请选择成立时间'}}</view>
 								<view class="arrow-right">
 									<u-icon name="arrow-right" size="20" color="#707070" />
 								</view>
@@ -45,14 +49,11 @@
 						</template>
 					</up-datetime-picker>
 				</up-form-item>
-				<!-- <up-form-item label="成员数量" prop="amount" required>
-					<u-input v-model="form.amount" type="digit" placeholder="请输入成员数量" />
-				</up-form-item> -->
 				<up-form-item label="真实姓名" prop="fullName" required>
-					<u-input v-model="form.fullName" placeholder="请输入您的真实姓名" />
+					<input v-model="form.fullName" class="u-input" @input="validateField('fullName')" maxlength="50" placeholder="请输入您的真实姓名" />
 				</up-form-item>
 				<up-form-item label="联系电话" prop="phone" required>
-					<u-input v-model="form.phone" placeholder="请输入您的联系电话" />
+					<input v-model="form.phone" class="u-input" @input="validateField('phone')" maxlength="11" placeholder="请输入您的联系电话" />
 				</up-form-item>
 			</up-form>
 
@@ -109,21 +110,10 @@
 		establish_time: dayjs().valueOf(),
 	});
 	const isAgree = ref(false);
-
-	// 监听 poster 变化，自动触发验证
-	watch(
-		() => form.value.poster,
-		(newVal) => {
-			if (newVal) {
-				// 延迟触发验证，确保值已更新
-				nextTick(() => {
-					if (uForm.value) {
-						uForm.value.validateField("poster", () => {}, "change");
-					}
-				});
-			}
-		}
-	);
+	
+	function validateField(propName) {
+		uForm.value.validateField(propName, () => {}, "change");
+	}
 
 	const rules = ref({
 		poster: [{
@@ -141,11 +131,6 @@
 			message: "必填项",
 			trigger: ["blur", "change"],
 		}, ],
-		// amount: [{
-		// 	required: true,
-		// 	message: '必填项',
-		// 	trigger: ['blur', 'change']
-		// }],
 		fullName: [{
 			required: true,
 			message: "必填项",
@@ -199,6 +184,8 @@
 			success: (res) => {
 				console.log(res, "返回地址");
 				form.value.location = res.address;
+				
+				validateField('location')
 			},
 			fail: (e) => {
 				console.log(e, "选择地址失败");
@@ -426,25 +413,17 @@
 			margin-top: 6rpx;
 		}
 
-		.u-border,
-		.u-input {
-			border: 0;
-		}
-
-		.u-textarea {
-			padding-bottom: 40rpx;
-			// padding-left:0;
-			// padding-right:0;
-		}
-
 		.pickermap,
-		.u-textarea,
 		.u-input {
-			border: 0;
+			width: 682rpx;
+			font-size: 26rpx;
+			padding: 20rpx;
 			border-radius: 16rpx;
 			min-height: 100rpx;
 			background: #ffffff;
+			font-weight: bold !important;
 			border: 2rpx solid rgba(0, 0, 0, 0.06);
+			box-sizing: border-box;
 		}
 
 		// .u-form-item__body{
@@ -514,6 +493,9 @@
 	}
 	
 	::v-deep {
+		.u-popup__content{
+			border-radius: 20rpx 20rpx 0 0;
+		}
 		.section-upload {
 			width: 200rpx;
 			height: 200rpx;
