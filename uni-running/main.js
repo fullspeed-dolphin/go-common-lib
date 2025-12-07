@@ -14,6 +14,8 @@ export function createApp() {
     app.mixin(pageScrollMixin)
     app.use(store)
     app.use(uviewPlus)
+		
+		console.log(uni.$u)
     
     // 配置全局属性
     app.config.globalProperties.$toast = toast

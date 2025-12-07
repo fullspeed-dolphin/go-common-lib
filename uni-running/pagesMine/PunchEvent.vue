@@ -98,8 +98,7 @@ import { ref, onMounted, computed } from 'vue'
 import UserLogin from "@/components/UserLogin.vue";
 import request from "@/utils/request.js"
 import { asyncAlls } from "@/utils/util.js"
-import { getUserAreaScope } from "@/utils/location.js"
-import { checkLocationPermission } from '@/utils/location.js'
+import { checkLocationPermission, getUserAreaScope } from './assets/location.js'
 import {
 	onLoad,
 	onUnload,

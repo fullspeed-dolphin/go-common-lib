@@ -448,7 +448,7 @@ import { reactive, ref, watch, computed, nextTick, onMounted } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import Navbar from "@/components/navbar.vue";
 import dayjs from "dayjs";
-import { pinyin } from "pinyin-pro";
+import { pinyin } from "../utils/pinyin-pro";
 import {
   loadProvinceData,
   loadCityData,

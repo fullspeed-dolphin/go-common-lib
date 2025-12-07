@@ -7,9 +7,9 @@
 import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { getCurrentInstance } from 'vue'
-import agree_signUp from "@/utils/agree_signUp.js"
-import agree_privy from "@/utils/agree_privy.js"
-import baoxian from "@/utils/baoxian.js"
+import agree_signUp from "../utils/agree_signUp.js"
+import agree_privy from "../utils/agree_privy.js"
+import baoxian from "../utils/baoxian.js"
 
 // 获取当前实例以访问全局属性
 const { proxy } = getCurrentInstance()
