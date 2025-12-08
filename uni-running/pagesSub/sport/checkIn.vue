@@ -50,6 +50,25 @@
         </view>
       </view>
 
+      <!-- 运动数据 -->
+      <view class="sport-data-section" v-if="sportData.distance || sportData.duration || sportData.pace">
+        <view class="sport-data-title">{{ selectedDate }} 运动数据</view>
+        <view class="sport-data-list">
+          <view class="sport-data-item">
+            <view class="sport-data-value">{{ sportData.distance || '--' }}</view>
+            <view class="sport-data-label">公里数(KM)</view>
+          </view>
+          <view class="sport-data-item">
+            <view class="sport-data-value">{{ sportData.duration || '--' }}</view>
+            <view class="sport-data-label">时间</view>
+          </view>
+          <view class="sport-data-item">
+            <view class="sport-data-value">{{ sportData.pace || '--' }}</view>
+            <view class="sport-data-label">配速</view>
+          </view>
+        </view>
+      </view>
+
       <!-- 任务模块 -->
       <view
         class="task-section"
@@ -228,17 +247,15 @@ const nextMonth = () => {
   loadCheckInData();
 };
 
+// 选中的日期
+const selectedDate = ref(dayjs().format("YYYY-MM-DD"));
+
 // 点击日期
 const handleDayClick = (day) => {
   if (day.otherMonth) return;
 
-  const record = checkInRecords.value.find(
-    (item) => item.date === day.fullDate
-  );
-
-  if (record?.id) {
-    goToSportDetail(record.id);
-  }
+  selectedDate.value = day.fullDate;
+  loadSportDataByDate(day.fullDate);
 };
 
 // 加载打卡数据
@@ -296,8 +313,16 @@ const loadTaskList = async () => {
 };
 
 const sportId = ref(null);
-// 加载运动数据
-const loadSportData = async () => {
+
+// 运动数据
+const sportData = ref({
+  distance: '',
+  duration: '',
+  pace: ''
+});
+
+// 根据日期加载运动数据
+const loadSportDataByDate = async (date) => {
   uni.showLoading({
     title: "加载中...",
     mask: true,
@@ -305,10 +330,20 @@ const loadSportData = async () => {
 
   try {
     const res = await request.get(`/sport-api/api/manual/getRecordByDate`, {
-      date: dayjs().format("YYYY-MM-DD"),
+      date: date,
     });
 
     sportId.value = res?.length ? res[0]?.id : null;
+
+    // 填充运动数据
+    if (res?.length && res[0]) {
+      const record = res[0];
+      sportData.value.distance = record.km || '';
+      sportData.value.duration = record.time || '';
+      sportData.value.pace = record.speed || '';
+    } else {
+      sportData.value = { distance: '', duration: '', pace: '' };
+    }
 
     console.log("sportId======>", sportId.value, res);
   } catch (error) {
@@ -317,6 +352,11 @@ const loadSportData = async () => {
   } finally {
     uni.hideLoading();
   }
+};
+
+// 加载运动数据（默认加载今天）
+const loadSportData = () => {
+  loadSportDataByDate(dayjs().format("YYYY-MM-DD"));
 };
 
 const goToSportDetail = (id) => {
@@ -468,6 +508,46 @@ onMounted(() => {
       font-weight: bold;
     }
   }
+}
+
+// 今日运动数据模块
+.sport-data-section {
+  background: #ffffff;
+  border-radius: 16rpx;
+  border: 2rpx solid rgba(0, 0, 0, 0.06);
+  padding: 30rpx 26rpx;
+  margin-bottom: 30rpx;
+}
+
+.sport-data-title {
+  font-weight: bold;
+  font-size: 32rpx;
+  color: #111827;
+  margin-bottom: 30rpx;
+}
+
+.sport-data-list {
+  display: flex;
+  justify-content: space-between;
+}
+
+.sport-data-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sport-data-value {
+  font-weight: bold;
+  font-size: 40rpx;
+  color: #ff8c00;
+  margin-bottom: 12rpx;
+}
+
+.sport-data-label {
+  font-size: 24rpx;
+  color: #999999;
 }
 
 // 任务模块
