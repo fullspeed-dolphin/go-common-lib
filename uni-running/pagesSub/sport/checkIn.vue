@@ -40,7 +40,8 @@
             :class="{
               'other-month': day.otherMonth,
               'has-checkin': day.hasCheckin,
-              today: day.isToday,
+              'today': day.isToday,
+              'selected': day.fullDate === selectedDate,
             }"
             @click="handleDayClick(day)"
           >
@@ -70,36 +71,21 @@
       </view>
 
       <!-- 任务模块 -->
-      <view
-        class="task-section"
-        v-if="sportId"
-        @click="goToSportDetail(sportId)"
-      >
+      <view class="task-section">
         <view class="task-title">赚得跑币</view>
         <view class="task-list">
-          <view
-            class="task-item"
-            v-for="(task, index) in taskList"
-            :key="index"
-          >
+          <view class="task-item">
             <view class="task-icon-wrapper">
               <image
                 class="task-icon"
-                :src="task.icon"
+                :src="taskList[0].icon"
                 mode="aspectFill"
               ></image>
             </view>
             <view class="task-content">
-              <view class="task-header">
-                <text class="task-name">{{ task.name }}</text>
-                <text class="task-progress" v-if="task.progress">{{
-                  task.progress
-                }}</text>
-              </view>
-              <view class="task-desc">{{ task.description }}</view>
+              <view class="task-coming-soon">全速体育即将推出的打卡送跑币功能，敬请期待</view>
             </view>
             <view class="task-reward">
-              <text class="reward-amount">+{{ task.reward }}</text>
               <image
                 class="reward-icon"
                 src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-coin-check-in@2x.png"
@@ -508,6 +494,23 @@ onMounted(() => {
       font-weight: bold;
     }
   }
+
+  &.selected {
+    border: 4rpx solid #ff8c00;
+    border-radius: 50%;
+
+    .day-number {
+      color: #ff8c00;
+      font-weight: bold;
+    }
+  }
+
+  // 选中 + 有打卡记录
+  &.selected.has-checkin {
+    background: #fff5e6;
+    border: 4rpx solid #ff8c00;
+    border-radius: 50%;
+  }
 }
 
 // 今日运动数据模块
@@ -630,6 +633,12 @@ onMounted(() => {
   font-size: 20rpx;
   color: #b0b0b0;
   line-height: 48rpx;
+}
+
+.task-coming-soon {
+  font-size: 26rpx;
+  color: #999;
+  line-height: 1.5;
 }
 
 .task-reward {

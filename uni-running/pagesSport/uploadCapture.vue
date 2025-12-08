@@ -6,7 +6,7 @@
 					<template #trigger>
 						<view class="section-upload flex-col-center">
 							<view class="icon">
-								<up-icon name="plus" color="#E3E3E3" size="86rpx"></up-icon>
+								<up-icon name="plus" color="#FF8C00" size="86rpx"></up-icon>
 							</view>
 							<view>上传打卡</view>
 							<view>(上传软件截图或照片)</view>
@@ -33,10 +33,12 @@
 			</view>
 		</section>
 
-		<u-button type="primary" @click="submitForm()" customStyle="width:640rpx; margin: 60rpx auto 30rpx" color="#FF8C00"
+		<u-button v-if="isCheckInSuccess" type="primary" @click="goBack()" customStyle="width:640rpx; margin: 60rpx auto 30rpx" color="#FF8C00"
 			shape="circle">
-			上传打卡
+			返回运动页
 		</u-button>
+
+		<view class="powered-by">Powered By Payeco AI</view>
 	</view>
 </template>
 <script setup>
@@ -50,6 +52,9 @@
 		duration: '',
 		pace: ''
 	})
+
+	// 打卡是否成功
+	const isCheckInSuccess = ref(false);
 
 	// 图片上传成功后调用OCR识别
 	const onImageUploaded = async (imageUrl) => {
@@ -65,18 +70,41 @@
 				image_url: imageUrl
 			});
 
-			// 将识别结果填入
-			if (res) {
-				exerciseInfo.value.distance = res.km || '';
-				exerciseInfo.value.duration = res.time || '';
-				exerciseInfo.value.pace = res.speed || '';
-			}
-
 			uni.hideLoading();
+
+			// 校验返回数据是否有效（不为空、不为0）
+			const isValidData = res &&
+				res.km && res.km !== '0' && res.km !== '0.00' &&
+				res.time && res.time !== '00:00' && res.time !== '00:00:00' &&
+				res.speed;
+
+			if (isValidData) {
+				// 将识别结果填入
+				exerciseInfo.value.distance = res.km;
+				exerciseInfo.value.duration = res.time;
+				exerciseInfo.value.pace = res.speed;
+
+				isCheckInSuccess.value = true;
+				uni.showToast({
+					title: '打卡成功',
+					icon: 'success',
+					mask: true
+				});
+			} else {
+				uni.showToast({
+					title: '识别失败',
+					icon: 'error',
+					mask: true
+				});
+			}
 		} catch (error) {
 			uni.hideLoading();
 			console.error('OCR识别失败:', error);
-			uni.$u.toast('识别失败，请重试');
+			uni.showToast({
+				title: '识别失败',
+				icon: 'error',
+				mask: true
+			});
 		}
 	};
 
@@ -88,30 +116,9 @@
 		phone: "",
 	});
 
-	const submitForm = () => {
-		const token = uni.getStorageSync("token");
-		if (!token) {
-			uni.$u.toast("请先登录~");
-			setTimeout(() => {
-				uni.$u.route("/pagesSub/login");
-			}, 1000);
-			return;
-		}
-
-		const data = {
-			activity: ruleForm.value.activity,
-		};
-		uni.showLoading({
-			mask: true,
-		});
-
-		request.post(`/running-group/api/v1/groups/update`, data).then(async (res) => {
-			uni.$u.toast("");
-
-			setTimeout(() => {
-				uni.navigateBack();
-			}, 500);
-		});
+	// 返回运动页
+	const goBack = () => {
+		uni.navigateBack();
 	};
 </script>
 
@@ -168,19 +175,32 @@
 		.section-upload {
 			width: 448rpx;
 			height: 790rpx;
-			background: #FFFFFF;
+			background: #FFF8F0;
 			border-radius: 16rpx 16rpx 16rpx 16rpx;
-			border: 2rpx dashed #ccc;
+			border: 2rpx dashed #FF8C00;
 			line-height: 40rpx;
-			color: #999;
+			color: #FF8C00;
 
 			.icon {
 				margin-bottom: 42rpx;
 			}
 
 			.u-icon__icon {
-				color: #ccc;
+				color: #FF8C00;
 			}
 		}
+	}
+
+	.powered-by {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		text-align: center;
+		color: #FF8C00;
+		font-size: 24rpx;
+		padding: 30rpx 0;
+		padding-bottom: calc(30rpx + env(safe-area-inset-bottom));
+		background: transparent;
 	}
 </style>
