@@ -30,9 +30,10 @@ function fetch(options) {
 				const response = res?.data;
 				
 				// #ifdef MP-WEIXIN
-					console.log("接口 url======>", options.url)
-					console.log("接口 reqParams======>", options.data)
+					console.log('\n')
+					console.log("接口 url======>", options.url, " ", options.data)
 					console.log("接口 res======>", response)
+					console.log('\n')
 				// #endif
 				
 				// 登录过期
