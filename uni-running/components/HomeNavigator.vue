@@ -1,5 +1,5 @@
 <template>
-	<view class="menu" v-if="isRelease">
+	<view class="menu">
 		<view class="menu-item" v-for="(item, index) in navList" :key="index" @click="routeTo(item)">
 			<view class="menu-item-bg">
 				<image class="menu-item-icon" :src="item.icon_url" mode="aspectFill"></image>
