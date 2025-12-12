@@ -60,6 +60,7 @@ onPageScroll((e) => {
 @import "@/uni_modules/uview-plus/theme.scss";
 @import "@/uni_modules/uview-plus/index.scss";
 @import "./assets/style/common.scss";
+@import "./static/iconfont.css";
 @import "./assets/style/theme.scss";
 
 // 全局样式：表单错误提示右对齐

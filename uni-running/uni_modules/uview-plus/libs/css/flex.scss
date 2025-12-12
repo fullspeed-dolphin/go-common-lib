@@ -10,11 +10,11 @@
 // 	@include vue-flex(column);
 // }
 
-// .u-flex-xy-center {
-// 	@include vue-flex(row);
-// 	justify-content: center;
-// 	align-items: center;
-// }
+.u-flex-xy-center {
+	display:flex;
+	justify-content: center;
+	align-items: center;
+}
 
 // .u-flex-x-center {
 // 	@include vue-flex(row);

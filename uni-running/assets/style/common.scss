@@ -580,8 +580,8 @@ cover-view {
     color: #fff !important;
   }
 }
-.u-form-item__body__left__content__label {
-  font-weight: bold !important;
-  font-size: 30rpx !important;
-  color: #000000 !important;
+.u-form-item .u-form-item__body__left__content__label {
+  font-weight: bold;
+  font-size: 30rpx;
+  color: #000000;
 }
