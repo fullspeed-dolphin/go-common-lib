@@ -3,10 +3,10 @@
 		<section class="section-search u-flex">
 			<u-search v-model="searchTxt" @search="refreshList" placeholder="请输入赛事名称" shape="round" bgColor="#fff"
 				borderColor="#FF8C00" :showAction="false"></u-search>
-			<view class="u-flex-xy-center iconfont icon-sheyingshiguanli" 
+			<!-- <view class="u-flex-xy-center iconfont icon-sheyingshiguanli" 
 				@click="$u.route('pagesDashboard/eventAlbum/contractForm')" 
 				style="width: 84rpx;font-size: 47rpx;font-family: 500;color:#707070;">
-			</view>
+			</view> -->
 		</section>
 		<mescroll-uni ref="mescrollRef" @init="e => mescroll = e" @down="e => e.resetUpScroll()" @up="getList" top="100">
 			<view class="card-item bgf u-flex" v-for="item in dataList" :key="item.id" @click="viewDetail(item)">
@@ -102,7 +102,7 @@
 	.section-search{
 		position: relative;
 		z-index: 10;
-		padding: 20rpx 0 20rpx 34rpx;
+		padding: 20rpx 34rpx;
 		background: #fafafa;
 	}
 	

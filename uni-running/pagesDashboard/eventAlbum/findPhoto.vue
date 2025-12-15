@@ -1,4 +1,5 @@
 <template>
+	<up-popup :show="show" @close="close" @open="open">
 	<view class="flex-col-center">
 		<view class="" style="font-weight: bold;color: #979797;margin-top:70rpx;">
 			请点击上传或更换您的头像<text style="color: #E53935;">（必选）</text>
@@ -35,13 +36,33 @@ color: #E53935;">
 			承担<text style="color:#43A047">《特别提示》</text>中的法律责任。
 		</view>
 	</view>
+		</up-popup>
 </template>
 
 <script setup>
 	import {
 		ref
 	} from "vue";
-
+	
+	// Emits
+	const emit = defineEmits(["open"]);
+	
+	// 创建响应式数据  
+	const show = ref(false);
+	  
+	// 定义方法  
+	function open() {  
+	  // 打开逻辑，比如设置 show 为 true  
+	  show.value = true;  
+	  // console.log('open');  
+	}  
+	  
+	function close() {  
+	  // 关闭逻辑，设置 show 为 false  
+	  show.value = false;  
+	  // console.log('close');  
+	} 
+	
 	import request from "@/utils/request.js"
 
 	const searchTxt = ref("")
@@ -93,6 +114,12 @@ color: #E53935;">
 				mescroll.value.endSuccess();
 			});
 	};
+	
+	// 暴露方法给父组件
+	defineExpose({
+	  open,
+	  close,
+	});
 </script>
 
 <style lang="scss" scoped>

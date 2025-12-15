@@ -12,15 +12,15 @@
 
 			<section class="section-btns u-flex-xy-center" style="width:580rpx;margin: 24rpx auto ;">
 				<up-button type="primary" 
-					@click="$u.route('pagesDashboard/eventAlbum/findPhoto')"
+					@click="refFindPhoto.open()"
 					customStyle="width: 298rpx;font-size: 24rpx;height: 82rpx;">
 					<text class="iconfont icon-saomiaorenlian u-mr-10"></text>
 					查找照片和视频
 				</up-button>
-				<up-button type="info" plain openType="share" customStyle="width: 204rpx;font-size: 24rpx;color:#FF8C00;height: 82rpx;">
+				<!-- <up-button type="info" plain openType="share" customStyle="width: 204rpx;font-size: 24rpx;color:#FF8C00;height: 82rpx;">
 					<text class="iconfont icon-fenxiang u-mr-10"></text>
 					分享照片
-				</up-button>
+				</up-button> -->
 			</section>
 
 			<section class="section-tabs u-flex-y-center">
@@ -39,10 +39,13 @@
 				</view>
 			</section>
 		</mescroll-uni>
+		
+		<FindPhoto ref="refFindPhoto"/>
 	</view>
 </template>
 
 <script setup>
+	import FindPhoto from "./components/FindPhoto.vue"
 	import {
 		ref,
 	} from "vue";
@@ -51,6 +54,8 @@
 		onLoad,
 		onShareAppMessage,
 	} from "@dcloudio/uni-app";
+	
+	const refFindPhoto = ref(null)
 
 	import request from "@/utils/request.js"
 
