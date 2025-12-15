@@ -173,6 +173,22 @@
 				  </template>
 				</u-cell>
 
+				<u-cell
+				  title="关注全速体育"
+				  class="nav-cell"
+				  @click="openOfficialAccount"
+				  :border="false"
+				  isLink
+				>
+				  <template #icon>
+				    <image
+				      class="nav-icon"
+				      style="width: 40rpx; height: 40rpx"
+				      src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/wechat-logo.png"
+				    ></image>
+				  </template>
+				</u-cell>
+
         <!-- <u-cell title="意见反馈" class="nav-cell" @click="routeTo('/pagesSub/settings/feedback')" :border="false" isLink>
 					<template #icon>
 						<image class="nav-icon" src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/帮助反馈Icon@2x.png"></image>
@@ -264,6 +280,31 @@ const logout = () => {
       }
     },
   });
+};
+
+const openOfficialAccount = () => {
+  // #ifdef MP-WEIXIN
+  wx.openOfficialAccountProfile({
+    username: 'gh_7234583f8d1b',
+    success: (res) => {
+      console.log('打开公众号成功', res);
+    },
+    fail: (err) => {
+      console.error('打开公众号失败', err);
+      uni.showToast({
+        title: '打开公众号失败',
+        icon: 'none'
+      });
+    }
+  });
+  // #endif
+
+  // #ifndef MP-WEIXIN
+  uni.showToast({
+    title: '仅支持微信小程序',
+    icon: 'none'
+  });
+  // #endif
 };
 </script>
 
