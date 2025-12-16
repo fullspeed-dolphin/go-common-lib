@@ -9,13 +9,13 @@
 			</view> -->
 		</section>
 		<mescroll-uni ref="mescrollRef" @init="e => mescroll = e" @down="e => e.resetUpScroll()" @up="getList" top="100">
-			<view class="card-item bgf u-flex" v-for="item in dataList" :key="item.id" @click="viewDetail(item)">
-				<up-lazy-load class="img" borderRadius="16" :image="item.background_image_url" mode="aspectFill" />
+			<view class="card-item bgf u-flex" v-for="item in dataList" :key="item.event_id" @click="viewDetail(item)">
+				<up-lazy-load class="img" borderRadius="16" :image="item.image_url" mode="aspectFill" />
 				
 				<view class="" style="width:510rpx;margin-left:12rpx;">
 					<view class="u-flex">
 						<view class="title ellipsis2 mb15" style="width:420rpx;line-height: 1.2;">
-							{{item.name}}
+							{{item.description}}
 						</view>
 						<view class="ml5">2345张</view>
 					</view>
@@ -51,7 +51,7 @@
 
 	// 方法定义
 	const viewDetail = (item) => {
-		uni.$u.route(`pagesDashboard/eventAlbum/albumDetail?id=${item.id}`);
+		uni.$u.route(`pagesDashboard/eventAlbum/albumDetail?id=${item.event_id}`);
 	};
 	
 	let mescroll = ref(null);
@@ -73,22 +73,25 @@
 			pageSize: 10,
 			keyword: searchTxt.value
 		};
-		
-		request.get(`/event-api/api/v1/events`, params).then((res) => {
+
+		request.get(`/event-api/getOfflineEventSwiper`, params).then((res) => {
 				//如果是第一页需手动制空列表
 				if (page.num == 1) dataList.value = []
-				
-				res = res.events.map(item => {
+
+				const events = res.map(item => {
 					return {
-						...item,
-						event_time: item.event_time?.replace("T", " ").slice(0, 10),
+						event_id: item.event_id,
+						description: item.description,
+						image_url: item.image_url,
+						event_time: item.event_time.slice(0, 10),
+						event_location: item.event_location
 					}
 				});
 
-				dataList.value = dataList.value.concat(res)
-				
+				dataList.value = dataList.value.concat(events)
+
 				//隐藏下拉刷新和上拉加载的状态;
-				mescroll.value.endSuccess(res.length);
+				mescroll.value.endSuccess(events.length);
 			})
 			.catch((error) => {
 				console.log(error)

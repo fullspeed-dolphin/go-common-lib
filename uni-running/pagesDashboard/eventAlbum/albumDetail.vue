@@ -2,7 +2,7 @@
 	<view>
 		<mescroll-uni ref="mescrollRef" @init="e => mescroll = e" @down="e => e.resetUpScroll()" @up="getList" top="0">
 			<section class="section-banner">
-				<up-lazy-load class="img" v-if="dataList[0]" :image="dataList[0].background_image_url" mode="aspectFill" />
+				<up-lazy-load class="img" v-if="currentEvent" :image="currentEvent.image_url" mode="aspectFill" />
 				<view class="summary">
 					<view class="item u-flex-y-center">照片 2346</view>
 					<view class="item u-flex-y-center">视频 2346</view>
@@ -34,8 +34,8 @@
 			</section>
 
 			<section class="u-flex-wrap u-flex" style="gap: 10rpx;padding: 0 34rpx;">
-				<view class="card-item" v-for="item in dataList" :key="item.id" @click="viewDetail(item)">
-					<up-lazy-load class="img" height="507" :image="item.background_image_url" mode="aspectFill" />
+				<view class="card-item" v-for="item in dataList" :key="item.event_id" @click="viewDetail(item)">
+					<up-lazy-load class="img" height="507" :image="item.image_url" mode="aspectFill" />
 				</view>
 			</section>
 		</mescroll-uni>
@@ -54,16 +54,18 @@
 		onLoad,
 		onShareAppMessage,
 	} from "@dcloudio/uni-app";
-	
+
 	const refFindPhoto = ref(null)
 
 	import request from "@/utils/request.js"
 
 	const tabActive = ref('photo')
+	const currentEvent = ref(null)
+	let eventId = ''
 
 	// 方法定义
 	const viewDetail = (item) => {
-		uni.$u.route(`pagesDashboard/eventAlbum/albumDetail?id=${item.id}`);
+		uni.$u.route(`pagesDashboard/eventAlbum/albumDetail?id=${item.event_id}`);
 	};
 
 	let mescroll = ref(null);
@@ -86,21 +88,38 @@
 			keyword: ''
 		};
 
-		request.get(`/event-api/api/v1/events`, params).then((res) => {
+		request.get(`/event-api/getOfflineEventSwiper`, params).then((res) => {
 				//如果是第一页需手动制空列表
 				if (page.num == 1) dataList.value = []
 
-				res = res.events.map(item => {
+				// 找到当前活动
+				if (eventId && !currentEvent.value) {
+					const event = res.find(item => item.event_id === eventId)
+					if (event) {
+						currentEvent.value = {
+							event_id: event.event_id,
+							description: event.description,
+							image_url: event.image_url,
+							event_time: event.event_time.slice(0, 10),
+							event_location: event.event_location
+						}
+					}
+				}
+
+				const events = res.map(item => {
 					return {
-						...item,
-						event_time: item.event_time?.replace("T", " ").slice(0, 10),
+						event_id: item.event_id,
+						description: item.description,
+						image_url: item.image_url,
+						event_time: item.event_time.slice(0, 10),
+						event_location: item.event_location
 					}
 				});
 
-				dataList.value = dataList.value.concat(res)
+				dataList.value = dataList.value.concat(events)
 
 				//隐藏下拉刷新和上拉加载的状态;
-				mescroll.value.endSuccess(res.length);
+				mescroll.value.endSuccess(events.length);
 			})
 			.catch((error) => {
 				console.log(error)
@@ -111,6 +130,8 @@
 
 	// 页面加载
 	onLoad((options) => {
+		eventId = options.id || ''
+
 		// #ifdef MP-WEIXIN
 		wx.showShareMenu({
 			withShareTicket: true,
