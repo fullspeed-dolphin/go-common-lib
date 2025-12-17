@@ -87,6 +87,29 @@ onMounted(() => {
 		line-height: 20px;
 		font-size: 20px;
 	}
+	::v-deep {
+		.u-form-item {
+			position: relative;
+			&:last-child:after{
+				display: none;
+			}
+			&:after {
+				position: absolute;
+				box-sizing: border-box;
+				-webkit-transform-origin: center;
+				transform-origin: center;
+				content: " ";
+				pointer-events: none;
+				top: -50%;
+				right: -50%;
+				bottom: -50%;
+				left: -50%;
+				border-bottom: 1px solid #eee;
+				-webkit-transform: scale(.5);
+				transform: scale(.5)
+			}
+		}
+	}
 	:deep(.u-form-item__body__left__content){
 		flex-direction: row-reverse!important;
 		justify-content: flex-end!important;
