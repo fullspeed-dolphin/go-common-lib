@@ -51,7 +51,12 @@
 
 	// 方法定义
 	const viewDetail = (item) => {
-		uni.$u.route(`pagesDashboard/eventAlbum/albumDetail?id=${item.event_id}`);
+		uni.$u.route({
+			url: `pagesDashboard/eventAlbum/albumDetail`,
+			params: {
+				...item
+			}
+		});
 	};
 	
 	let mescroll = ref(null);
@@ -78,7 +83,7 @@
 				//如果是第一页需手动制空列表
 				if (page.num == 1) dataList.value = []
 
-				const events = res.map(item => {
+				res = res.map(item => {
 					return {
 						event_id: item.event_id,
 						description: item.description,
@@ -88,10 +93,10 @@
 					}
 				});
 
-				dataList.value = dataList.value.concat(events)
+				dataList.value = dataList.value.concat(res)
 
 				//隐藏下拉刷新和上拉加载的状态;
-				mescroll.value.endSuccess(events.length);
+				mescroll.value.endSuccess(res.length);
 			})
 			.catch((error) => {
 				console.log(error)

@@ -4,12 +4,13 @@ page {
   -webkit-overflow-scrolling: touch;
   box-sizing: border-box;
   // padding-bottom: env(safe-area-inset-bottom);
-  max-width: 640px;
+  max-width: 640PX;
   margin: 0 auto;
   color: #000;
   background: #fafafa;
   font-family: PingFang SC, PingFang SC;
 }
+
 .container {
   padding: 0 34rpx;
   box-sizing: border-box;

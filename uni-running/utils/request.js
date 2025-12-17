@@ -33,7 +33,6 @@ function fetch(options) {
 					console.log('\n')
 					console.log("接口 url======>", options.url, " ", options.data)
 					console.log("接口 res======>", response)
-					console.log('\n')
 				// #endif
 				
 				// 登录过期

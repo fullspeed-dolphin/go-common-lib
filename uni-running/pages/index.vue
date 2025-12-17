@@ -290,6 +290,7 @@
 			left: 30rpx;
 			width: 100%;
 			padding: 0 20rpx;
+			max-width: 640PX!important;
 			color: #999;
 			background: rgba(250,250,250, .7);
 			z-index: 11;

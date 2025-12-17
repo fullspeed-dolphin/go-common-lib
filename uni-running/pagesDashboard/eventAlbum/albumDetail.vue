@@ -34,8 +34,8 @@
 			</section>
 
 			<section class="u-flex-wrap u-flex" style="gap: 10rpx;padding: 0 34rpx;">
-				<view class="card-item" v-for="item in dataList" :key="item.event_id" @click="viewDetail(item)">
-					<up-lazy-load class="img" height="507" :image="item.image_url" mode="aspectFill" />
+				<view class="card-item" v-for="(item, index) in dataList" :key="index" @click="previewImg(item)">
+					<up-lazy-load class="img" height="507" :image="item" mode="aspectFill" />
 				</view>
 			</section>
 		</mescroll-uni>
@@ -60,7 +60,7 @@
 	import request from "@/utils/request.js"
 
 	const tabActive = ref('photo')
-	const currentEvent = ref(null)
+	const currentEvent = ref({})
 	let eventId = ''
 
 	// 方法定义
@@ -85,41 +85,20 @@
 		const params = {
 			pageIndex: page.num - 1,
 			pageSize: 10,
-			keyword: ''
+			keyword: '',
+			event_id: currentEvent.value.event_id,
 		};
 
-		request.get(`/event-api/getOfflineEventSwiper`, params).then((res) => {
+		request.get(`/image-service/oss`, params).then((res) => {
 				//如果是第一页需手动制空列表
 				if (page.num == 1) dataList.value = []
 
-				// 找到当前活动
-				if (eventId && !currentEvent.value) {
-					const event = res.find(item => item.event_id === eventId)
-					if (event) {
-						currentEvent.value = {
-							event_id: event.event_id,
-							description: event.description,
-							image_url: event.image_url,
-							event_time: event.event_time.slice(0, 10),
-							event_location: event.event_location
-						}
-					}
-				}
+				res = res.urls
 
-				const events = res.map(item => {
-					return {
-						event_id: item.event_id,
-						description: item.description,
-						image_url: item.image_url,
-						event_time: item.event_time.slice(0, 10),
-						event_location: item.event_location
-					}
-				});
-
-				dataList.value = dataList.value.concat(events)
+				dataList.value = dataList.value.concat(res)
 
 				//隐藏下拉刷新和上拉加载的状态;
-				mescroll.value.endSuccess(events.length);
+				mescroll.value.endSuccess(res.length);
 			})
 			.catch((error) => {
 				console.log(error)
@@ -130,23 +109,7 @@
 
 	// 页面加载
 	onLoad((options) => {
-		eventId = options.id || ''
-
-		// #ifdef MP-WEIXIN
-		wx.showShareMenu({
-			withShareTicket: true,
-			menus: ['shareAppMessage']
-		});
-		// #endif
-	});
-
-	// 分享给朋友
-	onShareAppMessage(() => {
-		return {
-			title: '跑了没 - 跑，一切活力的泉源',
-			// path: '/pages/index',
-			imageUrl: '', // 可以设置自定义分享图片，留空则使用当前页面截图
-		};
+		currentEvent.value = options
 	});
 </script>
 
