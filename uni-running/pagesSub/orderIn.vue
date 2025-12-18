@@ -97,7 +97,10 @@
               }"
             >
               <view class="price-item-content">
-                <view class="price-item-label">{{ item.label }}</view>
+                <view class="price-item-row">
+                  <view class="price-item-label">{{ item.label }}</view>
+                  <view class="price-item-price">￥{{ item.price }}</view>
+                </view>
                 <view v-if="item.isFull" class="price-item-status">已满</view>
                 <view v-else-if="item.capacity !== null && item.capacity !== undefined" class="price-item-capacity">
                   剩余 {{ item.capacity - (item.capacityUsed || 0) }}
@@ -577,6 +580,16 @@ const submitOrder = () => {
 
   if (!isAgree.value) return proxy.$toast("请勾选同意协议");
 
+  // 校验：如果选中的套餐总价为0，拒绝付款
+  if (totalPrice.value === 0) {
+    uni.showModal({
+      title: "提示",
+      content: "当前套餐不支持单独购买",
+      showCancel: false,
+    });
+    return;
+  }
+
   // 判断单选还是多选，获取对应的 package 和 price
   let packageStr = "";
   let paymentAmount = 0;
@@ -783,9 +796,12 @@ defineOptions({
     &.active {
       background: #ff8c00;
       color: #ffffff;
-      .price-item-status,
-      .price-item-capacity {
-        color: #ffffff;
+      .price-item-content {
+        .price-item-price,
+        .price-item-status,
+        .price-item-capacity {
+          color: #ffffff;
+        }
       }
     }
 
@@ -810,9 +826,21 @@ defineOptions({
       align-items: flex-start;
       gap: 4rpx;
 
+      .price-item-row {
+        display: flex;
+        align-items: center;
+        gap: 16rpx;
+      }
+
       .price-item-label {
         font-weight: bold;
         font-size: 30rpx;
+      }
+
+      .price-item-price {
+        font-size: 26rpx;
+        color: #ff8c00;
+        font-weight: bold;
       }
 
       .price-item-status {
