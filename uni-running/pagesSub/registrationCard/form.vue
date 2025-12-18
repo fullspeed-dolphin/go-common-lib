@@ -1029,6 +1029,11 @@
 			message: "请选择性别",
 			trigger: ["change"]
 		}],
+		idType: [{
+			required: true,
+			message: "请选择证件类型",
+			trigger: ["change"]
+		}],
 		idCardNumber: [{
 			required: true,
 			message: "请填写证件号码",
