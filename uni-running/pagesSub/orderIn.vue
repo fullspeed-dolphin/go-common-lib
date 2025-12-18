@@ -34,7 +34,7 @@
 			</view>
 		</section>
 
-		<view class="section">
+		<view class="section" style="margin-top:30rpx;">
 			<view class="section-title">选择套餐</view>
 			<view class="section-content">
 				<view class="price-list">
@@ -45,19 +45,29 @@
                   : activeType.label === item.label,
                 disabled: item.isFull
               }">
-							<view class="flex-between-center" @click="togglePackage(item)">
-								<view class="price-item-content" >
-									<view class="price-item-row">
-										<view class="price-item-label">{{ item.label }}</view>
-										<view class="price-item-price">￥{{ item.price }}</view>
-									</view>
-									<view v-if="item.isFull" class="price-item-status">已满</view>
-									<view v-else-if="item.capacity !== null && item.capacity !== undefined" class="price-item-capacity">
-										剩余 {{ item.capacity - (item.capacityUsed || 0) }}
-									</view>
+							<view class="flex-start">
+								<view class="flex-center u-mr-10" @click="selectPackage(item)">
+									<u-icon name="checkmark-circle-fill" :color="item.isChecked ? '#FF8C00' : '#999'" size="20"></u-icon>
 								</view>
-								<view class="check-icon flex-center" :class="{active: item.isToggle}">
-									<u-icon name="arrow-right" color="#fff" size="10"></u-icon>
+								
+								<view class="flex-between-center" style="width:600rpx; align-items: flex-start;" @click="togglePackage(item)">
+									<view class="price-item-content" >
+										<view class="price-item-row">
+											<view class="price-item-label">{{ item.label }}</view>
+										</view>
+										<view class="flex-start">
+											<view class="price-item-price u-mr-20">￥{{ item.price }}</view>
+											<view v-if="item.isFull" class="price-item-status">已满</view>
+											<view v-else-if="item.capacity !== null && item.capacity !== undefined" class="price-item-capacity">
+												剩余 {{ item.capacity - (item.capacityUsed || 0) }}
+											</view>
+										</view>
+									</view>
+									
+									<view class="flex-center u-mt-10" style="font-size: 24rpx;" :class="{active: item.isToggle}">
+										{{item.isToggle ? '展开' : '收起' }}
+										<u-icon name="arrow-right" color="#999" size="10"></u-icon>
+									</view>
 								</view>
 							</view>
 							
@@ -89,11 +99,11 @@
 			</view>
 		</view>
 
-		<section class="section">
+		<section class="section" style="margin-top:30rpx;">
 			<section v-if="priceList.length" class="section-content payment-content">
 				<view class="money flex-row" style="align-items: baseline">
 					￥{{ totalPrice }}
-					<view class="txt"> ({{ selectedLabels }}) </view>
+					<view class="txt"> {{ !totalPrice ? '(请添加报名人员）' :'' }} </view>
 				</view>
 				<view class="" style="line-height: 34rpx; margin-bottom: 34rpx; font-size: 24rpx">
 					选择支付方式
@@ -192,13 +202,23 @@
 		(newVal) => {
 			let total = 0
 			priceList.value.forEach(item => {
-				total += (item.price || 0) * (item.signerList?.length || 0)
+				if (item.isChecked) {
+					total += (item.price || 0) * (item.signerList?.length || 0)
+				}
 			})
 			
 			totalPrice.value = total;
 		},
 		 { deep: true }
 	);
+	
+	function selectPackage(item) {
+		item.isChecked = !item.isChecked;
+		
+		if (priceList.value.filter(i => i.isChecked).length > multiPackageCount.value) {
+			item.isChecked = false
+		}
+	}
 	
 	// 计算选中的标签（用于显示）
 	const selectedLabels = computed(() => {
@@ -343,28 +363,6 @@
 		uni.hideLoading();
 	};
 
-	const getSignerInfo = () => {
-		// 如果有选中的报名卡 id，使用它；否则使用默认逻辑
-		const selectedSignerId = uni.getStorageSync("selectedSignerId");
-		if (!selectedSignerId) {
-			// 如果没有选中，保持原有逻辑或清空
-			SignerInfo.value = {};
-			return;
-		}
-
-		const data = {
-			id: selectedSignerId,
-		};
-		console.log("data", data);
-		request.post("/booking-api/registration/getSignerInfo", data)
-			.then((res) => {
-				SignerInfo.value = res;
-			})
-			.catch((error) => {
-				console.error("获取报名卡信息失败:", error);
-			});
-	};
-
 	const getEventPrice = (spxcode = null) => {
 		const data = {
 			event_id: event_id.value,
@@ -440,9 +438,9 @@
 			// 如果有选中数据，更新选中的数据
 			if (isMultiSelect.value) {
 				// 多选模式：更新已选中的套餐价格，移除已满的套餐
-				selectedPackages.value = selectedPackages.value
-					.map(pkg => priceListData.find(i => i.label === pkg.label))
-					.filter(pkg => pkg !== undefined && !pkg.isFull);
+				// selectedPackages.value = selectedPackages.value
+				// 	.map(pkg => priceListData.find(i => i.label === pkg.label))
+				// 	.filter(pkg => pkg !== undefined && !pkg.isFull);
 			} else {
 				// 单选模式：更新选中的套餐，如果已满则清空
 				if (activeType.value.label) {
@@ -469,15 +467,14 @@
 		
 		const curOption = priceList.value.find(item => item.label === data.eventInfo.label);
 		
-		if (!isMultiSelect.value) {
-			const isSigned = priceList.value.some(item => {
-				return item?.signerList?.some(i => i.id === data.signerInfo.id)
-			})
-			
-			if (isSigned) {
-				return uni.$u.toast('重复添加，只能单个项目报名~')
-			}
-		}
+		// if (!isMultiSelect.value) {
+		// 	const isSigned = priceList.value.some(item => {
+		// 		return item?.signerList?.some(i => i.id === data.signerInfo.id)
+		// 	})
+		// 	if (isSigned) {
+		// 		return uni.$u.toast('重复添加，只能单个项目报名~')
+		// 	}
+		// }
 		
 		if (!curOption.signerList) {
 			curOption.signerList = [data.signerInfo]
@@ -565,7 +562,7 @@
 		
 		try {
 			let allSignerList = []
-			priceList.value.forEach(item => {
+			priceList.value.filter(i => i.isChecked).forEach(item => {
 				if (item.signerList) {
 					item.signerList?.forEach(user => {
 						allSignerList.push({
@@ -574,7 +571,6 @@
 						})
 					})
 				}
-				
 			})
 			const promiseList = allSignerList.map(item => createSingleOrder(item))
 			
@@ -764,7 +760,7 @@
 	}
 
 	.section-bottom {
-		margin: 50rpx 34rpx;
+		margin: 30rpx 34rpx;
 	}
 
 	.section-assign {
@@ -835,7 +831,7 @@
 		gap: 20rpx;
 
 		.price-item {
-			padding: 20rpx 32rpx;
+			padding: 20rpx 20rpx;
 			min-height: 90rpx;
 			background: #f6fafb;
 			border-radius: 16rpx 16rpx 16rpx 16rpx;
@@ -912,7 +908,7 @@
 	}
 
 	.payment-content {
-		padding: 64rpx 20rpx !important;
+		padding: 44rpx 20rpx !important;
 
 		.money {
 			color: #e53935;
