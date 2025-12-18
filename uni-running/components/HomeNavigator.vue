@@ -2,7 +2,7 @@
 	<view class="menu">
 		<view class="menu-item" v-for="(item, index) in navList" :key="index" @click="routeTo(item)">
 			<view class="menu-item-bg">
-				<image class="menu-item-icon" :src="item.icon_url" mode="aspectFill"></image>
+				<image class="menu-item-icon" :src="item.icon_url + '?x-oss-process=image/resize,w_90,h_90,m_fill'" mode="aspectFill"></image>
 			</view>
 			<view class="menu-item-title">{{ item.name }}</view>
 		</view>

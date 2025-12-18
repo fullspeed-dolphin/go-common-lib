@@ -13,7 +13,7 @@
 					<swiper class="swiper" circular indicator-dots indicator-active-color="#FF8C00" :autoplay="true"
 						:interval="3000">
 						<swiper-item v-for="(item, index) in bannerList" :key="index">
-							<image class="img" :src="item.image_url" mode="aspectFill" @click="clickSwiper(item)"></image>
+							<image class="img" :src="item.image_url + '?x-oss-process=image/resize,w_700,h_350,m_fill'" mode="aspectFill" @click="clickSwiper(item)"></image>
 						</swiper-item>
 					</swiper>
 				</view>

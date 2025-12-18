@@ -3,7 +3,7 @@
     <!-- 活动卡片 -->
     <view v-if="selectedEvent.id" class="panel-info">
       <view class="activity-header" @click="isShowEventModal = true">
-        <image :src="selectedEvent.background_image_url" class="avatar" />
+        <image :src="selectedEvent.background_image_url+ '?x-oss-process=image/resize,w_80,h_80,m_fill'" class="avatar" />
         <view class="info">
           <view class="title">{{selectedEvent.name}}</view>
           <view class="time" v-if="selectedEvent.checkin_start_time">

@@ -20,7 +20,7 @@
     <section style="padding: 0; overflow: hidden; height: 750rpx">
       <image
         class="img"
-        :src="detail.background_image_url"
+        :src="detail.background_image_url + '?x-oss-process=image/resize,w_700,h_700,m_fill'"
         mode="aspectFill"
         style="width: 100%; display: block; height: 100%"
       ></image>
@@ -261,7 +261,7 @@ const getDetail = () => {
   proxy.$axios
     .get(`/event-api/api/v1/events/${routerParams.value.id}`)
     .then((res) => {
-      res.text = `<img src="${res.long_image_url}" style="max-width:100%;" />`;
+      res.text = `<img src="${res.long_image_url}?x-oss-process=image/resize,w_500" style="max-width:100%;" />`;
       res.eventItems = res.event_projects.split("、");
 
       // test

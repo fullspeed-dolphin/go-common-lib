@@ -10,7 +10,7 @@
 		</section>
 		<mescroll-uni ref="mescrollRef" @init="e => mescroll = e" @down="e => e.resetUpScroll()" @up="getList" top="100">
 			<view class="card-item bgf u-flex" v-for="item in dataList" :key="item.event_id" @click="viewDetail(item)">
-				<up-lazy-load class="img" borderRadius="16" :image="item.image_url" mode="aspectFill" />
+				<up-lazy-load class="img" borderRadius="16" :image="item.image_url + '?x-oss-process=image/resize,w_100,h_100,m_fill'" mode="aspectFill" />
 				
 				<view class="" style="width:510rpx;margin-left:12rpx;">
 					<view class="u-flex">

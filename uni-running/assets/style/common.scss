@@ -45,6 +45,12 @@ open-data{
   box-sizing: border-box;
 }
 
+/* #ifdef H5 */
+section {
+  box-sizing: border-box;
+}
+/* #endif */
+
 rich-text,
 open-data,
 form {

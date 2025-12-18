@@ -3,10 +3,12 @@
     <mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="0">
       <view class="member-item flex-start" v-for="(item, index) in dataList" :key="index">
         <view class="img-box">
-          <image class="img" :src="
-              item.avatar_url ||
-              'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
-            " mode="aspectFill"></image>
+					<view class="img">
+						<up-lazy-load borderRadius="100" :image="
+						  (item.avatar_url ||
+						  'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_110,h_110,m_fill'
+						" mode="aspectFill" />
+					</view>
         </view>
         <view class="">
           <view class="mb10" style="color: #222">{{

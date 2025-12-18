@@ -6,7 +6,7 @@
   >
     <image
       class="event-item-image"
-      :src="item.image_url || item.background_image_url"
+      :src="(item.image_url || item.background_image_url) + '?x-oss-process=image/resize,w_600,h_300,m_fill'"
       mode="aspectFill"
       :style="
         direction === 'row'

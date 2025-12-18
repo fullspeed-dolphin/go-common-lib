@@ -2,7 +2,7 @@
 	<view>
 		<mescroll-uni ref="mescrollRef" @init="e => mescroll = e" @down="e => e.resetUpScroll()" @up="getList" top="0">
 			<section class="section-banner">
-				<up-lazy-load class="img" v-if="currentEvent" :image="currentEvent.image_url" mode="aspectFill" />
+				<up-lazy-load class="img" v-if="currentEvent" :image="currentEvent.image_url + '?x-oss-process=image/resize,w_600,h_200,m_fill'" mode="aspectFill" />
 				<view class="summary">
 					<view class="item u-flex-y-center">照片 2346</view>
 					<view class="item u-flex-y-center">视频 2346</view>
@@ -35,7 +35,7 @@
 
 			<section class="u-flex-wrap u-flex" style="gap: 10rpx;padding: 0 34rpx;">
 				<view class="card-item" v-for="(item, index) in dataList" :key="index" @click="previewImg(item)">
-					<up-lazy-load class="img" height="507" :image="item" mode="aspectFill" />
+					<up-lazy-load height="507" :image="item" mode="aspectFill" />
 				</view>
 			</section>
 		</mescroll-uni>
@@ -93,8 +93,10 @@
 				//如果是第一页需手动制空列表
 				if (page.num == 1) dataList.value = []
 
-				res = res.urls
-
+				res = res.urls.map(i => {
+					return i + '?x-oss-process=image/resize,w_300,h_200,m_fill'
+				})
+				
 				dataList.value = dataList.value.concat(res)
 
 				//隐藏下拉刷新和上拉加载的状态;
@@ -167,6 +169,8 @@
 	}
 
 	.card-item {
+		width: 336rpx;
+		height: 502rpx;
 		.img {
 			width: 336rpx;
 			height: 502rpx;

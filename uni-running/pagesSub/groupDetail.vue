@@ -9,8 +9,8 @@
 		<block v-if="!isEmpty">
 			<section class="section-card flex-col-center">
 				<image class="img" :src="
-            detail.avatar_url ||
-            'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
+            (detail.avatar_url ||
+            'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_120,h_120,m_fill'
           " mode="aspectFill"></image>
 				<view class="name ellipsis2">{{ detail.name }}</view>
 				<view class="flex-between-center c9 b">
@@ -69,8 +69,8 @@
 					<view class="leader-item flex-start">
 						<view class="img-box">
 							<image class="img" :src="
-                  memberLeader.avatar_url ||
-                  'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
+                  (memberLeader.avatar_url ||
+                  'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png') + '?x-oss-process=image/resize,w_70,h_70,m_fill'
                 " mode="aspectFill"></image>
 						</view>
 						<view class="">
@@ -99,10 +99,12 @@
 				<view class="flex-row flex-wrap">
 					<view class="member-item flex-col-center" v-for="(item, index) in memberList" :key="index">
 						<view class="img-box">
-							<image class="img" :src="
-                  item.avatar_url ||
-                  'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
-                " mode="aspectFill"></image>
+							<view class="img">
+								<up-lazy-load height="70" borderRadius="100" :image="
+								  (item.avatar_url ||
+								  'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_150,h_150,m_fill'
+								" mode="aspectFill" />
+							</view>
 						</view>
 						<view class="">
 							<view class="mb10 ellipsis tac mt10" style="width: 120rpx">{{
@@ -126,10 +128,12 @@
 							<view class="flex-row-center">
 								<view class="number">{{ index + 1 }}</view>
 								<view class="img-box">
-									<image class="img" :src="
-                      item.avatar_url ||
-                      'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
-                    " mode="aspectFill"></image>
+									<view class="img">
+										<up-lazy-load height="70" borderRadius="100" :image="
+										  (item.avatar_url ||
+										  'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_150,h_150,m_fill'
+										" mode="aspectFill" />
+									</view>
 								</view>
 								<view class="ellipsis name" style="width: 120rpx">{{
                   item.nickname || "成员"
@@ -153,8 +157,8 @@
 			<!-- 团长才可修改 -->
 			<section v-if="detail.user_role === 'creator'" class="section-bottom">
 				<view style="padding: 0rpx 30rpx 40rpx" class="flex-between-center">
-					<u-button type="primary" color="#f2f2f2" shape="circle" customStyle="height: 80rpx;width: 320rpx;color: #FF8C00;"
-						@click="deleteGroup()">删除跑团</u-button>
+					<u-button type="primary" color="#f2f2f2" shape="circle"
+						customStyle="height: 80rpx;width: 320rpx;color: #FF8C00;" @click="deleteGroup()">删除跑团</u-button>
 					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 320rpx;"
 						@click="updateGroup()">更新跑团</u-button>
 				</view>
@@ -276,7 +280,7 @@
 			.then((res) => {
 				res.establish_time = res.establish_time.slice(0, 10);
 				detail.value = res;
-				
+
 				isEmpty.value = false;
 
 				getMemberList();
@@ -359,10 +363,10 @@
 						}).catch(e => {
 							uni.hideLoading()
 							uni.showModal({
-							  title: '提示',
-							  content: e.msg,
-							  showCancel: false, // 如果不需要“取消”按钮
-							  confirmText: '我知道了'
+								title: '提示',
+								content: e.msg,
+								showCancel: false, // 如果不需要“取消”按钮
+								confirmText: '我知道了'
 							});
 							console.log(e)
 						})
