@@ -1062,11 +1062,10 @@
 				}
 			},
 		}, ],
-		mobile: [{
-			required: true,
-			message: "请填写手机号码",
-			trigger: ["blur", "change"]
-		}, ],
+		mobile: [
+			{ required: true, message: "请填写手机号码", trigger: ["blur", "change"] },
+			{ pattern: /^1[3-9]\d{9}$/, message: "请输入正确的中国大陆手机号", trigger: ["blur", "change"] }
+		],
 		country: [{
 			required: true,
 			message: "请填写国家或地区",

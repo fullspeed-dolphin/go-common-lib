@@ -79,7 +79,7 @@
     </section>
 
     <view class="section">
-      <view class="section-title">选择套餐</view>
+      <view class="section-title">选择套餐{{ isMultiSelect ? `（可选 ${multiPackageCount} 项）` : '' }}</view>
       <view class="section-content">
         <view class="price-list">
           <view
@@ -89,14 +89,28 @@
           >
             <view
               class="price-item flex-center"
-              :class="{ active: activeType.label === item.label }"
+              :class="{
+                active: isMultiSelect
+                  ? selectedPackages.some(pkg => pkg.label === item.label)
+                  : activeType.label === item.label,
+                disabled: item.isFull
+              }"
             >
-              {{ item.label }}
+              <view class="price-item-content">
+                <view class="price-item-label">{{ item.label }}</view>
+                <view v-if="item.isFull" class="price-item-status">已满</view>
+                <view v-else-if="item.capacity !== null && item.capacity !== undefined" class="price-item-capacity">
+                  剩余 {{ item.capacity - (item.capacityUsed || 0) }}
+                </view>
+              </view>
               <u-checkbox
                 shape="circle"
                 activeColor="##8CC63E"
                 inactiveColor="#ffffff"
-                :checked="activeType.label === item.label"
+                :checked="isMultiSelect
+                  ? selectedPackages.some(pkg => pkg.label === item.label)
+                  : activeType.label === item.label"
+                :disabled="item.isFull"
               />
             </view>
           </view>
@@ -107,8 +121,8 @@
     <section class="section">
       <section v-if="priceList.length" class="section-content payment-content">
         <view class="money flex-row" style="align-items: baseline">
-          ￥{{ activeType.price }}
-          <view class="txt"> ({{ activeType.label }}) </view>
+          ￥{{ totalPrice }}
+          <view class="txt"> ({{ selectedLabels }}) </view>
         </view>
         <view
           class=""
@@ -161,7 +175,7 @@
           color="#ff8c00"
           shape="circle"
           @click="submitOrder()"
-          >￥{{ activeType.price }} 支付</u-button
+          >￥{{ totalPrice }} 支付</u-button
         >
       </view>
     </section>
@@ -206,6 +220,7 @@ const refUserLogin = ref(null);
 const verifyCode = ref("");
 const myGroup = ref({});
 const activeType = ref({});
+const selectedPackages = ref([]); // 多选时存储选中的套餐数组
 const isAgree = ref(false);
 const SignerInfo = ref({});
 const eventInfo = ref({});
@@ -217,9 +232,37 @@ const selectedAddress = ref("");
 const addressList = ref([]);
 const showAddressPicker = ref(false);
 const addressPickerColumns = ref([]);
+const multiPackageCount = ref(1); // 存储 multi_package 字段值
 
 // 计算属性
 const userInfo = computed(() => store.state.userInfo);
+
+// 判断是否多选
+const isMultiSelect = computed(() => {
+  return multiPackageCount.value > 1;
+});
+
+// 计算总价格
+const totalPrice = computed(() => {
+  if (isMultiSelect.value) {
+    // 多选：累加所有选中项的价格
+    return selectedPackages.value.reduce((sum, pkg) => sum + Number(pkg.price || 0), 0);
+  } else {
+    // 单选：返回选中项的价格
+    return Number(activeType.value?.price || 0);
+  }
+});
+
+// 计算选中的标签（用于显示）
+const selectedLabels = computed(() => {
+  if (isMultiSelect.value) {
+    // 多选：用顿号连接所有选中项
+    return selectedPackages.value.map(pkg => pkg.label).join('、') || '请选择套餐';
+  } else {
+    // 单选：返回选中项的标签
+    return activeType.value?.label || '请选择套餐';
+  }
+});
 
 // 监听verifyCode变化
 watch(
@@ -293,6 +336,15 @@ const getEventAddresses = async () => {
     const res = await proxy.$axios.get(
       `/event-api/api/v1/events/${event_id.value}`
     );
+
+    // 获取 multi_package 字段，判断是否多选
+    if (res && res.multi_package !== undefined && res.multi_package !== null) {
+      multiPackageCount.value = Number(res.multi_package);
+    } else {
+      multiPackageCount.value = 1; // 默认单选
+    }
+
+    console.log("multi_package:", multiPackageCount.value, "isMultiSelect:", isMultiSelect.value);
 
     // request.js 已经提取了 response.data，所以 res 直接是事件对象
     if (res && res.racekit_pickup_address) {
@@ -402,18 +454,49 @@ const getEventPrice = (spxcode = null) => {
     let priceListData = [];
     res?.tickets?.map((ticket) => {
       Object.keys(ticket?.price || {}).forEach((i) => {
-        const data = {
-          price: ticket?.price[i],
-          label: i,
-        };
-        console.log("data", data, ticket?.price);
-        if (!activeType?.value?.label) {
-          activeType.value = data;
+        const priceValue = ticket?.price[i];
+
+        // 判断是新格式还是旧格式
+        let itemData = {};
+        if (typeof priceValue === 'object' && priceValue !== null) {
+          // 新格式：带容量限制
+          const capacity = priceValue.capacity;
+          const capacityUsed = priceValue.capacity_used;
+
+          // 判断是否已满：capacity_used >= capacity（只有两者都不为 null 时才判断）
+          const isFull = (capacity !== null && capacity !== undefined) &&
+                         (capacityUsed !== null && capacityUsed !== undefined) &&
+                         capacityUsed >= capacity;
+
+          itemData = {
+            price: priceValue.price,
+            label: i,
+            capacity: capacity,
+            capacityUsed: capacityUsed,
+            isFull: isFull,
+          };
+
+          console.log(`套餐 ${i}: 容量 ${capacityUsed}/${capacity}, 已满: ${isFull}`);
+        } else {
+          // 旧格式：直接是数字
+          itemData = {
+            price: priceValue,
+            label: i,
+            isFull: false, // 旧格式默认不限制
+          };
         }
-        priceListData.push(data);
+
+        console.log("data", itemData, ticket?.price);
+
+        // 如果没有选中的套餐，且当前套餐未满，则设为默认选中
+        if (!activeType?.value?.label && !itemData.isFull) {
+          activeType.value = itemData;
+        }
+
+        priceListData.push(itemData);
       });
     });
-		
+
 		console.log("priceListData======>", priceListData)
 
     // 小距离在前
@@ -421,11 +504,25 @@ const getEventPrice = (spxcode = null) => {
 
     // activeType.value = priceListData[0];
     priceList.value = priceListData;
-		
+
 		// 如果有选中数据，更新选中的数据
-		if (activeType.value.label) {
-			activeType.value = priceListData.find(i => i.label === activeType.value.label) || {}
-		}
+		if (isMultiSelect.value) {
+      // 多选模式：更新已选中的套餐价格，移除已满的套餐
+      selectedPackages.value = selectedPackages.value
+        .map(pkg => priceListData.find(i => i.label === pkg.label))
+        .filter(pkg => pkg !== undefined && !pkg.isFull);
+    } else {
+      // 单选模式：更新选中的套餐，如果已满则清空
+      if (activeType.value.label) {
+        const updatedItem = priceListData.find(i => i.label === activeType.value.label);
+        if (updatedItem && !updatedItem.isFull) {
+          activeType.value = updatedItem;
+        } else {
+          // 如果选中的套餐已满，选择第一个未满的套餐
+          activeType.value = priceListData.find(i => !i.isFull) || {};
+        }
+      }
+    }
   });
 };
 
@@ -435,7 +532,31 @@ const selectSigner = () => {
 };
 
 const changeTab = (item) => {
-  activeType.value = item;
+  // 检查套餐是否已满
+  if (item.isFull) {
+    proxy.$toast("该套餐已满，无法选择");
+    return;
+  }
+
+  if (isMultiSelect.value) {
+    // 多选逻辑：toggle 选中状态
+    const index = selectedPackages.value.findIndex(pkg => pkg.label === item.label);
+    if (index > -1) {
+      // 已选中，移除
+      selectedPackages.value.splice(index, 1);
+    } else {
+      // 未选中，添加（检查是否超过限制）
+      if (selectedPackages.value.length >= multiPackageCount.value) {
+        proxy.$toast(`最多只能选择 ${multiPackageCount.value} 个套餐`);
+        return;
+      }
+      selectedPackages.value.push(item);
+    }
+    console.log("已选中套餐:", selectedPackages.value);
+  } else {
+    // 单选逻辑：直接替换
+    activeType.value = item;
+  }
 };
 
 const submitOrder = () => {
@@ -456,6 +577,28 @@ const submitOrder = () => {
 
   if (!isAgree.value) return proxy.$toast("请勾选同意协议");
 
+  // 判断单选还是多选，获取对应的 package 和 price
+  let packageStr = "";
+  let paymentAmount = 0;
+
+  if (isMultiSelect.value) {
+    // 多选：检查是否选择了套餐
+    if (selectedPackages.value.length === 0) {
+      return proxy.$toast("请选择报名套餐");
+    }
+    // 用 '_' 拼接多个 package
+    packageStr = selectedPackages.value.map(pkg => pkg.label).join('_');
+    // 累加价格
+    paymentAmount = totalPrice.value;
+  } else {
+    // 单选：检查是否选择了套餐
+    if (!activeType.value.label) {
+      return proxy.$toast("请选择报名套餐");
+    }
+    packageStr = activeType.value.label;
+    paymentAmount = activeType.value.price;
+  }
+
   const data = {
     full_name: SignerInfo.value.full_name || null,
     id_card: SignerInfo.value.cert_number || null,
@@ -464,10 +607,10 @@ const submitOrder = () => {
     tshirt_size: SignerInfo.value.tshirt_size || null,
     email: SignerInfo.value.email || null,
     blood_type: SignerInfo.value.blood_type || null,
-    package: activeType.value.label,
+    package: packageStr,
     payment_method: "wechat",
     event_id: event_id.value,
-    payment_amount: activeType.value.price,
+    payment_amount: paymentAmount,
     spxcode: computedCode.value.isOk ? verifyCode.value : null,
     running_group: String(userInfo.value.running_group || ""),
     racekit_pickup_address: selectedAddress.value || null,
@@ -626,18 +769,63 @@ defineOptions({
   gap: 20rpx;
   .price-item {
     display: flex;
-    padding: 0 32rpx;
+    padding: 20rpx 32rpx;
     align-items: center;
     justify-content: space-between;
-    height: 90rpx;
+    min-height: 90rpx;
     background: #f6fafb;
     border-radius: 16rpx 16rpx 16rpx 16rpx;
     font-weight: bold;
     font-size: 30rpx;
     color: #000000;
+    transition: all 0.3s ease;
+
     &.active {
       background: #ff8c00;
       color: #ffffff;
+      .price-item-status,
+      .price-item-capacity {
+        color: #ffffff;
+      }
+    }
+
+    &.disabled {
+      background: #e0e0e0;
+      color: #9e9e9e;
+      cursor: not-allowed;
+      opacity: 0.6;
+
+      .price-item-status {
+        color: #d32f2f;
+      }
+
+      .price-item-capacity {
+        color: #9e9e9e;
+      }
+    }
+
+    .price-item-content {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4rpx;
+
+      .price-item-label {
+        font-weight: bold;
+        font-size: 30rpx;
+      }
+
+      .price-item-status {
+        font-size: 22rpx;
+        color: #d32f2f;
+        font-weight: normal;
+      }
+
+      .price-item-capacity {
+        font-size: 22rpx;
+        color: #666666;
+        font-weight: normal;
+      }
     }
   }
 }
