@@ -218,6 +218,7 @@ onShow(() => {
   bottom: 0px;
   width: 100%;
   z-index: 10;
+	margin:0;
 }
 .card {
   display: flex;

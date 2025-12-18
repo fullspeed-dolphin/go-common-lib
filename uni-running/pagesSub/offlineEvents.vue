@@ -126,7 +126,7 @@
         <rich-text :nodes="detail.text"></rich-text>
       </section>
 
-      <view class="section-bottom">
+      <view class="section-bottom1">
         <!-- <view class="txt">
 				  {{isSignUp ? '取消' : ''}}报名截止：2025.09.30 9:00
 			  </view> -->
@@ -435,7 +435,7 @@ const callPhone = (phoneNumber) => {
   }
 }
 
-.section-bottom {
+.section-bottom1 {
   position: fixed;
   bottom: 0;
   width: 100%;
@@ -455,7 +455,7 @@ const callPhone = (phoneNumber) => {
 }
 
 .isLoadedPage {
-  .section-bottom {
+  .section-bottom1 {
     // transition: transform 0.5s;
     // transform: translateY(0%);
     animation: slideIn 0.5s 0.5s forwards;

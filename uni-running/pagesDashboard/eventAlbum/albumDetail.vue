@@ -33,8 +33,13 @@
 				时间轴
 			</section>
 
-			<section class="u-flex-wrap u-flex" style="gap: 10rpx;padding: 0 34rpx;">
+			<section v-if="tabActive === 'photo'" class="u-flex-wrap u-flex" style="gap: 10rpx;padding: 0 34rpx;">
 				<view class="card-item" v-for="(item, index) in dataList" :key="index" @click="previewImg(item)">
+					<up-lazy-load height="507" :image="item + '?x-oss-process=image/resize,w_300,h_200,m_fill'" mode="aspectFill" />
+				</view>
+			</section>
+			<section v-if="tabActive === 'video'" class="u-flex-wrap u-flex" style="gap: 10rpx;padding: 0 34rpx;">
+				<view class="card-item" v-for="(item, index) in []" :key="index" @click="previewImg(item)">
 					<up-lazy-load height="507" :image="item + '?x-oss-process=image/resize,w_300,h_200,m_fill'" mode="aspectFill" />
 				</view>
 			</section>
