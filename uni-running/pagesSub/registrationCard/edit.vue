@@ -47,11 +47,20 @@ function apiToForm(apiData) {
     gender = "male";
   }
 
+  // 处理cert_type：将后端枚举值转换为中文
+  const certTypeReverseMap = {
+    "CN_ID": "身份证",
+    "HK_ID": "香港居民身份证",
+    "MA_ID": "澳门居民身份证",
+    "HK_MA_PASS": "港澳居民往来大陆通行证(回乡证)"
+  };
+  const idType = certTypeReverseMap[apiData.cert_type] || "身份证";
+
   return {
     name: apiData.full_name || "",
     pinyin: apiData.full_name_pinyin || "",
     gender: gender,
-    idType: apiData.cert_type || "身份证",
+    idType: idType,
     idCardNumber: apiData.cert_number || "",
     birthday: apiData.birthday || "",
     mobile: apiData.phone_number || "",
@@ -80,11 +89,20 @@ function formToApi(formData) {
   // 处理gender：表单是"male"/"female"，API需要"1"/"0"
   const gender = formData.gender === "female" ? "0" : "1";
 
+  // 处理cert_type：将中文转换为后端枚举值
+  const certTypeMap = {
+    "身份证": "CN_ID",
+    "香港居民身份证": "HK_ID",
+    "澳门居民身份证": "MA_ID",
+    "港澳居民往来大陆通行证(回乡证)": "HK_MA_PASS"
+  };
+  const cert_type = certTypeMap[formData.idType] || "CN_ID";
+
   const apiData = {
     full_name: formData.name,
     full_name_pinyin: formData.pinyin,
     gender: gender,
-    cert_type: formData.idType,
+    cert_type: cert_type,
     cert_number: formData.idCardNumber,
     birthday: formData.birthday,
     phone_number: formData.mobile,

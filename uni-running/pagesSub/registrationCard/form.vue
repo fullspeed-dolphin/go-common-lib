@@ -553,7 +553,8 @@
 		return bloodType ? bloodType.name : form.bloodType;
 	});
 
-	const idTypeOptions = [{
+	const idTypeOptions = [
+		{
 			id: "身份证",
 			name: "身份证"
 		},
@@ -565,10 +566,10 @@
 			id: "澳门居民身份证",
 			name: "澳门居民身份证"
 		},
-		// { id: "军官证", name: "军官证" },
-		// { id: "护照", name: "护照" },
-		// { id: "港澳居民往来大陆通行证", name: "港澳居民往来大陆通行证" },
-		// { id: "台胞证", name: "台胞证" },
+		{
+			id: "港澳居民往来大陆通行证(回乡证)",
+			name: "港澳居民往来大陆通行证(回乡证)"
+		},
 	];
 
 	const countryOptions = [{
