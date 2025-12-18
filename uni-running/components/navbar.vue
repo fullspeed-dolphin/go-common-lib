@@ -198,14 +198,14 @@ onUnmounted(() => {
     position: fixed;
     left: 0;
     right: 0;
-    z-index: 9;
+    z-index: 99;
     width: 100%;
     box-sizing: border-box;
   }
 
   .navbar-button-container {
     position: fixed;
-    z-index: 11;
+    z-index: 110;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -269,7 +269,7 @@ onUnmounted(() => {
     position: fixed;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 10;
+    z-index: 100;
     pointer-events: none; // 标题不阻挡点击事件
     // 确保标题不会被左侧按钮和右侧胶囊按钮遮挡
     padding: 0 120px;

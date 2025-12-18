@@ -1,8 +1,7 @@
 <template>
   <view class="">
     <u-navbar autoBack placeholder title="我的消息"></u-navbar>
-    <mescroll-uni
-      ref="mescrollRef"
+    <mescroll-body
       @init="mescrollInit"
       @down="downCallback"
       @up="getList"
@@ -27,52 +26,30 @@
           <view class="time"> 9月20日 </view>
         </view>
       </view>
-    </mescroll-uni>
+    </mescroll-body>
   </view>
 </template>
 
 <script setup>
-import { ref, nextTick } from "vue";
+import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { getCurrentInstance } from "vue";
-import MescrollMixin from "@/uni_modules/mescroll-uni/components/mescroll-uni/mescroll-mixins.js";
+import { onPageScroll, onReachBottom } from "@dcloudio/uni-app";
+import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
+const { mescrollInit, downCallback } = useMescroll(onPageScroll, onReachBottom);
 
 // 获取当前实例以访问全局属性
 const { proxy } = getCurrentInstance();
 
-// 模板引用
-const mescrollRef = ref(null);
-
-// 响应式数据
-const dataList = ref([]);
-
-// mescroll相关
-let mescroll = null;
-
-const mescrollInit = (mescrollInstance) => {
-  mescroll = mescrollInstance;
-};
-
-// 页面加载
-onLoad(() => {});
-
-// 方法定义
-const refreshList = () => {
-  nextTick(() => {
-    mescroll.resetUpScroll(); // 重置列表数据为第一页
-    mescroll.scrollTo(0, 0); // 重置列表数据为第一页时,建议把滚动条也重置到顶部,避免无法再次翻页的问题
-  });
-};
-
-const getList = (page) => {
+const getList = (mescroll) => {
   uni.showLoading({ mask: true });
   const data = {
-    Page: page.num,
+    Page: mescroll.num,
     Size: "10",
   };
 
   proxy.$axios
-    .post(`/api/store/purchase/order/list?page=${page.num}`, data)
+    .post(`/api/store/purchase/order/list?page=${mescroll.num}`, data)
     .then(async (res) => {
       uni.hideLoading();
 
@@ -80,7 +57,7 @@ const getList = (page) => {
       mescroll.endSuccess(res.List.length);
 
       //如果是第一页需手动制空列表
-      if (page.num == 1) {
+      if (mescroll.num == 1) {
         dataList.value = [];
       }
 
@@ -88,13 +65,8 @@ const getList = (page) => {
     })
     .catch((error) => {
       uni.hideLoading();
-      mescroll.endSuccess();
+      mescroll.endErr();
     });
-};
-
-const downCallback = () => {
-  // 下拉刷新
-  refreshList();
 };
 </script>
 

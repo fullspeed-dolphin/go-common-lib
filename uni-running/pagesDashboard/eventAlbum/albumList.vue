@@ -8,7 +8,7 @@
 				style="width: 84rpx;font-size: 47rpx;font-family: 500;color:#707070;">
 			</view> -->
 		</section>
-		<mescroll-uni ref="mescrollRef" @init="e => mescroll = e" @down="e => e.resetUpScroll()" @up="getList" top="100">
+		<mescroll-body @init="mescrollInit" @down="downCallback" @up="getList" top="0">
 			<view class="card-item bgf u-flex" v-for="item in dataList" :key="item.event_id" @click="viewDetail(item)">
 				<up-lazy-load class="img" borderRadius="16" :image="item.image_url + '?x-oss-process=image/resize,w_100,h_100,m_fill'" mode="aspectFill" />
 				
@@ -36,7 +36,7 @@
 					</view>
 				</view>
 			</view>
-		</mescroll-uni>
+		</mescroll-body>
 	</view>
 </template>
 
@@ -44,6 +44,9 @@
 	import {
 		ref
 	} from "vue";
+	import { onPageScroll, onReachBottom } from '@dcloudio/uni-app';
+	import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
+	const { mescrollInit, downCallback } = useMescroll(onPageScroll, onReachBottom)
 
 	import request from "@/utils/request.js"
 
@@ -68,20 +71,20 @@
 	};
 
 	const dataList = ref([])
-	const getList = (page) => {
+	const getList = (mescroll) => {
 		uni.showLoading({
 			mask: true
 		});
 
 		const params = {
-			pageIndex: page.num - 1,
+			pageIndex: mescroll.num - 1,
 			pageSize: 10,
 			keyword: searchTxt.value
 		};
 
 		request.get(`/event-api/getOfflineEventSwiper`, params).then((res) => {
 				//如果是第一页需手动制空列表
-				if (page.num == 1) dataList.value = []
+				if (mescroll.num == 1) dataList.value = []
 
 				res = res.map(item => {
 					return {
@@ -96,12 +99,12 @@
 				dataList.value = dataList.value.concat(res)
 
 				//隐藏下拉刷新和上拉加载的状态;
-				mescroll.value.endSuccess(res.length);
+				mescroll.endSuccess(res.length);
 			})
 			.catch((error) => {
 				console.log(error)
 				uni.hideLoading();
-				mescroll.value.endSuccess();
+				mescroll.endErr();
 			});
 	};
 </script>
@@ -119,7 +122,7 @@
 		min-height: 150rpx;
 		border-radius: 16rpx;
 		padding: 20rpx 16rpx;
-		margin: 30rpx auto;
+		margin: 0rpx auto 30rpx;
 		color:#979797;font-size:24rpx;
 		.img{
 			width: 120rpx;

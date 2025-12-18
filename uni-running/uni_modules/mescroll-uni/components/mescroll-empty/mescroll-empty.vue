@@ -29,7 +29,6 @@ export default {
 	computed: {
 		// 图标
 		icon() {
-			return "https://img01.yzcdn.cn/vant/empty-image-default.png";
 			if (this.option.icon != null) { // 此处不使用短路求值, 用于支持传空串不显示图标
 				return this.option.icon
 			} else{
@@ -78,7 +77,7 @@ export default {
 .mescroll-empty {
 	box-sizing: border-box;
 	width: 100%;
-	padding: 20rpx 50rpx;
+	padding: 100rpx 50rpx;
 	text-align: center;
 }
 
@@ -104,11 +103,11 @@ export default {
 	display: inline-block;
 	margin-top: 40rpx;
 	min-width: 200rpx;
-	padding: 18rpx 40rpx;
+	padding: 18rpx;
 	font-size: 28rpx;
-	border: 1px solid #FF8C00;
+	border: 1rpx solid #e04b28;
 	border-radius: 60rpx;
-	color: #FF8C00;
+	color: #e04b28;
 }
 
 .mescroll-empty .empty-btn:active {

@@ -91,7 +91,7 @@
 		},
 		data() {
 			return {
-				mescroll: null, // mescroll实例
+				mescroll: {optDown:{},optUp:{}}, // mescroll实例
 				downHight: 0, //下拉刷新: 容器高度
 				downLoadType: 0, // 下拉刷新状态: 0(loading前), 1(inOffset), 2(outOffset), 3(showLoading), 4(endDownScroll)
 				upLoadType: 0, // 上拉加载状态：0（loading前），1（loading中），2（没有更多了,显示END文本提示），3（没有更多了,不显示END文本提示）

@@ -106,7 +106,7 @@
 	 * @event {Function} emptyclick 点击empty配置的btnText按钮回调
 	 * @event {Function} topclick 点击回到顶部的按钮回调
 	 * @event {Function} scroll 滚动监听 (需在 up 配置 onScroll:true 才生效)
-	 * @example <mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="upCallback"> ... </mescroll-body>
+	 * @example <mescroll-body @init="mescrollInit" @down="downCallback" @up="upCallback"> ... </mescroll-body>
 	 */
 	export default {
 		name: 'mescroll-body',

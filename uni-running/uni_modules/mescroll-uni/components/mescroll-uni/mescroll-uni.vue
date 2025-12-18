@@ -106,7 +106,7 @@
 	 * @event {Function} emptyclick 点击empty配置的btnText按钮回调
 	 * @event {Function} topclick 点击回到顶部的按钮回调
 	 * @event {Function} scroll 滚动监听 (需在 up 配置 onScroll:true 才生效)
-	 * @example <mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="upCallback"> ... </mescroll-uni>
+	 * @example <mescroll-uni @init="mescrollInit" @down="downCallback" @up="upCallback"> ... </mescroll-uni>
 	 */
 	export default {
 		name: 'mescroll-uni',
@@ -149,6 +149,12 @@
 				windowBottom: 0, // 可使用窗口的底部位置
 				windowHeight: 0, // 可使用窗口的高度
 				statusBarHeight: 0 // 状态栏高度
+			}
+		},
+		watch: {
+			height() {
+				// 设置容器的高度
+				this.setClientHeight()
 			}
 		},
 		computed: {
@@ -259,7 +265,7 @@
 			},
 			// 更新滚动区域的高度 (使内容不满屏和到底,都可继续翻页)
 			setClientHeight() {
-				if (this.mescroll.getClientHeight(true) === 0 && !this.isExec) {
+				if (!this.isExec) {
 					this.isExec = true; // 避免多次获取
 					this.$nextTick(() => { // 确保dom已渲染
 						this.getClientInfo(data=>{
@@ -278,10 +284,7 @@
 			},
 			// 获取滚动区域的信息
 			getClientInfo(success){
-				let query = uni.createSelectorQuery();
-				// #ifndef MP-ALIPAY || MP-DINGTALK
-				query = query.in(this) // 支付宝小程序不支持in(this),而字节跳动小程序必须写in(this), 否则都取不到值
-				// #endif
+				let query = uni.createSelectorQuery().in(this);
 				let view = query.select('#' + this.viewId);
 				view.boundingClientRect(data => {
 					success(data)
@@ -379,13 +382,13 @@
 			vm.$emit('init', vm.mescroll);
 			
 			// 设置高度
-			const WindowInfo = uni.getWindowInfo()
-			if(WindowInfo.windowTop) vm.windowTop = WindowInfo.windowTop;
-			if(WindowInfo.windowBottom) vm.windowBottom = WindowInfo.windowBottom;
-			if(WindowInfo.windowHeight) vm.windowHeight = WindowInfo.windowHeight;
-			if(WindowInfo.statusBarHeight) vm.statusBarHeight = WindowInfo.statusBarHeight;
+			const sys = uni.getSystemInfoSync();
+			if(sys.windowTop) vm.windowTop = sys.windowTop;
+			if(sys.windowBottom) vm.windowBottom = sys.windowBottom;
+			if(sys.windowHeight) vm.windowHeight = sys.windowHeight;
+			if(sys.statusBarHeight) vm.statusBarHeight = sys.statusBarHeight;
 			// 使down的bottomOffset生效
-			vm.mescroll.setBodyHeight(WindowInfo.windowHeight);
+			vm.mescroll.setBodyHeight(sys.windowHeight);
 
 			// 因为使用的是scrollview,这里需自定义scrollTo
 			vm.mescroll.resetScrollTo((y, t) => {

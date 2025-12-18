@@ -1,11 +1,11 @@
 <!-- 回到顶部的按钮 -->
 <template>
 	<image
-		v-if="mOption.src"
+		v-if="option.src"
 		class="mescroll-totop"
-		:class="[value ? 'mescroll-totop-in' : 'mescroll-totop-out', {'mescroll-totop-safearea': mOption.safearea}]"
-		:style="{'z-index':mOption.zIndex, 'left': left, 'right': right, 'bottom': '150rpx', 'width':addUnit(mOption.width), 'border-radius':addUnit(mOption.radius)}"
-		:src="mOption.src"
+		:class="[isShow ? 'mescroll-totop-in' : 'mescroll-totop-out', {'mescroll-totop-safearea': option.safearea}]"
+		:style="{'z-index':option.zIndex, 'left': left, 'right': right, 'bottom':addUnit(option.bottom), 'width':addUnit(option.width), 'border-radius':addUnit(option.radius)}"
+		:src="option.src"
 		mode="widthFix"
 		@click="toTopClick"
 	/>
@@ -15,22 +15,33 @@
 export default {
 	props: {
 		// up.toTop的配置项
-		option: Object | null,
+		option: {
+			type: Object,
+			default(){
+				return {}
+			}
+		},
 		// 是否显示
-		value: false
+		value: false, // vue2
+		modelValue: false // vue3
 	},
 	computed: {
-		// 支付宝小程序需写成计算属性,prop定义default仍报错
-		mOption(){
-			return this.option || {}
-		},
 		// 优先显示左边
 		left(){
-			return this.mOption.left ? this.addUnit(this.mOption.left) : 'auto';
+			return this.option.left ? this.addUnit(this.option.left) : 'auto';
 		},
 		// 右边距离 (优先显示左边)
 		right() {
-			return this.mOption.left ? 'auto' : this.addUnit(this.mOption.right);
+			return this.option.left ? 'auto' : this.addUnit(this.option.right);
+		},
+		// 是否显示
+		isShow(){
+			// #ifdef VUE3
+			return this.modelValue
+			// #endif
+			// #ifdef VUE2
+			return this.value
+			// #endif
 		}
 	},
 	methods: {
@@ -40,7 +51,12 @@ export default {
 			return num
 		},
 		toTopClick() {
-			this.$emit('input', false); // 使v-model生效
+			// #ifdef VUE3
+			this.$emit("update:modelValue", false); // 使v-model生效 vue3
+			// #endif
+			// #ifdef VUE2
+			this.$emit('input', false); // 使v-model生效 vue2
+			// #endif
 			this.$emit('click'); // 派发点击事件
 		}
 	}

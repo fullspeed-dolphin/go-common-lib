@@ -13,7 +13,7 @@
 			</view>
 		</section>
 		<view class="mescroll-wrapper">
-			<mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" :top="230" bottom="246"
+			<mescroll-uni @init="mescrollInit" @down="downCallback" @up="getList" :top="230" bottom="246"
 				:safearea="true" :fixed="false" height="100%">
 				<view class="container group-list">
 					<GroupItem :item="item" variant="detail" v-for="(item, index) in dataList" :key="index" />
@@ -43,6 +43,10 @@
 	import {
 		onShow
 	} from "@dcloudio/uni-app";
+	import { onPageScroll, onReachBottom } from '@dcloudio/uni-app';
+	import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
+	const { mescrollInit, downCallback, getMescroll } = useMescroll(onPageScroll, onReachBottom)
+
 	import {
 		useStore
 	} from "vuex";
@@ -92,9 +96,6 @@
 	// mescroll相关
 	let mescroll = null;
 
-	const mescrollInit = (mescrollInstance) => {
-		mescroll = mescrollInstance;
-	};
 
 	// 计算 navbar 高度
 	const computeNavbarHeight = () => {
@@ -166,18 +167,18 @@
 
 	const refreshList = () => {
 		nextTick(() => {
-			mescroll.resetUpScroll(); // 重置列表数据为第一页
-			mescroll.scrollTo(0, 0); // 重置列表数据为第一页时,建议把滚动条也重置到顶部,避免无法再次翻页的问题
+			getMescroll().resetUpScroll(); // 重置列表数据为第一页
+			getMescroll().scrollTo(0, 0); // 重置列表数据为第一页时,建议把滚动条也重置到顶部,避免无法再次翻页的问题
 		});
 	};
 
-	const getList = (page) => {
+	const getList = (mescroll) => {
 		uni.showLoading({
 			mask: true
 		});
 
 		const data = {
-			pageIndex: page.num - 1,
+			pageIndex: mescroll.num - 1,
 			pageSize: 10,
 			keyword: searchTxt.value,
 			type: curTab.value.value === 1 ? "nearby" : "hot", // 根据标签页类型传参
@@ -191,7 +192,7 @@
 				mescroll.endSuccess(res.data.length);
 
 				//如果是第一页需手动制空列表
-				if (page.num == 1) {
+				if (mescroll.num == 1) {
 					dataList.value = [];
 				}
 
@@ -201,11 +202,6 @@
 				uni.hideLoading();
 				mescroll.endSuccess(6);
 			});
-	};
-
-	const downCallback = (mescroll) => {
-		// 下拉刷新的回调
-		mescroll.resetUpScroll();
 	};
 </script>
 

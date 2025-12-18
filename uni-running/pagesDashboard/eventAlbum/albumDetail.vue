@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<mescroll-uni ref="mescrollRef" @init="e => mescroll = e" @down="e => e.resetUpScroll()" @up="getList" top="0">
+		<mescroll-body :sticky="true" @init="mescrollInit" @down="downCallback" @up="getList" top="0">
 			<section class="section-banner">
 				<up-lazy-load class="img" v-if="currentEvent" :image="currentEvent.image_url + '?x-oss-process=image/resize,w_600,h_200,m_fill'" mode="aspectFill" />
 				<view class="summary">
@@ -35,17 +35,19 @@
 
 			<section class="u-flex-wrap u-flex" style="gap: 10rpx;padding: 0 34rpx;">
 				<view class="card-item" v-for="(item, index) in dataList" :key="index" @click="previewImg(item)">
-					<up-lazy-load height="507" :image="item" mode="aspectFill" />
+					<up-lazy-load height="507" :image="item + '?x-oss-process=image/resize,w_300,h_200,m_fill'" mode="aspectFill" />
 				</view>
 			</section>
-		</mescroll-uni>
+		</mescroll-body>
 		
 		<FindPhoto ref="refFindPhoto"/>
+		<PreviewMedia ref="refPreviewMedia"/>
 	</view>
 </template>
 
 <script setup>
 	import FindPhoto from "./components/FindPhoto.vue"
+	import PreviewMedia from "./components/PreviewMedia.vue"
 	import {
 		ref,
 	} from "vue";
@@ -55,17 +57,22 @@
 		onShareAppMessage,
 	} from "@dcloudio/uni-app";
 
+	import { onPageScroll, onReachBottom } from '@dcloudio/uni-app';
+	import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
+	const { mescrollInit, downCallback } = useMescroll(onPageScroll, onReachBottom) // 调用mescroll的hook
+
 	const refFindPhoto = ref(null)
+	const refPreviewMedia = ref(null)
 
 	import request from "@/utils/request.js"
 
 	const tabActive = ref('photo')
 	const currentEvent = ref({})
 	let eventId = ''
-
-	// 方法定义
-	const viewDetail = (item) => {
-		uni.$u.route(`pagesDashboard/eventAlbum/albumDetail?id=${item.event_id}`);
+	
+	const previewImg = (item) => {
+		console.log('item')
+		refPreviewMedia.value.openModal(item)
 	};
 
 	let mescroll = ref(null);
@@ -77,13 +84,13 @@
 	};
 
 	const dataList = ref([])
-	const getList = (page) => {
+	const getList = (mescroll) => {
 		uni.showLoading({
 			mask: true
 		});
 
 		const params = {
-			pageIndex: page.num - 1,
+			pageIndex: mescroll.num - 1,
 			pageSize: 10,
 			keyword: '',
 			event_id: currentEvent.value.event_id,
@@ -91,21 +98,21 @@
 
 		request.get(`/image-service/oss`, params).then((res) => {
 				//如果是第一页需手动制空列表
-				if (page.num == 1) dataList.value = []
+				if (mescroll.num == 1) dataList.value = []
 
 				res = res.urls.map(i => {
-					return i + '?x-oss-process=image/resize,w_300,h_200,m_fill'
+					return i
 				})
 				
 				dataList.value = dataList.value.concat(res)
 
 				//隐藏下拉刷新和上拉加载的状态;
-				mescroll.value.endSuccess(res.length);
+				mescroll.endSuccess(res.length);
 			})
 			.catch((error) => {
 				console.log(error)
 				uni.hideLoading();
-				mescroll.value.endSuccess();
+				mescroll.endErr();
 			});
 	};
 
@@ -151,11 +158,15 @@
 	}
 
 	.section-tabs {
+		z-index: 990;
+		position: sticky;
+		top:0;
 		height: 88rpx;
 		border-bottom: 2rpx solid #EFEDEE;
 		padding-left: 34rpx;
 		font-weight: bold;
 		text-align: center;
+		background: #fff;
 
 		.item {
 			width: 94rpx;

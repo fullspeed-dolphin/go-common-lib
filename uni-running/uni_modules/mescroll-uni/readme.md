@@ -8,8 +8,8 @@
 <br/>
 
 
-## 最新文档(1.3.7版本): <a href="https://www.mescroll.com/uni.html">https://www.mescroll.com/uni.html</a>
-2021-04-13 by 小瑾同学 (文档可能会有缓存,建议打开时刷新一下)
+## 最新文档(1.3.8版本): <a href="https://www.mescroll.com/uni.html">https://www.mescroll.com/uni.html</a>
+2023-03-26 by 小瑾同学 (文档可能会有缓存,建议打开时刷新一下)
 
 
 ## 1.3.5版本已调整为[uni_modules](https://uniapp.dcloud.io/uni_modules)
@@ -26,7 +26,7 @@ uni_modules版本的mescroll-body 和 mescroll-empty 支持 [easycom规范](http
 ```
 
 ## 近期已更新优化的内容:
-1. 微信小程序, app, h5使用高性能wxs和renderjs, 下拉刷新更流畅丝滑, 尤其能明显解决Android小程序下拉卡顿的问题  
+1. 新增vue3 script setup的示例  
 2. 新增`入门极简`示例, 国际化`mescroll-i18n.vue`示例, 轮播吸顶菜单`mescroll-swiper-sticky.vue`示例  
 3. 新增 "局部区域滚动" 的案例: mescroll-body-part.vue 和 mescroll-uni-part.vue  
 4. 新增 me-video 视频组件, 解决APP端视频下拉悬浮错位的问题, 参考 mescroll-options.vue 示例  

@@ -1,5 +1,5 @@
 <template>
-	<up-popup :show="show" @close="close" closeable @open="open">
+	<up-popup :show="show" @close="close" closeable>
 		<view class="flex-between-center" style="height: 100rpx;padding: 0 34rpx;">
 			<view class="" style="font-weight: bold;font-size: 30rpx;color: rgba(0,0,0,0.8);">AI找我</view>
 		</view>
@@ -102,6 +102,7 @@
 	const show = ref(false);
 
 	function open() {
+		console.log('open')
 		show.value = true;
 	}
 

@@ -43,7 +43,7 @@ MeScroll.prototype.extendDownScroll = function(optDown) {
 	// 下拉刷新的配置
 	MeScroll.extend(optDown, {
 		use: true, // 是否启用下拉刷新; 默认true
-		auto: false, // 是否在初始化完毕之后自动执行下拉刷新的回调; 默认true
+		auto: true, // 是否在初始化完毕之后自动执行下拉刷新的回调; 默认true
 		native: false, // 是否使用系统自带的下拉刷新; 默认false; 仅mescroll-body生效 (值为true时,还需在pages配置enablePullDownRefresh:true;详请参考mescroll-native的案例)
 		autoShowLoading: false, // 如果设置auto=true(在初始化完毕之后自动执行下拉刷新的回调),那么是否显示下拉刷新的进度; 默认false
 		isLock: false, // 是否锁定下拉刷新,默认false;
@@ -95,7 +95,7 @@ MeScroll.prototype.extendUpScroll = function(optUp) {
 		noMoreSize: 5, // 如果列表已无数据,可设置列表的总数量要大于等于5条才显示无更多数据;避免列表数据过少(比如只有一条数据),显示无更多数据会不好看
 		offset: 150, // 距底部多远时,触发upCallback,仅mescroll-uni生效 ( mescroll-body配置的是pages.json的 onReachBottomDistance )
 		textLoading: '加载中 ...', // 加载中的提示文本
-		textNoMore: '没有更多啦', // 没有更多数据的提示文本
+		textNoMore: '-- END --', // 没有更多数据的提示文本
 		bgColor: "transparent", // 背景颜色 (建议在pages.json中再设置一下backgroundColorBottom)
 		textColor: "gray", // 文本颜色 (当bgColor配置了颜色,而textColor未配置时,则textColor会默认为白色)
 		inited: null, // 初始化完毕的回调

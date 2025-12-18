@@ -1,23 +1,22 @@
 <template>
   <view class="">
-    <mescroll-uni ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" top="0">
+    <mescroll-body @init="mescrollInit" @down="downCallback" @up="getList" top="0">
       <view class="member-item flex-start" v-for="(item, index) in dataList" :key="index">
         <view class="img-box">
-					<view class="img">
-						<up-lazy-load borderRadius="100" :image="
+          <view class="img">
+            <up-lazy-load borderRadius="100" :image="
 						  (item.avatar_url ||
 						  'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_110,h_110,m_fill'
 						" mode="aspectFill" />
-					</view>
+          </view>
         </view>
         <view class="">
           <view class="mb10" style="color: #222">{{
             item.nickname || "成员"
           }}</view>
-          <!-- {{item.user_phone}} -->
         </view>
       </view>
-    </mescroll-uni>
+    </mescroll-body>
   </view>
 </template>
 
@@ -25,7 +24,9 @@
 import { ref, nextTick } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { getCurrentInstance } from "vue";
-import MescrollMixin from "@/uni_modules/mescroll-uni/components/mescroll-uni/mescroll-mixins.js";
+import { onPageScroll, onReachBottom } from "@dcloudio/uni-app";
+import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
+const { mescrollInit, downCallback } = useMescroll(onPageScroll, onReachBottom);
 
 // 获取当前实例以访问全局属性
 const { proxy } = getCurrentInstance();
@@ -37,31 +38,16 @@ const mescrollRef = ref(null);
 const dataList = ref([]);
 const group_id = ref("");
 
-// mescroll相关
-let mescroll = null;
-
-const mescrollInit = (mescrollInstance) => {
-  mescroll = mescrollInstance;
-};
-
 // 页面加载
 onLoad((options) => {
   console.log(options);
   group_id.value = options.group_id;
 });
 
-// 方法定义
-const refreshList = () => {
-  nextTick(() => {
-    mescroll.resetUpScroll(); // 重置列表数据为第一页
-    mescroll.scrollTo(0, 0); // 重置列表数据为第一页时,建议把滚动条也重置到顶部,避免无法再次翻页的问题
-  });
-};
-
-const getList = (page) => {
+const getList = (mescroll) => {
   uni.showLoading({ mask: true });
   const data = {
-    pageIndex: page.num - 1,
+    pageIndex: mescroll.num - 1,
     pageSize: 15,
     groupId: Number(group_id.value),
   };
@@ -69,13 +55,11 @@ const getList = (page) => {
   proxy.$axios
     .post(`/running-group/api/v1/groups/members`, data)
     .then(async (res) => {
-      uni.hideLoading();
-
       //联网成功的回调,隐藏下拉刷新和上拉加载的状态;
       mescroll.endSuccess(res.memberships.length);
 
       //如果是第一页需手动制空列表
-      if (page.num == 1) {
+      if (mescroll.num == 1) {
         dataList.value = [];
       }
 
@@ -83,13 +67,8 @@ const getList = (page) => {
     })
     .catch((error) => {
       uni.hideLoading();
-      mescroll.endSuccess();
+      mescroll.endErr();
     });
-};
-
-const downCallback = () => {
-  // 下拉刷新
-  refreshList();
 };
 </script>
 

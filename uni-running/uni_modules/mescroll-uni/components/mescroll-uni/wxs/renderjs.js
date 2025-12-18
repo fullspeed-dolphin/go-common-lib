@@ -47,7 +47,7 @@ if(window && !window.$mescrollRenderInit){
 
 /* 获取滚动条的位置 */
 me.getScrollTop = function() {
-	return me.scrollTop || 0
+	return me.scrollTop || document.documentElement.scrollTop || document.body.scrollTop || 0
 }
 
 /* 是否禁用下拉刷新 */

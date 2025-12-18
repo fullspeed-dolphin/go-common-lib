@@ -92,7 +92,7 @@
 		},
 		data() {
 			return {
-				mescroll: null, // mescroll实例
+				mescroll: {optDown:{},optUp:{}}, // mescroll实例
 				viewId: 'id_' + Math.random().toString(36).substr(2,16), // 随机生成mescroll的id(不能数字开头,否则找不到元素)
 				downHight: 0, //下拉刷新: 容器高度
 				downLoadType: 0, // 下拉刷新状态: 0(loading前), 1(inOffset), 2(outOffset), 3(showLoading), 4(endDownScroll)
@@ -258,10 +258,7 @@
 			},
 			// 获取滚动区域的信息
 			getClientInfo(success){
-				let query = uni.createSelectorQuery();
-				// #ifndef MP-ALIPAY || MP-DINGTALK
-				query = query.in(this) // 支付宝小程序不支持in(this),而字节跳动小程序必须写in(this), 否则都取不到值
-				// #endif
+				let query = uni.createSelectorQuery().in(this);
 				let view = query.select('#' + this.viewId);
 				view.boundingClientRect(data => {
 					success(data)

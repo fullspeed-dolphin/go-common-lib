@@ -62,9 +62,12 @@ const MescrollMoreMixin = {
 		tabChange(i){
 			let mescroll = this.getMescroll(i);
 			if(mescroll){
-				// 延时(比$nextTick靠谱一些),确保元素已渲染
+				// 恢复上次滚动条的位置
+				let y = mescroll.getScrollTop()
+				mescroll.scrollTo(y, 0)
+				// 再次恢复上次滚动条的位置, 确保元素已渲染
 				setTimeout(()=>{
-					mescroll.scrollTo(mescroll.getScrollTop(),0)
+					mescroll.scrollTo(y, 0)
 				},30)
 			}
 		}
