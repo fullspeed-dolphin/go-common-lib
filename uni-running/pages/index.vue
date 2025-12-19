@@ -28,7 +28,7 @@
 					<u-icon name="arrow-right" size="24rpx" color="#ff8c00"></u-icon>
 				</view>
 			</view>
-			<swiper class="event-swiper" circular indicator-active-color="#FF8C00" :autoplay="true" :interval="3000"
+			<swiper class="event-swiper" circular indicator-active-color="#FF8C00" :autoplay="false" :interval="3000"
 				:display-multiple-items="1.2">
 				<swiper-item v-for="(item, index) in bannerEventList" :key="index">
 					<view class="event-swiper-item">
@@ -44,7 +44,7 @@
 					<u-icon name="arrow-right" size="24rpx" color="#ff8c00"></u-icon>
 				</view>
 			</view>
-			<swiper class="event-swiper" circular indicator-active-color="#FF8C00" :autoplay="true" :interval="3000"
+			<swiper class="event-swiper" circular indicator-active-color="#FF8C00" :autoplay="false" :interval="3000"
 				:next-margin="126" v-if="onlineEventList && onlineEventList.length > 0">
 				<swiper-item v-for="(item, index) in onlineEventList" :key="index">
 					<view class="event-swiper-item">
@@ -296,12 +296,6 @@
 			z-index: 11;
 			border-radius: 36rpx 36rpx 36rpx 36rpx;
 			border: 2rpx solid #f58700;
-			box-sizing: border-box;
-	
-			::v-deep {
-				.u-search__content {
-				}
-			}
 		}
 	}
 	
@@ -346,12 +340,6 @@
 					font-size: 20rpx;
 				}
 			}
-
-			// ::v-deep {
-			//   .u-button--disabled {
-			//     color: #707070!important;
-			//   }
-			// }
 		}
 
 		.section-banner {

@@ -183,7 +183,7 @@
 			</view>
 
 			<view class="section">
-				<view class="section-content agree">
+				<view class="section-content agree u-pb-20">
 					<view class="agree-text">
 						<span>阅读并同意以下内容</span>
 						<up-checkbox v-model:checked="form.agreed" :usedAlone="true" shape="circle" activeColor="#8CC63E" />

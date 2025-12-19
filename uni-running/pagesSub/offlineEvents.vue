@@ -326,7 +326,7 @@ const callPhone = (phoneNumber) => {
 };
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .share-btn {
   position: fixed;
   right: 20rpx;
