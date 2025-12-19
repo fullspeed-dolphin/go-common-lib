@@ -66,10 +66,42 @@
 		close();
 		emit('select', {
 			eventInfo: eventData.value,
-			signerInfo: selectedItem.value
+			signerInfo: getLimitSingerdata()
 		})
 	}
-
+	
+	// gender: "male",
+	// birthday: "",
+	// 0、如果证件类型选择的是身份证，要做实时校验
+	// 1、在报名卡中如果检测到是大于18岁的男性，T-shirt尺码只给选择L
+	// 2、如果是大于18岁的女性，T-shirt尺码只给选择M
+	// 3、2016年之后出生的身份证只给130的T-shirt尺码
+	
+	function getLimitSingerdata () {
+		const form = JSON.parse(JSON.stringify(selectedItem.value))
+		
+		if (form?.birthday) {
+			const userAge = new Date().getFullYear() - form.birthday.slice(0, 4);
+			
+			if (userAge > 18) {
+				if (form.gender === "1") {
+					form.clothesSize = 'L'
+				} else {
+					form.clothesSize = 'M'
+				}
+			}
+			
+			if (userAge < 10) {
+				form.clothesSize = '130'
+			}
+		}
+		
+		console.log("form====>", form)
+		
+		return form;
+	}
+	
+	
 	// 获取报名卡列表
 	const loading = ref(false)
 	const dataList = ref([])
@@ -89,8 +121,7 @@
 				dataList.value = [];
 			}
 		} catch (error) {
-			console.error("获取报名卡列表失败:", error);
-			showRequestError(error, "获取报名卡失败");
+			console.error(error);
 			dataList.value = [];
 		} finally {
 			loading.value = false;

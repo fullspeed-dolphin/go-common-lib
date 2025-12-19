@@ -84,7 +84,7 @@
 	.event-item-title {
 		position: absolute;
 		width: 100%;
-		bottom: 126rpx;
+		bottom: 124rpx;
 		left: 0;
 		font-weight: 500;
 		line-height: 44rpx;
