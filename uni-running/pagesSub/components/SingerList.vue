@@ -1,23 +1,32 @@
 <template>
 	<up-popup :show="show" @close="close" closeable>
 		<view class="flex-center van-hairline--bottom" style="height: 100rpx;padding: 0 34rpx;">
-			<view class="" style="font-weight: bold;font-size: 30rpx;color: rgba(0,0,0,0.8);">选择人员</view>
+			<view class="" style="font-weight: bold;font-size: 30rpx;color: rgba(0,0,0,0.8);">选择报名卡</view>
 		</view>
 
-		<view class="card-item van-hairline--bottom" v-for="(item, index) in dataList" :key="index" @click="handleSelect(item)">
-			<view class="name">
-				<view class="name-text">{{ item.full_name }}</view>
-				<view class="name-owner" v-if="item.is_self">本人</view>
-			</view>
-			<view class="id-card-number">
-				<view class="id-card-number-text">{{
-		      formatIdCard(item.cert_number || "")
-		    }}</view>
-				<view class="id-card-number-separator">|</view>
-				<view class="id-card-number-type"> 成人 </view>
+		<view class="card-item van-hairline--bottom" v-for="(item, index) in dataList" :key="index" @click="selectItem(item)">
+			<view class="card-item-wrapper">
+				<view class="radio-btn" @click.stop="selectItem(item)">
+					<u-icon v-if="selectedId === item.id" name="checkmark-circle-fill" color="#FF8C00" size="22"></u-icon>
+					<view v-else class="radio-circle"></view>
+				</view>
+				<view class="card-item-content">
+					<view class="name">
+						<view class="name-text">{{ item.full_name }}</view>
+						<view class="name-owner" v-if="item.is_self">本人</view>
+					</view>
+					<view class="id-card-number">
+						<view class="id-card-number-text">{{
+				      formatIdCard(item.cert_number || "")
+				    }}</view>
+						<view class="id-card-number-separator">|</view>
+						<view class="id-card-number-type"> 成人 </view>
+					</view>
+				</view>
 			</view>
 		</view>
-		<u-button type="primary" @click="$u.route('pagesSub/registrationCard/list')" shape="circle" customStyle="margin: 40rpx auto;width: 500rpx;">添加报名卡</u-button>
+		<u-button v-if="dataList.length" type="primary" @click="confirmSelect" shape="circle" :disabled="!selectedId" customStyle="margin: 40rpx auto;width: 500rpx;">确认</u-button>
+		<u-button :type="dataList.length ? 'info' : 'primary'" @click="$u.route('pagesSub/registrationCard/list')" shape="circle" :plain="dataList.length > 0" customStyle="margin: 40rpx auto;width: 500rpx;">创建报名卡</u-button>
 	</up-popup>
 </template>
 
@@ -31,16 +40,34 @@
 	const emit = defineEmits(["open", 'select']);
 
 	const show = ref(false);
+	const selectedId = ref(null);
+	const selectedItem = ref(null);
 
 	const eventData = ref({})
 	function open(data) {
 		show.value = true;
 		eventData.value = data
+		selectedId.value = null
+		selectedItem.value = null
 		getList()
 	}
 
 	function close() {
 		show.value = false;
+	}
+
+	function selectItem(item) {
+		selectedId.value = item.id
+		selectedItem.value = item
+	}
+
+	function confirmSelect() {
+		if (!selectedItem.value) return
+		close();
+		emit('select', {
+			eventInfo: eventData.value,
+			signerInfo: selectedItem.value
+		})
 	}
 
 	// 获取报名卡列表
@@ -75,15 +102,6 @@
 		return `${idCard.slice(0, 1)} *************** ${idCard.slice(-2)}`;
 	};
 	
-	function handleSelect(item) {
-		close();
-		
-		emit('select', {
-			eventInfo: eventData.value,
-			signerInfo: item
-		})
-	}
-
 	// 暴露方法给父组件
 	defineExpose({
 		open,
@@ -97,6 +115,28 @@
 		padding: 24rpx 20rpx;
 		background: #ffffff;
 		border-radius: 16rpx 16rpx 16rpx 16rpx;
+
+		.card-item-wrapper {
+			display: flex;
+			align-items: center;
+
+			.radio-btn {
+				margin-right: 20rpx;
+				flex-shrink: 0;
+
+				.radio-circle {
+					width: 40rpx;
+					height: 40rpx;
+					border: 2rpx solid #ccc;
+					border-radius: 50%;
+					box-sizing: border-box;
+				}
+			}
+
+			.card-item-content {
+				flex: 1;
+			}
+		}
 
 		.name {
 			display: flex;

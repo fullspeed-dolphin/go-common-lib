@@ -56,7 +56,7 @@
               :src="staticBaseUrl + '/images/icon-event-date@2x.png'"
               mode="aspectFill"
             ></image>
-            <text>活动时间：</text>
+            <text>活动开始时间：</text>
           </view>
           <view class="value">{{
             dayjs(detail.event_time).format("YYYY-MM-DD HH:mm")

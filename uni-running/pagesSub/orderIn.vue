@@ -35,22 +35,13 @@
 		</section>
 
 		<view class="section" style="margin-top:30rpx;">
-			<view class="section-title">选择套餐</view>
+			<view class="section-title">选择套餐<text v-if="multiPackageCount > 1" style="font-size: 24rpx; color: #999; margin-left: 10rpx;">（可选{{ multiPackageCount }}个套餐）</text></view>
 			<view class="section-content">
 				<view class="price-list">
 					<view v-for="(item, index) in priceList" :key="index">
-						<view class="price-item " :class="{
-                active: isMultiSelect
-                  ? selectedPackages.some(pkg => pkg.label === item.label)
-                  : activeType.label === item.label,
-                disabled: item.isFull
-              }">
-							<view class="flex-start">
-								<view class="flex-center u-mr-10" @click="selectPackage(item)">
-									<u-icon name="checkmark-circle-fill" :color="item.isChecked ? '#FF8C00' : '#999'" size="20"></u-icon>
-								</view>
-								
-								<view class="flex-between-center" style="width:600rpx; align-items: flex-start;" @click="togglePackage(item)">
+						<view class="price-item " :class="{ disabled: item.isFull }">
+							<view class="price-item-header" :class="{ active: item.isChecked }" @click="togglePackage(item)">
+								<view class="flex-between-center" style="width:100%; align-items: flex-start;">
 									<view class="price-item-content" >
 										<view class="price-item-row">
 											<view class="price-item-label">{{ item.label }}</view>
@@ -63,16 +54,16 @@
 											</view>
 										</view>
 									</view>
-									
+
 									<view class="flex-center u-mt-10" style="font-size: 24rpx;" :class="{active: item.isToggle}">
-										{{item.isToggle ? '展开' : '收起' }}
-										<u-icon name="arrow-right" color="#999" size="10"></u-icon>
+										{{item.isToggle ? '收起' : '展开' }}
+										<u-icon name="arrow-right" :color="item.isChecked ? '#fff' : '#999'" size="10"></u-icon>
 									</view>
 								</view>
 							</view>
-							
-							<view v-if="item.isToggle" class="u-mt-20">
-								<view class="u-flex u-flex-wrap" style="gap:20rpx;">
+
+							<view v-if="item.isToggle && item.isChecked" class="price-item-signers">
+								<view class="u-flex u-flex-wrap" style="gap:20rpx; justify-content: flex-start; align-items: flex-end;">
 									<block v-if="item.signerList">
 										<view class="flex-col-center" v-for="(signer, indexSigner) in item.signerList" :key="signer.id">
 											<view  class="add-btn flex-center rel"  @click="removeSigner(item, indexSigner)">
@@ -84,13 +75,14 @@
 											<view class="u-mt-10" style="color:#333;font-weight:400;font-size: 24rpx;">{{signer.full_name}}</view>
 										</view>
 									</block>
-									
+
 									<view v-if="!item.isFull || (item.capacity - (item.capacityUsed || 0) > 0)" class="add-btn flex-center" v-for="(item1) in item.signers" @click="refSingerList.open(item)">
 										<u-icon name="plus" color="#fff" size="16"></u-icon>
 									</view>
-								</view>
-								<view v-if="!item.signerList" class="u-mt-20" style="font-size: 24rpx;color: #E53935;">
-									请选择报名卡
+
+									<view v-if="!item.signerList" style="flex: 1; font-size: 24rpx; color: #E53935; text-align: right;">
+										请选择报名卡
+									</view>
 								</view>
 							</view>
 						</view>
@@ -484,15 +476,43 @@
 			if (curOption.signerList.some(i => i.id === data.signerInfo.id)) {
 				return uni.$u.toast('重复添加~')
 			}
-			
+
 			curOption.signerList.push(data.signerInfo)
 			curOption.signers --
 			curOption.capacityUsed ++
 		}
+
+		// 添加报名卡后自动选中套餐
+		if (!curOption.isChecked) {
+			const checkedCount = priceList.value.filter(i => i.isChecked).length
+			if (checkedCount < multiPackageCount.value) {
+				curOption.isChecked = true
+			}
+		}
 	};
 	
+	function canSelectPackage(item) {
+		if (item.isChecked) return true
+		const checkedCount = priceList.value.filter(i => i.isChecked).length
+		return checkedCount < multiPackageCount.value
+	}
+
 	function togglePackage (item) {
+		// 如果套餐未选中且已达选择上限，不响应点击
+		if (!item.isChecked && !canSelectPackage(item)) {
+			return
+		}
+
 		item.isToggle = !item.isToggle
+		if (item.isToggle) {
+			// 展开时自动选中套餐
+			if (!item.isChecked) {
+				item.isChecked = true
+			}
+		} else {
+			// 收起时取消选中套餐
+			item.isChecked = false
+		}
 	}
 
 	const changeTab = (item) => {
@@ -530,11 +550,15 @@
 		
 		if (!isAgree.value) return uni.$u.toast("请勾选同意协议");
 		
-		const isSigned = priceList.value.some(item => {
-			return !!item?.signerList?.length
-		})
-		
-		if (!isSigned) return uni.$u.toast("请在套餐内加上人员");
+		// 校验：所有被选中的套餐都必须添加人员
+		const checkedPackages = priceList.value.filter(item => item.isChecked)
+		if (!checkedPackages.length) return uni.$u.toast("请选择套餐");
+
+		const packagesWithoutSigners = checkedPackages.filter(item => !item?.signerList?.length)
+		if (packagesWithoutSigners.length > 0) {
+			const names = packagesWithoutSigners.map(p => p.label).join('、')
+			return uni.$u.toast(`请在「${names}」套餐内添加人员`);
+		}
 
 		// if (!selectedAddress.value) return uni.$u.toast("请选择参赛包领取地址");
 
@@ -831,27 +855,37 @@
 		gap: 20rpx;
 
 		.price-item {
-			padding: 20rpx 20rpx;
 			min-height: 90rpx;
 			background: #f6fafb;
-			border-radius: 16rpx 16rpx 16rpx 16rpx;
+			border-radius: 16rpx;
 			font-weight: bold;
 			font-size: 30rpx;
 			color: #000000;
-			transition: all 0.3s ease;
+			overflow: hidden;
 
-			&.active {
-				background: #ff8c00;
-				color: #ffffff;
+			.price-item-header {
+				padding: 20rpx;
+				background: #f6fafb;
+				border-radius: 16rpx;
+				transition: all 0.3s ease;
 
-				.price-item-content {
+				&.active {
+					background: #ff8c00;
+					color: #ffffff;
 
-					.price-item-price,
-					.price-item-status,
-					.price-item-capacity {
-						color: #ffffff;
+					.price-item-content {
+						.price-item-price,
+						.price-item-status,
+						.price-item-capacity {
+							color: #ffffff;
+						}
 					}
 				}
+			}
+
+			.price-item-signers {
+				padding: 20rpx 20rpx 20rpx 0;
+				background: #ffffff;
 			}
 
 			&.disabled {
