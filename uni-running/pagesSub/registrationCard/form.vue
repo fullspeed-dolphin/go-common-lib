@@ -161,7 +161,11 @@
 								</view>
 							</div>
 						</template>
-						<view style="width:100%;padding-right:20rpx;" @click="showTshirtSizePicker = true">
+						<view v-if="isReadOnlyClothSize" style="width:100%;padding-right:20rpx;">
+							<up-input v-model="form.clothesSize" placeholder="请选择" border="none" inputAlign="right" readonly>
+							</up-input>
+						</view>
+						<view v-if="!isReadOnlyClothSize" style="width:100%;padding-right:20rpx;" @click="showTshirtSizePicker = true">
 							<up-input :modelValue="tshirtSizeDisplayName" placeholder="请选择" border="none" inputAlign="right" readonly>
 								<template #suffix>
 									<up-icon name="arrow-right" size="18" color="#999" />
@@ -316,6 +320,40 @@
 			Object.assign(form, defaultForm, val);
 		}, {
 			deep: true
+		}
+	);
+	
+	// gender: "male",
+	// birthday: "",
+	// 0、如果证件类型选择的是身份证，要做实时校验
+	// 1、在报名卡中如果检测到是大于18岁的男性，T-shirt尺码只给选择L
+	// 2、如果是大于18岁的女性，T-shirt尺码只给选择M
+	// 3、2016年之后出生的身份证只给130的T-shirt尺码
+	const isReadOnlyClothSize = ref(false)
+	watch(
+		() => [form.gender, form.birthday],
+		(newVal) => {
+			console.log('newVal====>', newVal)
+			
+			if (form?.birthday) {
+				isReadOnlyClothSize.value = false
+				const userAge = new Date().getFullYear() - form.birthday.slice(0, 4);
+				
+				if (userAge > 18) {
+					if (form.gender === "male") {
+						isReadOnlyClothSize.value = true;
+						form.clothesSize = 'L'
+					} else {
+						isReadOnlyClothSize.value = true;
+						form.clothesSize = 'M'
+					}
+				}
+				
+				if (userAge < 10) {
+					isReadOnlyClothSize.value = true;
+					form.clothesSize = '130'
+				}
+			}
 		}
 	);
 

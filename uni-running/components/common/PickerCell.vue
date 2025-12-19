@@ -68,7 +68,7 @@ const props = defineProps({
     type: String,
     default: "label",
   },
-  value: {
+  modelValue: {
     type: [String, Number],
     default: "",
   },
@@ -90,7 +90,7 @@ const defaultIndex = ref([0]);
 
 // 监听value变化
 watch(
-  () => props.value,
+  () => props.modelValue,
   (val) => {
     setDefaultValue();
   },
@@ -115,9 +115,9 @@ watch(
 
 // 方法定义
 function setDefaultValue () {
-  if (String(props.value).length && props.columns?.length) {
+  if (String(props.modelValue).length && props.columns?.length) {
     const index = props.columns.findIndex(
-      (i) => String(i.value) === String(props.value)
+      (i) => String(i.value) === String(props.modelValue)
     );
 
     // console.log("index=====>", index)

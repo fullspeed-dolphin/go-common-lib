@@ -27,6 +27,11 @@ function fetch(options) {
 			success(res) {
 				uni.hideLoading();
 				
+				// 请求省市区接口，直接返回数据
+				if (options.url.includes('.json')) {
+					return resolve(res.data)
+				}
+				
 				const response = res?.data;
 				
 				// #ifdef MP-WEIXIN

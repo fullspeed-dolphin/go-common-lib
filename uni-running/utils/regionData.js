@@ -1,5 +1,5 @@
 
-const staticBaseUrl = 'https://speexpay.com';
+	import request from "@/utils/request.js"
 
 // 缓存已加载的数据
 let provinceDataCache = null;
@@ -18,17 +18,8 @@ let areaDataPromise = null;
  */
 async function loadJsonFromUrl(url) {
   try {
-    const response = await uni.request({
-      url: url,
-      method: 'GET',
-      timeout: 10000,
-    });
-    
-    if (response.statusCode === 200 && response.data) {
-      return response.data;
-    } else {
-      throw new Error(`加载失败: ${url}`);
-    }
+    const response = await request.get(url);
+    return response;
   } catch (error) {
     console.error(`加载 JSON 文件失败: ${url}`, error);
     throw error;
@@ -48,7 +39,7 @@ export async function loadProvinceData() {
     return provinceDataPromise;
   }
   
-  provinceDataPromise = loadJsonFromUrl(`${staticBaseUrl}/province.json`)
+  provinceDataPromise = loadJsonFromUrl(`/province.json`)
     .then((data) => {
       provinceDataCache = data;
       return data;
@@ -73,7 +64,7 @@ export async function loadCityData() {
     return cityDataPromise;
   }
   
-  cityDataPromise = loadJsonFromUrl(`${staticBaseUrl}/city.json`)
+  cityDataPromise = loadJsonFromUrl(`/city.json`)
     .then((data) => {
       cityDataCache = data;
       return data;
@@ -98,7 +89,7 @@ export async function loadAreaData() {
     return areaDataPromise;
   }
   
-  areaDataPromise = loadJsonFromUrl(`${staticBaseUrl}/area.json`)
+  areaDataPromise = loadJsonFromUrl(`/area.json`)
     .then((data) => {
       areaDataCache = data;
       return data;
