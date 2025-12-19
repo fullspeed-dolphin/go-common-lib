@@ -71,12 +71,12 @@
 					</template>
 				</u-cell>
 
-				<u-cell title="我的跑币" class="nav-cell" @click="routeTo('/pagesSub/device/deviceList')" :border="false" isLink>
+				<!-- <u-cell title="我的跑币" class="nav-cell" @click="routeTo('/pagesSub/device/deviceList')" :border="false" isLink>
 					<template #icon>
 						<image class="nav-icon" style="width: 40rpx; height: 40rpx"
 							src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-mine-coin@2x.png"></image>
 					</template>
-				</u-cell>
+				</u-cell> -->
 
 				<view class="service-cell u-cell u-cell__body" @click="showLoading()">
 					<button class="u-reset-button" open-type="contact">
