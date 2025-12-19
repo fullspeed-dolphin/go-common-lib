@@ -27,6 +27,7 @@
 								</view> -->
 								<view class="u-flex-y-center" style="color: #666; margin-top: 16rpx">
 									<image style="width:28rpx;height:30rpx;" src="/static/images/跑币@2x.png" mode="aspectFill"></image>
+									<text class="u-ml-10 b c0">跑币余额:</text>
 									<text class="u-ml-10 u-mr-10 b c0">0</text>
 									<u-icon name="arrow-right" size="10"></u-icon>
 								</view>

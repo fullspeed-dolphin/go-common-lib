@@ -76,7 +76,7 @@
 										</view>
 									</block>
 
-									<view v-if="!item.isFull || (item.capacity - (item.capacityUsed || 0) > 0)" class="add-btn flex-center" v-for="(item1) in item.signers" @click="refSingerList.open(item)">
+									<view v-if="!item.isFull || (item.capacity - (item.capacityUsed || 0) > 0)" class="add-btn flex-center" v-for="(item1) in item.signers" @click="refSignerList.open(item)">
 										<u-icon name="plus" color="#fff" size="16"></u-icon>
 									</view>
 
@@ -110,14 +110,23 @@
 		</section>
 
 		<section class="section-bottom">
-			<view class="txt flex-start">
+			<view class="agreement-wrapper">
 				<up-checkbox shape="circle" activeColor="#8CC63E" v-model:checked="isAgree" :usedAlone="true"
-					:customStyle="{ marginRight: '-10rpx' }" size="32rpx" />
-				<text @click="isAgree = !isAgree">
-					<text class="ml5">我已阅读并同意该</text>
-				</text>
-				<text style="color: #ff8c00" @click="$u.route('pagesSub/settings/agreement?type=signUp')">《用户协议》</text>以及
-				<text style="color: #ff8c00" @click="$u.route('pagesSub/settings/agreement?type=baoxian')">《保险须知》</text>
+					:customStyle="{ marginRight: '10rpx' }" size="32rpx" />
+				<view class="agreement-text">
+					<text @click="isAgree = !isAgree">我已阅读并同意</text>
+					<text style="color: #ff8c00" @click="$u.route('pagesSub/settings/agreement?type=signUp')">《用户协议》</text>
+					<text>、</text>
+					<text style="color: #ff8c00" @click="$u.route('pagesSub/settings/agreement?type=baoxian')">《保险须知》</text>
+					<template v-if="event_id === '01KCRXHMXF7SEBYCMZ1X2M4E0Y'">
+						<text>、</text>
+						<text style="color: #ff8c00" @click="$u.route('pagesSub/settings/agreement?type=notices_ShuiLianHu')">《水濂湖报名须知》</text>
+						<text>、</text>
+						<text style="color: #ff8c00" @click="$u.route('pagesSub/settings/agreement?type=rule_ShuiLianHu')">《水濂湖活动章程》</text>
+						<text>、</text>
+						<text style="color: #ff8c00" @click="$u.route('pagesSub/settings/agreement?type=disclaimer_ShuiLianHu')">《水濂湖免责声明》</text>
+					</template>
+				</view>
 			</view>
 			<view class="" style="padding: 56rpx 20rpx 80rpx">
 				<u-button type="primary" color="#ff8c00" shape="circle" @click="submitOrder()">￥{{ totalPrice }} 支付</u-button>
@@ -131,7 +140,7 @@
 		<u-picker :show="showAddressPicker" :columns="[addressPickerColumns]" keyName="label" @confirm="confirmAddress"
 			@cancel="showAddressPicker = false" title="请选择参赛包领取地址" confirmText="确定" cancelText="取消"></u-picker>
 		
-		<SingerList ref="refSingerList" @select="addSigner"/>
+		<SignerList ref="refSignerList" @select="addSigner"/>
 	</view>
 </template>
 <script setup>
@@ -150,7 +159,7 @@
 	import GroupList from "./components/groupList.vue";
 	import UserLogin from "@/components/UserLogin.vue";
 	import Navbar from "@/components/navbar.vue";
-	import SingerList from "./components/SingerList.vue"
+	import SignerList from "./components/SignerList.vue"
 	import { asyncAlls } from "../utils/util";
 		import request from "@/utils/request.js"
 
@@ -158,7 +167,7 @@
 	const store = useStore();
 
 	// 模板引用
-	const refSingerList = ref(null);
+	const refSignerList = ref(null);
 	const refGroupList = ref(null);
 	const refUserLogin = ref(null);
 
@@ -453,12 +462,55 @@
 		item.signers ++
 		item.capacityUsed --
 	}
-	
+
+	// 从身份证号码解析出生日期
+	const parseBirthDateFromIdCard = (idCard) => {
+		if (!idCard || idCard.length !== 18) return null;
+		const birthStr = idCard.substring(6, 14); // YYYYMMDD
+		const year = parseInt(birthStr.substring(0, 4));
+		const month = parseInt(birthStr.substring(4, 6));
+		const day = parseInt(birthStr.substring(6, 8));
+		return new Date(year, month - 1, day);
+	};
+
+	// 从身份证号码解析性别 (第17位,奇数为男,偶数为女)
+	const parseGenderFromIdCard = (idCard) => {
+		if (!idCard || idCard.length !== 18) return null;
+		const genderCode = parseInt(idCard.charAt(16));
+		return genderCode % 2 === 1 ? '男' : '女';
+	};
+
 	const addSigner = (data) => {
 		// console.log(data, priceList.value)
-		
+
 		const curOption = priceList.value.find(item => item.label === data.eventInfo.label);
-		
+
+		// 硬编码逻辑:仅对特定活动生效
+		if (event_id.value === '01KCRXHMXF7SEBYCMZ1X2M4E0Y') {
+			const idCard = data.signerInfo.cert_number;
+
+			// 验证1:如果套餐价格为0,只能选择2016年1月1日之后出生的报名卡
+			if (curOption.price === 0) {
+				const birthDate = parseBirthDateFromIdCard(idCard);
+				const limitDate = new Date(2016, 0, 1); // 2016-01-01
+				if (!birthDate || birthDate < limitDate) {
+					return uni.$u.toast('请选择2016年之后出生的报名卡');
+				}
+			}
+
+			// 验证2:套餐名称包含'男'或'女',强制匹配性别
+			const packageName = curOption.label;
+			const genderFromIdCard = parseGenderFromIdCard(idCard);
+
+			if (packageName.includes('男') && genderFromIdCard !== '男') {
+				return uni.$u.toast('请选择正确性别的报名卡');
+			}
+
+			if (packageName.includes('女') && genderFromIdCard !== '女') {
+				return uni.$u.toast('请选择正确性别的报名卡');
+			}
+		}
+
 		// if (!isMultiSelect.value) {
 		// 	const isSigned = priceList.value.some(item => {
 		// 		return item?.signerList?.some(i => i.id === data.signerInfo.id)
@@ -560,7 +612,7 @@
 			return uni.$u.toast(`请在「${names}」套餐内添加人员`);
 		}
 
-		// if (!selectedAddress.value) return uni.$u.toast("请选择参赛包领取地址");
+		if (!selectedAddress.value) return uni.$u.toast("请选择参赛包领取地址");
 
 		// const reg = /^[0-9a-zA-Z]*$/g;
 		// if (verifyCode.value) {
@@ -669,16 +721,50 @@
 	};
 	
 	
+	// 硬编码逻辑：根据套餐名称强制设置T-shirt尺码（仅对特定活动生效）
+	function getFixedTshirtSize(packageLabel, originalSize) {
+		// 仅对特定活动生效
+		if (event_id.value !== '01KCRXHMXF7SEBYCMZ1X2M4E0Y') {
+			return originalSize;
+		}
+
+		if (packageLabel.includes('男')) {
+			return 'L';
+		} else if (packageLabel.includes('女')) {
+			return 'M';
+		} else if (packageLabel.includes('小孩') || packageLabel.includes('儿童') || packageLabel.includes('亲子')) {
+			return '130';
+		} else {
+			// 其他情况返回 null，调用方需要处理报错
+			return null;
+		}
+	}
+
 	async function createSingleOrder(signer) {
+		const packageLabel = signer.eventInfo.label;
+
+		// 获取强制设置的T-shirt尺码
+		let tshirtSize = getFixedTshirtSize(packageLabel, signer.tshirt_size);
+
+		// 特定活动下，如果无法确定尺码则报错
+		if (event_id.value === '01KCRXHMXF7SEBYCMZ1X2M4E0Y' && tshirtSize === null) {
+			uni.showModal({
+				title: "提示",
+				content: `套餐"${packageLabel}"无法确定T-shirt尺码，请联系客服`,
+				showCancel: false,
+			});
+			return null;
+		}
+
 		const data = {
 			full_name: signer.full_name || null,
 			id_card: signer.cert_number || null,
 			gender: signer.gender || null,
 			phone_number: signer.phone_number || null,
-			tshirt_size: signer.tshirt_size || null,
+			tshirt_size: tshirtSize,
 			email: signer.email || null,
 			blood_type: signer.blood_type || null,
-			package: signer.eventInfo.label,
+			package: packageLabel,
 			payment_method: "wechat",
 			event_id: event_id.value,
 			payment_amount: signer.eventInfo.price,
@@ -785,6 +871,26 @@
 
 	.section-bottom {
 		margin: 30rpx 34rpx;
+
+		.agreement-wrapper {
+			display: flex;
+			align-items: flex-start;
+			gap: 10rpx;
+		}
+
+		.agreement-text {
+			flex: 1;
+			font-size: 26rpx;
+			line-height: 1.6;
+			color: #333;
+			word-wrap: break-word;
+			word-break: break-all;
+
+			text {
+				font-size: 26rpx;
+				line-height: 1.6;
+			}
+		}
 	}
 
 	.section-assign {

@@ -11,6 +11,9 @@ import agree_signUp from "../utils/agree_signUp.js"
 import agree_privy from "../utils/agree_privy.js"
 import faceScanPolicy from "../utils/faceScanPolicy.js"
 import baoxian from "../utils/baoxian.js"
+import notices_ShuiLianHu from "../utils/notices_ShuiLianHu.js"
+import rule_ShuiLianHu from "../utils/rule_ShuiLianHu.js"
+import disclaimer_ShuiLianHu from "../utils/disclaimer_ShuiLianHu.js"
 
 // 获取当前实例以访问全局属性
 const { proxy } = getCurrentInstance()
@@ -33,9 +36,27 @@ onLoad((options) => {
 	}
 	if (options.type === 'faceScanPolicy') {
 		detail.value.Content = faceScanPolicy
-		
+
 		uni.setNavigationBarTitle({
 			title: "人脸识别条款"
+		})
+	}
+	if (options.type === 'notices_ShuiLianHu') {
+		detail.value.Content = notices_ShuiLianHu
+		uni.setNavigationBarTitle({
+			title: "水濂湖报名须知"
+		})
+	}
+	if (options.type === 'rule_ShuiLianHu') {
+		detail.value.Content = rule_ShuiLianHu
+		uni.setNavigationBarTitle({
+			title: "水濂湖活动章程"
+		})
+	}
+	if (options.type === 'disclaimer_ShuiLianHu') {
+		detail.value.Content = disclaimer_ShuiLianHu
+		uni.setNavigationBarTitle({
+			title: "水濂湖免责声明"
 		})
 	}
 })

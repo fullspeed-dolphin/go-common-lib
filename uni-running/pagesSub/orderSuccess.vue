@@ -12,57 +12,61 @@
         报名后开始运动才能算有效成绩。先报名后开跑，该赛事为线下赛，暂不支持历史完赛成绩
       </view>
     </view>
-    <view class="section info">
+    <view
+      class="section info"
+      v-for="(signInfo, index) in detail.sign_info_list"
+      :key="index"
+    >
       <view class="section-content">
-        <view class="section-header">我的报名信息</view>
+        <view class="section-header">参赛人{{ index + 1 }}</view>
         <view class="section-items">
           <view class="section-item">
             <text class="label">姓名：</text>
-            <text class="value">{{ detail.sign_info?.full_name || "--" }}</text>
+            <text class="value">{{ signInfo?.full_name || "--" }}</text>
           </view>
           <!-- <view class="section-item">
             <text class="label">手机号码：</text>
             <text class="value">{{
-              detail.sign_info?.phone_number || "--"
+              signInfo?.phone_number || "--"
             }}</text>
           </view> -->
           <view class="section-item">
             <text class="label">性别：</text>
             <text class="value">{{
-              detail.sign_info?.gender === "1" ? "男" : "女" || "--"
+              signInfo?.gender === "1" ? "男" : "女" || "--"
             }}</text>
           </view>
           <!-- <view class="section-item">
             <text class="label">身份证号码：</text>
-            <text class="value">{{ detail.sign_info?.id_card || "--" }}</text>
+            <text class="value">{{ signInfo?.id_card || "--" }}</text>
           </view> -->
           <view class="section-item">
             <text class="label">血型：</text>
             <text class="value">{{
-              detail.sign_info?.blood_type || "--"
+              signInfo?.blood_type || "--"
             }}</text>
           </view>
           <!-- <view class="section-item">
             <text class="label">所在跑团：</text>
             <text class="value">{{
-              detail.sign_info?.running_group || "--"
+              signInfo?.running_group || "--"
             }}</text>
           </view> -->
           <view class="section-item">
             <text class="label">T恤尺码：</text>
             <text class="value">{{
-              detail.sign_info?.tshirt_size || "--"
+              signInfo?.tshirt_size || "--"
             }}</text>
           </view>
           <view class="section-item address-item">
             <text class="label">参赛包领取地址：</text>
             <text class="value">{{
-              detail?.racekit_pickup_address || "--"
+              signInfo?.racekit_pickup_address || "--"
             }}</text>
           </view>
-          <view class="section-item" v-if="detail.sign_info?.package">
+          <view class="section-item" v-if="signInfo?.package">
             <text class="label">报名项目：</text>
-            <text class="value">{{ detail.sign_info.package }}</text>
+            <text class="value">{{ signInfo.package }}</text>
           </view>
           <view class="section-item" v-if="detail.event_info?.name">
             <text class="label">参赛活动：</text>
@@ -81,37 +85,37 @@
         </view>
         <view class="section-actions">
           <u-button
-            v-if="detail?.bib_url"
+            v-if="signInfo?.bib_url"
             type="primary"
             shape="circle"
             color="#FF8C00"
-            @click="viewBib()"
+            @click="viewBib(signInfo)"
             >查看号码布</u-button
           >
           <u-button
-            v-if="!detail?.bib_url"
+            v-if="!signInfo?.bib_url"
             type="primary"
             plain
             shape="circle"
             color="#FF8C00"
-            @click="viewBib()"
+            @click="viewBib(signInfo)"
             >查看号码布</u-button
           >
           <u-button
-            v-if="detail?.certificate_url"
+            v-if="signInfo?.certificate_url"
             type="primary"
             shape="circle"
             color="#FF8C00"
-            @click="viewCertificate(detail)"
+            @click="viewCertificate(signInfo)"
             >查看完赛证书</u-button
           >
           <u-button
-            v-if="!detail?.certificate_url"
+            v-if="!signInfo?.certificate_url"
             type="primary"
             plain
             shape="circle"
             color="#FF8C00"
-            @click="viewCertificate(detail)"
+            @click="viewCertificate(signInfo)"
             >查看完赛证书</u-button
           >
         </view>
@@ -146,11 +150,12 @@
       <view class="refund-button">
         <u-button
           type="primary"
-          color="#FF8C00"
+          :color="canRefund ? '#FF8C00' : '#CCCCCC'"
           shape="circle"
+          :disabled="!canRefund"
           @click="refundOrder(detail)"
         >
-          申请退赛
+          {{ canRefund ? '申请退赛' : '已超过退赛时间' }}
         </u-button>
       </view>
     </view>
@@ -172,7 +177,7 @@
 </template>
 
 <script setup>
-import { ref, onUnmounted, watch } from "vue";
+import { ref, onUnmounted, watch, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { getCurrentInstance } from "vue";
 import CommonDialog from "@/components/common/CommonDialog.vue";
@@ -186,7 +191,7 @@ const { proxy } = getCurrentInstance();
 // 响应式数据
 const detail = ref({
   event_info: {},
-  sign_info: {},
+  sign_info_list: [], // 改为数组，支持多个参赛人
   order_no: "",
   amount: 0,
   amount_yuan: 0,
@@ -198,6 +203,20 @@ const order_no = ref("");
 const loading = ref(false);
 const countdownText = ref("");
 let countdownTimer = null;
+
+// 判断订单是否在24小时内
+const isWithin24Hours = (createdAt) => {
+  if (!createdAt) return false;
+  const now = dayjs();
+  const orderTime = dayjs(createdAt);
+  const hoursDiff = now.diff(orderTime, "hour");
+  return hoursDiff < 24;
+};
+
+// 计算是否可以退赛
+const canRefund = computed(() => {
+  return isWithin24Hours(detail.value.created_at);
+});
 
 // 格式化倒计时显示
 const formatCountdown = (diff) => {
@@ -285,6 +304,16 @@ onLoad((options) => {
     const storedDetail = uni.getStorageSync("orderDetail");
     if (storedDetail) {
       detail.value = storedDetail;
+
+      // 兼容新旧数据结构
+      if (storedDetail.sign_info_list && Array.isArray(storedDetail.sign_info_list)) {
+        detail.value.sign_info_list = storedDetail.sign_info_list;
+      } else if (storedDetail.sign_info) {
+        detail.value.sign_info_list = [storedDetail.sign_info];
+      } else {
+        detail.value.sign_info_list = [];
+      }
+
       // 如果存储的数据中有事件时间，启动倒计时
       if (storedDetail.event_info?.event_time) {
         startCountdown();
@@ -316,10 +345,19 @@ const getOrderDetail = () => {
       console.log("订单详情 res", res);
 
       detail.value = res;
-      // 确保 sign_info 存在
-      if (!detail.value.sign_info) {
-        detail.value.sign_info = {};
+
+      // 兼容新旧数据结构
+      if (res.sign_info_list && Array.isArray(res.sign_info_list)) {
+        // 新结构：使用 sign_info_list
+        detail.value.sign_info_list = res.sign_info_list;
+      } else if (res.sign_info) {
+        // 旧结构：将 sign_info 转换为数组
+        detail.value.sign_info_list = [res.sign_info];
+      } else {
+        // 都没有，初始化为空数组
+        detail.value.sign_info_list = [];
       }
+
       proxy.$axios
         .get(`/event-api/api/v1/events/${res.event_id}`)
         .then((eventRes) => {
@@ -342,31 +380,68 @@ const getOrderDetail = () => {
 };
 
 const refundOrder = () => {
+  if (!canRefund.value) {
+    proxy.$toast("已超过退赛时间");
+    return;
+  }
   refundDialogRef.value.open();
 };
 
 const confirmRefund = () => {
   console.log("confirmRefund");
-  uni.$u.route("pagesSub/orderRefund");
+
+  if (!detail.value.order_no) {
+    proxy.$toast("订单号不存在");
+    refundDialogRef.value.close();
+    return;
+  }
+
+  uni.showLoading({
+    mask: true,
+    title: "退款中...",
+  });
+
+  const params = {
+    order_no: detail.value.order_no,
+    reason: "用户申请退款",
+    refund_amount: detail.value.amount,
+  };
+
+  proxy.$axios
+    .post(`/pay/wechat/refund`, params)
+    .then((res) => {
+      uni.hideLoading();
+      refundDialogRef.value.close();
+      // 显示后端返回的消息
+      const message = res.msg || res.message || res.data || JSON.stringify(res);
+      proxy.$toast(message);
+    })
+    .catch((err) => {
+      uni.hideLoading();
+      refundDialogRef.value.close();
+      // 显示后端返回的错误消息
+      const errorMessage = err.msg || err.message || err.data || JSON.stringify(err);
+      proxy.$toast(errorMessage);
+    });
 };
 
 const closeRefund = () => {
   console.log("closeRefund");
 };
 
-const viewBib = () => {
-  if (!detail.value.bib_url) {
+const viewBib = (signInfo) => {
+  if (!signInfo?.bib_url) {
     return proxy.$toast("暂无号码布");
   }
-  uni.$u.route(`pagesSub/settings/webView?link=${detail.value.bib_url}`);
+  uni.$u.route(`pagesSub/settings/webView?link=${signInfo.bib_url}`);
 };
 
-const viewCertificate = () => {
-  if (!detail.value.certificate_url) {
+const viewCertificate = (signInfo) => {
+  if (!signInfo?.certificate_url) {
     return proxy.$toast("暂无完赛证书");
   }
   uni.$u.route(
-    `pagesSub/settings/webView?link=${detail.value.certificate_url}`
+    `pagesSub/settings/webView?link=${signInfo.certificate_url}`
   );
 };
 
@@ -419,6 +494,11 @@ onUnmounted(() => {
 .section {
   &.info {
     margin-top: -100rpx;
+
+    // 多个参赛人卡片时，后续卡片添加间距
+    &:not(:first-child) {
+      margin-top: 24rpx;
+    }
   }
   padding: 0 34rpx;
   .section-content {

@@ -50,7 +50,7 @@
 					<view class="c9 fs24">
 						创建时间:{{order.created_at}}
 					</view>
-					<view class="" v-if="order.status == 'SUCC'">
+					<view class="" v-if="order.status == 'SUCC' && isWithin24Hours(order.created_at)">
 						<u-button type="primary" @click="refundOrder(order)" color="#FF8C00" customStyle="height: 50rpx;"
 							size="small" plain shape="circle">
 							申请退款
@@ -86,7 +86,8 @@
 		onReachBottom
 	);
 	import Navbar from "@/components/navbar.vue";
-	import request from "@/utils/request.js"
+	import request from "@/utils/request.js";
+	import dayjs from "dayjs";
 
 	const dataList = ref([]);
 
@@ -118,6 +119,14 @@
 	}
 
 	// 方法定义
+	// 判断订单是否在24小时内
+	const isWithin24Hours = (createdAt) => {
+		const now = dayjs();
+		const orderTime = dayjs(createdAt);
+		const hoursDiff = now.diff(orderTime, 'hour');
+		return hoursDiff < 24;
+	};
+
 	const viewDetail = (item) => {
 		uni.$u.route(`pagesSub/orderSuccess?order_no=${item.order_no}`);
 	};
@@ -134,7 +143,11 @@
 						"refund_amount": item.amount
 					}
 					request.post(`/pay/wechat/refund `, params).then((res) => {
-						navList.value = res
+						uni.$u.toast(res.msg || res.message || "退款申请已提交");
+						// 刷新列表
+						refreshList();
+					}).catch((err) => {
+						uni.$u.toast(err.msg || err.message || "退款申请失败，请稍后重试");
 					});
 				} else if (res.cancel) {
 					console.log("用户点击取消");
