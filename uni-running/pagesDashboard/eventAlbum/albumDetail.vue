@@ -34,14 +34,20 @@
 			</section>
 
 			<section v-if="tabActive === 'photo'" class="u-flex-wrap u-flex" style="gap: 10rpx;padding: 0 34rpx;">
-				<view class="card-item" v-for="(item, index) in dataList" :key="index" @click="previewImg(item)">
-					<up-lazy-load height="507" :image="item + '?x-oss-process=image/resize,w_300,h_200,m_fill'" mode="aspectFill" />
-				</view>
+				<up-waterfall v-model="dataList" ref="uWaterfallRef" columns="2">
+					<template v-slot:column="{colList, colIndex}">
+						<view class="card-item" 
+							v-for="(item, index) in colList" 
+							:key="index" @click="previewImg(item)">
+							<up-lazy-load :image="item.url + '?x-oss-process=image/resize,w_300'" mode="aspectFill" />
+						</view>
+					</template>
+				</up-waterfall>
 			</section>
 			<section v-if="tabActive === 'video'" class="u-flex-wrap u-flex" style="gap: 10rpx;padding: 0 34rpx;">
-				<view class="card-item" v-for="(item, index) in []" :key="index" @click="previewImg(item)">
-					<up-lazy-load height="507" :image="item + '?x-oss-process=image/resize,w_300,h_200,m_fill'" mode="aspectFill" />
-				</view>
+					<view class="card-item" v-for="(item, index) in []" :key="index" @click="previewImg(item)">
+						<up-lazy-load :image="item.url + '?x-oss-process=image/resize,w_300'" mode="aspectFill" />
+					</view>
 			</section>
 		</mescroll-body>
 		
@@ -76,9 +82,11 @@
 	let eventId = ''
 	
 	const previewImg = (item) => {
-		console.log('item')
-		refPreviewMedia.value.openModal(item)
+		refPreviewMedia.value.openModal(item.url)
 	};
+	
+	const uWaterfallRef = ref(null);
+	const loadStatus = ref('loadmore');
 
 	let mescroll = ref(null);
 	const refreshList = () => {
@@ -106,7 +114,10 @@
 				if (mescroll.num == 1) dataList.value = []
 
 				res = res.urls.map(i => {
-					return i
+					return {
+						id: i,
+						url: i
+					}
 				})
 				
 				dataList.value = dataList.value.concat(res)
@@ -183,13 +194,44 @@
 			}
 		}
 	}
-
+	.u-column-0{
+		.card-item {
+			&:nth-child(1){
+				height: 500rpx;
+				::v-deep{
+					.u-lazy-item{
+						height: 500rpx!important;
+					}
+				}
+			}
+			&:nth-child(5n){
+				height: 502rpx;
+				::v-deep{
+					.u-lazy-item{
+						height: 502rpx!important;
+					}
+				}
+			}
+		}
+	}
+	
+	.u-column-1{
+		.card-item {
+			&:nth-child(8n){
+				height: 502rpx;
+				::v-deep{
+					.u-lazy-item{
+						height: 502rpx!important;
+					}
+				}
+			}
+		}
+	}
 	.card-item {
 		width: 336rpx;
-		height: 502rpx;
+		margin-bottom: 10rpx;
 		.img {
 			width: 336rpx;
-			height: 502rpx;
 		}
 	}
 </style>

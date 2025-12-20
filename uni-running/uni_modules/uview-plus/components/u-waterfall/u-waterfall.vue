@@ -6,7 +6,7 @@
             :key="index"
             :ref="`u-column-${index}`"
             :id="`u-column-${index}`"
-            class="u-column"
+            :class="`u-column  u-column-${index}`" 
         >
             <slot name="column"
                 :colIndex="index" 
