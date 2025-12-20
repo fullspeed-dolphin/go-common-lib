@@ -1,5 +1,4 @@
 <template>
-	<view class="page">
 		<Navbar title="活动报名" :bgHeight="370" />
 
 		<section class="section-assign">
@@ -37,53 +36,50 @@
 		<view class="section" style="margin-top:30rpx;">
 			<view class="section-title">选择套餐<text v-if="multiPackageCount > 1" style="font-size: 24rpx; color: #999; margin-left: 10rpx;">（可选{{ multiPackageCount }}个套餐）</text></view>
 			<view class="section-content">
-				<view class="price-list">
-					<view v-for="(item, index) in priceList" :key="index">
-						<view class="price-item " :class="{ disabled: item.isFull }">
-							<view class="price-item-header" :class="{ active: item.isChecked }" @click="togglePackage(item)">
-								<view class="flex-between-center" style="width:100%; align-items: flex-start;">
-									<view class="price-item-content" >
-										<view class="price-item-row">
-											<view class="price-item-label">{{ item.label }}</view>
-										</view>
-										<view class="flex-start">
-											<view class="price-item-price u-mr-20">￥{{ item.price }}</view>
-											<view v-if="item.isFull" class="price-item-status">已满</view>
-											<view v-else-if="item.capacity !== null && item.capacity !== undefined" class="price-item-capacity">
-												剩余 {{ item.capacity - (item.capacityUsed || 0) }}
-											</view>
-										</view>
-									</view>
-
-									<view class="flex-center u-mt-10" style="font-size: 24rpx;" :class="{active: item.isToggle}">
-										{{item.isToggle ? '收起' : '展开' }}
-										<u-icon name="arrow-right" :color="item.isChecked ? '#fff' : '#999'" size="10"></u-icon>
+				<view class="price-item" v-for="(item, index) in priceList" :key="index" 
+					:class="{ disabled: item.isFull, active: item.isChecked }">
+					<view class="price-item-header" @click="togglePackage(item)">
+						<view class="flex-between-center" style="width:100%; align-items: flex-start;">
+							<view class="price-item-content" >
+								<view class="price-item-row">
+									<view class="price-item-label">{{ item.label }}</view>
+								</view>
+								<view class="flex-start">
+									<view class="price-item-price u-mr-20">￥{{ item.price }}</view>
+									<view v-if="item.isFull" class="price-item-status">已满</view>
+									<view v-else-if="item.capacity !== null && item.capacity !== undefined" class="price-item-capacity">
+										剩余 {{ item.capacity - (item.capacityUsed || 0) }}
 									</view>
 								</view>
 							</view>
 
-							<view v-if="item.isToggle && item.isChecked" class="price-item-signers">
-								<view class="u-flex u-flex-wrap" style="gap:20rpx; justify-content: flex-start; align-items: flex-end;">
-									<block v-if="item.signerList">
-										<view class="flex-col-center" v-for="(signer, indexSigner) in item.signerList" :key="signer.id">
-											<view  class="add-btn flex-center rel"  @click="removeSigner(item, indexSigner)">
-												<view style="position: absolute;right:-8rpx;top:-8rpx;z-index:6;">
-													<u-icon name="close-circle" color="#999" size="20"></u-icon>
-												</view>
-												<image style="width:88rpx;height:88rpx;" src="/static/images/user.png" mode="aspectFill"></image>
-											</view>
-											<view class="u-mt-10" style="color:#333;font-weight:400;font-size: 24rpx;">{{signer.full_name}}</view>
+							<view v-if="!item.isFull" class="flex-center u-mt-10" style="font-size: 24rpx;" :class="{active: item.isToggle}">
+								{{item.isToggle ? '收起' : '展开' }}
+								<u-icon name="arrow-right" :color="item.isChecked ? '#fff' : '#999'" size="10"></u-icon>
+							</view>
+						</view>
+					</view>
+
+					<view v-if="item.isToggle && item.isChecked" class="price-item-signers u-pl-10">
+						<view class="u-flex u-flex-wrap" style="gap:20rpx; justify-content: flex-start; align-items: flex-end;">
+							<block v-if="item.signerList">
+								<view class="flex-col-center" v-for="(signer, indexSigner) in item.signerList" :key="signer.id">
+									<view  class="add-btn flex-center rel"  @click="removeSigner(item, indexSigner)">
+										<view style="position: absolute;right:-8rpx;top:-8rpx;z-index:6;">
+											<u-icon name="close-circle" color="#999" size="20"></u-icon>
 										</view>
-									</block>
-
-									<view v-if="!item.isFull || (item.capacity - (item.capacityUsed || 0) > 0)" class="add-btn flex-center" v-for="(item1) in item.signers" @click="refSignerList.open(item)">
-										<u-icon name="plus" color="#fff" size="16"></u-icon>
+										<image style="width:88rpx;height:88rpx;" src="/static/images/user.png" mode="aspectFill"></image>
 									</view>
-
-									<view v-if="!item.signerList" style="flex: 1; font-size: 24rpx; color: #E53935; text-align: right;">
-										请选择报名卡
-									</view>
+									<view class="u-mt-10" style="color:#333;font-weight:400;font-size: 24rpx;">{{signer.full_name}}</view>
 								</view>
+							</block>
+
+							<view v-if="!item.isFull || (item.capacity - (item.capacityUsed || 0) > 0)" class="add-btn flex-center" v-for="(item1) in item.signers" @click="refSignerList.open(item)">
+								<u-icon name="plus" color="#fff" size="16"></u-icon>
+							</view>
+
+							<view v-if="!item.signerList" style="flex: 1; font-size: 24rpx; color: #E53935; text-align: right;">
+								请选择报名卡
 							</view>
 						</view>
 					</view>
@@ -93,11 +89,11 @@
 
 		<section class="section" style="margin-top:30rpx;">
 			<section v-if="priceList.length" class="section-content payment-content">
-				<view class="money flex-row" style="align-items: baseline">
+				<view class="money flex-row u-mb-20" style="align-items: baseline">
 					￥{{ totalPrice }}
 					<view class="txt"> {{ !totalPrice ? '(请添加报名人员）' :'' }} </view>
 				</view>
-				<view class="" style="line-height: 34rpx; margin-bottom: 34rpx; font-size: 24rpx">
+				<view class="" style="margin-bottom: 20rpx; font-size: 24rpx">
 					选择支付方式
 				</view>
 				<view class="flex-between-center method-cell">
@@ -112,7 +108,7 @@
 		<section class="section-bottom">
 			<view class="agreement-wrapper">
 				<up-checkbox shape="circle" activeColor="#8CC63E" v-model:checked="isAgree" :usedAlone="true"
-					:customStyle="{ marginRight: '10rpx' }" size="32rpx" />
+					size="32rpx" />
 				<view class="agreement-text">
 					<text @click="isAgree = !isAgree">我已阅读并同意</text>
 					<text style="color: #ff8c00" @click="$u.route('pagesSub/settings/agreement?type=signUp')">《用户协议》</text>
@@ -133,15 +129,12 @@
 			</view>
 		</section>
 
-		<GroupList ref="refGroupList" @success="getUserGroup()" />
-		<UserLogin ref="refUserLogin" />
-
 		<!-- 参赛包领取地址选择器 -->
 		<u-picker :show="showAddressPicker" :columns="[addressPickerColumns]" keyName="label" @confirm="confirmAddress"
 			@cancel="showAddressPicker = false" title="请选择参赛包领取地址" confirmText="确定" cancelText="取消"></u-picker>
 		
 		<SignerList ref="refSignerList" @select="addSigner"/>
-	</view>
+		<GroupList ref="refGroupList" @success="getUserGroup()" />
 </template>
 <script setup>
 	import {
@@ -157,7 +150,6 @@
 		useStore
 	} from "vuex";
 	import GroupList from "./components/groupList.vue";
-	import UserLogin from "@/components/UserLogin.vue";
 	import Navbar from "@/components/navbar.vue";
 	import SignerList from "./components/SignerList.vue"
 	import { asyncAlls } from "../utils/util";
@@ -339,7 +331,7 @@
 		}
 	};
 
-	const getUserGroup = async () => {
+	const getUserGroup = () => {
 		uni.showLoading({
 			mask: true
 		});
@@ -350,18 +342,11 @@
 			return;
 		}
 
-		try {
-			let res = await request.get(
-				`/running-group/api/v1/groups/info?group_id=${userInfo.value.running_group}`
-			);
+		request.get(`/running-group/api/v1/groups/info?group_id=${userInfo.value.running_group}`).then(res => {
 			if (res) {
 				myGroup.value = res;
 			}
-		} catch (error) {
-			console.error(error);
-		}
-
-		uni.hideLoading();
+		})
 	};
 
 	const getEventPrice = (spxcode = null) => {
@@ -550,6 +535,8 @@
 	}
 
 	function togglePackage (item) {
+		if (item.isFull) return;
+		
 		// 如果套餐未选中且已达选择上限，不响应点击
 		if (!item.isChecked && !canSelectPackage(item)) {
 			return
@@ -662,64 +649,7 @@
 		}
 		
 		isSubmitting.value = false;
-		return
-
-		// 判断单选还是多选，获取对应的 package 和 price
-		let packageStr = "";
-		let paymentAmount = 0;
-
-		if (isMultiSelect.value) {
-			// 用 '_' 拼接多个 package
-			packageStr = selectedPackages.value.map(pkg => pkg.label).join('_');
-			// 累加价格
-			paymentAmount = totalPrice.value;
-		} else {
-			// 单选：检查是否选择了套餐
-			if (!activeType.value.label) {
-				return uni.$u.toast("请选择报名套餐");
-			}
-			packageStr = activeType.value.label;
-			paymentAmount = activeType.value.price;
-		}
-
-		const data = {
-			full_name: SignerInfo.value.full_name || null,
-			id_card: SignerInfo.value.cert_number || null,
-			gender: SignerInfo.value.gender || null,
-			phone_number: SignerInfo.value.phone_number || null,
-			tshirt_size: SignerInfo.value.tshirt_size || null,
-			email: SignerInfo.value.email || null,
-			blood_type: SignerInfo.value.blood_type || null,
-			package: packageStr,
-			payment_method: "wechat",
-			event_id: event_id.value,
-			payment_amount: paymentAmount,
-			spxcode: computedCode.value.isOk ? verifyCode.value : null,
-			running_group: String(userInfo.value.running_group || ""),
-			racekit_pickup_address: selectedAddress.value || null,
-		};
-
-		delete data.updated_at;
-		delete data.status;
-		delete data.created_at;
-
-		
-		request.post(`/booking-api/registration/SignInEvent`, data)
-			.then((res) => {
-				payOrder(res.reg_no);
-			})
-			.catch((err) => {
-				console.error(err);
-				uni.hideLoading();
-				uni.showModal({
-					title: "提示",
-					content: err.msg,
-					showCancel: false,
-				});
-				isSubmitting.value = false;
-			});
 	};
-	
 	
 	// 硬编码逻辑：根据套餐名称强制设置T-shirt尺码（仅对特定活动生效）
 	function getFixedTshirtSize(packageLabel, originalSize) {
@@ -786,17 +716,8 @@
 				content: error.msg,
 				showCancel: false,
 			});
-			//TODO handle the exception
 		}
 	}
-
-	const getCode = async () => {
-		return (
-			await new Promise((resolve) => uni.login({
-				success: (e) => resolve(e)
-			}))
-		).code;
-	};
 
 	const payOrder = async (reg_no) => {
 		const data = {
@@ -810,9 +731,6 @@
 		});
 
 		request.post(`/pay/wechat/payment`, data).then((res) => {
-			console.log("res", res);
-			uni.hideLoading();
-			isSubmitting.value = false;
 			wxPay(res);
 		});
 	};
@@ -896,7 +814,7 @@
 	.section-assign {
 		.cell {
 			width: 682rpx;
-			height: 120rpx;
+			height: 100rpx;
 			padding: 0 20rpx;
 			margin: 0rpx auto 20rpx;
 			background: #ffffff;
@@ -937,28 +855,22 @@
 		margin-top: 48rpx;
 		padding: 0 34rpx;
 		width: 100%;
-
-		.section-title {
-			font-weight: bold;
-			font-size: 30rpx;
-			color: #000000;
-			margin-bottom: 24rpx;
-		}
-
-		.section-content {
-			background: #ffffff;
-			border-radius: 16rpx 16rpx 16rpx 16rpx;
-			border: 2rpx solid rgba(0, 0, 0, 0.06);
-			width: 100%;
-			padding: 30rpx 20rpx;
-		}
 	}
-
-	.price-list {
+	
+	.section-title {
+		font-weight: bold;
+		font-size: 30rpx;
+		color: #000000;
+		margin-bottom: 24rpx;
+	}
+	
+	.section-content {
+		background: #ffffff;
+		border-radius: 16rpx 16rpx 16rpx 16rpx;
+		border: 2rpx solid rgba(0, 0, 0, 0.06);
 		width: 100%;
-		display: flex;
-		flex-direction: column;
-		gap: 20rpx;
+		padding: 30rpx 20rpx;
+	}
 
 		.price-item {
 			min-height: 90rpx;
@@ -968,25 +880,29 @@
 			font-size: 30rpx;
 			color: #000000;
 			overflow: hidden;
+			margin-bottom: 20rpx;
+			&.active {
+				border: 1px solid #ff8c00;
+				box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.3);
+				.price-item-header{
+					background: #ff8c00;
+					color: #ffffff;
+					border-radius: 0;
+				}
+				.price-item-content {
+					.price-item-price,
+					.price-item-status,
+					.price-item-capacity {
+						color: #ffffff;
+					}
+				}
+			}
 
 			.price-item-header {
 				padding: 20rpx;
 				background: #f6fafb;
 				border-radius: 16rpx;
-				transition: all 0.3s ease;
-
-				&.active {
-					background: #ff8c00;
-					color: #ffffff;
-
-					.price-item-content {
-						.price-item-price,
-						.price-item-status,
-						.price-item-capacity {
-							color: #ffffff;
-						}
-					}
-				}
+				// transition: background 0.3s ease;
 			}
 
 			.price-item-signers {
@@ -1045,17 +961,11 @@
 				}
 			}
 		}
-	}
 
 	.payment-content {
-		padding: 44rpx 20rpx !important;
-
 		.money {
 			color: #e53935;
 			font-size: 44rpx;
-			line-height: 60rpx;
-			margin-bottom: 30rpx;
-
 			.txt {
 				font-size: 34rpx;
 				color: #000;
