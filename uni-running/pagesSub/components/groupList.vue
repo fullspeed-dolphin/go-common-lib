@@ -1,136 +1,106 @@
 <template>
-  <u-popup
-    :show="isShowPop"
-    mode="bottom"
-    zIndex="10"
-    closeable
-    round="15"
-    @close="isShowPop = false"
-  >
-    <view class="flex-center" style="height: 100rpx; font-size: 32rpx">
-      请选择跑团
-    </view>
-    <section class="section-filter bgf" style="margin-top: -20rpx">
-      <view class="section-search">
-        <u-search
-          v-model="searchTxt"
-          @search="getList"
-          placeholder="搜索跑团"
-          shape="round"
-          bgColor="#fff"
-          borderColor="#FF8C00"
-          :showAction="false"
-        ></u-search>
-      </view>
-    </section>
-    <view
-      class=""
-      style="overflow: auto; max-height: 600rpx; min-height: 400rpx"
-    >
-      <GroupItem
-        from="search"
-        :item="item"
-        v-for="(item, index) in dataList"
-        :key="index"
-        @join="joinGroup"
-      />
-    </view>
-  </u-popup>
+	<u-popup :show="isShowPop" mode="bottom" zIndex="10" closeable round="15" @close="isShowPop = false">
+		<view class="flex-center" style="height: 100rpx; font-size: 32rpx">
+			请选择跑团
+		</view>
+		<section class="section-filter bgf u-pl-20 u-pr-20" style="margin-top: -20rpx">
+			<view class="section-search">
+				<u-search v-model="searchTxt" @search="getList" placeholder="搜索跑团" shape="round" bgColor="#fff"
+					borderColor="#FF8C00" :showAction="false"></u-search>
+			</view>
+		</section>
+		<scroll-view scroll-y style="overflow: auto; max-height: 600rpx; min-height: 400rpx">
+			<GroupItem from="search" :item="item" v-for="(item, index) in dataList" :key="index" @join="joinGroup" />
+		</scroll-view>
+	</u-popup>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import { useStore } from "vuex";
-import { getCurrentInstance } from "vue";
-import GroupItem from "@/components/GroupItem.vue";
-
-// 获取当前实例以访问全局属性
-const { proxy } = getCurrentInstance();
-
-// 使用store
+	import {
+		ref
+	} from "vue";
+	import { useStore } from "vuex";
+	import request from "@/utils/request.js"
+	import GroupItem from "@/components/GroupItem.vue";
 const store = useStore();
 
-// 模板引用
-const refPhoneLogin = ref(null);
+	// 模板引用
+	const refPhoneLogin = ref(null);
 
-// 响应式数据
-const searchTxt = ref("");
-const isShowPop = ref(false);
-const dataList = ref([]);
+	// 响应式数据
+	const searchTxt = ref("");
+	const isShowPop = ref(false);
+	const dataList = ref([]);
 
-// 计算属性
-const userInfo = computed(() => store.state.userInfo);
+	// Emits
+	const emit = defineEmits(["success"]);
 
-// Emits
-const emit = defineEmits(["success"]);
+	// 方法定义
+	const open = () => {
+		isShowPop.value = true;
+		getList();
+	};
 
-// 方法定义
-const open = () => {
-  isShowPop.value = true;
-  getList();
-};
+	const close = () => {
+		isShowPop.value = false;
+	};
 
-const close = () => {
-  isShowPop.value = false;
-};
+	const getList = () => {
+		uni.showLoading({
+			mask: true
+		});
 
-const getList = () => {
-  uni.showLoading({ mask: true });
+		const data = {
+			pageIndex: 0,
+			pageSize: 20,
+			keyword: searchTxt.value,
+		};
+		request.get(`/running-group/api/v1/groups/list`, data).then((res) => {
+			dataList.value = res.data.map(item => ({
+				...item,
+				introduction: item.introduction?.slice(0, 30) || ''
+			}))
+		});
+	};
 
-  const data = {
-    pageIndex: 0,
-    pageSize: 20,
-    keyword: searchTxt.value,
-  };
-  proxy.$axios.get(`/running-group/api/v1/groups/list`, data).then((res) => {
-    uni.hideLoading();
+	const joinGroup = (item) => {
+		uni.showModal({
+			title: "提示",
+			content: "是否确认加入该跑团？",
+			success: (res) => {
+				if (res.confirm) {
+					const data = {
+						running_group: Number(item.group_id),
+					};
 
-    dataList.value = res.data;
-  });
-};
+					uni.showLoading({
+						mask: true
+					});
+					request.post(`/user-api/user/joinRunningGroup`, data)
+						.then(async (res) => {
+							uni.hideLoading();
+							uni.$u.toast("加入成功！");
 
-const joinGroup = (item) => {
-  if (!store.state.userInfo.id) {
-    return refPhoneLogin.value.open();
-  }
-  uni.showModal({
-    title: "提示",
-    content: "是否确认加入该跑团？",
-    success: (res) => {
-      if (res.confirm) {
-        const data = {
-          running_group: Number(item.group_id),
-        };
+							close();
 
-        uni.showLoading({ mask: true });
-        proxy.$axios
-          .post(`/user-api/user/joinRunningGroup`, data)
-          .then(async (res) => {
-            uni.hideLoading();
-            proxy.$toast("加入成功！");
+							await store.dispatch("getUserInfo");
 
-            close();
+							emit("success");
+						});
+				} else if (res.cancel) {
+					console.log("用户点击取消");
+				}
+			},
+		});
+	};
 
-            await store.dispatch("getUserInfo");
-
-            emit("success");
-          });
-      } else if (res.cancel) {
-        console.log("用户点击取消");
-      }
-    },
-  });
-};
-
-// 暴露方法给父组件
-defineExpose({
-  open,
-  close,
-});
+	// 暴露方法给父组件
+	defineExpose({
+		open,
+		close,
+	});
 </script>
 
-<style lang="scss" scoped>
-.section-filter {
-  width: 100%;
-}
+<style lang="scss">
+
 </style>
