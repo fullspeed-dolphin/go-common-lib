@@ -20,7 +20,7 @@
 				      formatIdCard(item.cert_number || "")
 				    }}</view>
 						<view class="id-card-number-separator">|</view>
-						<view class="id-card-number-type"> 成人 </view>
+						<view class="id-card-number-type"> {{item.ageScope}} ({{item.genderString}}) </view>
 					</view>
 				</view>
 				<view class="edit-btn" @click.stop="editCard(item.id)">
@@ -108,8 +108,6 @@
 			}
 		}
 		
-		console.log("form====>", form)
-		
 		return form;
 	}
 	
@@ -128,7 +126,11 @@
 				"/booking-api/registration/getSignerList", {}
 			);
 			if (Array.isArray(res)) {
-				dataList.value = res;
+				dataList.value = res.map(item => ({
+					...item,
+					genderString: ['女', '男', '未知'][item.gender],
+					ageScope: new Date().getFullYear() - item.birthday.slice(0, 4) > 18 ? '成人' : '儿童'
+				}));
 			} else {
 				dataList.value = [];
 			}
