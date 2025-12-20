@@ -1,5 +1,6 @@
 <template>
-	<view class="menu">
+	<!-- 只在正式版和开发版中显示，体验版中隐藏（用于规避审核） -->
+	<view class="menu" v-if="shouldShow">
 		<view class="menu-item" v-for="(item, index) in navList" :key="index" @click="routeTo(item)">
 			<view class="menu-item-bg">
 				<image class="menu-item-icon" :src="item.icon_url + '?x-oss-process=image/resize,w_90,h_90,m_fill'" mode="aspectFill"></image>
@@ -10,16 +11,25 @@
 </template>
 <script setup>
 	import {
-		ref
+		ref,
+		computed
 	} from 'vue'
 	import {
 		onShow,
 	} from "@dcloudio/uni-app";
 	import request from "@/utils/request.js"
-	
+
+	// 获取小程序运行环境：develop(开发版)、trial(体验版)、release(正式版)
 	const envVersion = uni?.getAccountInfoSync?.().miniProgram.envVersion;
-	const isRelease =['release'].includes(envVersion);
-	
+
+	// 只在正式版中显示，开发版和体验版中隐藏（用于规避审核）
+	const shouldShow = computed(() => {
+		// release: 正式版（显示）
+		// develop: 开发者工具（不显示）
+		// trial: 体验版（不显示）
+		return envVersion === 'release';
+	});
+
 	const navList = ref([])
 	// 页面显示
 	onShow(() => {
