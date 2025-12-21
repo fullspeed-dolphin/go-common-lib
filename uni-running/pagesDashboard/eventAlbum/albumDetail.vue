@@ -6,7 +6,6 @@
 	<!-- 如果页面中的cell高度是固定不变的，则不需要设置cell-height-mode，如果页面中高度是动态改变的，则设置cell-height-mode="dynamic" -->
 	<zPaging ref="paging" use-virtual-list enable-back-to-top
 		cell-height-mode="fixed"
-		auto-show-back-to-top
 		:preload-page="20"
 		:virtual-list-col="2" :inner-list-style="{'display':'flex','flex-wrap':'wrap'}"
 		:default-page-size="30" :force-close-inner-list="true" @virtualListChange="virtualListChange"
@@ -35,6 +34,16 @@
 				<view class="item" :class="{active: tabActive === 'photo'}" @click="tabActive = 'photo'">照片</view>
 				<view class="item" :class="{active: tabActive === 'video'}" @click="tabActive = 'video'">视频</view>
 			</section>
+			
+			<view v-if="isShowBackTop" @click="goToTop()" class="back-to-top" :class="{active: isScrolling}">
+				 <view class="box">
+					 <view class="flex-center">
+							顶部 
+							<text class="iconfont icon-back-top"></text>
+					 </view>
+					 <view class="number">{{ currentImageIndex }} / 3000</view>
+				 </view>
+			</view>
 		</view>
 		<!-- :id="`zp-id-${item.zp_index}`"和:key="item.zp_index" 必须写，必须写！！！！ -->
 		<!-- 这里for循环的index不是数组中真实的index了，请使用item.zp_index获取真实的index -->
@@ -57,23 +66,41 @@
 		},
 		data() {
 			return {
+				itemHeight: 240,
+				isScrolling: false,
+				currentImageIndex: 0,
 				isShowBackTop: false,
 				currentEvent: {},
 				tabActive: 'photo',
 				virtualList: [],
 				ossParams: '?x-oss-process=image/crop,w_500,h_400,x_100,y_100/format,webp/q_80',
-				tt: '?x-oss-process=image/resize,w_480'
+				tt: '?x-oss-process=image/resize,w_720/quality,q_80/format,webp',
+				tt1: '?x-oss-process=image/watermark,image_d2F0ZXJtYXJrL1BSTzUzMDE1NC9tYXJrMTQ1MTkwMS5wbmc_eC1vc3MtcHJvY2Vzcz1pbWFnZS9yZXNpemUsbV9maXhlZCx0eXBlXzIsd180ODAsaF84MCxsaW1pdF8wL2Zvcm1hdCxwbmc=,g_south,x_0,y_0,t_100',
 			}
 		},
 		onLoad(options) {
 			this.currentEvent = options
 		},
 		methods: {
-			onListScroll(e) {
-				console.log(e.detail.scrollTop)
-				this.isShowBackTop = e.detail.scrollTop >= 260
+			goToTop() {
+				this.$refs.paging.scrollToTop();
 			},
-			// 监听虚拟列表数组改变并赋值给virtualList进行重新渲染
+			onListScroll(e) {
+				// console.log(e.detail.scrollTop)
+				const scrollTop = e.detail.scrollTop
+				this.isShowBackTop = scrollTop >= 256;
+				
+				const index = Math.floor(scrollTop / this.itemHeight);
+				// 限制范围：不能超过总图片数 - 1, 2 列
+				this.currentImageIndex = Math.min(index, this.virtualList.length - 1) * 2 + 4;
+				
+				this.isScrolling = true;
+				if (this.scrollTimer) clearTimeout(this.scrollTimer)
+	
+				this.scrollTimer = setTimeout(() => {
+					this.isScrolling = false;
+				}, 150);
+			},
 			virtualListChange(vList) {
 				this.virtualList = vList;
 			},
@@ -94,6 +121,31 @@
 </script>
 
 <style lang="scss" scoped>
+	.back-to-top{
+		position: fixed;
+		top: 140px;
+		left: 0;
+		padding: 0 8px;
+		min-width: 75px;
+		height: 30px;
+		line-height: 30px;
+		font-size: 24rpx;
+		color: #fff;
+		background: rgba(0, 0, 0, 0.8);
+		text-align: center;
+		border-radius: 0 15px 15px 0;
+		overflow: hidden;
+		z-index: 100;
+		.box{
+			transform: translateY(0rpx);
+			transition: transform 0.3s;
+		}
+		&.active{
+			.box{
+				transform: translateY(-60rpx);
+			}
+		}
+	}
 	.section-banner {
 		position: relative;
 		height: 344rpx;

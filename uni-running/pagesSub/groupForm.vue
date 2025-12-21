@@ -37,7 +37,10 @@
 					</view>
 				</up-form-item>
 				<up-form-item label="成立时间" prop="establish_time">
-					<up-datetime-picker hasInput sharp="circle" v-model="establishTimeTimestamp" mode="date" cancelText="取消" confirmText="确认"
+					<up-datetime-picker hasInput sharp="circle" v-model="establishTimeTimestamp"
+						:minDate="nimDate"
+						:maxDate="new Date().getTime()"
+					 mode="date" cancelText="取消" confirmText="确认"
 						confirmColor="#FF8C00" @confirm="onEstablishTimeConfirm">
 						<template #trigger="{ value }">
 							<view class="select">
@@ -109,6 +112,9 @@
 		// amount: '',
 		establish_time: dayjs().valueOf(),
 	});
+
+	const nimDate = dayjs('1995-01-01').valueOf();
+
 	const isAgree = ref(false);
 	
 	function validateField(propName) {
