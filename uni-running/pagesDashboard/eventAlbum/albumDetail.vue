@@ -1,8 +1,20 @@
+
+<!-- 虚拟列表演示(非内置列表写法) -->
+<!-- 写法较简单，在页面中对当前需要渲染的虚拟列表数据进行for循环，在vue3中兼容性良好 -->
 <template>
-	<view>
-		<mescroll-body :sticky="true" @init="mescrollInit" @down="downCallback" @up="getList" top="0">
+<!-- // https://zyt-cloud.github.io/virtual/index.html -->
+	<!-- 如果页面中的cell高度是固定不变的，则不需要设置cell-height-mode，如果页面中高度是动态改变的，则设置cell-height-mode="dynamic" -->
+	<zPaging ref="paging" use-virtual-list enable-back-to-top
+		cell-height-mode="fixed"
+		auto-show-back-to-top
+		:preload-page="20"
+		:virtual-list-col="2" :inner-list-style="{'display':'flex','flex-wrap':'wrap'}"
+		:default-page-size="30" :force-close-inner-list="true" @virtualListChange="virtualListChange"
+		@query="queryList" @scroll="onListScroll">
+		<view class="" s1lot="header">
 			<section class="section-banner">
-				<up-lazy-load class="img" v-if="currentEvent" :image="currentEvent.image_url + '?x-oss-process=image/resize,w_600,h_200,m_fill'" mode="aspectFill" />
+				<up-lazy-load class="img" v-if="currentEvent"
+					:image="currentEvent.image_url + '?x-oss-process=image/resize,w_600,h_200,m_fill'" mode="aspectFill" />
 				<view class="summary">
 					<view class="item u-flex-y-center">照片 2346</view>
 					<view class="item u-flex-y-center">视频 2346</view>
@@ -10,138 +22,81 @@
 				</view>
 			</section>
 
-			<section class="section-btns u-flex-xy-center" style="width:580rpx;margin: 24rpx auto ;">
-				<up-button type="primary" 
-					@click="refFindPhoto.open()"
+			<section class="section-btns u-flex-xy-center" style="width:580rpx;margin: 24rpx auto;">
+				<up-button type="primary" @click="refFindPhoto.open()"
 					customStyle="width: 298rpx;font-size: 24rpx;height: 82rpx;">
 					<text class="iconfont icon-saomiaorenlian u-mr-10"></text>
 					查找照片和视频
 				</up-button>
-				<!-- <up-button type="info" plain openType="share" customStyle="width: 204rpx;font-size: 24rpx;color:#FF8C00;height: 82rpx;">
-					<text class="iconfont icon-fenxiang u-mr-10"></text>
-					分享照片
-				</up-button> -->
 			</section>
 
-			<section class="section-tabs u-flex-y-center">
+			<view v-if="isShowBackTop" style="height: 88rpx;"></view>
+			<section class="section-tabs u-flex-y-center" :class="{isFixed: isShowBackTop}" >
 				<view class="item" :class="{active: tabActive === 'photo'}" @click="tabActive = 'photo'">照片</view>
 				<view class="item" :class="{active: tabActive === 'video'}" @click="tabActive = 'video'">视频</view>
 			</section>
-
-			<section class="u-flex-y-center" style="height: 80rpx;padding-left: 34rpx;">
-				<view class="iconfont icon-shijianzhou"></view>
-				时间轴
-			</section>
-
-			<section v-if="tabActive === 'photo'" class="u-flex-wrap u-flex" style="gap: 10rpx;padding: 0 34rpx;">
-				<up-waterfall v-model="dataList" ref="uWaterfallRef" columns="2">
-					<template v-slot:column="{colList, colIndex}">
-						<view class="card-item" 
-							v-for="(item, index) in colList" 
-							:key="index" @click="previewImg(item)">
-							<up-lazy-load :image="item.url + '?x-oss-process=image/resize,w_300'" mode="aspectFill" />
-						</view>
-					</template>
-				</up-waterfall>
-			</section>
-			<section v-if="tabActive === 'video'" class="u-flex-wrap u-flex" style="gap: 10rpx;padding: 0 34rpx;">
-					<view class="card-item" v-for="(item, index) in []" :key="index" @click="previewImg(item)">
-						<up-lazy-load :image="item.url + '?x-oss-process=image/resize,w_300'" mode="aspectFill" />
-					</view>
-			</section>
-		</mescroll-body>
-		
-		<FindPhoto ref="refFindPhoto"/>
-		<PreviewMedia ref="refPreviewMedia"/>
-	</view>
+		</view>
+		<!-- :id="`zp-id-${item.zp_index}`"和:key="item.zp_index" 必须写，必须写！！！！ -->
+		<!-- 这里for循环的index不是数组中真实的index了，请使用item.zp_index获取真实的index -->
+		<view class="u-flex u-flex-wrap u-pl-10">
+			<view class="card-item" v-for="(item, index) in virtualList" :id="`zp-id-${item.zp_index}`" :key="item.zp_index">
+				<image class="img" :src="item.item + tt" mode="aspectFill" />
+			</view>
+		</view>
+	</zPaging>
 </template>
 
-<script setup>
+<script>
+	import zPaging from "@/uni_modules/z-paging/components/z-paging/z-paging.vue"
+	import request from "@/utils/request.js"
 	import FindPhoto from "./components/FindPhoto.vue"
 	import PreviewMedia from "./components/PreviewMedia.vue"
-	import {
-		ref,
-	} from "vue";
+	export default {
+		components: {
+			zPaging, FindPhoto, PreviewMedia
+		},
+		data() {
+			return {
+				isShowBackTop: false,
+				currentEvent: {},
+				tabActive: 'photo',
+				virtualList: [],
+				ossParams: '?x-oss-process=image/crop,w_500,h_400,x_100,y_100/format,webp/q_80',
+				tt: '?x-oss-process=image/resize,w_480'
+			}
+		},
+		onLoad(options) {
+			this.currentEvent = options
+		},
+		methods: {
+			onListScroll(e) {
+				console.log(e.detail.scrollTop)
+				this.isShowBackTop = e.detail.scrollTop >= 260
+			},
+			// 监听虚拟列表数组改变并赋值给virtualList进行重新渲染
+			virtualListChange(vList) {
+				this.virtualList = vList;
+			},
+			queryList(pageNo, pageSize) {
+				const params = {
+					pageIndex: pageNo,
+					pageSize: pageSize,
+					keyword: '',
+					event_id: this.currentEvent.event_id || '01K9VG019M6SDK49NNGGAZQM5C',
+				};
 
-	import {
-		onLoad,
-		onShareAppMessage,
-	} from "@dcloudio/uni-app";
-
-	import { onPageScroll, onReachBottom } from '@dcloudio/uni-app';
-	import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
-	const { mescrollInit, downCallback } = useMescroll(onPageScroll, onReachBottom) // 调用mescroll的hook
-
-	const refFindPhoto = ref(null)
-	const refPreviewMedia = ref(null)
-
-	import request from "@/utils/request.js"
-
-	const tabActive = ref('photo')
-	const currentEvent = ref({})
-	let eventId = ''
-	
-	const previewImg = (item) => {
-		refPreviewMedia.value.openModal(item.url)
-	};
-	
-	const uWaterfallRef = ref(null);
-	const loadStatus = ref('loadmore');
-
-	let mescroll = ref(null);
-	const refreshList = () => {
-		nextTick(() => {
-			mescroll.value.resetUpScroll(); // 重置列表数据为第一页
-			mescroll.value.scrollTo(0, 0); // 重置列表数据为第一页时,建议把滚动条也重置到顶部,避免无法再次翻页的问题
-		});
-	};
-
-	const dataList = ref([])
-	const getList = (mescroll) => {
-		uni.showLoading({
-			mask: true
-		});
-
-		const params = {
-			pageIndex: mescroll.num - 1,
-			pageSize: 10,
-			keyword: '',
-			event_id: currentEvent.value.event_id,
-		};
-
-		request.get(`/image-service/oss`, params).then((res) => {
-				//如果是第一页需手动制空列表
-				if (mescroll.num == 1) dataList.value = []
-
-				res = res.urls.map(i => {
-					return {
-						id: i,
-						url: i
-					}
+				request.get(`/image-service/oss`, params).then((res) => {
+					this.$refs.paging.complete(res.urls);
 				})
-				
-				dataList.value = dataList.value.concat(res)
-
-				//隐藏下拉刷新和上拉加载的状态;
-				mescroll.endSuccess(res.length);
-			})
-			.catch((error) => {
-				console.log(error)
-				uni.hideLoading();
-				mescroll.endErr();
-			});
-	};
-
-	// 页面加载
-	onLoad((options) => {
-		currentEvent.value = options
-	});
+			}
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
 	.section-banner {
 		position: relative;
-
+		height: 344rpx;
 		.img {
 			width: 100%;
 			height: 344rpx;
@@ -164,26 +119,27 @@
 			}
 		}
 	}
-	
-	.section-btns{
-		::v-deep{
-			.u-button--square{
+
+	.section-btns {
+		::v-deep {
+			.u-button--square {
 				border-radius: 16rpx;
 			}
 		}
 	}
-
+	.isFixed {
+			z-index: 990;
+			position: fixed;
+			top: 0;
+			width: 100%;
+		}
 	.section-tabs {
-		z-index: 990;
-		position: sticky;
-		top:0;
 		height: 88rpx;
 		border-bottom: 2rpx solid #EFEDEE;
 		padding-left: 34rpx;
 		font-weight: bold;
 		text-align: center;
 		background: #fff;
-
 		.item {
 			width: 94rpx;
 			padding-bottom: 10rpx;
@@ -194,44 +150,14 @@
 			}
 		}
 	}
-	.u-column-0{
-		.card-item {
-			&:nth-child(1){
-				height: 500rpx;
-				::v-deep{
-					.u-lazy-item{
-						height: 500rpx!important;
-					}
-				}
-			}
-			&:nth-child(5n){
-				height: 502rpx;
-				::v-deep{
-					.u-lazy-item{
-						height: 502rpx!important;
-					}
-				}
-			}
-		}
-	}
-	
-	.u-column-1{
-		.card-item {
-			&:nth-child(8n){
-				height: 502rpx;
-				::v-deep{
-					.u-lazy-item{
-						height: 502rpx!important;
-					}
-				}
-			}
-		}
-	}
+
 	.card-item {
-		width: 336rpx;
-		margin-bottom: 10rpx;
+		min-width: 48%;
+		padding: 0 10rpx 10rpx 0;
 		.img {
-			width: 336rpx;
+			display: block;
+			width: 360rpx;
+			height: 480rpx;
 		}
 	}
 </style>

@@ -370,6 +370,7 @@
       }
     ]
   },
+	"onReachBottomDistance": 500,
   "globalStyle": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "跑了没",

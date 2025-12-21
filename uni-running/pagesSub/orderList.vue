@@ -94,13 +94,14 @@
 	// 响应式数据
 	const tab = ref({
 		active: 0,
-		items: [{
-				label: "线上活动",
-				value: "online",
-			},
+		items: [
 			{
 				label: "线下活动",
 				value: "offline",
+			},
+			{
+				label: "线上活动",
+				value: "online",
 			},
 		],
 	});
@@ -162,7 +163,7 @@
 	};
 
 	const getList = (mescroll) => {
-		if (tab.value.active === 0) {
+		if (tab.value.active === 1) {
 			dataList.value = [];
 			uni.hideLoading();
 			mescroll.endBySize(0, 0);
