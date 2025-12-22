@@ -10,7 +10,7 @@
 		:virtual-list-col="2" :inner-list-style="{'display':'flex','flex-wrap':'wrap'}"
 		:default-page-size="30" :force-close-inner-list="true" @virtualListChange="virtualListChange"
 		@query="queryList" @scroll="onListScroll">
-		<view class="" s1lot="header">
+		<view class="" sot="header">
 			<section class="section-banner">
 				<up-lazy-load class="img" v-if="currentEvent"
 					:image="currentEvent.image_url + '?x-oss-process=image/resize,w_600,h_200,m_fill'" mode="aspectFill" />
@@ -49,10 +49,12 @@
 		<!-- 这里for循环的index不是数组中真实的index了，请使用item.zp_index获取真实的index -->
 		<view class="u-flex u-flex-wrap u-pl-10">
 			<view class="card-item" v-for="(item, index) in virtualList" :id="`zp-id-${item.zp_index}`" :key="item.zp_index">
-				<image class="img" :src="item.item + tt" mode="aspectFill" />
+				<image class="img" :src="item.item + tt" mode="aspectFill" @click="handleImg(item.item,item.zp_index)" />
 			</view>
 		</view>
 	</zPaging>
+	<!-- 轮播图 -->
+	<PreviewMedia ref="refPreviewMedia" @loadingMore="loadingMore"/>
 </template>
 
 <script>
@@ -66,6 +68,7 @@
 		},
 		data() {
 			return {
+				allImages: [],
 				itemHeight: 240,
 				isScrolling: false,
 				currentImageIndex: 0,
@@ -76,12 +79,24 @@
 				ossParams: '?x-oss-process=image/crop,w_500,h_400,x_100,y_100/format,webp/q_80',
 				tt: '?x-oss-process=image/resize,w_720/quality,q_80/format,webp',
 				tt1: '?x-oss-process=image/watermark,image_d2F0ZXJtYXJrL1BSTzUzMDE1NC9tYXJrMTQ1MTkwMS5wbmc_eC1vc3MtcHJvY2Vzcz1pbWFnZS9yZXNpemUsbV9maXhlZCx0eXBlXzIsd180ODAsaF84MCxsaW1pdF8wL2Zvcm1hdCxwbmc=,g_south,x_0,y_0,t_100',
+				swiperPageNo:0,
+				swiperPageSize: 10,
+				isloading:false,
+				isNextLevel: false
 			}
 		},
 		onLoad(options) {
+			console.log('options=====>', options)
 			this.currentEvent = options
 		},
 		methods: {
+			async loadingMore(index) {
+				// console.log('albumDetail的触发')
+				this.isNextLevel = true
+				const res = await this.queryList(this.swiperPageNo+1,this.swiperPageSize)
+				// console.log('albumDetail的触发res====',res)
+				this.$refs.refPreviewMedia.openModal('',index,this.virtualList2)
+			},
 			goToTop() {
 				this.$refs.paging.scrollToTop();
 			},
@@ -105,6 +120,9 @@
 				this.virtualList = vList;
 			},
 			queryList(pageNo, pageSize) {
+				this.swiperPageNo = pageNo
+				this.swiperPageSize = pageSize
+								
 				const params = {
 					pageIndex: pageNo,
 					pageSize: pageSize,
@@ -113,8 +131,24 @@
 				};
 
 				request.get(`/image-service/oss`, params).then((res) => {
+					// keep full list for preview
+					this.allImages = res.urls || [];
 					this.$refs.paging.complete(res.urls);
+					
+					if(pageNo == 1) {
+						this.virtualList2 = res.urls
+					} else {
+						this.virtualList2 = this.virtualList2.concat(res.urls)
+					}
 				})
+			},
+			handleImg(link,index) {
+				this.$refs.refPreviewMedia.openModal(link,index,this.virtualList2)
+			},
+			openPreview(index) {
+				// index should be the global index provided by virtual list
+				if (!this.$refs.preview) return;
+				this.$refs.preview.openModal(this.allImages, index || 0);
 			}
 		}
 	}

@@ -1,10 +1,11 @@
 <template>
 	<up-popup :show="isShowModal" @close="close" overlayOpacity="0.9" bgColor="transparent" mode="center" closeable>
-		<view class="flex-center" style="height: 100vh;">
+		<view class="flex-center" style="height: 100vh;width:100vw">
+			<rswiper :originList="originList" :originIndex="originIndex" @loadingMore="loadingMore"></rswiper>
 			<view class="flex-col-center">
-				<image style="display: block;width:750rpx;" :src="fileLink + '?x-oss-process=image/resize,w_750'" mode="widthFix" />
-				<view class="flex-center" style="position: fixed;bottom: 100rpx;width: 100%;">
-					<up-button @click="downloadPicture" type="primary" shape="circle" icon="download" customStyle="width:186rpx;height:60rpx;">
+				<view class="flex-center" style="position: fixed;left:0;bottom: 90rpx;width: 100%;">
+					<up-button @click="downloadPicture" type="primary" shape="circle" icon="download"
+						customStyle="width:186rpx;height:60rpx;">
 						下载原图
 					</up-button>
 				</view>
@@ -15,31 +16,39 @@
 
 <script setup>
 	import {
-		ref
+		ref, onMounted
 	} from "vue";
-
+	import rswiper from "./rswiper.vue"
 	// Emits
-	const emit = defineEmits(["open"]);
+	const emits = defineEmits(["open",'loadingMore']);
 
 	const isShowModal = ref(false);
 	const fileLink = ref('');
+	const originList = ref([]) // 源数据
+	const displaySwiperList = ref([]) // swiper需要的数据
+	const displayIndex = ref(0) // 用于显示swiper的真正的下标数值只有：0，1，2。
+	const originIndex = ref(0) // 记录源数据的下标
 
-	function openModal(link) {
-		console.log('link====>', link)
-		fileLink.value = link
-		isShowModal.value = true;
+	function openModal(link, index, list) {
+		console.log('link====>', link, index, list)
+		if(link) {
+			isShowModal.value = true;
+		}
+		originIndex.value = index
+		originList.value = list
 	}
-
+	const loadingMore=(index)=> {
+		emits('loadingMore', index)
+	}
 	function close() {
 		isShowModal.value = false;
 	}
-	
+
 	function downloadPicture() {
 		uni.saveImageToPhotosAlbum({
 			filePath: fileLink.value
 		})
 	}
-
 	defineExpose({
 		openModal,
 		close,
@@ -47,6 +56,22 @@
 </script>
 
 <style lang="scss" scoped>
+	// @import '@zebra-ui/swiper/index.scss';
+
+	.swiper {
+		width: 100vw;
+		height: 100vh;
+	}
+
+	// .swiper-item {
+	// 	width: 100%;
+	// 	height: 500rpx;
+	// 	display: flex;
+	// 	align-items: center;
+	// 	justify-content: center;
+	// 	user-select: none;
+	// }
+
 	.card-icon {
 		position: relative;
 		padding-top: 1px;
