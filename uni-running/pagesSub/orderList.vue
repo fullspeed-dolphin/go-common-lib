@@ -33,10 +33,11 @@
 						<view class="b u-mt-10 ellipsis2" style="font-size: 32rpx;">
 							{{order.event_info.name}}
 						</view>
-						<view class="c9 u-mt-20 fs24" style="line-height: 1.3;">
+						<view class="c9 u-mt-20 fs24" style="line-height: 1.2;">
 							{{order.event_info.event_location}}
 						</view>
-						<view class="flex-between-center u-mt-20">
+
+						<view class="flex-between-center u-mt-10">
 							<view v-if="order.sign_info" class="c9 fs24">
 								报名人: {{order.sign_info.full_name}}
 							</view>
@@ -44,19 +45,22 @@
 								<text style="font-size: 20rpx;">￥</text>{{order.amount_yuan}}
 							</view>
 						</view>
+						<view v-if="!order.canRefund" class="c9 u-mt-10 fs24" style="">
+							{{order.remainingTimeStr}}
+						</view>
 					</view>
 				</view>
 				<view class="flex-between-center van-hairline--top u-mt-20 u-pt-20">
 					<view class="c9 fs24">
 						创建时间:{{order.created_at}}
 					</view>
-					<view class="" v-if="order.status == 'SUCC' && isWithin24Hours(order.created_at)">
+					<view v-if="order.status == 'SUCC' && order.canRefund">
 						<u-button type="primary" @click="refundOrder(order)" color="#FF8C00" customStyle="height: 50rpx;"
 							size="small" plain shape="circle">
 							申请退款
 						</u-button>
 					</view>
-					<view class="" v-if="order.status == 'PND'">
+					<view v-if="order.status == 'PND'">
 						<u-button type="primary" @click="payOrder(order)" color="#18b566" customStyle="height: 50rpx;" size="small"
 							shape="circle">
 							微信支付
@@ -178,8 +182,18 @@
 			pageSize: 10,
 			orderStatus: "SUCC",
 		};
+		
+		
 		request.post(`/pay/order/statusByUser`, data).then((res) => {
-				res = res.orders
+				res = res.orders.map(item => {
+					return {
+						...item,
+						...(getRefundInfo(item.created_at, item.refund_valid_hour || 24))
+					}
+				})
+				
+				console.log(res)
+				
 				mescroll.endSuccess(res.length);
 
 				//如果是第一页需手动制空列表
@@ -194,6 +208,37 @@
 				mescroll.endErr();
 			});
 	};
+	
+	function getRefundInfo(orderTime, endHour) {
+	  const orderDate = new Date(orderTime);
+	  const now = new Date();
+		
+	  // 计算 endHour 小时后的截止时间（毫秒）
+	  const refundDeadline = new Date(orderDate.getTime() + endHour * 60 * 60 * 1000);
+	
+	  // 是否还在退款时间内
+	  const canRefund = now < refundDeadline;
+	
+	  let remainingTimeStr = '';
+	
+	  if (canRefund) {
+	    const diffMs = refundDeadline - now;
+	
+	    // 转换为小时和分钟
+	    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+	    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+	
+	    remainingTimeStr = `还剩 ${hours} 小时 ${minutes} 分钟可申请退款`;
+	  } else {
+	    remainingTimeStr = `已超过 ${endHour} 小时，无法退款`;
+	  }
+	
+	  return {
+	    canRefund,
+	    refundDeadline,
+	    remainingTimeStr
+	  };
+	}
 
 	const payOrder = (item) => {
 		const respay = item.payment_params;

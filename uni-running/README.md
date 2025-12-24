@@ -10,3 +10,9 @@
  requirement [飞书](https://fcnyx7eni183.feishu.cn/wiki/Es7WwSOhgiuq8Jkq03wcj2bbnbc)
  
  ui [](https://lanhuapp.com/web/#/item/project/stage?tid=13701d3f-3f03-46cd-b13d-7eae4312bc44&pid=49f34d3e-3c8d-4359-9d57-96a88120054b)
+ 
+ 
+ to do list: 
+ 
+ 1. 活动报名，参赛包地址如果只有一个，自定选上
+ 2. 订单列表修改为 状态切换
