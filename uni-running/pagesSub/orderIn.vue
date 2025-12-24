@@ -24,11 +24,8 @@
 			</view>
 			<view class="cell flex-between-center">
 				<view class="cell-label">参赛包领取地址<u-icon name="star-fill" color="#E53935" size="8"></u-icon></view>
-				<view class="flex-start" @click="openAddressPicker()">
-					<view class="txt" :class="{ c70: !selectedAddress }">
-						{{ selectedAddress || "请选择地址" }}
-					</view>
-					<u-icon v-if="addressList.length > 0" name="arrow-right" size="34rpx" color="#999"></u-icon>
+				<view class="" style="width:540rpx;margin:0 -20rpx;">
+					<PickerCell v-model="selectedAddress" :disabled="!addressPickerColumns.length" placeholder="请选择地址" :border="false" :columns="addressPickerColumns" />
 				</view>
 			</view>
 		</section>
@@ -129,10 +126,6 @@
 			</view>
 		</section>
 
-		<!-- 参赛包领取地址选择器 -->
-		<u-picker :show="showAddressPicker" :columns="[addressPickerColumns]" keyName="label" @confirm="confirmAddress"
-			@cancel="showAddressPicker = false" title="请选择参赛包领取地址" confirmText="确定" cancelText="取消"></u-picker>
-		
 		<SignerList ref="refSignerList" @select="addSigner"/>
 		<GroupList ref="refGroupList" @success="getUserGroup()" />
 </template>
@@ -149,6 +142,7 @@
 	import {
 		useStore
 	} from "vuex";
+	import PickerCell from "@/components/common/PickerCell.vue"
 	import GroupList from "./components/groupList.vue";
 	import Navbar from "@/components/navbar.vue";
 	import SignerList from "./components/SignerList.vue"
@@ -176,8 +170,6 @@
 	const event_id = ref("");
 	const isSubmitting = ref(false);
 	const selectedAddress = ref("");
-	const addressList = ref([]);
-	const showAddressPicker = ref(false);
 	const addressPickerColumns = ref([]);
 	const multiPackageCount = ref(1); // 存储 multi_package 字段值
 
@@ -265,24 +257,6 @@
 		refGroupList.value.open();
 	};
 
-	// 打开地址选择器
-	const openAddressPicker = () => {
-		if (addressList.value.length === 0) {
-			uni.$u.toast("暂无可用地址");
-			return;
-		}
-		showAddressPicker.value = true;
-	};
-
-	// 确认选择地址
-	const confirmAddress = (detail) => {
-		if (detail && detail.value && detail.value[0]) {
-			const selected = detail.value[0];
-			selectedAddress.value = selected.label || selected;
-		}
-		showAddressPicker.value = false;
-	};
-
 	// 获取活动地址列表
 	const getEventAddresses = async () => {
 		if (!event_id.value) return;
@@ -299,28 +273,33 @@
 
 			console.log("multi_package:", multiPackageCount.value, "isMultiSelect:", isMultiSelect.value);
 
-			// request.js 已经提取了 response.data，所以 res 直接是事件对象
-			if (res && res.racekit_pickup_address) {
+			if (res?.racekit_pickup_address) {
 				try {
 					// racekit_pickup_address 是 JSON 字符串，需要解析
 					const addressData =
 						typeof res.racekit_pickup_address === "string" ?
 						JSON.parse(res.racekit_pickup_address) :
 						res.racekit_pickup_address;
-
+						
+					
+					
 					if (
-						addressData &&
-						addressData.addresses &&
+						addressData?.addresses &&
 						Array.isArray(addressData.addresses)
 					) {
-						addressList.value = addressData.addresses;
 						// 转换为 picker 需要的格式
-						addressPickerColumns.value = addressData.addresses.map(
+						addressPickerColumns.value = addressData?.addresses.map(
 							(addr, index) => ({
 								label: addr,
-								value: index,
+								value: addr,
 							})
 						);
+						
+						const addressList = addressData?.addresses || []
+						
+						if (addressList.length === 1) {
+							selectedAddress.value = addressPickerColumns.value[0].value
+						}
 					}
 				} catch (error) {
 					console.error("解析地址数据失败:", error);
@@ -814,7 +793,7 @@
 	.section-assign {
 		.cell {
 			width: 682rpx;
-			height: 100rpx;
+			min-height: 100rpx;
 			padding: 0 20rpx;
 			margin: 0rpx auto 20rpx;
 			background: #ffffff;
@@ -824,7 +803,6 @@
 
 		.txt {
 			font-weight: 500;
-			font-weight: bold;
 			font-size: 30rpx;
 			color: #000000;
 
