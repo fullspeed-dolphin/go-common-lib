@@ -171,6 +171,14 @@
 				</view>
 			</section>
 		</block>
+		
+		<button
+		  class="share-btn flex-center"
+		  :class="{ active: isScroll }"
+		  open-type="share"
+		>
+		  <u-icon name="share" color="#fff" size="18"></u-icon>
+		</button>
 
 		<UserLogin ref="refUserLogin" />
 	</view>
@@ -183,8 +191,12 @@
 	import {
 		onLoad,
 		onUnload,
-		onShow
+		onShow,
+		onPageScroll,
+		onShareAppMessage,
+		onShareTimeline
 	} from "@dcloudio/uni-app";
+	
 	import {
 		useStore
 	} from "vuex";
@@ -206,12 +218,25 @@
 	const refUserLogin = ref(null);
 
 	// 响应式数据
+	const isScroll = ref(false);
 	const isEmpty = ref(false);
 	const detail = ref({});
 	const routeParams = ref({});
 	const memberList = ref([]);
 	const memberLeader = ref({});
-
+	
+	// 定时器
+	let timer = null;
+	// 页面滚动
+	onPageScroll((e) => {
+	  isScroll.value = true;
+	
+	  clearTimeout(timer);
+	  timer = setTimeout(() => {
+	    isScroll.value = false;
+	  }, 100);
+	});
+	
 	// 计算属性
 	const pageTitle = computed(() => {
 		return routeParams.value.from === "mine" ? "我的跑团" : "跑团详情";
@@ -406,9 +431,60 @@
 			phoneNumber,
 		});
 	};
+	
+	// 页面加载
+	onLoad((options) => {
+		// #ifdef MP-WEIXIN
+		wx.showShareMenu({
+			withShareTicket: true,
+			menus: ['shareAppMessage', 'shareTimeline'] // 开启分享给朋友和分享到朋友圈
+		});
+		// #endif
+	});
+	
+	// #ifdef MP-WEIXIN
+	// 分享给朋友
+	onShareAppMessage(() => {
+		return {
+			title: '跑了没 - ' + (detail.value.name || ''),
+			imageUrl: detail.value.avatar_url, // 可以设置自定义分享图片，留空则使用当前页面截图
+		};
+	});
+	// 分享到朋友圈
+	onShareTimeline(() => {
+		return {
+			title: '跑了没 - ' + (detail.value.name || ''),
+			query: '', // 可以携带参数
+			imageUrl: detail.value.avatar_url, // 可以设置自定义分享图片
+		};
+	});
+	// #endif
 </script>
 
 <style lang="less" scoped>
+	.share-btn {
+	  position: fixed;
+	  right: 20rpx;
+	  bottom: 200rpx;
+	  width: 90rpx;
+	  height: 90rpx;
+	  border-radius: 200rpx;
+	  color: #fff;
+	  z-index: 20;
+	  border: 1px solid #18b566;
+	  background-color: #18b566 !important;
+	  margin-bottom: 20rpx !important;
+	  flex-direction: column;
+	  font-size: 20rpx;
+	  box-shadow: 0px 1px 6rpx rgba(0, 0, 0, 0.4);
+	  transition: transform 0.3s;
+	  &:after {
+	    display: none;
+	  }
+	  &.active {
+	    transform: translate(100rpx);
+	  }
+	}
 	.section-summary {
 		height: 126rpx;
 		font-weight: bold;
