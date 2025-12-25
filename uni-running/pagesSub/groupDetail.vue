@@ -7,7 +7,14 @@
       }" @emptyclick="$u.route(`pagesSub/groupForm?from=mine`)" />
 
 		<block v-if="!isEmpty">
-			<section class="section-card flex-col-center">
+			<section class="flex-center" style="height: 432rpx;filter: blur(50px); ">
+				<image class="img" style="width:750rpx;height:432rpx;" :src="
+				    (detail.avatar_url ||
+				    'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_120,h_120,m_fill'
+				  " mode="aspectFill"></image>
+					
+			</section>
+			<section class="section-card flex-col-center" style="margin-top: -350rpx;">
 				<image class="img" :src="
             (detail.avatar_url ||
             'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_120,h_120,m_fill'
@@ -39,7 +46,7 @@
 					</view>
 					男女比例
 				</view>
-				<view class="divider"></view>
+				<!-- <view class="divider"></view>
 				<view class="flex-1 flex-col-center">
 					<view class="number">
 						{{ detail.total_members }}
@@ -52,133 +59,100 @@
 						{{ detail.total_members }}
 					</view>
 					周人均跑量
-				</view>
+				</view> -->
 			</section>
 
-			<section class="section-intro panel">
-				<view class="h4">跑团介绍</view>
-				<view style="font-weight: 500; line-height: 34rpx">
+			<section class="panel">
+				<view class="h4">跑团简介</view>
+				<view style="font-weight: 500; line-height: 40rpx;text-indent: 2em;">
 					{{ detail.introduction }}
 				</view>
 			</section>
 
 			<section class="panel">
-				<view class="h4">跑团管理</view>
-				<view class="bar flex-start">团长</view>
+				<view class="h4">团长</view>
 				<view class="flex-between-center">
 					<view class="leader-item flex-start">
 						<view class="img-box">
 							<image class="img" :src="
-                  (memberLeader.avatar_url ||
-                  'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png') + '?x-oss-process=image/resize,w_70,h_70,m_fill'
-                " mode="aspectFill"></image>
+					          (memberLeader.avatar_url ||
+					          'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png') + '?x-oss-process=image/resize,w_70,h_70,m_fill'
+					        " mode="aspectFill"></image>
 						</view>
 						<view class="">
-							<view class="mb10 ellipsis mt10" style="width: 320rpx">{{
-                memberLeader.nickname || "成员"
-              }}</view>
+							<view class="mb10 ellipsis mt10" style="width: 300rpx">{{
+					        memberLeader.nickname || "成员"
+					      }}</view>
 							<!-- {{memberLeader.user_phone}} -->
 						</view>
 					</view>
-					<view style="width: 120rpx">
-						<u-button type="primary" color="#FF8C00" size="mini" style="width: 120rpx" shape="circle"
+					<view style="width: 184rpx">
+						<u-button type="primary" color="#FF8C00" style="width: 184rpx;height: 84rpx;" shape="circle"
 							@click="callPhone(memberLeader.user_phone)">
 							联系Ta
 						</u-button>
 					</view>
 				</view>
+			</section>
 
-				<view class="bar flex-between-center">
-					成员
-					<view v-if="memberList.length >= 8" class="flex-center" style="font-size: 20rpx" @click="viewMoreMembers()">
-						<text style="color: #ff8c00; margin-right: 5rpx">查看更多</text>
-						<u-icon name="arrow-right" color="#FF8C00" size="10"></u-icon>
-					</view>
-				</view>
-
-				<view class="flex-row flex-wrap">
+			<section class="panel" style="padding-right:0;">
+				<view class="h4">成员</view>
+				<view class="flex-row flex-wrap" style="margin-left: 26rpx;">
 					<view class="member-item flex-col-center" v-for="(item, index) in memberList" :key="index">
-						<view class="img-box">
-							<view class="img">
-								<up-lazy-load height="70" borderRadius="100" :image="
-								  (item.avatar_url ||
-								  'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_150,h_150,m_fill'
-								" mode="aspectFill" />
-							</view>
+						<view class="img">
+							<up-lazy-load height="120" borderRadius="200" :image="
+								(item.avatar_url ||
+								'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_150,h_150,m_fill'
+							" mode="aspectFill" />
 						</view>
 						<view class="">
-							<view class="mb10 ellipsis tac mt10" style="width: 120rpx">{{
-                item.nickname || "成员"
-              }}</view>
+							<view class="mb10 ellipsis tac mt10" style="width: 120rpx;margin-top: 16rpx;line-height: 44rpx;">
+								{{ item.nickname}}
+							</view>
 						</view>
 					</view>
+				</view>
+				<view class="flex-center u-mt-15">
+					<u-button type="primary" color="#FF8C00"
+						v-if="memberList.length >= 8"
+						style="width: 236rpx;height: 84rpx;" shape="circle"
+						@click="viewMoreMembers()">
+						查看更多
+						<u-icon name="arrow-right" color="#fff" size="14"></u-icon>
+					</u-button>
 				</view>
 
 				<mescroll-empty v-if="!memberList.length" :option="{ tip: '暂无跑团成员~' }" />
 			</section>
 
-			<section class="section-intro panel">
-				<view class="h4">成员跑量排行榜<image
-						src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-top5@2x.png"
-						style="width: 77rpx; height: 23rpx" mode="aspectFill"></image>
-				</view>
-				<view style="font-weight: 500; line-height: 34rpx">
-					<view class="flex-col">
-						<view class="member-item flex-row-center" v-for="(item, index) in memberList" :key="index">
-							<view class="flex-row-center">
-								<view class="number">{{ index + 1 }}</view>
-								<view class="img-box">
-									<view class="img">
-										<up-lazy-load height="70" borderRadius="100" :image="
-										  (item.avatar_url ||
-										  'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_150,h_150,m_fill'
-										" mode="aspectFill" />
-									</view>
-								</view>
-								<view class="ellipsis name" style="width: 120rpx">{{
-                  item.nickname || "成员"
-                }}</view>
-							</view>
-							<view class="score"> 100km </view>
-						</view>
-					</view>
+			<section class="panel">
+				<view class="h4">跑团活动</view>
+				<view v-for="(item, index) in eventList" :key="index">
+					<EventItem :item="item" :key="index" height="474rpx" />
 				</view>
 			</section>
 
 			<view class="" style="height: 120rpx"></view>
-			<!-- 未加入跑团，才可加入跑团 -->
-			<section v-if="!userInfo.running_group && detail.user_role === 'guest'" class="section-bottom">
-				<view style="padding: 56rpx 54rpx 40rpx">
-					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;"
+
+			<section class="section-bottom flex-wrap u-flex flex-between-center">
+				<button v-if="!isEmpty" class="share-btn flex-center" open-type="share">
+					分享跑团
+				</button>
+				<!-- 未加入跑团，才可加入跑团 -->
+				<block v-if="!userInfo.running_group && detail.user_role === 'guest'">
+					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;"
 						@click="joinGroup()">加入跑团</u-button>
-				</view>
-			</section>
-
-			<!-- 团长才可修改 -->
-			<section v-if="detail.user_role === 'creator'" class="section-bottom">
-				<view style="padding: 0rpx 30rpx 40rpx" class="flex-between-center">
-					<u-button type="primary" color="#f2f2f2" shape="circle"
-						customStyle="height: 80rpx;width: 320rpx;color: #FF8C00;" @click="deleteGroup()">删除跑团</u-button>
-					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 320rpx;"
+				</block>
+				<block v-if="detail.user_role === 'creator'">
+					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;"
 						@click="updateGroup()">更新跑团</u-button>
-				</view>
-			</section>
-
-			<section v-if="detail.user_role === 'member'" class="section-bottom">
-				<view style="padding: 56rpx 54rpx 40rpx">
-					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx; "
+				</block>
+				<block v-if="detail.user_role === 'member'">
+					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;"
 						@click="leaveGroup()">退出跑团</u-button>
-				</view>
+				</block>
 			</section>
 		</block>
-		
-		<button
-		  class="share-btn flex-center"
-		  :class="{ active: isScroll }"
-		  open-type="share"
-		>
-		  <u-icon name="share" color="#fff" size="18"></u-icon>
-		</button>
 
 		<UserLogin ref="refUserLogin" />
 	</view>
@@ -192,24 +166,17 @@
 		onLoad,
 		onUnload,
 		onShow,
-		onPageScroll,
 		onShareAppMessage,
 		onShareTimeline
 	} from "@dcloudio/uni-app";
-	
+
 	import {
 		useStore
 	} from "vuex";
-	import {
-		getCurrentInstance
-	} from "vue";
 	import UserLogin from "@/components/UserLogin.vue";
 	import Navbar from "@/components/navbar.vue";
-
-	// 获取当前实例以访问全局属性
-	const {
-		proxy
-	} = getCurrentInstance();
+	import EventItem from "@/components/EventItem.vue";
+	import request from "@/utils/request.js"
 
 	// 使用store
 	const store = useStore();
@@ -218,25 +185,13 @@
 	const refUserLogin = ref(null);
 
 	// 响应式数据
-	const isScroll = ref(false);
 	const isEmpty = ref(false);
 	const detail = ref({});
 	const routeParams = ref({});
+	const eventList = ref([]);
 	const memberList = ref([]);
 	const memberLeader = ref({});
-	
-	// 定时器
-	let timer = null;
-	// 页面滚动
-	onPageScroll((e) => {
-	  isScroll.value = true;
-	
-	  clearTimeout(timer);
-	  timer = setTimeout(() => {
-	    isScroll.value = false;
-	  }, 100);
-	});
-	
+
 	// 计算属性
 	const pageTitle = computed(() => {
 		return routeParams.value.from === "mine" ? "我的跑团" : "跑团详情";
@@ -255,12 +210,19 @@
 		}
 
 		getDetail();
+		getEvents();
 
 		// #ifdef MP-WEIXIN
 		wx.showShareMenu();
 		// #endif
 	});
-
+	
+	const getEvents = () => {
+		request.get(`/event-api/getOfflineEventSwiper`).then(res => {
+			eventList.value = res;
+		});
+	};
+	
 	// 页面卸载
 	onUnload(() => {
 		uni.removeStorageSync("groupDetail");
@@ -298,8 +260,7 @@
 			mask: true
 		});
 
-		proxy.$axios
-			.get(
+		request.get(
 				`/running-group/api/v1/groups/info?group_id=${routeParams.value.group_id}`
 			)
 			.then((res) => {
@@ -318,8 +279,7 @@
 			pageSize: 9,
 			groupId: Number(detail.value.group_id),
 		};
-		proxy.$axios
-			.post(`/running-group/api/v1/groups/members`, data)
+		request.post(`/running-group/api/v1/groups/members`, data)
 			.then((res) => {
 				memberLeader.value =
 					(res.memberships || []).find((i) => i.role === "creator") || {};
@@ -345,12 +305,11 @@
 					uni.showLoading({
 						mask: true
 					});
-					proxy.$axios
-						.post(`/user-api/user/joinRunningGroup`, data)
+					request.post(`/user-api/user/joinRunningGroup`, data)
 						.then((res) => {
 							uni.hideLoading();
 							getDetail();
-							proxy.$toast("加入成功！");
+							uni.$u.toast("加入成功！");
 						});
 				} else if (res.cancel) {
 					console.log("用户点击取消");
@@ -372,8 +331,7 @@
 					uni.showLoading({
 						mask: true
 					});
-					proxy.$axios
-						.delete(
+					request.delete(
 							`/running-group/api/v1/groups?group_id=${detail.value.group_id}`
 						)
 						.then((res) => {
@@ -411,8 +369,8 @@
 					uni.showLoading({
 						mask: true
 					});
-					proxy.$axios.post(`/user-api/user/quitRunningGroup`).then((res) => {
-						proxy.$toast("操作成功！");
+					request.post(`/user-api/user/quitRunningGroup`).then((res) => {
+						uni.$u.toast("操作成功！");
 
 						// 调用用户数据，检查参加或创建跑团标记
 						store.dispatch("getUserInfo");
@@ -431,7 +389,7 @@
 			phoneNumber,
 		});
 	};
-	
+
 	// 页面加载
 	onLoad((options) => {
 		// #ifdef MP-WEIXIN
@@ -441,7 +399,7 @@
 		});
 		// #endif
 	});
-	
+
 	// #ifdef MP-WEIXIN
 	// 分享给朋友
 	onShareAppMessage(() => {
@@ -462,33 +420,40 @@
 </script>
 
 <style lang="less" scoped>
-	.share-btn {
-	  position: fixed;
-	  right: 20rpx;
-	  bottom: 200rpx;
-	  width: 90rpx;
-	  height: 90rpx;
-	  border-radius: 200rpx;
-	  color: #fff;
-	  z-index: 20;
-	  border: 1px solid #18b566;
-	  background-color: #18b566 !important;
-	  margin-bottom: 20rpx !important;
-	  flex-direction: column;
-	  font-size: 20rpx;
-	  box-shadow: 0px 1px 6rpx rgba(0, 0, 0, 0.4);
-	  transition: transform 0.3s;
-	  &:after {
-	    display: none;
-	  }
-	  &.active {
-	    transform: translate(100rpx);
-	  }
+	.panel {
+		box-shadow: 10rpx 10rpx 10rpx 2rpx rgba(255, 140, 0, 0.3);
+		border-radius: 32rpx 32rpx 32rpx 32rpx;
+		border:0;
+		background: #fff;
+		padding: 30rpx 20rpx;
 	}
+	
+	::v-deep{
+		.event-item{
+			box-shadow: 0rpx 6rpx 12rpx 2rpx rgba(255,140,0,0.16);
+			margin-bottom: 30rpx;
+		}
+	}
+
+	.share-btn {
+		margin: 0;
+		height: 80rpx;
+		width: 312rpx;
+		border-radius: 200rpx;
+		color: #fff;
+		border: 1px solid #07C160;
+		background-color: #07C160 !important;
+		padding: 0 20rpx;
+		font-size: 28rpx;
+
+		&:after {
+			display: none;
+		}
+	}
+
 	.section-summary {
 		height: 126rpx;
 		font-weight: bold;
-		font-size: 20rpx;
 		color: #999999;
 
 		.number {
@@ -522,28 +487,21 @@
 		gap: 20rpx;
 		position: relative;
 		font-weight: 800;
-		font-size: 28rpx;
+		font-size: 36rpx;
 		color: #000000;
-		line-height: 38rpx;
-		padding-left: 20rpx;
-		margin-bottom: 28rpx;
+		line-height: 50rpx;
+		padding-left: 18rpx;
+		margin-bottom: 22rpx;
 
 		&:before {
 			position: absolute;
 			content: "";
 			width: 8rpx;
 			left: 0;
-			height: 38rpx;
+			height: 32rpx;
 			background: #ff8c00;
 			border-radius: 4rpx 4rpx 4rpx 4rpx;
 		}
-	}
-
-	.section-intro {
-		font-weight: bold;
-		font-size: 24rpx;
-		color: #999999;
-		padding-bottom: 40rpx;
 	}
 
 	.cell-item {
@@ -553,35 +511,32 @@
 	}
 
 	.leader-item {
-		padding: 16rpx 0 28rpx;
 		font-weight: bold;
-		font-size: 26rpx;
-		color: #000000;
+		font-size: 32rpx;
 
 		.img-box {
 			border-radius: 999px;
 			background: #ffffff;
-			margin-right: 12rpx;
+			margin-right: 30rpx;
 			overflow: hidden;
 		}
 
 		.img {
 			display: block;
-			width: 70rpx;
-			height: 70rpx;
+			width: 120rpx;
+			height: 120rpx;
 			background: #f5f5f5;
 		}
 	}
 
 	.member-item {
-		padding: 20rpx;
 		color: #000;
-		font-size: 24rpx;
-
+		font-size: 32rpx;
+		margin: 0 36rpx 16rpx 0;
 		.number {
 			font-weight: bold;
 			font-size: 30rpx;
-			color: #707070;
+			color: #12012070;
 			margin-right: 20rpx;
 		}
 
@@ -596,26 +551,19 @@
 			color: #000000;
 		}
 
-		.img-box {
-			border-radius: 999px;
-			background: #ffffff;
-			margin-right: 12rpx;
-			overflow: hidden;
-			border: 1rpx solid #f5f5f5;
-		}
-
 		.img {
+			border-radius: 999px;
 			display: block;
-			width: 70rpx;
-			height: 70rpx;
+			width: 120rpx;
+			height: 120rpx;
 			background: #f5f5f5;
 		}
 	}
 
 	.section-card {
+		position: relative;
+		z-index: 11;
 		padding: 34rpx 34rpx 0;
-
-		// background: linear-gradient( 180deg, #FFF5E8 0%, #FFFFFF 100%);
 		.img {
 			display: block;
 			width: 142rpx;
@@ -665,6 +613,14 @@
 		bottom: 0;
 		width: 100%;
 		z-index: 10;
+		padding: 0 30rpx 20rpx;
+		gap: 25px;
+
+		::v-deep {
+			.u-button {
+				margin: 0;
+			}
+		}
 	}
 
 	.u-border-left {

@@ -79,7 +79,6 @@ const getList = (mescroll) => {
   .img-box {
     border-radius: 999px;
     background: #ffffff;
-    border: 2rpx solid #707070;
     margin-right: 30rpx;
     overflow: hidden;
   }
