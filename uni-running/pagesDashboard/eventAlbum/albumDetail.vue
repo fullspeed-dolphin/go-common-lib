@@ -194,7 +194,7 @@
 <style lang="scss" scoped>
 	::v-deep{
 		.u-popup__content__close {
-			top: 200rpx;
+			top: 200rpx!important;
 		}
 	}
 	.back-to-top{
