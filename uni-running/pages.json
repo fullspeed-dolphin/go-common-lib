@@ -38,7 +38,7 @@
 		  "pages": [
 				{ "path": "angelForm","style": { "navigationBarTitleText": "全速天使招募"} },
 				{ "path": "eventAlbum/albumList","style": { "navigationBarTitleText": "活动相册"} },
-				{ "path": "eventAlbum/albumDetail","style": { "navigationBarTitleText": "详情"} },
+				{ "path": "eventAlbum/albumDetail","style": { "navigationBarTitleText": "详情", "navigationStyle": "custom"} },
 				{ "path": "eventAlbum/findPhoto","style": { "navigationBarTitleText": "查找图片"} },
 				{ "path": "eventAlbum/contractForm","style": { "navigationBarTitleText": "入驻摄影师"} }
 			]
@@ -97,8 +97,7 @@
         {
           "path": "orderList",
           "style": {
-            "navigationStyle": "custom",
-            "navigationBarTitleText": "",
+            "navigationBarTitleText": "我的活动",
             "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
           }
         },

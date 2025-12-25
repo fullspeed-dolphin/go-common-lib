@@ -1,7 +1,7 @@
 <template>
 	<up-popup :show="isShowModal" @close="close" overlayOpacity="0.9" bgColor="transparent" mode="center" closeable>
 		<view class="flex-center" style="height: 100vh;width:100vw">
-			<rswiper :originList="originList" :originIndex="originIndex" @loadingMore="loadingMore"></rswiper>
+			<rswiper :originList="originList" :totalNumber="totalNumber" :originIndex="originIndex" @loadingMore="loadingMore"></rswiper>
 			<view class="flex-col-center">
 				<view class="flex-center" style="position: fixed;left:0;bottom: 90rpx;width: 100%;">
 					<up-button @click="downloadPicture" type="primary" shape="circle" icon="download"
@@ -28,14 +28,19 @@
 	const displaySwiperList = ref([]) // swiper需要的数据
 	const displayIndex = ref(0) // 用于显示swiper的真正的下标数值只有：0，1，2。
 	const originIndex = ref(0) // 记录源数据的下标
-
-	function openModal(link, index, list) {
-		console.log('link====>', link, index, list)
+	const totalNumber = ref('')
+	
+	function openModal(link, index, list, total) {
+		// console.log('link====>', link, index, list)
 		if(link) {
 			isShowModal.value = true;
 		}
+		
+		console.log('totalNumber=====>', total)
+		
 		originIndex.value = index
 		originList.value = list
+		totalNumber.value = total
 	}
 	const loadingMore=(index)=> {
 		emits('loadingMore', index)

@@ -10,29 +10,35 @@
 		:virtual-list-col="2" :inner-list-style="{'display':'flex','flex-wrap':'wrap'}"
 		:default-page-size="30" :force-close-inner-list="true" @virtualListChange="virtualListChange"
 		@query="queryList" @scroll="onListScroll">
+		<u-navbar :title="currentEvent.description" placeholder></u-navbar>
 		<view class="" sot="header">
 			<section class="section-banner">
 				<up-lazy-load class="img" v-if="currentEvent"
 					:image="currentEvent.image_url + '?x-oss-process=image/resize,w_600,h_200,m_fill'" mode="aspectFill" />
 				<view class="summary">
-					<view class="item u-flex-y-center">照片 2346</view>
-					<view class="item u-flex-y-center">视频 2346</view>
-					<view class="item u-flex-y-center">热度 2346</view>
+					<view class="item u-flex-y-center">照片 {{totalNumber}}</view>
+					<!-- <view class="item u-flex-y-center">视频 2346</view> -->
+					<!-- <view class="item u-flex-y-center">热度 2346</view> -->
 				</view>
 			</section>
 
 			<section class="section-btns u-flex-xy-center" style="width:580rpx;margin: 24rpx auto;">
-				<up-button type="primary" @click="refFindPhoto.open()"
+				<up-button type="primary" @click="$refs.refFindPhoto.open()"
 					customStyle="width: 298rpx;font-size: 24rpx;height: 82rpx;">
 					<text class="iconfont icon-saomiaorenlian u-mr-10"></text>
 					查找照片和视频
 				</up-button>
 			</section>
 
-			<view v-if="isShowBackTop" style="height: 88rpx;"></view>
-			<section class="section-tabs u-flex-y-center" :class="{isFixed: isShowBackTop}" >
+			<view v-if="isShowBackTop" :style="{
+				height: addUnit(getPx('44px') + getWindowInfo().statusBarHeight,'px'),
+			}"></view>
+			<section class="section-tabs u-flex-y-center" :class="{isFixed: isShowBackTop}" 
+			:style="{
+				top: addUnit(getPx('44px') + getWindowInfo().statusBarHeight,'px'),
+			}">
 				<view class="item" :class="{active: tabActive === 'photo'}" @click="tabActive = 'photo'">照片</view>
-				<view class="item" :class="{active: tabActive === 'video'}" @click="tabActive = 'video'">视频</view>
+				<!-- <view class="item" :class="{active: tabActive === 'video'}" @click="tabActive = 'video'">视频</view> -->
 			</section>
 			
 			<view v-if="isShowBackTop" @click="goToTop()" class="back-to-top" :class="{active: isScrolling}">
@@ -41,7 +47,7 @@
 							顶部 
 							<text class="iconfont icon-back-top"></text>
 					 </view>
-					 <view class="number">{{ currentImageIndex }} / 3000</view>
+					 <view class="number">{{ currentImageIndex }} / {{totalNumber}}</view>
 				 </view>
 			</view>
 		</view>
@@ -55,6 +61,7 @@
 	</zPaging>
 	<!-- 轮播图 -->
 	<PreviewMedia ref="refPreviewMedia" @loadingMore="loadingMore"/>
+	<FindPhoto ref="refFindPhoto" />
 </template>
 
 <script>
@@ -62,13 +69,17 @@
 	import request from "@/utils/request.js"
 	import FindPhoto from "./components/FindPhoto.vue"
 	import PreviewMedia from "./components/PreviewMedia.vue"
+	import { addUnit, getPx, getWindowInfo } from '@/uni_modules/uview-plus/libs/function/index.js';
+	
 	export default {
 		components: {
 			zPaging, FindPhoto, PreviewMedia
 		},
 		data() {
 			return {
+				addUnit, getPx, getWindowInfo,
 				allImages: [],
+				totalNumber: 0,
 				itemHeight: 240,
 				isScrolling: false,
 				currentImageIndex: 0,
@@ -88,6 +99,28 @@
 		onLoad(options) {
 			console.log('options=====>', options)
 			this.currentEvent = options
+			
+			// #ifdef MP-WEIXIN
+			wx?.showShareMenu?.({
+				withShareTicket: true,
+				menus: ['shareAppMessage', 'shareTimeline'] // 开启分享给朋友和分享到朋友圈
+			});
+			// #endif
+		},
+		// 分享给朋友
+		onShareAppMessage() {
+			return {
+				title: '跑了没 - ' + (this.currentEvent.description || ''),
+				imageUrl: this.currentEvent.image_url, // 可以设置自定义分享图片，留空则使用当前页面截图
+			};
+		},
+		// 分享到朋友圈
+		onShareTimeline() {
+			return {
+				title: '跑了没 - ' + (this.currentEvent.description || ''),
+				query: '', // 可以携带参数
+				imageUrl: this.currentEvent.image_url, // 可以设置自定义分享图片
+			};
 		},
 		methods: {
 			async loadingMore(index) {
@@ -95,7 +128,7 @@
 				this.isNextLevel = true
 				const res = await this.queryList(this.swiperPageNo+1,this.swiperPageSize)
 				// console.log('albumDetail的触发res====',res)
-				this.$refs.refPreviewMedia.openModal('',index,this.virtualList2)
+				this.$refs.refPreviewMedia.openModal('',index,this.virtualList2, this.totalNumber)
 			},
 			goToTop() {
 				this.$refs.paging.scrollToTop();
@@ -103,7 +136,7 @@
 			onListScroll(e) {
 				// console.log(e.detail.scrollTop)
 				const scrollTop = e.detail.scrollTop
-				this.isShowBackTop = scrollTop >= 256;
+				this.isShowBackTop = scrollTop >= 210;
 				
 				const index = Math.floor(scrollTop / this.itemHeight);
 				// 限制范围：不能超过总图片数 - 1, 2 列
@@ -135,6 +168,8 @@
 					this.allImages = res.urls || [];
 					this.$refs.paging.complete(res.urls);
 					
+					this.totalNumber = res.total
+					
 					if(pageNo == 1) {
 						this.virtualList2 = res.urls
 					} else {
@@ -143,7 +178,7 @@
 				})
 			},
 			handleImg(link,index) {
-				this.$refs.refPreviewMedia.openModal(link,index,this.virtualList2)
+				this.$refs.refPreviewMedia.openModal(link,index,this.virtualList2, this.totalNumber)
 			},
 			openPreview(index) {
 				// index should be the global index provided by virtual list
@@ -152,6 +187,8 @@
 			}
 		}
 	}
+	
+	
 </script>
 
 <style lang="scss" scoped>
@@ -182,10 +219,10 @@
 	}
 	.section-banner {
 		position: relative;
-		height: 344rpx;
+		height: 300rpx;
 		.img {
 			width: 100%;
-			height: 344rpx;
+			height: 300rpx;
 		}
 
 		.summary {
@@ -216,7 +253,7 @@
 	.isFixed {
 			z-index: 990;
 			position: fixed;
-			top: 0;
+			top: 88rpx;
 			width: 100%;
 		}
 	.section-tabs {
