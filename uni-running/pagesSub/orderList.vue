@@ -1,10 +1,10 @@
 <template>
-	<Navbar title="我的活动" :bgHeight="370" />
+	<!-- <Navbar title="我的活动" :bgHeight="370" /> -->
 	<view class="tab-container">
 		<u-tabs :inactiveStyle="{ color: '#000' }" :activeStyle="{ color: '#FF8C00' }" :list="tab.items" @change="changeTab"
 			:scrollable="false" keyName="label" lineColor="#FF8C00" />
 	</view>
-	<mescroll-body @init="mescrollInit" @down="downCallback" @up="getList">
+	<mescroll-body @init="mescrollInit" @down="downCallback" @up="getList" :top="100">
 		<view class="order-item" v-for="order in dataList" :key="order.id">
 			<view class="flex-between-center u-mb-20">
 				<view class="order-no flex-row" @click="setClipboardData(order.order_no)">
@@ -17,7 +17,7 @@
 					<u-text v-if="order.status == 'PND'" size="14" type="error" text="待支付"></u-text>
 					<u-text v-if="order.status == 'SUCC'" size="14" type="success" text="已付款"></u-text>
 					<u-text v-if="order.status == 'FAIL'" size="14" type="error" text="失败"></u-text>
-					<u-text v-if="order.status == 'RFND'" size="14" type="info" text="已退款"></u-text>
+					<u-text v-if="order.status == 'RFUND'" size="14" type="info" text="已退款"></u-text>
 					<u-text v-if="order.status == 'CXL'" size="14" type="info" text="已取消"></u-text>
 					<u-text v-if="order.status == 'EXP'" size="14" type="info" text="已过期"></u-text>
 				</view>
@@ -38,14 +38,15 @@
 						</view>
 
 						<view class="flex-between-center u-mt-10">
-							<view v-if="order.sign_info" class="c9 fs24">
-								报名人: {{order.sign_info.full_name}}
+							<view v-if="order.sign_info_list" class="c9 fs24 ellipsis" style="max-width:380rpx;">
+								报名人: {{order.sign_list}}
 							</view>
 							<view class="b" style="color: red;">
 								<text style="font-size: 20rpx;">￥</text>{{order.amount_yuan}}
 							</view>
 						</view>
-						<view v-if="!order.canRefund" class="c9 u-mt-10 fs24" style="">
+						
+						<view v-if="!order.canRefund && order.status == 'SUCC'" class="c9 u-mt-10 fs24" style="">
 							{{order.remainingTimeStr}}
 						</view>
 					</view>
@@ -100,17 +101,28 @@
 		active: 0,
 		items: [
 			{
-				label: "线下活动",
-				value: "offline",
+				label: "全部订单",
+				value: "",
 			},
 			{
-				label: "线上活动",
-				value: "online",
+				label: "已付款",
+				value: "SUCC",
+			},
+			{
+				label: "已退款",
+				value: "RFUND",
+			},
+			{
+				label: "已过期",
+				value: "EXP",
 			},
 		],
 	});
+	
+	const orderStatus = ref('')
 	const changeTab = (detail) => {
-		tab.value.active = detail.index;
+		console.log(detail)
+		orderStatus.value = detail.value;
 		refreshList();
 	};
 
@@ -180,19 +192,24 @@
 		const data = {
 			pageIndex: mescroll.num - 1,
 			pageSize: 10,
-			orderStatus: "SUCC",
+			orderStatus: orderStatus.value,
 		};
 		
 		
-		request.post(`/pay/order/statusByUser`, data).then((res) => {
+		let url = `/pay/order/list`
+		if (orderStatus.value) {
+			url = `/pay/order/statusByUser`
+		}
+		
+		request.post(`/pay/order/list`, data).then((res) => {
 				res = res.orders.map(item => {
+					const sign_info_list = item.sign_info_list
 					return {
 						...item,
-						...(getRefundInfo(item.created_at, item.refund_valid_hour || 24))
+						...(getRefundInfo(item.created_at, item.refund_valid_hour || 24)),
+						sign_list: sign_info_list?.map(i => i.full_name).join(',') || ''
 					}
 				})
-				
-				console.log(res)
 				
 				mescroll.endSuccess(res.length);
 
@@ -253,7 +270,7 @@
 				uni.hideLoading();
 				uni.$u.toast("支付成功");
 				setTimeout(() => {
-					// uni.navigateBack()
+					refreshList()
 					uni.$u.route("pagesSub/signUpStatus?order_no=" + item.order_no);
 				}, 300);
 			},
@@ -334,10 +351,10 @@
 
 	.tab-container {
 		background-color: #fafafa;
-		position: sticky;
+		position: fixed;
+		width: 100%;
 		z-index: 10;
 		top: 0;
-		width: 500rpx;
 		margin: 0rpx auto 20rpx;
 	}
 </style>
