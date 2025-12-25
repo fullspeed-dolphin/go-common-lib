@@ -26,7 +26,18 @@
 					hover-start-time="150"
 					@tap="leftClick"
 				>
-					<slot name="left">
+					<view v-if="leftIcon" class="navbar-badge flex-start" :style="'height:'+ menuHeight + 'px'">
+						<view v-if="!isFirstPage" class="flex-center border-right" style="padding: 6rpx 15rpx 6rpx 20rpx;" @tap="leftClick()">
+							<u-icon :name="leftIcon" :size="leftIconSize"
+								:color="leftIconColor"></u-icon>
+						</view>
+						<view class="flex-center " style="padding: 6rpx 15rpx 6rpx 15rpx;" @tap="goHome()">
+							<u-icon name="home" size="24"
+								:color="leftIconColor"></u-icon>
+						</view>
+					</view>
+										
+					<!-- <slot name="left">
 						<up-icon
 							v-if="leftIcon"
 							:name="leftIcon"
@@ -40,7 +51,7 @@
 							}"
 							class="u-navbar__content__left__text"
 						>{{ leftText }}</text>
-					</slot>
+					</slot> -->
 				</view>
 				<slot name="center">
 					<text
@@ -113,6 +124,16 @@
 			}
 		},
 		emits: ["leftClick", "rightClick"],
+		computed: {
+			isFirstPage() {
+				return uni.$u.pages().length === 1
+			},
+			menuHeight() {
+				const menuButtonInfo = uni?.getMenuButtonBoundingClientRect?.();
+				
+				return menuButtonInfo?.height || 32
+			}
+		},
 		methods: {
 			addStyle,
 			addUnit,
@@ -130,6 +151,11 @@
 					}
 				}
 			},
+			goHome() {
+				uni.switchTab({
+					url: '/pages/index'
+				});
+			},
 			// 点击右侧区域
 			rightClick() {
 				this.$emit('rightClick')
@@ -139,7 +165,24 @@
 </script>
 
 <style lang="scss" scoped>
-
+	.navbar-badge{
+		border-radius: 999px;
+		border: 1px solid #eee;
+		background: #fff;
+	}
+	.border-right{
+			position: relative;
+			&:after{
+				position: absolute;
+				content: "";
+				height: 40rpx;
+				width: 1px;
+				background: #eee;
+				right:0;
+				top:50%;
+				transform: translateY(-50%);
+			}
+		}
 	.u-navbar {
 
 		&--fixed {

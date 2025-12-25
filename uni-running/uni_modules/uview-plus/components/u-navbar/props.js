@@ -66,7 +66,7 @@ export const props = defineMixin({
 		// 标题的宽度
 		titleWidth: {
 			type: [String, Number],
-			default: () => defProps.navbar.titleWidth
+			default: () => '350rpx'
 		},
 		// 导航栏高度
 		height: {
@@ -86,12 +86,12 @@ export const props = defineMixin({
 		// 点击左侧区域(返回图标)，是否自动返回上一页
 		autoBack: {
 			type: Boolean,
-			default: () => defProps.navbar.autoBack
+			default: true
 		},
 		// 标题的样式，对象或字符串
 		titleStyle: {
 			type: [String, Object],
 			default: () => defProps.navbar.titleStyle
-		}
+		},
 	}
 })
