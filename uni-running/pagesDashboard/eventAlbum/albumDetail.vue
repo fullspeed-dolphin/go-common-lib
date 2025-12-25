@@ -192,9 +192,14 @@
 </script>
 
 <style lang="scss" scoped>
+	::v-deep{
+		.u-popup__content__close {
+			top: 200rpx;
+		}
+	}
 	.back-to-top{
 		position: fixed;
-		top: 140px;
+		top: 240px;
 		left: 0;
 		padding: 0 8px;
 		min-width: 75px;

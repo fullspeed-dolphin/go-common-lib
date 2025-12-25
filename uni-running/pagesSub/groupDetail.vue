@@ -87,7 +87,7 @@
 						</view>
 					</view>
 					<view style="width: 184rpx">
-						<u-button type="primary" color="#FF8C00" style="width: 184rpx;height: 84rpx;" shape="circle"
+						<u-button type="primary" color="#FF8C00" customStyle="width: 184rpx;height: 84rpx;" shape="circle"
 							@click="callPhone(memberLeader.user_phone)">
 							联系Ta
 						</u-button>
@@ -115,7 +115,7 @@
 				<view class="flex-center u-mt-15">
 					<u-button type="primary" color="#FF8C00"
 						v-if="memberList.length >= 8"
-						style="width: 236rpx;height: 84rpx;" shape="circle"
+						customStyle="width: 236rpx;height: 84rpx;" shape="circle"
 						@click="viewMoreMembers()">
 						查看更多
 						<u-icon name="arrow-right" color="#fff" size="14"></u-icon>

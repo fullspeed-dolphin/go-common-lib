@@ -9,7 +9,7 @@
 
 			<view class="event-item-meta flex-between-center" v-if="showButton">
 				<view>
-					<view class="event-item-meta b ellipsis u-mt-10" style="width: 430rpx;">
+					<view class="event-item-meta b ellipsis u-mt-10" style="max-width: 430rpx;">
 						{{ item.is_online ? "线上跑" : '地址: ' + item.event_location}}
 					</view>
 					<view class="event-item-location b u-mt-20 u-mb-5">

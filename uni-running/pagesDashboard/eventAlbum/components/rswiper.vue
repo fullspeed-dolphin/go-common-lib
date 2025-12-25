@@ -199,14 +199,6 @@
 </script>
 
 <style lang="scss" scoped>
-	::v-deep{
-		.xz-slider-range__block{
-			padding: 0 20rpx;
-			width: auto;
-			display: flex;
-			align-items: center;
-		}
-	}
 	.title {
 		width: 100%;
 		display: flex;

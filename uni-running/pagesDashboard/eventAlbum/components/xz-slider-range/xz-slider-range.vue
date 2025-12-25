@@ -74,7 +74,10 @@
     }
 
     &__block {
-      width: v-bind("sliderRangeStyle.blockSize");
+      width: auto;
+			padding: 0 20rpx;
+			display: flex;
+			align-items: center;
       height: calc(v-bind("sliderRangeStyle.blockSize") / 2);
       background-color: v-bind("$props.color");
 	  font-size:18rpx;
