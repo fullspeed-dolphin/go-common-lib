@@ -10,11 +10,11 @@
 		:virtual-list-col="2" :inner-list-style="{'display':'flex','flex-wrap':'wrap'}"
 		:default-page-size="30" :force-close-inner-list="true" @virtualListChange="virtualListChange"
 		@query="queryList" @scroll="onListScroll">
-		<u-navbar :title="currentEvent.description" placeholder></u-navbar>
+		<u-navbar :title="currentEvent.name" placeholder></u-navbar>
 		<view class="" sot="header">
 			<section class="section-banner">
 				<up-lazy-load class="img" v-if="currentEvent"
-					:image="currentEvent.image_url + '?x-oss-process=image/resize,w_600,h_200,m_fill'" mode="aspectFill" />
+					:image="currentEvent.background_image_url + '?x-oss-process=image/resize,w_600'" mode="aspectFill" />
 				<view class="summary">
 					<view class="item u-flex-y-center">照片 {{totalNumber}}</view>
 					<!-- <view class="item u-flex-y-center">视频 2346</view> -->
@@ -99,7 +99,7 @@
 		onLoad(options) {
 			console.log('options=====>', options)
 			this.currentEvent = options
-			
+			this.getDetail()
 			// #ifdef MP-WEIXIN
 			wx?.showShareMenu?.({
 				withShareTicket: true,
@@ -110,16 +110,16 @@
 		// 分享给朋友
 		onShareAppMessage() {
 			return {
-				title: '跑了没 - ' + (this.currentEvent.description || ''),
-				imageUrl: this.currentEvent.image_url, // 可以设置自定义分享图片，留空则使用当前页面截图
+				title: '跑了没 - ' + (this.currentEvent.name || ''),
+				imageUrl: this.currentEvent.background_image_url, // 可以设置自定义分享图片，留空则使用当前页面截图
 			};
 		},
 		// 分享到朋友圈
 		onShareTimeline() {
 			return {
-				title: '跑了没 - ' + (this.currentEvent.description || ''),
+				title: '跑了没 - ' + (this.currentEvent.name || ''),
 				query: '', // 可以携带参数
-				imageUrl: this.currentEvent.image_url, // 可以设置自定义分享图片
+				imageUrl: this.currentEvent.background_image_url, // 可以设置自定义分享图片
 			};
 		},
 		methods: {
@@ -151,6 +151,15 @@
 			},
 			virtualListChange(vList) {
 				this.virtualList = vList;
+			},
+			getDetail (){
+			  uni.showLoading({
+			    mask: true,
+			  });
+			  request.get(`/event-api/api/v1/events/${this.currentEvent.event_id}`)
+			    .then((res) => {
+			      this.currentEvent = res
+			    });
 			},
 			queryList(pageNo, pageSize) {
 				this.swiperPageNo = pageNo
