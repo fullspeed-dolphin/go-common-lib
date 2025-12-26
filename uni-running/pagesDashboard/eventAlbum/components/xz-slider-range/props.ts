@@ -34,6 +34,7 @@ export const xzSilderRangeProps = {
   min: makeNumberProp(0),
   // 最大值
   max: makeNumberProp(100),
+  total: makeNumberProp(1),
   // 步进倍率（依据实际min和max为主）
   rate: makeNumberProp(0),
   // 滑块值格式化回调

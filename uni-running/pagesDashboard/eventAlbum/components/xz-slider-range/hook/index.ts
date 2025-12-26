@@ -85,7 +85,7 @@ export function useXzSliderRange(
 	  console.log('touch====')
     const { pageX } = e?.touches?.[e?.touches.length - 1] ?? {};
     const { left, width } = $state.rect;
-
+	console.log('left===',left,width)
     if (left && width) {
       const target = Math.round(getPercent(pageX, left, width)
         * (($props.max - $props.min) / 100)
@@ -114,6 +114,7 @@ export function useXzSliderRange(
 
       // 赋值完毕才取值
       const extract = $state.values.slice(0, $props.solo ? 1 : $state.values.length);
+	  console.log('extract===',extract)
       // 防抖过程
       _blockDebounceTimer && clearTimeout(_blockDebounceTimer);
       _blockDebounceTimer = setTimeout(() => {
@@ -142,7 +143,8 @@ export function useXzSliderRange(
   }
 
   async function execute() {
-    $state.rect = await getRect(".xz-slider-range__inner", $refs.self);
+	  console.log('getRect===============sie')
+    $state.rect = await getRect("#sliderRange", $refs.self);
 
     if ($props.modelValue && Array.isArray($props.modelValue) && $props.modelValue.length >= 1) {
       $state.values = $props.modelValue;
@@ -161,12 +163,14 @@ export function useXzSliderRange(
 
 // 获取DOM元素矩形宽高
 export function getRect(target: string, range?: unknown) {
+	console.log('rang===',range,target)
   return new Promise<NodeInfo>((resolve) => {
     uni
       .createSelectorQuery()
       .in(range)
       .select(target)
       .boundingClientRect((size) => {
+		console.log("size==================",size)
         resolve(size as NodeInfo);
       })
       .exec();

@@ -10,7 +10,16 @@
 		<view class="section-slider">
 			<!-- <view class="title">当前：{{originIndex+1 }}/{{ originList.length }}</view> -->
 			<!-- // <slider :value="originIndex" @change="sliderChange" :step="1" :max="originList.length -1" /> -->
-			<xzsliderrange v-model="originIndexArr" solo :decoration="false"  @move="moveChange" :size="30" height="2px" activeBgc="rgb(0, 122, 255)" :max="totalNumber" :min="0"/>
+			<xzsliderrange v-model="originIndexArr" solo :decoration="false"  
+			@move="moveChange" 
+			:size="30" 
+			height="2px" 
+			activeBgc="rgb(0, 122, 255)" 
+			:max="Number(originList.length || 0)" 
+			:min="0"
+			:total="Number(totalNumber || 0)"
+			hintColor="#fff"
+			/>
 		</view>
 		<!-- loading -->
 		<view class="loading">
@@ -142,7 +151,7 @@
 		// originIndexArr.value[0] = originIndex.value
 		// originIndexArr.value = originIndex.value
 		// console.log('value 发生变化：' + e.detail.value)
-		if (originIndex.value + 3 > originList.value.length) {
+		if (originIndex.value + 3 > originList.value.length && !isloading.value) {
 			emits('loadingMore', originIndex.value)
 			isloading.value = true
 			return;

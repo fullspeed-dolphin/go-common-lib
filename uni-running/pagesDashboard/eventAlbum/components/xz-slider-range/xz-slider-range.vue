@@ -1,7 +1,7 @@
 <template>
   <view :class="{ 'xz-slider-range--disabled': $props.disabled }"
         class="xz-slider-range">
-    <view class="xz-slider-range__inner">
+    <view class="xz-slider-range__inner" id="sliderRange">
       <!-- 滑动条 -->
       <view class="xz-slider-range__bar">
         <view class="xz-slider-range__bar-bg" />
@@ -12,7 +12,7 @@
             class="xz-slider-range__controls"
             @touchmove="blockEvent($event, index)">
         <!-- 滑块值提示 -->
-        <!-- <view v-if="item.showHint"
+        <view v-if="item.showHint"
               :class="{
                 'xz-slider-range__hint--top': /^top$/.test($props.hintMode),
                 'xz-slider-range__hint--bottom': /^bottom$/.test($props.hintMode),
@@ -20,8 +20,8 @@
                 'xz-slider-range__hint--toast': /^toast$/.test($props.hintMode)
               }"
               class="xz-slider-range__hint">
-          <text>{{ item.hint }}</text>
-        </view> -->
+          <text>总{{ $props.total }}</text>
+        </view>
         <!-- 滑块 -->
         <view :class="{'xz-slider-range__block--decoration': sliderBlockCtx.decoration}"
               class="xz-slider-range__block">{{ item.hint+1 }}/{{$props.max}}</view>
