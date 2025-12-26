@@ -34,11 +34,11 @@
 			default: []
 		},
 		originIndex: {
-			type: Number,
+			type: [Number, String],
 			default: 0
 		},
 		totalNumber: {
-			type: Number,
+			type: [Number, String],
 			default: 0
 		}
 	})

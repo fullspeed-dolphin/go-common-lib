@@ -14,7 +14,7 @@
 		<view class="" sot="header">
 			<section class="section-banner">
 				<up-lazy-load class="img" v-if="currentEvent"
-					:image="currentEvent.background_image_url + '?x-oss-process=image/resize,w_600'" mode="aspectFill" />
+					:image="currentEvent.image_url + '?x-oss-process=image/resize,w_600'" mode="aspectFill" />
 				<view class="summary">
 					<view class="item u-flex-y-center">照片 {{totalNumber}}</view>
 					<!-- <view class="item u-flex-y-center">视频 2346</view> -->
@@ -172,7 +172,7 @@
 					event_id: this.currentEvent.event_id || '01K9VG019M6SDK49NNGGAZQM5C',
 				};
 
-				request.get(`/image-service/oss`, params).then((res) => {
+				return request.get(`/image-service/oss`, params).then((res) => {
 					// keep full list for preview
 					this.allImages = res.urls || [];
 					this.$refs.paging.complete(res.urls);
