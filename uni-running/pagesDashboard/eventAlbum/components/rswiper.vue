@@ -8,7 +8,7 @@
 		</swiper>
 		
 		<view class="section-slider">
-			<!-- <view class="title">当前：{{originIndex+1 }}/{{ originList.length }}</view> -->
+			
 			<!-- // <slider :value="originIndex" @change="sliderChange" :step="1" :max="originList.length -1" /> -->
 			<xzsliderrange v-model="originIndexArr" solo :decoration="false"  
 			@move="moveChange" 
@@ -19,7 +19,12 @@
 			:min="0"
 			:total="Number(totalNumber || 0)"
 			hintColor="#fff"
+			@showNum="showNum"
 			/>
+			<view class="title u-flex" v-show="isShow">
+				{{originIndex+1 }}
+				<text style="color:#999;">/{{ originList.length }}(总 {{totalNumber}})</text>
+			</view>
 		</view>
 		<!-- loading -->
 		<view class="loading">
@@ -56,7 +61,6 @@
 		console.log('val========', props.originIndex)
 		originList.value = props.originList
 		originIndex.value = props.originIndex
-		originIndexArr.value[0] = originIndex.value
 		displayIndex.value = 0
 		currentIndex.value = 0
 		isloading.value = false
@@ -70,15 +74,13 @@
 	const currentIndex = ref(0) // 显示swiper的当前值只有：0，1，2。
 	const disableTouch = ref(false) // 是否阻止触摸
 	const isloading = ref(false) // 加载动画内容
+	const isShow = ref(false) // 图片数量的显示隐藏
 	const initSwiperData = (originIndex) => {
-		// console.log('originIndex===', originIndex)
 		setTimeout(() => {
 			if (originIndex == 0 && endDir.value == 'right') {
 				disableTouch.value = true
-				// console.log("hello,world111", endDir.value)
 				return;
 			} else {
-				// console.log("hello,world22", endDir.value)
 				disableTouch.value = false
 			}
 			const originListLength = originList.value.length; // 源数据长度
@@ -94,8 +96,7 @@
 					originIndex + 1 == originListLength ? 0 : originIndex + 1
 				];
 			displaySwiperList.value = displayList;
-			// originIndexArr.value[0] = originIndex
-			// console.log('displayList', displayList)
+			originIndexArr.value[0] = originIndex
 		}, 200)
 
 	}
@@ -130,36 +131,23 @@
 			displayIndex.value = displayIndex.value - 1 == -1 ? 2 : displayIndex.value - 1;
 			initSwiperData(originIndex.value);
 		}
-		// console.log('originIndex.value',originIndex)s
 		originIndexArr.value[0] = originIndex.value
-		// console.log('originIndexArr.value[0]',originIndexArr.value[0])
 	}
-	// const sliderChange = (e) => {
-	// 	originIndex.value = e.detail.value
-	// 	console.log('value 发生变化：' + e.detail.value)
-	// 	if (originIndex.value + 3 > originList.value.length) {
-	// 		emits('loadingMore', originIndex.value + 1)
-	// 		isloading.value = true
-	// 		return;
-	// 	}
-	// 	initSwiperData(originIndex.value);
-	// }
 	const moveChange = (e) => {
 		if(originIndex.value == e[0])return
 		console.log('e===',e)
 		originIndex.value = e[0]
-		// originIndexArr.value[0] = originIndex.value
-		// originIndexArr.value = originIndex.value
-		// console.log('value 发生变化：' + e.detail.value)
 		if (originIndex.value + 3 > originList.value.length && !isloading.value) {
 			emits('loadingMore', originIndex.value)
 			isloading.value = true
 			return;
 		}
 		initSwiperData(originIndex.value);
-		originIndexArr.value[0] = originIndex.value
 	}
-
+	const showNum = (val) => {
+		console.log('val',val)
+		isShow.value = val
+	}
 	const startTime = ref(0)
 	const startPosition = ref(0)
 	const endPosition = ref(0)
@@ -201,8 +189,6 @@
 	onMounted(() => {
 		originList.value = props.originList
 		originIndex.value = props.originIndex
-		originIndexArr.value[0] = originIndex.value
-		// console.log("originList.value", originList.value)
 		initSwiperData(originIndex.value);
 	})
 </script>

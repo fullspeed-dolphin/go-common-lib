@@ -68,7 +68,7 @@ export const xzSilderRangeProps = {
 };
 
 export const xzSilderRangeEmits = [
-  "update:modelValue", "change", "move"
+  "update:modelValue", "change", "move", "showNum"
 ];
 
 export type XzSilderRangeProps = ExtractPropTypes<typeof xzSilderRangeProps>;
