@@ -1,6 +1,8 @@
 <template>
 	<view>
 		<Navbar :title="pageTitle" :bgHeight="370" />
+		
+		<!-- <u-navbar :title="pageTitle" placeholder></u-navbar> -->
 
 		<mescroll-empty v-if="isEmpty" mode="data" :option="{
         btnText: '创建跑团',
@@ -112,6 +114,7 @@
 						</view>
 					</view>
 				</view>
+				<mescroll-empty v-if="!memberList.length" :option="{ tip: '暂无跑团成员~' }" />
 				<view class="flex-center u-mt-15">
 					<u-button type="primary" color="#FF8C00"
 						v-if="memberList.length >= 8"
@@ -121,8 +124,6 @@
 						<u-icon name="arrow-right" color="#fff" size="14"></u-icon>
 					</u-button>
 				</view>
-
-				<mescroll-empty v-if="!memberList.length" :option="{ tip: '暂无跑团成员~' }" />
 			</section>
 
 			<section class="panel">
@@ -154,13 +155,14 @@
 			</section>
 		</block>
 
-		<UserLogin ref="refUserLogin" />
+		<UserLogin ref="refUserLogin" @success="getMemberList()"/>
 	</view>
 </template>
 <script setup>
 	import {
 		ref,
-		computed
+		computed,
+		nextTick
 	} from "vue";
 	import {
 		onLoad,
@@ -215,6 +217,12 @@
 		// #ifdef MP-WEIXIN
 		wx.showShareMenu();
 		// #endif
+		
+		nextTick(() => {
+			if (!store.state.userInfo.id) {
+				return refUserLogin.value.open();
+			}
+		})
 	});
 	
 	const getEvents = () => {

@@ -317,10 +317,12 @@
 			vm.$emit('init', vm.mescroll);
 
 			// 设置高度
+			const WindowInfo = uni.getWindowInfo();
+			console.log('WindowInfo=====>', WindowInfo)
 			const sys = uni.getSystemInfoSync();
 			if (sys.windowHeight) vm.windowHeight = sys.windowHeight;
 			if (sys.windowBottom) vm.windowBottom = sys.windowBottom;
-			if (sys.statusBarHeight) vm.statusBarHeight = sys.statusBarHeight;
+			if (sys.statusBarHeight) vm.statusBarHeight = WindowInfo.statusBarHeight;
 			// 使down的bottomOffset生效
 			vm.mescroll.setBodyHeight(sys.windowHeight);
 

@@ -382,13 +382,14 @@
 			vm.$emit('init', vm.mescroll);
 			
 			// 设置高度
-			const sys = uni.getSystemInfoSync();
-			if(sys.windowTop) vm.windowTop = sys.windowTop;
-			if(sys.windowBottom) vm.windowBottom = sys.windowBottom;
-			if(sys.windowHeight) vm.windowHeight = sys.windowHeight;
-			if(sys.statusBarHeight) vm.statusBarHeight = sys.statusBarHeight;
+			const windowInfo =  uni.getWindowInfo()
+			
+			if(windowInfo.windowTop) vm.windowTop = windowInfo.windowTop;
+			if(windowInfo.windowBottom) vm.windowBottom = windowInfo.windowBottom;
+			if(windowInfo.windowHeight) vm.windowHeight = windowInfo.windowHeight;
+			if(windowInfo.statusBarHeight) vm.statusBarHeight = windowInfo.statusBarHeight;
 			// 使down的bottomOffset生效
-			vm.mescroll.setBodyHeight(sys.windowHeight);
+			vm.mescroll.setBodyHeight(windowInfo.windowHeight);
 
 			// 因为使用的是scrollview,这里需自定义scrollTo
 			vm.mescroll.resetScrollTo((y, t) => {
