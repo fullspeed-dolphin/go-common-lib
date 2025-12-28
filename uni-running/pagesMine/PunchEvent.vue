@@ -75,13 +75,26 @@
 			  </u-button>
 			</view>
 
-			<template v-if="selectedEvent.id && isInCheckTime">
-				<view class="flex-center" style="margin-top:20px;color:#999;">
+			<view v-if="selectedEvent.id" class="flex-center" style="margin-top:20px;color:#999;min-height:40rpx;">
+				<template v-if="isInCheckTime">
 					<template v-if="!locationGranted">未获取定位权限</template>
 					<template v-else>{{isInPunchArea ? '在签到范围' : '不在签到范围'}}</template>
-				</view>
-			</template>
+				</template>
+			</view>
 		</div>
+
+		<!-- 底部二维码签到按钮 -->
+		<view v-if="participants.length" class="bottom-qrcode-btn">
+			<u-button
+				type="primary"
+				shape="circle"
+				:color="isInCheckTime ? '#FF8C00' : '#CCCCCC'"
+				customStyle="height: 80rpx; width: 312rpx;"
+				@click="handleQrcodeSign"
+			>
+				二维码签到
+			</u-button>
+		</view>
 		
 		<up-action-sheet round="16" 
 			@close="isShowEventModal = false"
@@ -89,6 +102,24 @@
 			:show="isShowEventModal" @select="changeEvent" />
 		
 		<UserLogin ref="refUserLogin" @success="getEvents()"/>
+
+		<!-- 二维码弹窗 -->
+		<u-popup v-model:show="showQrcodePopup" mode="center" round="16">
+			<view class="qrcode-popup">
+				<view class="qrcode-title">扫码签到</view>
+				<view class="qrcode-content">
+					<u-qrcode :val="qrcodeData" :size="200" />
+				</view>
+				<u-button
+					type="primary"
+					shape="circle"
+					color="#FF8C00"
+					@click="showQrcodePopup = false"
+				>
+					关闭
+				</u-button>
+			</view>
+		</u-popup>
   </view>
 </template>
 
@@ -115,6 +146,8 @@ const refUserLogin = ref(null);
 const punchInStatus = ref('pending')
 const isShowEventModal = ref(false)
 const selectedEvent = ref({})
+const showQrcodePopup = ref(false)
+const qrcodeData = ref('')
 const locationGranted = ref(false)  // 位置权限是否已授予
 
 const currentTime = ref('')
@@ -181,9 +214,10 @@ function selectSigner(item) {
 function changeEvent(e) {
 	console.log(e)
 	if (selectedEvent.value.id === e.id) return;
-	
+
 	selectedEvent.value = e
-	
+
+	get_isInCheckTime()  // 立即检测时间状态
 	getCurrentEventSigners()
 	handleCheckLocation()
 	isShowEventModal.value = false
@@ -202,6 +236,8 @@ const getCurrentEventSigners = () => {
 	participants.value = []
 	request.get(`/event-api/ticket/getTicketByOpenID?event_id=${selectedEvent.value?.id}`).then((res) => {
 		participants.value = res.tickets
+		// 保存完整 data 用于二维码
+		qrcodeData.value = JSON.stringify({ tickets: res.tickets, total: res.total || res.tickets.length })
 	});
 };
 
@@ -251,8 +287,17 @@ function signApi (item) {
 		id: item.id,
 		full_name: item.full_name,
 	}
-	
+
 	request.post(`/event-api/ticket/checkin`, data)
+}
+
+// 二维码签到点击处理
+function handleQrcodeSign() {
+	if (isInCheckTime.value) {
+		showQrcodePopup.value = true
+	} else {
+		uni.$u.toast('不在签到时间范围内')
+	}
 }
 
 const isInPunchArea = ref(false)
@@ -463,8 +508,8 @@ onUnload(() => {
 	.disableButton{
 		::v-deep{
 			.u-button{
-				border-color: #ddd;
-				background: #ddd;
+				border-color: #CCCCCC;
+				background: #CCCCCC;
 				box-shadow: 0rpx 6rpx 12rpx 2rpx #F5F5F5;
 			}
 		}
@@ -481,5 +526,34 @@ onUnload(() => {
   font-weight: bold;
   color: #fff;
 	font-size: 40rpx;
+}
+
+.qrcode-popup {
+  padding: 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .qrcode-title {
+    font-size: 36rpx;
+    font-weight: bold;
+    margin-bottom: 30rpx;
+  }
+
+  .qrcode-content {
+    margin-bottom: 30rpx;
+  }
+}
+
+.bottom-qrcode-btn {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx 34rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  background: #f8f8f8;
+  display: flex;
+  justify-content: center;
 }
 </style>
