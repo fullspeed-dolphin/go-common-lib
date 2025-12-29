@@ -1,6 +1,6 @@
 <template>
 	<view class="page">
-		<Navbar title="跑团风采" :bgHeight="370" placeholder />
+		<u-navbar title="跑团风采" placeholder></u-navbar>
 		<section class="section-filter" :style="{ top: navbarHeight + 'px' }">
 			<view class="section-search">
 				<u-search v-model="searchTxt" @search="refreshList" placeholder="请输入名称或团号或地址" shape="round" bgColor="#fff"
@@ -8,7 +8,7 @@
 			</view>
 
 			<view class="section-tabs">
-				<u-tabs lineHeight="2" :duration="0" :inactiveStyle="{ color: '#000' }" :activeStyle="{ color: '#FF8C00' }"
+				<u-tabs lineHeight="2" enable-flex :duration="0" :inactiveStyle="{ color: '#000' }" :activeStyle="{ color: '#FF8C00' }"
 					:list="tabList" @change="changeTab" :scrollable="false" keyName="label" lineColor="#FF8C00" />
 			</view>
 		</section>
@@ -55,8 +55,6 @@
 	} from "vue";
 	import GroupItem from "@/components/GroupItem.vue";
 	import UserLogin from "@/components/UserLogin.vue";
-	import MescrollMixin from "@/uni_modules/mescroll-uni/components/mescroll-uni/mescroll-mixins.js";
-	import Navbar from "@/components/navbar.vue";
 
 	// 获取当前实例以访问全局属性
 	const {
@@ -96,11 +94,9 @@
 	// mescroll相关
 	let mescroll = null;
 
-
 	// 计算 navbar 高度
 	const computeNavbarHeight = () => {
-		const systemInfo = uni.getSystemInfoSync();
-		const statusBarHeight = systemInfo.statusBarHeight || 0;
+		const statusBarHeight = uni.getWindowInfo().statusBarHeight || 0;
 
 		// #ifdef MP-WEIXIN
 		const menuBtn = uni.getMenuButtonBoundingClientRect();

@@ -151,10 +151,10 @@ const options = ref({});
 const userInfo = computed(() => store.state.userInfo);
 
 const pageHeight = computed(() => {
-  const systemInfo = uni.getSystemInfoSync();
+	const WindowInfo = uni.getWindowInfo();
 
   // 状态栏高度（单位 px）
-  statusBarHeight.value = systemInfo.statusBarHeight || 0;
+  statusBarHeight.value = WindowInfo.statusBarHeight || 0;
 
   // 导航栏高度计算（关键）
   let navBarHeightValue = 0;
@@ -174,18 +174,11 @@ const pageHeight = computed(() => {
   navBarHeight.value = navBarHeightValue;
 
   // 计算内容区域可用高度
-  return systemInfo.windowHeight - navBarHeightValue - 20;
+  return WindowInfo.windowHeight - navBarHeightValue - 20;
 });
 
 // 页面加载
 onLoad((optionsParam) => {
-  try {
-    const systemInfo = uni.getSystemInfoSync();
-    console.log(systemInfo);
-  } catch (err) {
-    console.error("获取系统信息失败", err);
-  }
-
   options.value = optionsParam;
 
   polyline.value[0].points = testTrackData; // 假设trackPoints已在其他地方定义

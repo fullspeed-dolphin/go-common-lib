@@ -127,7 +127,7 @@ const titleStyle = computed(() => {
 });
 
 const computeNavbarBoxHeight = () => {
-  const systemInfo = uni.getSystemInfoSync();
+  const systemInfo = uni.getWindowInfo();
   statusBarHeight.value = systemInfo.statusBarHeight || 0;
   windowWidth.value = systemInfo.windowWidth || 375;
 

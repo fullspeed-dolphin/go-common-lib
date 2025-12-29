@@ -24,16 +24,13 @@
 					class="u-navbar__content__left"
 					hover-class="u-navbar__content__left--hover"
 					hover-start-time="150"
-					@tap="leftClick"
 				>
 					<view v-if="leftIcon" class="navbar-badge flex-start" :style="'height:'+ menuHeight + 'px'">
 						<view v-if="!isFirstPage" class="flex-center border-right" style="padding: 6rpx 15rpx 6rpx 20rpx;" @tap="leftClick()">
-							<u-icon :name="leftIcon" :size="leftIconSize"
-								:color="leftIconColor"></u-icon>
+							<u-icon :name="leftIcon" :size="leftIconSize" :color="leftIconColor"></u-icon>
 						</view>
 						<view class="flex-center " style="padding: 6rpx 15rpx 6rpx 15rpx;" @tap="goHome()">
-							<u-icon name="home" size="24"
-								:color="leftIconColor"></u-icon>
+							<u-icon name="home" size="24" :color="leftIconColor"></u-icon>
 						</view>
 					</view>
 										
