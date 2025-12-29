@@ -85,15 +85,17 @@
 
 		<!-- 底部二维码签到按钮 -->
 		<view v-if="participants.length" class="bottom-qrcode-btn">
-			<u-button
-				type="primary"
-				shape="circle"
-				:color="isInCheckTime ? '#FF8C00' : '#CCCCCC'"
-				customStyle="height: 80rpx; width: 312rpx;"
-				@click="handleQrcodeSign"
-			>
-				二维码签到
-			</u-button>
+			<view :class="['qrcode-btn-wrap', { 'is-pressed': showQrcodePopup }]">
+				<u-button
+					type="primary"
+					shape="circle"
+					:color="isInCheckTime ? '#FF8C00' : '#CCCCCC'"
+					customStyle="height: 80rpx; width: 312rpx;"
+					@click="handleQrcodeSign"
+				>
+					二维码签到
+				</u-button>
+			</view>
 		</view>
 		
 		<up-action-sheet round="16" 
@@ -104,11 +106,20 @@
 		<UserLogin ref="refUserLogin" @success="getEvents()"/>
 
 		<!-- 二维码弹窗 -->
-		<u-popup v-model:show="showQrcodePopup" mode="center" round="16">
+		<u-popup v-model:show="showQrcodePopup" mode="center" round="16" @open="onQrcodePopupOpen">
 			<view class="qrcode-popup">
-				<view class="qrcode-title">扫码签到</view>
+				<view class="qrcode-title">请出示给工作人员</view>
 				<view class="qrcode-content">
-					<u-qrcode :val="qrcodeData" :size="200" />
+					<u-qrcode
+						ref="qrcodeRef"
+						cid="punch-event-qrcode"
+						:val="qrcodeVal"
+						:size="280"
+						:lv="1"
+						:loadMake="false"
+						:onval="false"
+						:showLoading="false"
+					/>
 				</view>
 				<u-button
 					type="primary"
@@ -125,7 +136,7 @@
 
 <script setup>
 import dayjs from "dayjs";
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, nextTick } from 'vue'
 import UserLogin from "@/components/UserLogin.vue";
 import request from "@/utils/request.js"
 import { asyncAlls } from "@/utils/util.js"
@@ -148,6 +159,8 @@ const isShowEventModal = ref(false)
 const selectedEvent = ref({})
 const showQrcodePopup = ref(false)
 const qrcodeData = ref('')
+const qrcodeVal = ref('')
+const qrcodeRef = ref(null)
 const locationGranted = ref(false)  // 位置权限是否已授予
 
 const currentTime = ref('')
@@ -298,6 +311,21 @@ function handleQrcodeSign() {
 	} else {
 		uni.$u.toast('不在签到时间范围内')
 	}
+}
+
+// 二维码弹窗打开后生成二维码
+async function onQrcodePopupOpen() {
+	if (!qrcodeData.value) return
+	// 先设置数据
+	qrcodeVal.value = qrcodeData.value
+	// 等待 Vue 更新完成
+	await nextTick()
+	// 延迟确保 canvas 已挂载
+	setTimeout(() => {
+		if (qrcodeRef.value && qrcodeRef.value.val) {
+			qrcodeRef.value._makeCode()
+		}
+	}, 300)
 }
 
 const isInPunchArea = ref(false)
@@ -555,5 +583,14 @@ onUnload(() => {
   background: #f8f8f8;
   display: flex;
   justify-content: center;
+}
+
+.qrcode-btn-wrap {
+  &.is-pressed {
+    ::v-deep .u-button {
+      filter: brightness(0.85);
+      transform: scale(0.98);
+    }
+  }
 }
 </style>
