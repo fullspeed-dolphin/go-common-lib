@@ -8,7 +8,7 @@
 		cell-height-mode="fixed"
 		:preload-page="20"
 		:virtual-list-col="2" :inner-list-style="{'display':'flex','flex-wrap':'wrap'}"
-		:default-page-size="30" :force-close-inner-list="true" @virtualListChange="virtualListChange"
+		:default-page-size="28" :force-close-inner-list="true" @virtualListChange="virtualListChange"
 		@query="queryList" @scroll="onListScroll">
 		<u-navbar :title="currentEvent.name" placeholder></u-navbar>
 		<view class="" sot="header">
@@ -80,7 +80,7 @@
 				addUnit, getPx, getWindowInfo,
 				allImages: [],
 				totalNumber: 0,
-				itemHeight: 240,
+				itemHeight: 180,
 				isScrolling: false,
 				currentImageIndex: 0,
 				isShowBackTop: false,
@@ -88,7 +88,7 @@
 				tabActive: 'photo',
 				virtualList: [],
 				ossParams: '?x-oss-process=image/crop,w_500,h_400,x_100,y_100/format,webp/q_80',
-				tt: '?x-oss-process=image/resize,w_720/quality,q_80/format,webp',
+				tt: '?x-oss-process=image/resize,w_180/quality,q_80/format,webp',
 				tt1: '?x-oss-process=image/watermark,image_d2F0ZXJtYXJrL1BSTzUzMDE1NC9tYXJrMTQ1MTkwMS5wbmc_eC1vc3MtcHJvY2Vzcz1pbWFnZS9yZXNpemUsbV9maXhlZCx0eXBlXzIsd180ODAsaF84MCxsaW1pdF8wL2Zvcm1hdCxwbmc=,g_south,x_0,y_0,t_100',
 				swiperPageNo:0,
 				swiperPageSize: 10,
@@ -140,7 +140,7 @@
 				
 				const index = Math.floor(scrollTop / this.itemHeight);
 				// 限制范围：不能超过总图片数 - 1, 2 列
-				this.currentImageIndex = Math.min(index, this.virtualList.length - 1) * 2 + 4;
+				this.currentImageIndex = Math.min(index, this.virtualList.length - 1) * 4 + 24;
 				
 				this.isScrolling = true;
 				if (this.scrollTimer) clearTimeout(this.scrollTimer)
@@ -289,12 +289,12 @@
 	}
 
 	.card-item {
-		min-width: 48%;
-		padding: 0 10rpx 10rpx 0;
+		min-width: 24%;
+		padding: 0 5rpx 5rpx 0;
 		.img {
 			display: block;
-			width: 360rpx;
-			height: 480rpx;
+			width: 179rpx;
+			height: 180rpx;
 		}
 	}
 </style>
