@@ -88,7 +88,7 @@
 				tabActive: 'photo',
 				virtualList: [],
 				ossParams: '?x-oss-process=image/crop,w_500,h_400,x_100,y_100/format,webp/q_80',
-				tt: '?x-oss-process=image/resize,w_180/quality,q_80/format,webp',
+				tt: '?x-oss-process=image/resize,w_250/quality,q_80/format,webp',
 				tt1: '?x-oss-process=image/watermark,image_d2F0ZXJtYXJrL1BSTzUzMDE1NC9tYXJrMTQ1MTkwMS5wbmc_eC1vc3MtcHJvY2Vzcz1pbWFnZS9yZXNpemUsbV9maXhlZCx0eXBlXzIsd180ODAsaF84MCxsaW1pdF8wL2Zvcm1hdCxwbmc=,g_south,x_0,y_0,t_100',
 				swiperPageNo:0,
 				swiperPageSize: 10,
