@@ -93,6 +93,8 @@
 	import {
 		ref
 	} from "vue";
+	import { baseLink, uploadToken } from "@/utils/config.js";
+	import request from "@/utils/request.js";
 
 	// Emits
 	const emit = defineEmits(["open"]);
@@ -100,6 +102,7 @@
 	const activeTab = ref(1);
 	const isAgree = ref(false);
 	const show = ref(false);
+	const facePhoto = ref('');
 
 	function open() {
 		console.log('open')
@@ -109,20 +112,109 @@
 	function close() {
 		show.value = false;
 	}
-	
-	const facePhoto = ref('')
-	
+
+	// 压缩图片
+	const compressImage = (src) => {
+		return new Promise((resolve) => {
+			uni.compressImage({
+				src,
+				width: 750,
+				quality: 80,
+				success: (res) => {
+					resolve(res.tempFilePath);
+				},
+				fail() {
+					resolve(src);
+				}
+			});
+		});
+	};
+
+	// 上传图片到 basic-service
+	const uploadImage = async (filePath) => {
+		const compressedPath = await compressImage(filePath);
+		return new Promise((resolve, reject) => {
+			uni.uploadFile({
+				url: baseLink + '/basic-service/image/upload',
+				filePath: compressedPath,
+				name: 'image',
+				header: {
+					Authorization: uploadToken,
+					'content-type': 'application/json'
+				},
+				success(res) {
+					const data = JSON.parse(res.data);
+					if (data.data && data.data.url) {
+						resolve(data.data.url);
+					} else {
+						reject(new Error(data.msg || '上传失败'));
+					}
+				},
+				fail(err) {
+					reject(err);
+				}
+			});
+		});
+	};
+
+	// 调用人脸搜索接口
+	const searchFace = async (imageUrl) => {
+		return request.post('/face-rec/api/faces/search', {
+			image_url: imageUrl
+		});
+	};
+
 	const takePhoto = () => {
 		if (!isAgree.value) return uni.$u.toast('请勾选协议~')
 		uni.chooseMedia({
-			count: 1, // 只允许拍 1 张
-			mediaType: ['image'], // 只选图片
-			sourceType: ['camera'], // 仅使用相机，不显示相册
+			count: 1,
+			mediaType: ['image'],
+			sourceType: ['camera'],
 			camera: 'front',
-			success(res) {
-				console.log('拍照成功', res)
-				// res.tempFiles[0].tempFilePath 是临时路径
-				facePhoto.value = res.tempFiles[0].tempFilePath
+			async success(res) {
+				console.log('拍照成功', res);
+				const tempFilePath = res.tempFiles[0].tempFilePath;
+				facePhoto.value = tempFilePath;
+
+				uni.showLoading({
+					title: '正在搜索...',
+					mask: true
+				});
+
+				try {
+					// 1. 上传图片到 basic-service
+					const imageUrl = await uploadImage(tempFilePath);
+					console.log('上传成功，图片URL:', imageUrl);
+
+					// 2. 调用人脸搜索接口
+					const searchResult = await searchFace(imageUrl);
+					console.log('人脸搜索结果:', searchResult);
+
+					// 3. 提取结果并跳转到结果页面
+					if (searchResult && searchResult.results && searchResult.results.length > 0) {
+						// 存储搜索结果到缓存
+						uni.setStorageSync('faceSearchResults', searchResult.results);
+						// 关闭弹窗
+						close();
+						// 跳转到结果页面
+						uni.navigateTo({
+							url: '/pagesDashboard/eventAlbum/faceSearchResult'
+						});
+					} else {
+						uni.showToast({
+							title: '未找到匹配的照片',
+							icon: 'none'
+						});
+					}
+				} catch (err) {
+					console.error('人脸搜索失败:', err);
+					uni.showToast({
+						title: '搜索失败，请重试',
+						icon: 'none'
+					});
+				} finally {
+					uni.hideLoading();
+				}
 			},
 			fail(err) {
 				console.error('拍照失败', err)
@@ -130,7 +222,7 @@
 					title: '取消或失败',
 					icon: 'none'
 				})
-				
+
 				if (err.errMsg.includes('deny')) {
 					uni.showModal({
 						title: '需要相机权限',
@@ -139,7 +231,7 @@
 						confirmText: '去设置',
 						success: (modalRes) => {
 							if (modalRes.confirm) {
-								uni.openSetting() // 打开设置页
+								uni.openSetting()
 							}
 						}
 					})
@@ -147,8 +239,6 @@
 			}
 		})
 	}
-
-	import request from "@/utils/request.js"
 
 	const searchTxt = ref("")
 
