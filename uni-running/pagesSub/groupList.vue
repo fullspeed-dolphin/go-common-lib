@@ -8,7 +8,7 @@
 			</view>
 
 			<view class="section-tabs">
-				<u-tabs lineHeight="2" :duration="0" :inactiveStyle="{ color: '#000' }" :activeStyle="{ color: '#FF8C00' }"
+				<u-tabs lineHeight="2" enable-flex :duration="0" :inactiveStyle="{ color: '#000' }" :activeStyle="{ color: '#FF8C00' }"
 					:list="tabList" @change="changeTab" :scrollable="false" keyName="label" lineColor="#FF8C00" />
 			</view>
 		</section>

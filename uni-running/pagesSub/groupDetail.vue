@@ -1,8 +1,6 @@
 <template>
 	<view>
-		<Navbar :title="pageTitle" :bgHeight="370" />
-		
-		<!-- <u-navbar :title="pageTitle" placeholder></u-navbar> -->
+		<u-navbar :title="pageTitle" placeholder :bgColor="navBarBg"></u-navbar>
 
 		<mescroll-empty v-if="isEmpty" mode="data" :option="{
         btnText: '创建跑团',
@@ -168,6 +166,7 @@
 		onLoad,
 		onUnload,
 		onShow,
+		onPageScroll,
 		onShareAppMessage,
 		onShareTimeline
 	} from "@dcloudio/uni-app";
@@ -425,6 +424,16 @@
 		};
 	});
 	// #endif
+	
+	const navBarBg = ref('transparent');
+	onPageScroll((e) => {
+		const scrollTop = e.scrollTop || 0;
+		if (scrollTop >= 5) {
+		  navBarBg.value = "#ffffff";
+		} else {
+		  navBarBg.value = 'transparent';
+		}
+	})
 </script>
 
 <style lang="less" scoped>
@@ -570,7 +579,7 @@
 
 	.section-card {
 		position: relative;
-		z-index: 11;
+		z-index: 1;
 		padding: 34rpx 34rpx 0;
 		.img {
 			display: block;
