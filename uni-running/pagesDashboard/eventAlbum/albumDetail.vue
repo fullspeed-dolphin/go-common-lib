@@ -3,12 +3,12 @@
 <!-- 写法较简单，在页面中对当前需要渲染的虚拟列表数据进行for循环，在vue3中兼容性良好 -->
 <template>
 <!-- // https://zyt-cloud.github.io/virtual/index.html -->
-	<!-- 如果页面中的cell高度是固定不变的，则不需要设置cell-height-mode，如果页面中高度是动态改变的，则设置cell-height-mode="dynamic" -->
-	<zPaging ref="paging" use-virtual-list enable-back-to-top
+	<zPaging ref="paging" use-virtual-list
 		cell-height-mode="fixed"
-		:preload-page="20"
-		:virtual-list-col="2" :inner-list-style="{'display':'flex','flex-wrap':'wrap'}"
-		:default-page-size="28" :force-close-inner-list="true" @virtualListChange="virtualListChange"
+		:virtual-list-col="4" :inner-list-style="{'display':'flex','flex-wrap':'wrap'}"
+		fixed-cell-height="180rpx"
+		:default-page-size="60" :force-close-inner-list="true" 
+		@virtualListChange="virtualListChange"
 		@query="queryList" @scroll="onListScroll">
 		<u-navbar :title="currentEvent.name" placeholder></u-navbar>
 		<view class="" sot="header">
@@ -126,7 +126,7 @@
 			async loadingMore(index) {
 				// console.log('albumDetail的触发')
 				this.isNextLevel = true
-				const res = await this.queryList(this.swiperPageNo+1,this.swiperPageSize)
+				const res = await this.queryList(this.swiperPageNo+1, this.swiperPageSize)
 				// console.log('albumDetail的触发res====',res)
 				this.$refs.refPreviewMedia.openModal('',index,this.virtualList2, this.totalNumber)
 			},
@@ -134,9 +134,19 @@
 				this.$refs.paging.scrollToTop();
 			},
 			onListScroll(e) {
-				// console.log(e.detail.scrollTop)
-				const scrollTop = e.detail.scrollTop
+				// console.log(e.detail)
+				const { scrollTop, scrollHeight } = e.detail
 				this.isShowBackTop = scrollTop >= 210;
+				
+				const { screenHeight } = uni.getWindowInfo()
+				// 计算距离底部的距离
+				const distanceToBottom = scrollHeight - scrollTop - screenHeight
+							
+				// 提前 300px 触发加载（注意单位：px，不是 rpx）
+				if (distanceToBottom <= 300 && !this.isLoadingMore) {
+					console.log('提前 300px 触发加载====>')
+					this.loadMoreData()
+				}
 				
 				const index = Math.floor(scrollTop / this.itemHeight);
 				// 限制范围：不能超过总图片数 - 1, 2 列
@@ -158,10 +168,18 @@
 			  });
 			  request.get(`/event-api/api/v1/events/${this.currentEvent.event_id}`)
 			    .then((res) => {
+						res.event_id = res.id
 			      this.currentEvent = res
 			    });
 			},
+			loadMoreData (){
+				// console.log('this.$refs.paging===>', this.$refs.paging)
+			  if (this.isLoadingMore) return
+			  this.isLoadingMore = true
+			  this.$refs.paging?.doLoadMore() // 调用 zPaging 的 reloadMore 方法
+			},
 			queryList(pageNo, pageSize) {
+				console.log('queryList=====>')
 				this.swiperPageNo = pageNo
 				this.swiperPageSize = pageSize
 								
@@ -169,7 +187,7 @@
 					pageIndex: pageNo,
 					pageSize: pageSize,
 					keyword: '',
-					event_id: this.currentEvent.event_id || '01K9VG019M6SDK49NNGGAZQM5C',
+					event_id: this.currentEvent.event_id,
 				};
 
 				return request.get(`/image-service/oss`, params).then((res) => {
@@ -184,6 +202,8 @@
 					} else {
 						this.virtualList2 = this.virtualList2.concat(res.urls)
 					}
+					
+					this.isLoadingMore = false;
 				})
 			},
 			handleImg(link,index) {
@@ -202,8 +222,10 @@
 
 <style lang="scss" scoped>
 	::v-deep{
-		.u-popup__content__close {
-			top: 200rpx!important;
+		.PreviewMedia{
+			.u-popup__content__close {
+				top: 200rpx!important;
+			}
 		}
 	}
 	.back-to-top{
