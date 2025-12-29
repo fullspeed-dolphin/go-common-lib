@@ -7,6 +7,7 @@
 					:scroll-x="scrollable"
 					:scroll-left="scrollLeft"
 					scroll-with-animation
+					enable-flex
 					class="u-tabs__wrapper__scroll-view"
 					:show-scrollbar="false"
 					ref="u-tabs__wrapper__scroll-view"
@@ -366,6 +367,7 @@
 			}
 
 			&__nav {
+				width: 100%;
 				@include flex;
 				position: relative;
 

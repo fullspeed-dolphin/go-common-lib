@@ -170,7 +170,7 @@
                 // 总共三张图片，除了两个占位图，剩下的只能是正常的那张图片了
                 else whichImg = 'realImg';
                 // 只通知当前图片的index
-                this.$emit('click', this.index);
+                // this.$emit('click', this.index);
             },
             // 图片加载完成事件，可能是加载占位图时触发，也可能是加载真正的图片完成时触发，通过isShow区分
             imgLoaded() {
@@ -215,7 +215,11 @@
                 // 这里是组件内获取布局状态，不能用uni.createIntersectionObserver，而必须用this.createIntersectionObserver
                 // this.disconnectObserver('contentObserver');
                 // nvue 里不支持
-                const contentObserver = uni.createIntersectionObserver(this);
+                const contentObserver = uni.createIntersectionObserver(this, {
+									// 启用原生 IntersectionObserver（H5 性能优化）
+									nativeMode: true,
+									thresholds: [0, 0.5, 1]
+								});
                 // 要理解这里怎么计算的，请看这个：
                 // https://blog.csdn.net/qq_25324335/article/details/83687695
                 contentObserver.relativeToViewport({

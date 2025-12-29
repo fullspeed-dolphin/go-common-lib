@@ -1,11 +1,10 @@
 <template>
-	<!-- <Navbar title="我的活动" :bgHeight="370" /> -->
 	<view class="tab-container">
 		<u-tabs :inactiveStyle="{ color: '#000' }" :activeStyle="{ color: '#FF8C00' }" :list="tab.items" @change="changeTab"
 			:scrollable="false" keyName="label" lineColor="#FF8C00" />
 	</view>
 	<mescroll-body @init="mescrollInit" @down="downCallback" @up="getList" :top="100">
-		<view class="order-item" v-for="order in dataList" :key="order.id">
+		<view class="order-item" v-for="(order, index) in dataList" :key="order.order_no || index">
 			<view class="flex-between-center u-mb-20">
 				<view class="order-no flex-row" @click="setClipboardData(order.order_no)">
 					订单号:
@@ -135,15 +134,6 @@
 		});
 	}
 
-	// 方法定义
-	// 判断订单是否在24小时内
-	const isWithin24Hours = (createdAt) => {
-		const now = dayjs();
-		const orderTime = dayjs(createdAt);
-		const hoursDiff = now.diff(orderTime, 'hour');
-		return hoursDiff < 24;
-	};
-
 	const viewDetail = (item) => {
 		uni.$u.route(`pagesSub/orderSuccess?order_no=${item.order_no}`);
 	};
@@ -227,65 +217,34 @@
 	};
 	
 	function getRefundInfo(orderTime, endHour) {
-		  const orderDate = new Date(orderTime.replace(/-/g, '/'));
-		  const now = new Date();
-			
-		  // 计算 endHour 小时后的截止时间（毫秒）
-		  const refundDeadline = new Date(orderDate.getTime() + endHour * 60 * 60 * 1000);
+		const orderDate = new Date(orderTime.replace(/-/g, '/'));
+		const now = new Date();
 		
-		  // 是否还在退款时间内
-		  const canRefund = now < refundDeadline;
-		
-		  let remainingTimeStr = '';
-		
-		  if (canRefund) {
-		    const diffMs = refundDeadline - now;
-		
-		    // 转换为小时和分钟
-		    const hours = Math.floor(diffMs / (1000 * 60 * 60));
-		    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-		
-		    remainingTimeStr = `还剩 ${hours} 小时 ${minutes} 分钟可申请退款`;
-		  } else {
-		    remainingTimeStr = `已超过 ${endHour} 小时，无法退款`;
-		  }
-		
-		  return {
-		    canRefund,
-		    refundDeadline,
-		    remainingTimeStr
-		  };
-		}
-		
-	function getRefundInfo1(orderTime, endHour) {
-	  const orderDate = dayjs(orderTime);
-	  const now = dayjs();
-		
-	  const refundDeadline = orderDate.add(endHour, 'hour')
-	  
-	  const canRefund = now.isBefore(refundDeadline)
+		// 计算 endHour 小时后的截止时间（毫秒）
+		const refundDeadline = new Date(orderDate.getTime() + endHour * 60 * 60 * 1000);
 	
-	  let remainingTimeStr = '';
+		// 是否还在退款时间内
+		const canRefund = now < refundDeadline;
 	
-	  if (canRefund) {
-			// 计算剩余时间差（毫秒）
-			const diffMs = refundDeadline.diff(now)
+		let remainingTimeStr = '';
 	
-			// 使用 duration 插件解析
-			const dur = dayjs.duration(diffMs)
-			const hours = Math.floor(dur.asHours())
-			const minutes = dur.minutes()
+		if (canRefund) {
+			const diffMs = refundDeadline - now;
 	
-			remainingTimeStr = `还剩 ${hours} 小时 ${minutes} 分钟可申请退款`
+			// 转换为小时和分钟
+			const hours = Math.floor(diffMs / (1000 * 60 * 60));
+			const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+	
+			remainingTimeStr = `还剩 ${hours} 小时 ${minutes} 分钟可申请退款`;
 		} else {
-			remainingTimeStr = `已超过 ${endHour} 小时，无法退款`
+			remainingTimeStr = `已超过 ${endHour} 小时，无法退款`;
 		}
 	
-	  return {
-	    canRefund,
-	    refundDeadline,
-	    remainingTimeStr
-	  };
+		return {
+			canRefund,
+			refundDeadline,
+			remainingTimeStr
+		};
 	}
 
 	const payOrder = (item) => {
