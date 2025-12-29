@@ -93,20 +93,17 @@
 							<u-icon name="arrow-right" color="#909399" size="26rpx"></u-icon>
 						</view>
 					</button>
-
-					<!-- <u-cell :title="null" class=" nav-cell" isLink>
-						<template #icon>
-							<image class="nav-icon" src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/我的消息Icon@2x.png"></image>
-						</template>
-						<button class="u-reset-button" open-type="contact">
-						      联系客服
-						</button>
-					</u-cell> -->
 				</view>
 
 				<u-cell title="现场签到" class="nav-cell" @click="routeTo('/pagesMine/PunchEvent')" :border="false" isLink>
 					<template #icon>
 						<image class="nav-icon" style="width: 40rpx; height: 36rpx" src="/static/images/现场签到 @2x.png"></image>
+					</template>
+				</u-cell>
+				
+				<u-cell title="全速之家" class="nav-cell" @click="routeTo('/pagesMine/toolkit/UserRole')" :border="false" isLink>
+					<template #icon>
+						<image class="nav-icon" style="width: 36rpx; height: 42rpx" src="/static/images/quansuzhijia.png"></image>
 					</template>
 				</u-cell>
 

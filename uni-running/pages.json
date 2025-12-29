@@ -30,6 +30,9 @@
 		{
 		  "root": "pagesMine",
 		  "pages": [
+				{ "path": "toolkit/UserRole","style": { "navigationBarTitleText": "全速之家"} },
+				{ "path": "toolkit/Toolkit","style": { "navigationBarTitleText": "全速之家"} },
+				{ "path": "toolkit/ScanCode","style": { "navigationBarTitleText": "活动扫码"} },
 				{ "path": "PunchEvent","style": { "navigationBarTitleText": "现场签到"} }
 			]
 		},

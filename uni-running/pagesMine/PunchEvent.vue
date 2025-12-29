@@ -21,7 +21,7 @@
 			
 			<!-- 参赛人员列表 -->
 			<view class="participants-list">
-			  <view v-for="(item, index) in participants" :key="index" class="participant-item" @click="selectSigner(item)">
+			  <view v-for="(item, index) in participants" :key="index" class="participant-item" click="selectSigner(item)">
 			    <view class="">
 			    	<view class="name-row">
 			    	  <text class="name">{{ item.full_name }}</text>
@@ -33,13 +33,13 @@
 					<view v-if="item.status === 'check_in'" class="" style="color: #7dc33f;">
 						已签到
 					</view>
-					<!-- <view v-if="item.status === 'no_check_in'" class="" style="color: #FF8C00;">
+					<view v-if="item.status === 'no_check_in'" class="" style="color: #FF8C00;">
 						未签到
-					</view> -->
-					<template v-if="item.status === 'no_check_in'" >
+					</view>
+					<!-- <template v-if="item.status === 'no_check_in'" >
 						<u-icon :name="item.checked ? 'checkmark-circle-fill' : 'checkmark-circle' " 
 							:color="item.checked ? '#7dc33f' : '#999'" size="40rpx" />
-					</template>
+					</template> -->
 					
 					<!-- <u-icon v-if="item.status === 'no_check_in'" name="checkmark-circle-fill" color="#7dc33f" size="40rpx" /> -->
 			  </view>
@@ -98,13 +98,6 @@
 			</view>
 		</view>
 		
-		<up-action-sheet round="16" 
-			@close="isShowEventModal = false"
-			:actions="eventList" title="请选择活动" 
-			:show="isShowEventModal" @select="changeEvent" />
-		
-		<UserLogin ref="refUserLogin" @success="getEvents()"/>
-
 		<!-- 二维码弹窗 -->
 		<u-popup v-model:show="showQrcodePopup" mode="center" round="16" @open="onQrcodePopupOpen">
 			<view class="qrcode-popup">
@@ -131,6 +124,13 @@
 				</u-button>
 			</view>
 		</u-popup>
+		
+		<up-action-sheet round="16"
+			@close="isShowEventModal = false"
+			:actions="eventList" title="请选择活动" 
+			:show="isShowEventModal" @select="changeEvent" />
+		
+		<UserLogin ref="refUserLogin" @success="getEvents()"/>
   </view>
 </template>
 
@@ -260,12 +260,12 @@ const handleSign = async () => {
 		return refUserLogin.value.open();
 	}
 
-	let checkedList = participants.value.filter(i => i.status === 'no_check_in').filter(i => i.checked)
-	if (!checkedList.length) {
-		return uni.$u.toast('请勾选参赛人~')
-	}
+	// let checkedList = participants.value.filter(i => i.status === 'no_check_in').filter(i => i.checked)
+	// if (!checkedList.length) {
+	// 	return uni.$u.toast('请勾选参赛人~')
+	// }
 	
-	const promiseList = checkedList.map((item) =>
+	const promiseList = participants.value.map((item) =>
 		signApi(item)
 	);
 	
