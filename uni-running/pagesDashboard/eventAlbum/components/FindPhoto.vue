@@ -255,9 +255,9 @@
 		};
 
 		request.post(`/number-rec/api/number/search`, params).then((res) => {
-			if (res?.results?.length > 0) {
+			if (res?.image_urls?.length > 0) {
 				// 存储搜索结果到缓存
-				uni.setStorageSync('faceSearchResults', res.results);
+				uni.setStorageSync('faceSearchResults', res.image_urls);
 				// 关闭弹窗
 				close();
 				// 跳转到结果页面
