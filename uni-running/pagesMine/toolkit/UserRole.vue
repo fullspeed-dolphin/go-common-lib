@@ -12,6 +12,7 @@ import { onLoad } from "@dcloudio/uni-app";
 import {
 		useStore
 } from "vuex";
+import request from "@/utils/request.js"
 
 const store = useStore();
 
@@ -25,10 +26,10 @@ function goPage(item) {
 	uni.$u.route(`pagesMine/toolkit/Toolkit?role=${item.label}`)
 }
 
-const isStaff = ref(false)
+const isStaff = ref(true)
 const getUserList = () => {
 	const params = {
-		code: code
+		code: 'code'
 	}
   request.post('/api/code/code', params).then(res => {
 		const openid = store.state.userInfo.openid;
@@ -38,7 +39,7 @@ const getUserList = () => {
 }
 
 onLoad(() => {
-	getUserList()
+	// getUserList()
 })
 </script>
 

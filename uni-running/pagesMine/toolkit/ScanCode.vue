@@ -31,10 +31,21 @@
 
 <script setup>
 import { ref } from 'vue'
+import dayjs from "dayjs";
 import {
-	onLoad
+	onLoad,
+	onUnload
 } from "@dcloudio/uni-app";
+import { asyncAlls } from "@/utils/util.js"
 import request from "@/utils/request.js"
+
+function get_isInCheckTime() {
+	const now = dayjs()
+	const isBefore = now.isBefore(selectedEvent.value.checkin_end_time)
+	const isAfter = now.isAfter(selectedEvent.value.checkin_start_time)
+	
+	return (isBefore && isAfter)
+}
 
 const isShowEventModal = ref(false)
 const selectedEvent = ref({})
@@ -71,28 +82,59 @@ function getEvents () {
 };
 
 const startScan = () => {
+	// if (!get_isInCheckTime()) {
+	// 	return uni.$u.toast('不在签到时间范围内')
+	// }
+	
   uni.scanCode({
     onlyFromCamera: true, // 仅从摄像头扫描（不从相册）
     scanType: ['qrCode'],
     success: (res) => {
       console.log('扫码成功:', res.result)
+			
       handleScanResult(res.result)
     },
     fail: (err) => {
       console.error('扫码失败:', err)
-      uni.showToast({ title: '扫码已取消', icon: 'none' })
     }
   })
 }
 
-// 处理扫码结果
-const handleScanResult = (code) => {
-	const params = {
-		code: code
-	}
-  request.post('/api/code/code', params).then(res => {
+const handleScanResult = async (res) => {
+	try {
+		const participants = JSON.parse(res).tickets
+		const promiseList = participants.map((item) => signApi(item));
+		await asyncAlls(promiseList);
 		
-	})
+		uni.showToast({
+		  title: '签到成功！',
+		  icon: 'success',
+		  duration: 1500
+		})		
+		
+		// 扫码成功再次发起扫码
+		setTimeout(() => {
+			startScan()
+		}, 500) // 延迟避免过快
+	} catch (error) {
+		console.error(error)
+		
+		uni.showToast({
+		  title: '签到失败！',
+		  icon: 'error',
+		  duration: 1500
+		})
+	}
+}
+
+function signApi (item) {
+	const data = {
+		id: item.id,
+		full_name: item.full_name,
+		check_in_type: "qrcode"
+	}
+
+	return request.post(`/event-api/ticket/checkin`, data)
 }
 
 onLoad(() => {

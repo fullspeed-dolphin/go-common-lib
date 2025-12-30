@@ -84,7 +84,7 @@
 		</div>
 
 		<!-- 底部二维码签到按钮 -->
-		<view v-if="participants.length" class="bottom-qrcode-btn">
+		<view v-if="participants.length && isInCheckTime" class="bottom-qrcode-btn">
 			<view :class="['qrcode-btn-wrap', { 'is-pressed': showQrcodePopup }]">
 				<u-button
 					type="primary"
@@ -99,7 +99,7 @@
 		</view>
 		
 		<!-- 二维码弹窗 -->
-		<u-popup v-model:show="showQrcodePopup" mode="center" round="16" @open="onQrcodePopupOpen">
+		<u-popup v-model:show="showQrcodePopup" mode="center" round="16" closeable @open="onQrcodePopupOpen">
 			<view class="qrcode-popup">
 				<view class="qrcode-title">请出示给工作人员</view>
 				<view class="qrcode-content">
@@ -204,7 +204,7 @@ function get_isInCheckTime() {
 	const isBefore = now.isBefore(selectedEvent.value.checkin_end_time)
 	const isAfter = now.isAfter(selectedEvent.value.checkin_start_time)
 
-	isInCheckTime.value = isBefore && isAfter
+	isInCheckTime.value = (isBefore && isAfter)
 }
 
 // 按钮是否可用：在签到时间内 + 已授权定位 + 在签到范围
@@ -265,9 +265,7 @@ const handleSign = async () => {
 	// 	return uni.$u.toast('请勾选参赛人~')
 	// }
 	
-	const promiseList = participants.value.map((item) =>
-		signApi(item)
-	);
+	const promiseList = participants.value.map((item) => signApi(item));
 	
 	let tempFile = null
 	try {
@@ -294,14 +292,15 @@ const handleSign = async () => {
     duration: 1500
   })
 }
-
+// check_in_type: qrcode，gps签到的设置成check_in_type: gps
 function signApi (item) {
 	const data = {
 		id: item.id,
 		full_name: item.full_name,
+		check_in_type: "gps"
 	}
 
-	request.post(`/event-api/ticket/checkin`, data)
+	return request.post(`/event-api/ticket/checkin`, data)
 }
 
 // 二维码签到点击处理
