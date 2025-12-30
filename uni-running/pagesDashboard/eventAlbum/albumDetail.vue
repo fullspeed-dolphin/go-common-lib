@@ -53,10 +53,12 @@
 		</view>
 		<!-- :id="`zp-id-${item.zp_index}`"和:key="item.zp_index" 必须写，必须写！！！！ -->
 		<!-- 这里for循环的index不是数组中真实的index了，请使用item.zp_index获取真实的index -->
-		<view class="u-flex u-flex-wrap u-pl-10">
-			<view class="card-item" v-for="(item, index) in virtualList" :id="`zp-id-${item.zp_index}`" :key="item.zp_index">
-				<image class="img" :src="item.item + tt" mode="aspectFill" @click="handleImg(item.item,item.zp_index)" />
-			</view>
+		<view class="u-flex u-flex-wrap u-p-10">
+			<image 
+				class="card-img" :src="item.item + tt" mode="aspectFill" 
+				v-for="(item, index) in virtualList"
+				:id="`zp-id-${item.zp_index}`" :key="item.zp_index"
+				@click="handleImg(item.item,item.zp_index)" :alt="index"/>
 		</view>
 	</zPaging>
 	<!-- 轮播图 -->
@@ -310,13 +312,11 @@
 		}
 	}
 
-	.card-item {
-		min-width: 24%;
-		padding: 0 5rpx 5rpx 0;
-		.img {
-			display: block;
-			width: 179rpx;
-			height: 180rpx;
-		}
+	.card-img {
+		display: block;
+		width: 25%;
+		height: 180rpx;
+		padding: 5rpx;
+		box-sizing: border-box;
 	}
 </style>

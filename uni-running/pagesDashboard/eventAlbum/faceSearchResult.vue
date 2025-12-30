@@ -1,17 +1,17 @@
 <template>
-	<view class="page">
+	<view>
 		<u-navbar title="搜索结果" placeholder></u-navbar>
 
 		<view class="result-header">
 			<text>找到 {{ imageList.length }} 张匹配照片</text>
 		</view>
 
-		<view class="result-grid">
+		<view class="u-flex-row u-flex-wrap u-p-10">
 			<image
 				v-for="(url, index) in imageList"
 				:key="index"
 				class="result-img"
-				:src="url"
+				:src="url + ossPar250"
 				mode="aspectFill"
 				@click="previewImage(index)"
 			/>
@@ -23,44 +23,33 @@
 import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 
+const ossPar250  = '?x-oss-process=image/resize,w_250/quality,q_80/format,webp'
 const imageList = ref([]);
 
 onLoad(() => {
 	const results = uni.getStorageSync('faceSearchResults');
-	console.log('faceSearchResults:', results);
 	if (results && results.length > 0) {
-		// 将 http:// 替换为 https://，微信小程序不支持 http
-		imageList.value = results.map(item => item.image_url.replace('http://', 'https://'));
-		console.log('imageList:', imageList.value);
+		imageList.value = results.map(item => {
+			const link = item.image_url.replace('http://', 'https://')
+			return link.split('?Expires')[0]
+		});
 	}
 });
 
 const previewImage = (index) => {
+	const ossPar750  = '?x-oss-process=image/resize,w_750/quality,q_80/format,webp'
 	uni.previewImage({
-		urls: imageList.value,
+		urls: imageList.value.map(i => i + ossPar750),
 		current: index
 	});
 };
 </script>
 
 <style lang="scss" scoped>
-.page {
-	min-height: 100vh;
-	background: #f5f5f5;
-}
-
 .result-header {
 	padding: 30rpx 34rpx;
-	font-size: 28rpx;
-	color: #333;
 	font-weight: bold;
 	background: #fff;
-}
-
-.result-grid {
-	display: flex;
-	flex-wrap: wrap;
-	padding: 10rpx;
 }
 
 .result-img {

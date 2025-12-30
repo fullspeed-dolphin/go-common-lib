@@ -20,14 +20,13 @@
 				height: 216rpx;margin-bottom:40rpx;">
 					<div class="flex-col-center upload-box" style="">
 						<view class="iconfont icon-paizhao flex-center"></view>
-						<view>点击图片上传</view>
+						<view>点击人脸拍照</view>
 					</div>
 				</section>
-				<view class="" style="font-weight: bold;width:416rpx;text-align: center;
+				<view class="" style="font-weight: bold;text-align: center;
 							font-size: 24rpx;line-height: 36rpx;margin-top: 26rpx;margin-bottom:22rpx;
 							color: #999;">
-					请上传单人正脸照片，以确保人
-					脸搜索的准确性
+					请拍摄正脸照片，以确保人脸搜索的准确性
 				</view>
 
 				<section class="section-bottom" style="margin: 0rpx auto;">
@@ -132,6 +131,10 @@
 
 	// 上传图片到 basic-service
 	const uploadImage = async (filePath) => {
+		uni.showLoading({
+			title: '正在搜索...',
+			mask: true
+		});
 		const compressedPath = await compressImage(filePath);
 		return new Promise((resolve, reject) => {
 			uni.uploadFile({
@@ -159,13 +162,18 @@
 
 	// 调用人脸搜索接口
 	const searchFace = async (imageUrl) => {
+		uni.showLoading({
+			title: '正在搜索...',
+			mask: true
+		});
 		return request.post('/face-rec/api/faces/search', {
 			image_url: imageUrl
 		});
 	};
 
 	const takePhoto = () => {
-		if (!isAgree.value) return uni.$u.toast('请勾选协议~')
+		if (!isAgree.value) return uni.$u.toast('请勾选协议~');
+		
 		uni.chooseMedia({
 			count: 1,
 			mediaType: ['image'],
@@ -176,45 +184,7 @@
 				const tempFilePath = res.tempFiles[0].tempFilePath;
 				facePhoto.value = tempFilePath;
 
-				uni.showLoading({
-					title: '正在搜索...',
-					mask: true
-				});
-
-				try {
-					// 1. 上传图片到 basic-service
-					const imageUrl = await uploadImage(tempFilePath);
-					console.log('上传成功，图片URL:', imageUrl);
-
-					// 2. 调用人脸搜索接口
-					const searchResult = await searchFace(imageUrl);
-					console.log('人脸搜索结果:', searchResult);
-
-					// 3. 提取结果并跳转到结果页面
-					if (searchResult && searchResult.results && searchResult.results.length > 0) {
-						// 存储搜索结果到缓存
-						uni.setStorageSync('faceSearchResults', searchResult.results);
-						// 关闭弹窗
-						close();
-						// 跳转到结果页面
-						uni.navigateTo({
-							url: '/pagesDashboard/eventAlbum/faceSearchResult'
-						});
-					} else {
-						uni.showToast({
-							title: '未找到匹配的照片',
-							icon: 'none'
-						});
-					}
-				} catch (err) {
-					console.error('人脸搜索失败:', err);
-					uni.showToast({
-						title: '搜索失败，请重试',
-						icon: 'none'
-					});
-				} finally {
-					uni.hideLoading();
-				}
+				handleTakePhoto(tempFilePath)
 			},
 			fail(err) {
 				console.error('拍照失败', err)
@@ -238,6 +208,35 @@
 				}
 			}
 		})
+	}
+	
+	async function handleTakePhoto(tempFilePath) {		
+		try {
+			// 1. 上传图片到 basic-service
+			const imageUrl = await uploadImage(tempFilePath);
+			// const imageUrl = 'https://ccrun.oss-cn-guangzhou.aliyuncs.com/images/2025/12/30/5883c014-29a7-4fde-91f7-aa2966086c19.jpg';
+			console.log('上传成功，图片URL:', imageUrl);
+		
+			// 2. 调用人脸搜索接口
+			const searchResult = await searchFace(imageUrl);
+		
+			// 3. 提取结果并跳转到结果页面
+			if (searchResult?.results?.length > 0) {
+				// 存储搜索结果到缓存
+				uni.setStorageSync('faceSearchResults', searchResult.results);
+				// 关闭弹窗
+				close();
+				// 跳转到结果页面
+				uni.navigateTo({
+					url: '/pagesDashboard/eventAlbum/faceSearchResult'
+				});
+			} else {
+				uni.$u.toast('未找到匹配的照片')
+			}
+		} catch (err) {
+			console.error('人脸搜索失败:', err);
+			uni.$u.toast('搜索失败，请重试')
+		}
 	}
 
 	const searchTxt = ref("")
