@@ -30,7 +30,7 @@ onLoad(() => {
 	const results = uni.getStorageSync('faceSearchResults');
 	if (results && results.length > 0) {
 		imageList.value = results.map(item => {
-			const link = item.image_url.replace('http://', 'https://')
+			const link = item.image_url ? item.image_url.replace('http://', 'https://') : item
 			return link.split('?Expires')[0]
 		});
 	}

@@ -84,6 +84,8 @@
 					</view>
 				</section>
 			</block>
+			
+			<view style="font-size: 24rpx;color:#999;margin-top: 20rpx;">由易联支付AI平台强势驱动</view>
 		</view>
 	</up-popup>
 </template>
