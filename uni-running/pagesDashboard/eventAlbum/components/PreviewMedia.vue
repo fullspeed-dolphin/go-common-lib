@@ -1,18 +1,18 @@
 <template>
 	<view v-if="isShowModal" class="PreviewMedia">
-		<up-popup :show="isShowModal" @close="close" overlayOpacity="0.9" bgColor="transparent" mode="center" closeable>
-			<view class="flex-center" style="height: 100vh;width:100vw">
-				<rswiper :originList="originList" :totalNumber="totalNumber" :originIndex="originIndex" @loadingMore="loadingMore" v-if="isShowModal"></rswiper>
-				<view class="flex-col-center">
-					<view class="flex-center" style="position: fixed;left:0;bottom: 90rpx;width: 100%;">
-						<up-button @click="downloadPicture" type="primary" shape="circle" icon="download"
-							customStyle="width:186rpx;height:60rpx;">
-							下载原图
-						</up-button>
-					</view>
+	<up-popup :show="isShowModal" @close="close" overlayOpacity="0.9" bgColor="transparent" mode="center" closeable>
+		<view class="flex-center" style="height: 100vh;width:100vw">
+			<rswiper :originList="originList" :totalNumber="totalNumber" :originIndex="originIndex" @loadingMore="loadingMore" v-if="isShowModal"></rswiper>
+			<view class="flex-col-center">
+				<view class="flex-center" style="position: fixed;left:0;bottom: 90rpx;width: 100%;">
+					<up-button @click="downloadPicture" type="primary" shape="circle" icon="download"
+						customStyle="width:186rpx;height:60rpx;">
+						下载原图
+					</up-button>
 				</view>
 			</view>
-		</up-popup>
+		</view>
+	</up-popup>
 	</view>
 </template>
 

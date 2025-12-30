@@ -6,24 +6,32 @@
 				<image style="display: block;width:750rpx;" v-if="item" :src="item + '?x-oss-process=image/resize,w_750'" mode="widthFix" />
 			</swiper-item>
 		</swiper>
-		
 		<view class="section-slider">
+			<!-- 预览图 -->
+			<!-- <scrollimageview 
+			:dataList="originList" 
+			:originIndex="originIndex"
+			@dirHandle = "dirHandle"
+			:min="0"
+			:total="Number(totalNumber || 0)"
+			style="margin-bottom:20rpx;"
+			>
+			</scrollimageview> -->
 			
 			<!-- // <slider :value="originIndex" @change="sliderChange" :step="1" :max="originList.length -1" /> -->
+			<!-- 拖动滑块 -->
 			<xzsliderrange v-model="originIndexArr" solo :decoration="false"  
 			@move="moveChange" 
 			:size="30" 
 			height="2px" 
 			activeBgc="rgb(0, 122, 255)" 
-			:max="Number(originList.length || 0)" 
+			:max="Number(originList.length || 0)"
 			:min="0"
 			:total="Number(totalNumber || 0)"
 			hintColor="#fff"
 			@showNum="showNum"
 			/>
-			<view class="title u-flex" v-show="isShow">
-				{{originIndex+1 }}
-				<text style="color:#999;">/{{ originList.length }}(总 {{totalNumber}})</text>
+			<view class="title" :style="{opacity: !isShow ? 0 : 1}">{{originIndex+1 }}/{{ originList.length }}(总 {{totalNumber}})
 			</view>
 		</view>
 		<!-- loading -->
@@ -35,6 +43,7 @@
 
 <script setup>
 	import xzsliderrange from "./xz-slider-range/xz-slider-range.vue"
+	import scrollimageview from "./scrollimageview.vue"
 	import {
 		onMounted,
 		ref,
@@ -58,7 +67,7 @@
 	})
 	const emits = defineEmits(['loadingMore'])
 	watch(() => props.originList, (val) => {
-		console.log('val========', props.originIndex)
+		console.log('val=props.originList========', props.originIndex)
 		originList.value = props.originList
 		originIndex.value = props.originIndex
 		displayIndex.value = 0
@@ -111,7 +120,7 @@
 		currentIndex.value = current
 		// console.log(current, 'current=====',event.detail)
 		const originListLength = originList.value.length; // 源数据长度
-		if (originIndex.value + 3 > originListLength) {
+		if (originIndex.value + 6 > originListLength) {
 			emits('loadingMore', originIndex.value + 1)
 			isloading.value = true
 			return;
@@ -137,7 +146,7 @@
 		if(originIndex.value == e[0])return
 		console.log('e===',e)
 		originIndex.value = e[0]
-		if (originIndex.value + 3 > originList.value.length && !isloading.value) {
+		if (originIndex.value + 6 > originList.value.length && !isloading.value) {
 			emits('loadingMore', originIndex.value)
 			isloading.value = true
 			return;
@@ -186,6 +195,19 @@
 
 		// console.log(endDir.value)
 	}
+	
+		// 图片滚动回调设置slider
+	const dirHandle = (start, end) => {
+		console.log('start===',start)
+		originIndex.value = start
+		if (originIndex.value + 6 > originList.value.length && !isloading.value) {
+			emits('loadingMore', originIndex.value)
+			isloading.value = true
+			return;
+		}
+		initSwiperData(start)
+	}
+	
 	onMounted(() => {
 		originList.value = props.originList
 		originIndex.value = props.originIndex

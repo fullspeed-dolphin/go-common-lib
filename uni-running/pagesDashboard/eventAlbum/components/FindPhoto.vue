@@ -14,7 +14,7 @@
 				号码牌
 			</view>
 		</view>
-		<view class="flex-col-center" style="padding-bottom: 100rpx;">
+		<view class="flex-col-center" style="padding-bottom: 60rpx;height:500rpx;">
 			<block v-if="activeTab === 1">
 				<section @click="takePhoto()" class="section-camera u-flex-xy-center bgf" style="font-weight: bold;color: #267FF7;width: 216rpx;
 				height: 216rpx;margin-bottom:40rpx;">
@@ -57,7 +57,7 @@
 					<view class="" style="color: #707070;">
 						号码牌示例图：
 					</view>
-					<view class="flex-start" style="margin-top:30rpx;">
+					<view class="flex-start u-mt-20">
 						<view class="card-icon">
 							<view class="txt" style="margin: 8rpx 0 0 10rpx;">
 								A1234
@@ -65,7 +65,7 @@
 						</view>
 						建议输入完整号码搜索
 					</view>
-					<view class="flex-start" style="margin-top:30rpx;">
+					<view class="flex-start u-mt-20">
 						<view class="card-icon">
 							<view class="txt" style="margin: 8rpx 0 0 10rpx;text-align: right;">
 								<text style="color:#F9F9F9;">A</text>1234
@@ -73,7 +73,7 @@
 						</view>
 						建议输入明显的号码，如1234
 					</view>
-					<view class="flex-start" style="margin-top:30rpx;">
+					<view class="flex-start u-mt-20">
 						<view class="card-icon">
 							<view class="txt" style="margin: 6rpx 0;height:34rpx;">
 								A1234
@@ -292,11 +292,10 @@
 
 	.section-sample {
 		width: 682rpx;
-		height: 326rpx;
 		background: #F2F2F2;
 		padding: 32rpx 16rpx;
 		border-radius: 16rpx 16rpx 16rpx 16rpx;
-		margin-top: 48rpx;
+		margin-top: 30rpx;
 		font-weight: bold;
 		font-size: 24rpx;
 		color: #999999;

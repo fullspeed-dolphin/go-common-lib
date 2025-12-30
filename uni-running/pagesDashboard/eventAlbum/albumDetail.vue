@@ -1,8 +1,5 @@
-
-<!-- 虚拟列表演示(非内置列表写法) -->
-<!-- 写法较简单，在页面中对当前需要渲染的虚拟列表数据进行for循环，在vue3中兼容性良好 -->
+<!-- UI 参考 https://m.alltuu.com/album/3102256506/?menu=live -->
 <template>
-<!-- // https://zyt-cloud.github.io/virtual/index.html -->
 	<zPaging ref="paging" use-virtual-list
 		cell-height-mode="fixed"
 		:virtual-list-col="4" :inner-list-style="{'display':'flex','flex-wrap':'wrap'}"
@@ -13,54 +10,49 @@
 		<u-navbar :title="currentEvent.name" placeholder></u-navbar>
 		<view class="" sot="header">
 			<section class="section-banner">
-				<up-lazy-load class="img" v-if="currentEvent"
-					:image="currentEvent.image_url + '?x-oss-process=image/resize,w_600'" mode="aspectFill" />
+				<up-lazy-load class="img" :image="currentEvent.image_url + '?x-oss-process=image/resize,w_600'" mode="aspectFill" />
 				<view class="summary">
 					<view class="item u-flex-y-center">照片 {{totalNumber}}</view>
 					<!-- <view class="item u-flex-y-center">视频 2346</view> -->
-					<!-- <view class="item u-flex-y-center">热度 2346</view> -->
+					<view class="item u-flex-y-center">浏览量 {{visitAmount}}</view>
 				</view>
 			</section>
 
 			<section class="section-btns u-flex-xy-center" style="width:580rpx;margin: 24rpx auto;">
 				<up-button type="primary" @click="$refs.refFindPhoto.open()"
-					customStyle="width: 298rpx;font-size: 24rpx;height: 82rpx;">
+					customStyle="width: 298rpx;font-size: 24rpx;height: 82rpx;border-radius: 16rpx;">
 					<text class="iconfont icon-saomiaorenlian u-mr-10"></text>
 					查找照片和视频
 				</up-button>
 			</section>
 
-			<view v-if="isShowBackTop" :style="{
-				height: addUnit(getPx('44px') + getWindowInfo().statusBarHeight,'px'),
-			}"></view>
-			<section class="section-tabs u-flex-y-center" :class="{isFixed: isShowBackTop}" 
-			:style="{
-				top: addUnit(getPx('44px') + getWindowInfo().statusBarHeight,'px'),
-			}">
-				<view class="item" :class="{active: tabActive === 'photo'}" @click="tabActive = 'photo'">照片</view>
-				<!-- <view class="item" :class="{active: tabActive === 'video'}" @click="tabActive = 'video'">视频</view> -->
-			</section>
+			<view style="height: 44px;">
+				<section class="section-tabs u-flex-y-center" :class="{isFixed: isShowBackTop}" 
+					:style="{ top: addUnit(getPx('44px') + getWindowInfo().statusBarHeight,'px') }">
+					<view class="item" :class="{active: tabActive === 'photo'}" @click="tabActive = 'photo'">照片</view>
+					<!-- <view class="item" :class="{active: tabActive === 'video'}" @click="tabActive = 'video'">视频</view> -->
+				</section>
+			</view>
 			
-			<view v-if="isShowBackTop" @click="goToTop()" class="back-to-top" :class="{active: isScrolling}">
+			<view v-if="isShowBackTop" @click="$refs.paging.scrollToTop()" class="back-to-top" :class="{active: isScrolling}">
 				 <view class="box">
 					 <view class="flex-center">
-							顶部 
-							<text class="iconfont icon-back-top"></text>
+							顶部 <text class="iconfont icon-back-top"></text>
 					 </view>
 					 <view class="number">{{ currentImageIndex }} / {{totalNumber}}</view>
 				 </view>
 			</view>
 		</view>
-		<!-- :id="`zp-id-${item.zp_index}`"和:key="item.zp_index" 必须写，必须写！！！！ -->
-		<!-- 这里for循环的index不是数组中真实的index了，请使用item.zp_index获取真实的index -->
+		
 		<view class="u-flex u-flex-wrap u-p-10">
 			<image 
 				class="card-img" :src="item.item + tt" mode="aspectFill" 
 				v-for="(item, index) in virtualList"
-				:id="`zp-id-${item.zp_index}`" :key="item.zp_index"
+				:id="'zp-id-' + item.zp_index" :key="item.zp_index"
 				@click="handleImg(item.item,item.zp_index)" :alt="index"/>
 		</view>
 	</zPaging>
+	
 	<!-- 轮播图 -->
 	<PreviewMedia ref="refPreviewMedia" @loadingMore="loadingMore"/>
 	<FindPhoto ref="refFindPhoto" />
@@ -81,6 +73,7 @@
 			return {
 				addUnit, getPx, getWindowInfo,
 				allImages: [],
+				visitAmount: 0,
 				totalNumber: 0,
 				itemHeight: 180,
 				isScrolling: false,
@@ -98,32 +91,6 @@
 				isNextLevel: false
 			}
 		},
-		onLoad(options) {
-			console.log('options=====>', options)
-			this.currentEvent = options
-			this.getDetail()
-			// #ifdef MP-WEIXIN
-			wx?.showShareMenu?.({
-				withShareTicket: true,
-				menus: ['shareAppMessage', 'shareTimeline'] // 开启分享给朋友和分享到朋友圈
-			});
-			// #endif
-		},
-		// 分享给朋友
-		onShareAppMessage() {
-			return {
-				title: '跑了没 - ' + (this.currentEvent.name || ''),
-				imageUrl: this.currentEvent.background_image_url, // 可以设置自定义分享图片，留空则使用当前页面截图
-			};
-		},
-		// 分享到朋友圈
-		onShareTimeline() {
-			return {
-				title: '跑了没 - ' + (this.currentEvent.name || ''),
-				query: '', // 可以携带参数
-				imageUrl: this.currentEvent.background_image_url, // 可以设置自定义分享图片
-			};
-		},
 		methods: {
 			async loadingMore(index) {
 				// console.log('albumDetail的触发')
@@ -132,27 +99,26 @@
 				// console.log('albumDetail的触发res====',res)
 				this.$refs.refPreviewMedia.openModal('',index,this.virtualList2, this.totalNumber)
 			},
-			goToTop() {
-				this.$refs.paging.scrollToTop();
-			},
 			onListScroll(e) {
 				// console.log(e.detail)
-				const { scrollTop, scrollHeight } = e.detail
-				this.isShowBackTop = scrollTop >= 210;
+				const { scrollHeight } = e.detail;
+				const scrollTop = parseInt(e.detail.scrollTop)
+				this.isShowBackTop = scrollTop >= 245;
 				
+				
+				// 提前 600px 触发加载
 				const { screenHeight } = uni.getWindowInfo()
-				// 计算距离底部的距离
 				const distanceToBottom = scrollHeight - scrollTop - screenHeight
-							
-				// 提前 300px 触发加载（注意单位：px，不是 rpx）
-				if (distanceToBottom <= 300 && !this.isLoadingMore) {
-					console.log('提前 300px 触发加载====>')
+				if (distanceToBottom <= 600 && !this.isLoadingMore) {
+					console.log('提前 500px 触发加载====>')
 					this.loadMoreData()
 				}
 				
-				const index = Math.floor(scrollTop / this.itemHeight);
-				// 限制范围：不能超过总图片数 - 1, 2 列
-				this.currentImageIndex = Math.min(index, this.virtualList.length - 1) * 4 + 24;
+				console.log('scrollTop====>', scrollHeight, scrollTop, screenHeight)
+				
+				// 计算滚动到第几张图片位置
+				const photoIndex = Math.floor(scrollTop / 90);
+				this.currentImageIndex = Math.min(photoIndex, this.virtualList.length - 1) * 4 + 8;
 				
 				this.isScrolling = true;
 				if (this.scrollTimer) clearTimeout(this.scrollTimer)
@@ -165,20 +131,23 @@
 				this.virtualList = vList;
 			},
 			getDetail (){
-			  uni.showLoading({
-			    mask: true,
-			  });
-			  request.get(`/event-api/api/v1/events/${this.currentEvent.event_id}`)
-			    .then((res) => {
-						res.event_id = res.id
-			      this.currentEvent = res
-			    });
+			  uni.showLoading({ mask: true });
+			  request.get(`/event-api/api/v1/events/${this.currentEvent.event_id}`).then((res) => {
+					res.event_id = res.id
+					this.currentEvent = res
+				});
+				
+			  request.post(`/image-service/albums/view/count?event_id=${this.currentEvent.event_id}`).then((res) => {
+					this.visitAmount = res.view_count
+				});
+			},
+			addVistAmount() {
+				request.post(`/image-service/albums/view/increment?event_id=${this.currentEvent.event_id}`)
 			},
 			loadMoreData (){
-				// console.log('this.$refs.paging===>', this.$refs.paging)
-			  if (this.isLoadingMore) return
+			  if (this.isLoadingMore) return;
 			  this.isLoadingMore = true
-			  this.$refs.paging?.doLoadMore() // 调用 zPaging 的 reloadMore 方法
+			  this.$refs.paging?.doLoadMore()
 			},
 			queryList(pageNo, pageSize) {
 				console.log('queryList=====>')
@@ -186,47 +155,71 @@
 				this.swiperPageSize = pageSize
 								
 				const params = {
-					pageIndex: pageNo,
+					pageIndex: pageNo - 1,
 					pageSize: pageSize,
 					keyword: '',
 					event_id: this.currentEvent.event_id,
-				};
+				}
 
-				return request.get(`/image-service/oss`, params).then((res) => {
-					// keep full list for preview
-					this.allImages = res.urls || [];
-					this.$refs.paging.complete(res.urls);
+				return request.get(`/image-service/oss`, params).then(res => {
+					const list = res.urls || []
+					this.allImages = list;
+					this.$refs.paging.complete(list);
 					
 					this.totalNumber = res.total
 					
 					if(pageNo == 1) {
-						this.virtualList2 = res.urls
+						this.virtualList2 = list;
 					} else {
-						this.virtualList2 = this.virtualList2.concat(res.urls)
+						this.virtualList2 = this.virtualList2.concat(list)
 					}
 					
-					this.isLoadingMore = false;
+					this.isLoadingMore = false
 				})
 			},
 			handleImg(link,index) {
 				this.$refs.refPreviewMedia.openModal(link,index,this.virtualList2, this.totalNumber)
 			},
 			openPreview(index) {
-				// index should be the global index provided by virtual list
 				if (!this.$refs.preview) return;
 				this.$refs.preview.openModal(this.allImages, index || 0);
 			}
-		}
+		},
+		onLoad(options) {
+			console.log('options=====>', options)
+			this.currentEvent = options
+			this.getDetail()
+			this.addVistAmount()
+			
+			wx?.showShareMenu?.({
+				withShareTicket: true,
+				menus: ['shareAppMessage', 'shareTimeline']
+			});
+		},
+		onShareAppMessage() {
+			return {
+				title: '跑了没 - ' + (this.currentEvent.name || ''),
+				imageUrl: this.currentEvent.background_image_url
+			};
+		},
+		onShareTimeline() {
+			return {
+				title: '跑了没 - ' + (this.currentEvent.name || ''),
+				query: '', // 可以携带参数
+				imageUrl: this.currentEvent.background_image_url
+			};
+		},
 	}
-	
-	
 </script>
 
 <style lang="scss" scoped>
 	::v-deep{
 		.PreviewMedia{
-			.u-popup__content__close {
+		.u-popup__content__close {
 				top: 200rpx!important;
+				.u-icon__icon{
+					color: #fff!important;
+				}
 			}
 		}
 	}
@@ -274,20 +267,13 @@
 				color: #fff;
 				font-weight: bold;
 				font-size: 24rpx;
-				background: rgba(112, 112, 112, .5);
+				background: rgba(0, 0, 0, .6);
 				border-radius: 0rpx 8rpx 8rpx 0rpx;
 				margin-bottom: 10rpx;
 			}
 		}
 	}
 
-	.section-btns {
-		::v-deep {
-			.u-button--square {
-				border-radius: 16rpx;
-			}
-		}
-	}
 	.isFixed {
 			z-index: 990;
 			position: fixed;
@@ -313,7 +299,7 @@
 	}
 
 	.card-img {
-		display: block;
+			display: block;
 		width: 25%;
 		height: 180rpx;
 		padding: 5rpx;
