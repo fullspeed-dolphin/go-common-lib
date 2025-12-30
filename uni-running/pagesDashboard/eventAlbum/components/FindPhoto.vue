@@ -102,8 +102,10 @@
 	const isAgree = ref(false);
 	const show = ref(false);
 	const facePhoto = ref('');
-
-	function open() {
+	
+	const event_id = ref('')
+	function open(eventid) {
+		event_id.value = eventid
 		console.log('open')
 		show.value = true;
 	}
@@ -167,6 +169,7 @@
 			mask: true
 		});
 		return request.post('/face-rec/api/faces/search', {
+			event_id: event_id.value,
 			image_url: imageUrl
 		});
 	};
@@ -247,11 +250,23 @@
 		});
 
 		const params = {
-			keyword: searchTxt.value
+			event_id: event_id.value,
+			bib_number: searchTxt.value
 		};
 
-		request.get(`/event-api/api/v1/events`, params).then((res) => {
-
+		request.post(`/number-rec/api/number/search`, params).then((res) => {
+			if (res?.results?.length > 0) {
+				// 存储搜索结果到缓存
+				uni.setStorageSync('faceSearchResults', res.results);
+				// 关闭弹窗
+				close();
+				// 跳转到结果页面
+				uni.navigateTo({
+					url: '/pagesDashboard/eventAlbum/faceSearchResult'
+				});
+			} else {
+				uni.$u.toast('未找到匹配的照片')
+			}
 		})
 	};
 

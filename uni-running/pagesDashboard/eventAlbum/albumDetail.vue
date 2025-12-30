@@ -46,7 +46,7 @@
 				</section>
 		
 				<section class="section-btns u-flex-xy-center" style="width:580rpx;margin: 24rpx auto;">
-					<up-button type="primary" @click="$refs.refFindPhoto.open()"
+					<up-button type="primary" @click="$refs.refFindPhoto.open(currentEvent.event_id)"
 						customStyle="width: 298rpx;font-size: 24rpx;height: 82rpx;border-radius: 16rpx;">
 						<text class="iconfont icon-saomiaorenlian u-mr-10"></text>
 						查找照片和视频
