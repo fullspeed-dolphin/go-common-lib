@@ -1,5 +1,5 @@
 <template>
-		<Navbar title="活动报名" :bgHeight="370" />
+		<u-navbar title="活动报名" placeholder bgColor="#f8f8f8"/>
 
 		<section class="section-assign">
 			<view class="cell flex-between-center">

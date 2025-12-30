@@ -255,10 +255,10 @@
 	}
 	.section-banner {
 		position: relative;
-		height: 300rpx;
+		height: 362rpx;
 		.img {
 			width: 100%;
-			height: 300rpx;
+			height: 362rpx;
 		}
 
 		.summary {

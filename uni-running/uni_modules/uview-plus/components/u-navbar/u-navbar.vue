@@ -165,7 +165,7 @@
 	.navbar-badge{
 		border-radius: 999px;
 		border: 1px solid #eee;
-		background: #fff;
+		background: rgba(255,255,255, .8);
 	}
 	.border-right{
 			position: relative;

@@ -103,7 +103,7 @@
 				
 				<u-cell title="全速之家" class="nav-cell" @click="routeTo('/pagesMine/toolkit/UserRole')" :border="false" isLink>
 					<template #icon>
-						<image class="nav-icon" style="width: 36rpx; height: 42rpx" src="/static/images/quansuzhijia.png"></image>
+						<image class="nav-icon" style="width: 36rpx; height: 38rpx" src="/static/images/quansuzhijia.png"></image>
 					</template>
 				</u-cell>
 
