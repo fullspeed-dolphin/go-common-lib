@@ -229,7 +229,7 @@
 		loadProvinceData,
 		loadCityData,
 		loadAreaData,
-	} from "@/utils/regionData.js";
+	} from "../utils/regionData.js";
 
 	const props = defineProps({
 		modelValue: {

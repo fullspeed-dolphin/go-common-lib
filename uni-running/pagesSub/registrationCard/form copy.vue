@@ -196,7 +196,7 @@
 		loadProvinceData,
 		loadCityData,
 		loadAreaData,
-	} from "@/utils/regionData.js";
+	} from "../utils/regionData.js";
 	
 	import { bloodTypeOptions, idTypeOptions, countryOptions, tshirtSizeOptions } from "./tools.js"
 

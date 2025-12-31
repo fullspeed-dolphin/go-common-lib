@@ -3,7 +3,7 @@ import {
   loadProvinceData,
   loadCityData,
   loadAreaData,
-} from "@/utils/regionData.js";
+} from "../utils/regionData.js";
 
 const FIELD_KEY_REGEXP = /SaveSignerInfoRequest\.([A-Za-z0-9_]+)/;
 const FALLBACK_FIELD_REGEXP = /'([A-Za-z0-9_]+)'/;

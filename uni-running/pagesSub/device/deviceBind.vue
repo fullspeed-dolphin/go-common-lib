@@ -93,7 +93,7 @@
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import CommonDialog from "@/components/common/CommonDialog.vue";
-import { gaoChi, huaWei, jiaMing } from "./deviceBind.js";
+import { gaoChi, huaWei, jiaMing } from "./deviceUtils.js";
 
 // 模板引用
 const refCommonDialog = ref(null);

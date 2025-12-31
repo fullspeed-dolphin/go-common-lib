@@ -14,8 +14,8 @@
 				号码牌
 			</view>
 		</view>
-		<view class="flex-col-center" style="padding-bottom: 60rpx;height:500rpx;">
-			<block v-if="activeTab === 1">
+		<view style="padding-bottom: 60rpx;">
+			<div v-if="activeTab === 1" class="flex-col-center" style="height:500rpx;">
 				<section @click="takePhoto()" class="section-camera u-flex-xy-center bgf" style="font-weight: bold;color: #267FF7;width: 216rpx;
 				height: 216rpx;margin-bottom:40rpx;">
 					<div class="flex-col-center upload-box" style="">
@@ -40,9 +40,9 @@
 							@click="$u.route('pagesSub/settings/agreement?type=faceScanPolicy')">《人脸识别使用条款》</text>
 					</view>
 				</section>
-			</block>
+			</div>
 
-			<block v-if="activeTab === 2">
+			<view v-if="activeTab === 2" class="flex-col-center" style="height:500rpx;">
 				<view class="flex-start" style="margin-top:14rpx;">
 					<input v-model="searchTxt" class="u-input" maxlength="50" placeholder="请输入号码牌搜索照片" />
 
@@ -83,9 +83,9 @@
 						建议只输入字母和数字，如A1234
 					</view>
 				</section>
-			</block>
+			</view>
 			
-			<view style="font-size: 24rpx;color:#999;margin-top: 20rpx;">由易联支付AI平台强势驱动</view>
+			<view style="font-size: 24rpx;color:#999;margin-top: 20rpx;text-align: center;">由易联支付AI平台强势驱动</view>
 		</view>
 	</up-popup>
 </template>

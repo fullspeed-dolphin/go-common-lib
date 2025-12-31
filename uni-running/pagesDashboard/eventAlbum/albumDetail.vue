@@ -29,11 +29,11 @@
 					<view class="flex-between-center c6 fs24 u-mt-20" style="line-height: 1.2;">
 						<view class="">
 							<view class="u-mt-10 flex-start">
-								<u-icon name="clock" color="#666"></u-icon>
-								<view class="u-ml-10">{{currentEvent.event_time.slice(0, 10)}}</view>
+								<u-icon name="clock" color="#666" size="24rpx"></u-icon>
+								<view class="u-ml-10">{{currentEvent.event_time}}</view>
 							</view>
 							<view class="u-mt-10 u-flex-row" style="line-height: 1.2;">
-								<view class=""><u-icon name="map" color="#666"></u-icon></view>
+								<view class=""><u-icon name="map" color="#666" size="24rpx"></u-icon></view>
 								<view class="u-ml-10 ellipsis2" style1="max-width: 320rpx;">{{currentEvent.event_location}}</view>
 							</view>
 						</view>
@@ -87,7 +87,7 @@
 </template>
 
 <script >
-	import zPaging from "@/uni_modules/z-paging/components/z-paging/z-paging.vue"
+	import zPaging from "./components/z-paging/components/z-paging/z-paging.vue"
 	import request from "@/utils/request.js"
 	import FindPhoto from "./components/FindPhoto.vue"
 	import PreviewMedia from "./components/PreviewMedia.vue"
@@ -160,7 +160,7 @@
 				const distanceToBottom = scrollHeight - scrollTop - screenHeight;
 				
 				// console.log('scrollTop====>',  scrollHeight , scrollTop , screenHeight)
-				console.log('distanceT====>',  distanceToBottom, this.itemHeight * 5)
+				// console.log('distanceT====>',  distanceToBottom, this.itemHeight * 5)
 				
 				if (distanceToBottom <= this.itemHeight * 5 && !this.isLoadingMore) {
 					this.loadMoreData()
@@ -177,6 +177,7 @@
 			  uni.showLoading({ mask: true });
 			  request.get(`/event-api/api/v1/events/${this.currentEvent.event_id}`).then((res) => {
 					res.event_id = res.id
+					res.event_time.slice(0, 10)
 					this.currentEvent = res
 				});
 				
