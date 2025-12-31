@@ -10,12 +10,14 @@
 			@query="queryList" @scroll="onListScroll">
 			<u-navbar :title="currentEvent.name" placeholder></u-navbar>
 			<view class="" sot="header">
+				
 				<section class="section-banner">
 					<up-lazy-load class="img" :image="currentEvent.image_url + '?x-oss-process=image/resize,w_600'" mode="aspectFill" />
-					<view class="summary">
-						<view class="item u-flex-y-center">照片 {{totalNumber}}</view>
-						<!-- <view class="item u-flex-y-center">视频 2346</view> -->
-						<!-- <view class="item u-flex-y-center">浏览量 {{visitAmount}}</view> -->
+					<view v-if="totalNumber" class="summary">
+						<view class="item u-flex-y-center">
+							{{displayType === 'photo' ? '照片' : '视频'}}
+							{{totalNumber}}
+						</view>
 					</view>
 				</section>
 				
@@ -56,8 +58,8 @@
 				<view style="height: 44px;">
 					<section class="section-tabs u-flex-y-center" :class="{isFixed: isShowBackTop}" 
 						:style="{ top: addUnit(getPx('44px') + getWindowInfo().statusBarHeight,'px') }">
-						<view class="item" :class="{active: tabActive === 'photo'}" @click="tabActive = 'photo'">照片</view>
-						<!-- <view class="item" :class="{active: tabActive === 'video'}" @click="tabActive = 'video'">视频</view> -->
+						<view class="item" :class="{active: displayType === 'photo'}" @click="changeTab('photo')">照片</view>
+						<view class="item" :class="{active: displayType === 'video'}" @click="changeTab('video')">视频</view>
 					</section>
 				</view>
 				
@@ -72,17 +74,33 @@
 			</view>
 			
 			<view class="u-flex u-flex-wrap u-p-10">
-				<image 
-					class="card-img" :src="item.item + tt" mode="aspectFill" 
-					v-for="(item, index) in virtualList"
-					:id="'zp-id-' + item.zp_index" :key="item.zp_index"
-					@click="handleImg(item.item,item.zp_index)" :alt="index"/>
+				<block v-if="displayType === 'photo'">
+					<image 
+						class="card-img" :src="item.item + tt" mode="aspectFill" 
+						v-for="(item, index) in virtualList"
+						:id="'zp-id-' + item.zp_index" :key="item.zp_index"
+						@click="handleImg(item.item,item.zp_index)"/>
+				</block>
+				<block v-if="displayType === 'video'">
+					<view 
+						class="card-video"
+						v-for="(item, index) in virtualList"
+						:id="'zp-id-' + item.zp_index" :key="item.zp_index"
+						@click="$refs.refPreviewVideo.openModal(item.item)">
+						<view class="iconfont icon-bofang"></view>
+						<image class="img" :src="item.item + snapshot" mode="aspectFill" ></image>
+						<view class="ellipsis2 u-p-10">
+							{{item.item}}
+						</view>
+					</view>
+				</block>
 			</view>
 		</zPaging>
 		
 		<!-- 轮播图 -->
 		<PreviewMedia ref="refPreviewMedia" @loadingMore="loadingMore"/>
 		<FindPhoto ref="refFindPhoto" />
+		<PreviewVideo ref="refPreviewVideo" />
 	</view>
 </template>
 
@@ -90,6 +108,7 @@
 	import zPaging from "./components/z-paging/components/z-paging/z-paging.vue"
 	import request from "@/utils/request.js"
 	import FindPhoto from "./components/FindPhoto.vue"
+	import PreviewVideo from "./components/PreviewVideo.vue"
 	import PreviewMedia from "./components/PreviewMedia.vue"
 	import { addUnit, getPx, getWindowInfo } from '@/uni_modules/uview-plus/libs/function/index.js';
 	
@@ -106,7 +125,7 @@
 	
 	export default {
 		components: {
-			zPaging, FindPhoto, PreviewMedia
+			zPaging, FindPhoto, PreviewMedia, PreviewVideo
 		},
 		data() {
 			return {
@@ -119,8 +138,9 @@
 				currentImageIndex: 0,
 				isShowBackTop: false,
 				currentEvent: {},
-				tabActive: 'photo',
+				displayType: 'photo',
 				virtualList: [],
+				snapshot: '?x-oss-process=video/snapshot,t_5,f_jpg,w_720',
 				ossParams: '?x-oss-process=image/crop,w_500,h_400,x_100,y_100/format,webp/q_80',
 				tt: '?x-oss-process=image/resize,w_250/quality,q_80/format,webp',
 				tt1: '?x-oss-process=image/watermark,image_d2F0ZXJtYXJrL1BSTzUzMDE1NC9tYXJrMTQ1MTkwMS5wbmc_eC1vc3MtcHJvY2Vzcz1pbWFnZS9yZXNpemUsbV9maXhlZCx0eXBlXzIsd180ODAsaF84MCxsaW1pdF8wL2Zvcm1hdCxwbmc=,g_south,x_0,y_0,t_100',
@@ -131,6 +151,10 @@
 			}
 		},
 		methods: {
+			changeTab(type) {
+				this.displayType = type;
+				this.$refs.paging.reload();
+			},
 			async loadingMore(index) {
 				// console.log('albumDetail的触发')
 				this.isNextLevel = true
@@ -162,12 +186,15 @@
 				// console.log('scrollTop====>',  scrollHeight , scrollTop , screenHeight)
 				// console.log('distanceT====>',  distanceToBottom, this.itemHeight * 5)
 				
-				if (distanceToBottom <= this.itemHeight * 5 && !this.isLoadingMore) {
+				const itemHeight = this.displayType === 'photo' ? 180 : 270;  // 卡片高度
+				const lanes = this.displayType === 'photo' ? 4 : 2;  // 列数
+				
+				if (distanceToBottom <= itemHeight * 5 && !this.isLoadingMore) {
 					this.loadMoreData()
 				}
 				
-				// 计算滚动到第几张图片位置
-				const photoIndex = Math.floor(scrollTop / 90)  * 4 + 8;
+				// 计算滚动到第几张图片位置, 图片高度 90px, 视频高度 135px
+				const photoIndex = Math.floor(scrollTop / (itemHeight / 2)) * lanes + (lanes * 2);
 				this.currentImageIndex = Math.min(photoIndex, this.totalNumber);
 			}, 120),
 			virtualListChange(vList) {
@@ -206,7 +233,8 @@
 				}
 				
 				this.isLoadingMore = true
-				return request.get(`/image-service/oss`, params).then(res => {
+				// ${this.displayType === 'photo' ? 'oss' : 'videos'}
+				return request.get(`/image-service/${this.displayType === 'photo' ? 'oss' : 'videos'}`, params).then(res => {
 					console.log('加载成功')
 					const list = res.urls || []
 					this.allImages = list;
@@ -336,12 +364,20 @@
 			text-align: center;
 			background: #fff;
 			.item {
+				position: relative;
 				width: 94rpx;
 				padding-bottom: 10rpx;
-		
-				&.active {
-					color: #FF8C00;
-					border-bottom: 4rpx solid #FF8C00;
+				font-size: 16px;
+				&.active:before{
+					position: absolute;
+					content: "";
+					bottom:-10rpx;
+					left: 50%;
+					transform: translateX(-50%);
+					background: #FF8C00;
+					width: 14px;
+					height: 4px;
+					border-radius: 2px;
 				}
 			}
 		}
@@ -352,6 +388,36 @@
 			height: 180rpx;
 			padding: 5rpx;
 			box-sizing: border-box;
+		}
+		.card-video {
+			position: relative;
+			display: block;
+			width: 50%;
+			height: 270rpx;
+			padding: 5rpx;
+			box-sizing: border-box;
+			overflow: hidden;
+			.img{
+				width: 100%;
+				height: 192rpx;
+				border-radius: 10rpx 10rpx 0 0;
+			}
+			.icon-bofang{
+				position: absolute;
+				top: 40%;
+				left: 50%;
+				width: 30px;
+				height: 30px;
+				line-height: 30px;
+				border-radius: 50%;
+				font-size: 16px;
+				text-align: center;
+				transform: translate(-50%, -50%);
+				background: #fff;
+				color: #333;
+				mix-blend-mode: screen;
+				z-index: 1;
+			}
 		}
 	}
 	

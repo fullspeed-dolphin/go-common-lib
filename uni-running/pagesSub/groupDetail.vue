@@ -20,12 +20,12 @@
             'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_120,h_120,m_fill'
           " mode="aspectFill"></image>
 				<view class="name ellipsis2">{{ detail.name }}</view>
-				<view class="flex-between-center c9 b">
+				<view class="flex-between-center c3 b">
 					<view class="cell-item">{{ detail.establish_time }} 成立</view>
 					<view class="cell-item">跑团ID {{ detail.group_id }}</view>
 				</view>
-				<view class="cell-item flex-row c9 b">
-					<u-icon name="map" size="12" color="#999"></u-icon>
+				<view class="cell-item flex-row c3 b">
+					<u-icon name="map" size="12" color="#333"></u-icon>
 					<view class="flex-1">
 						{{ detail.establish_location }}
 					</view>

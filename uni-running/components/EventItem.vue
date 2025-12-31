@@ -9,10 +9,10 @@
 
 			<view class="event-item-meta flex-between-center" v-if="showButton">
 				<view>
-					<view class="event-item-meta b ellipsis u-mt-10" style="max-width: 430rpx;">
+					<view v-if="item.event_location" class="event-item-meta b ellipsis u-mt-10" style="max-width: 430rpx;">
 						{{ item.is_online ? "线上跑" : '地址: ' + item.event_location}}
 					</view>
-					<view class="event-item-location b u-mt-20 u-mb-5">
+					<view v-if="item.event_time" class="event-item-location b u-mt-20 u-mb-5">
 						活动日期: {{ dayjs(item.event_time).format("YYYY-MM-DD") }}
 					</view>
 				</view>

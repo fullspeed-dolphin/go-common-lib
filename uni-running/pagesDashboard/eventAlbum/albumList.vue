@@ -91,7 +91,7 @@
 						event_id: item.event_id,
 						description: item.description,
 						image_url: item.image_url,
-						event_time: item.event_time.slice(0, 10),
+						event_time: item.event_time?.slice(0, 10),
 						event_location: item.event_location
 					}
 				});
