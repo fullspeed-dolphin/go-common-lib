@@ -213,6 +213,11 @@
 		originIndex.value = props.originIndex
 		initSwiperData(originIndex.value);
 	})
+
+	defineExpose({
+		originIndex,
+		originList
+	})
 </script>
 
 <style lang="scss" scoped>

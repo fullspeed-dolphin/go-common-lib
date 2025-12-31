@@ -2,7 +2,7 @@
 	<view v-if="isShowModal" class="PreviewMedia">
 	<up-popup :show="isShowModal" @close="close" overlayOpacity="0.9" bgColor="transparent" mode="center" closeable>
 		<view class="flex-center" style="height: 100vh;width:100vw">
-			<rswiper :originList="originList" :totalNumber="totalNumber" :originIndex="originIndex" @loadingMore="loadingMore" v-if="isShowModal"></rswiper>
+			<rswiper ref="refSwiper" :originList="originList" :totalNumber="totalNumber" :originIndex="originIndex" @loadingMore="loadingMore" v-if="isShowModal"></rswiper>
 			<view class="flex-col-center">
 				<view class="flex-center" style="position: fixed;left:0;bottom: 90rpx;width: 100%;">
 					<up-button @click="downloadPicture" type="primary" shape="circle" icon="download"
@@ -25,7 +25,7 @@
 	const emits = defineEmits(["open",'loadingMore']);
 
 	const isShowModal = ref(false);
-	const fileLink = ref('');
+	const refSwiper = ref(null);
 	const originList = ref([]) // 源数据
 	const displaySwiperList = ref([]) // swiper需要的数据
 	const displayIndex = ref(0) // 用于显示swiper的真正的下标数值只有：0，1，2。
@@ -52,9 +52,46 @@
 	}
 
 	function downloadPicture() {
-		uni.saveImageToPhotosAlbum({
-			filePath: fileLink.value
-		})
+		const currentIndex = refSwiper.value?.originIndex;
+		const list = refSwiper.value?.originList;
+		const imageUrl = list?.[currentIndex];
+
+		if (!imageUrl) {
+			uni.showToast({ title: '获取图片失败', icon: 'none' });
+			return;
+		}
+
+		uni.showLoading({ title: '下载中...' });
+
+		uni.downloadFile({
+			url: imageUrl,
+			success: (res) => {
+				if (res.statusCode === 200) {
+					uni.saveImageToPhotosAlbum({
+						filePath: res.tempFilePath,
+						success: () => {
+							uni.hideLoading();
+							uni.showToast({ title: '保存成功', icon: 'success' });
+						},
+						fail: (err) => {
+							uni.hideLoading();
+							if (err.errMsg?.includes('auth deny')) {
+								uni.showToast({ title: '请授权相册权限', icon: 'none' });
+							} else {
+								uni.showToast({ title: '保存失败', icon: 'none' });
+							}
+						}
+					});
+				} else {
+					uni.hideLoading();
+					uni.showToast({ title: '下载失败', icon: 'none' });
+				}
+			},
+			fail: () => {
+				uni.hideLoading();
+				uni.showToast({ title: '下载失败', icon: 'none' });
+			}
+		});
 	}
 	defineExpose({
 		openModal,

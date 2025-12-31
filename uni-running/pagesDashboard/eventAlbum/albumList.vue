@@ -86,7 +86,7 @@
 				//如果是第一页需手动制空列表
 				if (mescroll.num == 1) dataList.value = []
 
-				res = res.map(item => {
+				res = res.filter(item => item.event_id).map(item => {
 					return {
 						event_id: item.event_id,
 						description: item.description,
