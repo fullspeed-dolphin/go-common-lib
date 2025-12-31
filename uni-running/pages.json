@@ -137,22 +137,6 @@
           }
         },
         {
-          "path": "myEvent",
-          "style": {
-            "navigationStyle": "custom",
-            "navigationBarTitleText": "我的活动",
-            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
-          }
-        },
-        {
-          "path": "myMessages",
-          "style": {
-            "navigationStyle": "custom",
-            "navigationBarTitleText": "我的消息",
-            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
-          }
-        },
-        {
           "path": "sportDetail",
           "style": {
             "navigationStyle": "custom",
@@ -208,22 +192,15 @@
         },
         // { "path": "settings/forgetPassword", "style": { "navigationBarTitleText": "忘记密码", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
         // { "path": "settings/findPassword", "style": { "navigationBarTitleText": "重置密码", "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" } } },
-        {
-          "path": "settings/editPassword",
-          "style": {
-            "navigationBarTitleText": "修改密码",
-            "app-plus": { "titleNView": true, "backgroundcolor": "#ffffff" }
-          }
-        },
         // { "path": "settings/settings", "style": { "navigationBarTitleText": "设置", "app-plus": { "titleNView": false, "backgroundcolor": "#ffffff" } } },
-        {
-          "path": "settings/feedback",
-          "style": {
-            "navigationStyle": "custom",
-            "navigationBarTitleText": "意见反馈",
-            "app-plus": { "titleNView": false, "backgroundcolor": "#ffffff" }
-          }
-        },
+        // {
+        //   "path": "settings/feedback",
+        //   "style": {
+        //     "navigationStyle": "custom",
+        //     "navigationBarTitleText": "意见反馈",
+        //     "app-plus": { "titleNView": false, "backgroundcolor": "#ffffff" }
+        //   }
+        // },
         {
           "path": "runMap",
           "style": {
