@@ -91,10 +91,10 @@ const submit = async () => {
 		Name,
 	} = userInfo.value;
 	// if (!Head || !Head.length) {
-	//   return proxy.$toast('请上传头像')
+	//   return uni.$u.toast('请上传头像')
 	// }
 	if (!Name || !Name.length) {
-		return proxy.$toast('请输入昵称')
+		return uni.$u.toast('请输入昵称')
 	}
 		
 	uni.showLoading({ mask: true })
@@ -111,7 +111,7 @@ const submit = async () => {
 		}
 		
 		uni.hideLoading()
-		proxy.$toast('保存成功');
+		uni.$u.toast('保存成功');
 		
 		setTimeout(() => {
 			isSubmitting.value = false;

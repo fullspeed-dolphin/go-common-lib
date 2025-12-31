@@ -59,7 +59,7 @@ const getCode = async () => {
 const getPhoneNumber = async ({ detail }) => {
 	// console.log(detail);
 	if (detail.errMsg == "getPhoneNumber:fail user deny") {
-		proxy.$toast("用户已拒绝");
+		uni.$u.toast("用户已拒绝");
 		
 		isDisabled.value = false;
 		return false;
@@ -84,7 +84,7 @@ const getPhoneNumber = async ({ detail }) => {
 		
 		uni.setStorageSync("token", res.sessionToken);
 		
-		proxy.$toast("登录成功");
+		uni.$u.toast("登录成功");
 		
 		close()
 		

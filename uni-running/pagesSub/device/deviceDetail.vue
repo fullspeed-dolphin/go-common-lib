@@ -130,7 +130,7 @@ const confirmAsync = () => {
   });
 
   setTimeout(() => {
-    proxy.$toast("同步成功");
+    uni.$u.toast("同步成功");
   }, 1300);
 };
 

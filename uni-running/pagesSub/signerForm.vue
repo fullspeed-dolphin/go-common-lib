@@ -363,7 +363,7 @@ const submit = () => {
 
     uni.setStorageSync("SignerInfo", data);
 
-    proxy.$toast("保存成功");
+    uni.$u.toast("保存成功");
 
     setTimeout(() => {
       uni.navigateBack();
@@ -382,7 +382,7 @@ const submit = () => {
         console.log(res);
         // uni.hideLoading()
 
-        proxy.$toast("保存成功");
+        uni.$u.toast("保存成功");
 
         setTimeout(() => {
           uni.navigateBack();

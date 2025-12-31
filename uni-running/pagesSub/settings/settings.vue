@@ -34,7 +34,7 @@ const logout = () => {
 		confirmColor: "#ff523d",
 		success: res => {
 			if (res.confirm) {
-				proxy.$toast('已退出登录')
+				uni.$u.toast('已退出登录')
 
 				uni.removeStorageSync('token')
 				uni.removeStorageSync('userInfo')

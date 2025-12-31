@@ -249,7 +249,7 @@
 		}
 
 		if (detail.value.status !== "ACT") {
-			return proxy.$toast("活动无效");
+			return uni.$u.toast("活动无效");
 		}
 
 		if (isSignUp.value) {
@@ -268,7 +268,7 @@
 					proxy.$axios({
 						url: "api/index/logout"
 					}).then((res) => {
-						proxy.$toast("已取消报名");
+						uni.$u.toast("已取消报名");
 					});
 				} else if (res.cancel) {
 					console.log("用户点击取消");

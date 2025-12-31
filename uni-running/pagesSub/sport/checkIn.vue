@@ -334,7 +334,7 @@ const loadSportDataByDate = async (date) => {
     console.log("sportId======>", sportId.value, res);
   } catch (error) {
     console.error("加载运动数据失败:", error);
-    proxy.$toast("加载数据失败");
+    uni.$u.toast("加载数据失败");
   } finally {
     uni.hideLoading();
   }

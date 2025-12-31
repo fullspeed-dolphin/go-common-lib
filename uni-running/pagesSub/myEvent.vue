@@ -43,7 +43,7 @@ const cancelSignUp = () => {
 		success: (res) => {
 			if (res.confirm) {
 				proxy.$axios({url: "api/index/logout"}).then(res => {
-					proxy.$toast('已取消报名')
+					uni.$u.toast('已取消报名')
 				})
 			} else if (res.cancel) {
 				console.log('用户点击取消');

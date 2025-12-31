@@ -18,7 +18,7 @@
         <view style="margin-top: 60rpx; width: 440rpx">
           <u-button
             v-if="!isAgree"
-            @click="$toast('请点击同意协议!')"
+            @click="$u.toast('请点击同意协议!')"
             :customStyle="{ width: '440rpx' }"
             type="primary"
             color="#19be6b"
@@ -116,13 +116,13 @@ const getCode = async () => {
 const getPhoneNumber = async ({ detail }) => {
   // console.log(detail);
   if (detail.errMsg == "getPhoneNumber:fail user deny") {
-    proxy.$toast("用户已拒绝");
+    uni.$u.toast("用户已拒绝");
 
     isDisabled.value = false;
     return false;
   }
 
-  // if (!isAgree.value) return proxy.$toast('请点击同意协议！');
+  // if (!isAgree.value) return uni.$u.toast('请点击同意协议！');
 
   uni.showLoading({
     title: "登录中...",
@@ -141,12 +141,12 @@ const getPhoneNumber = async ({ detail }) => {
   try {
     const res = await proxy.$axios.post("/wechat-login/login", data);
 
-    proxy.$toast("登录成功");
+    uni.$u.toast("登录成功");
     uni.setStorageSync("token", res.sessionToken);
     await store.dispatch("getUserInfo");
 
     // if (res.avatarUrl) {
-    //   proxy.$toast("登录成功");
+    //   uni.$u.toast("登录成功");
     //   uni.setStorageSync("token", res.sessionToken);
     //   await store.dispatch("getUserInfo");
     // } else {

@@ -375,7 +375,7 @@ const getSecondsBetween = (startTime, endTime) => {
 // 加载运动数据
 const loadSportData = async (id) => {
   if (!id) {
-    proxy.$toast("缺少运动记录ID");
+    uni.$u.toast("缺少运动记录ID");
     return;
   }
 
@@ -445,7 +445,7 @@ const loadSportData = async (id) => {
     }
   } catch (error) {
     console.error("加载运动数据失败:", error);
-    proxy.$toast("加载数据失败");
+    uni.$u.toast("加载数据失败");
   } finally {
     loading.value = false;
     uni.hideLoading();
@@ -501,7 +501,7 @@ onLoad((options) => {
   if (id) {
     loadSportData(id);
   } else {
-    proxy.$toast("缺少运动记录ID");
+    uni.$u.toast("缺少运动记录ID");
   }
 });
 </script>

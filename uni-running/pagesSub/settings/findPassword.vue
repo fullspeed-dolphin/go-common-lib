@@ -93,16 +93,16 @@ const getCode = () => {
 	if (isSendCode.value) return
 
 	if (!phone.value.length) {
-		return proxy.$toast('请输入手机号')
+		return uni.$u.toast('请输入手机号')
 	}
 	// if (!(/^1[3456789]\d{9}$/.test(phone))) {
-	//   return this.$toast('手机号码格式有误')
+	//   return uni.$u.toast('手机号码格式有误')
 	// }
 	const data = {
 		telPhone: phone.value
 	}
 	proxy.$axios({ url: `api/user/sendCode`, data }).then(res => {
-		proxy.$toast('短信验证码已经发送')
+		uni.$u.toast('短信验证码已经发送')
 		isSendCode.value = true
 		seconds.value = 60
 	})
@@ -110,25 +110,25 @@ const getCode = () => {
 
 const submit = async () => {
 	if (!phone.value.length) {
-		return proxy.$toast('请输入手机号')
+		return uni.$u.toast('请输入手机号')
 	}
 
 	// if (!(/^1[3456789]\d{9}$/.test(phone))) {
-	//   return this.$toast('手机号码格式有误')
+	//   return uni.$u.toast('手机号码格式有误')
 	// }
 
 	if (!verifyCode.value.length) {
-		return proxy.$toast('请输入验证码')
+		return uni.$u.toast('请输入验证码')
 	}
 	if (!password.value.length) {
-		return proxy.$toast('请输入新密码')
+		return uni.$u.toast('请输入新密码')
 	}
 	// if (password.length < 6) {
-	//   return this.$toast('密码长度应该为6位')
+	//   return uni.$u.toast('密码长度应该为6位')
 	// }
 
 	if (!password1.value.length) {
-		return proxy.$toast('请输入确认密码')
+		return uni.$u.toast('请输入确认密码')
 	}
 
 	const data = {
@@ -139,7 +139,7 @@ const submit = async () => {
 	}
 
 	proxy.$axios({ url: 'api/user/findPassword', data }).then(res => {
-		proxy.$toast('重置成功，请重新登录')
+		uni.$u.toast('重置成功，请重新登录')
 		setTimeout(() => {
 			uni.redirectTo({
 				url: '/pagesSub/login'

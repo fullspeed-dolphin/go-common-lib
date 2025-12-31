@@ -66,7 +66,7 @@ onLoad((options) => {
 // 获取订单详情
 const getOrderDetail = () => {
   if (!order_no.value) {
-    proxy.$toast("订单号不能为空");
+    uni.$u.toast("订单号不能为空");
     return;
   }
 
@@ -99,7 +99,7 @@ const getOrderDetail = () => {
     .catch((err) => {
       console.error("获取订单详情失败", err);
       uni.hideLoading();
-      proxy.$toast(err.msg || "获取订单详情失败");
+      uni.$u.toast(err.msg || "获取订单详情失败");
     })
     .finally(() => {
       loading.value = false;
@@ -116,7 +116,7 @@ const payOrder = () => {
     paySign: detail.value.payment_params.paySign,
     success: (res) => {
       uni.hideLoading();
-      proxy.$toast("支付成功");
+      uni.$u.toast("支付成功");
       setTimeout(() => {
         // uni.navigateBack()
         uni.$u.route("pagesSub/orderSuccess?order_no=" + detail.value.order_no);
@@ -125,7 +125,7 @@ const payOrder = () => {
     fail: (res) => {
       uni.hideLoading();
       console.log("res======>", res);
-      proxy.$toast("支付未完成");
+      uni.$u.toast("支付未完成");
     },
   });
 };

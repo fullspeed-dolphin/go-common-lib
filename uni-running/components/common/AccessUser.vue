@@ -157,8 +157,8 @@ const close = () => {
 };
 
 const submit = async () => {
-  if (!formData.value.avatarUrl.length) return proxy.$toast("请上传头像");
-  if (!formData.value.nickname.length) return proxy.$toast("请输入昵称");
+  if (!formData.value.avatarUrl.length) return uni.$u.toast("请上传头像");
+  if (!formData.value.nickname.length) return uni.$u.toast("请输入昵称");
 
   uni.showLoading({
     mask: true,
@@ -197,7 +197,7 @@ const submit = async () => {
     store.dispatch("getUserInfo");
     close();
 
-    proxy.$toast("更新成功");
+    uni.$u.toast("更新成功");
 		
 		emit('success')
   });

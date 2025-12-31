@@ -98,14 +98,14 @@ const submitForm = () => {
   uForm.value.validate().then((res) => {
     const token = uni.getStorageSync("token");
     if (!token) {
-      proxy.$toast("请先登录~");
+      uni.$u.toast("请先登录~");
       setTimeout(() => {
         proxy.$goUrl("/pagesSub/login");
       }, 1000);
       return;
     }
 
-    // if (!this.isAgree.length) return this.$toast('请勾选同意协议')
+    // if (!this.isAgree.length) return uni.$u.toast('请勾选同意协议')
 
     const data = {
       Account: form.value.name,
@@ -117,7 +117,7 @@ const submitForm = () => {
     proxy.$axios.post(`/api/store/login`, data).then((res) => {
       console.log(res);
 
-      proxy.$toast("提交成功");
+      uni.$u.toast("提交成功");
 
       setTimeout((res) => {
         uni.navigateBack();

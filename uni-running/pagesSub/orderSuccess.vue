@@ -325,7 +325,7 @@ onLoad((options) => {
 // 获取订单详情
 const getOrderDetail = () => {
   if (!order_no.value) {
-    proxy.$toast("订单号不能为空");
+    uni.$u.toast("订单号不能为空");
     return;
   }
 
@@ -372,7 +372,7 @@ const getOrderDetail = () => {
     .catch((err) => {
       console.error("获取订单详情失败", err);
       uni.hideLoading();
-      proxy.$toast(err.msg || "获取订单详情失败");
+      uni.$u.toast(err.msg || "获取订单详情失败");
     })
     .finally(() => {
       loading.value = false;
@@ -381,7 +381,7 @@ const getOrderDetail = () => {
 
 const refundOrder = () => {
   if (!canRefund.value) {
-    proxy.$toast("已超过退赛时间");
+    uni.$u.toast("已超过退赛时间");
     return;
   }
   refundDialogRef.value.open();
@@ -391,7 +391,7 @@ const confirmRefund = () => {
   console.log("confirmRefund");
 
   if (!detail.value.order_no) {
-    proxy.$toast("订单号不存在");
+    uni.$u.toast("订单号不存在");
     refundDialogRef.value.close();
     return;
   }
@@ -414,14 +414,14 @@ const confirmRefund = () => {
       refundDialogRef.value.close();
       // 显示后端返回的消息
       const message = res.msg || res.message || res.data || JSON.stringify(res);
-      proxy.$toast(message);
+      uni.$u.toast(message);
     })
     .catch((err) => {
       uni.hideLoading();
       refundDialogRef.value.close();
       // 显示后端返回的错误消息
       const errorMessage = err.msg || err.message || err.data || JSON.stringify(err);
-      proxy.$toast(errorMessage);
+      uni.$u.toast(errorMessage);
     });
 };
 
@@ -431,14 +431,14 @@ const closeRefund = () => {
 
 const viewBib = (signInfo) => {
   if (!signInfo?.bib_url) {
-    return proxy.$toast("暂无号码布");
+    return uni.$u.toast("暂无号码布");
   }
   uni.$u.route(`pagesSub/settings/webView?link=${signInfo.bib_url}`);
 };
 
 const viewCertificate = (signInfo) => {
   if (!signInfo?.certificate_url) {
-    return proxy.$toast("暂无完赛证书");
+    return uni.$u.toast("暂无完赛证书");
   }
   uni.$u.route(
     `pagesSub/settings/webView?link=${signInfo.certificate_url}`

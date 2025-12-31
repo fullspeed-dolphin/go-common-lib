@@ -172,7 +172,7 @@ const payOrder = (item) => {
     paySign: respay.paySign,
     success: (res) => {
       uni.hideLoading();
-      proxy.$toast("支付成功");
+      uni.$u.toast("支付成功");
       setTimeout(() => {
         // uni.navigateBack()
         uni.$u.route("pagesSub/signUpStatus?order_no=" + item.order_no);
@@ -181,7 +181,7 @@ const payOrder = (item) => {
     fail: (res) => {
       uni.hideLoading();
       console.log("res======>", res);
-      proxy.$toast("支付未完成");
+      uni.$u.toast("支付未完成");
       setTimeout(() => {
         // uni.navigateBack()
         uni.$u.route("pagesSub/signUpStatus?order_no=" + item.order_no);
