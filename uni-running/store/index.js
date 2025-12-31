@@ -1,6 +1,5 @@
 import { createStore } from 'vuex'
-import axios from "@/utils/request.js"
-import { clearUserInfo } from "@/utils/util.js"
+import request from "@/utils/request.js"
 
 const store = createStore({
     state() {
@@ -22,7 +21,7 @@ const store = createStore({
         async getUserInfo({commit}) {
             if (!uni.getStorageSync('token')) return {}
             try {
-                const res = await axios.get('/user-api/user')
+                const res = await request.get('/user-api/user')
                 uni.setStorageSync('userInfo', res)
                 commit('set', {
                     type: 'userInfo',

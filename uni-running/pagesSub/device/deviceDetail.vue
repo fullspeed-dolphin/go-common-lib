@@ -92,14 +92,9 @@
 <script setup>
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
-import { getCurrentInstance } from "vue";
 import CommonDialog from "@/components/common/CommonDialog.vue";
 import { gaoChi, huaWei, jiaMing } from "./deviceBind.js";
 
-// 获取当前实例以访问全局属性
-const { proxy } = getCurrentInstance();
-
-// 模板引用
 const refCommonDialog = ref(null);
 
 // 响应式数据

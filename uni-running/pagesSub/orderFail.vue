@@ -30,10 +30,8 @@
 <script setup>
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
-import { getCurrentInstance } from "vue";
 import Navbar from "@/components/navbar.vue";
-// 获取当前实例以访问全局属性
-const { proxy } = getCurrentInstance();
+import request from "@/utils/request.js"
 
 // 响应式数据
 const detail = ref({
@@ -80,8 +78,7 @@ const getOrderDetail = () => {
     order_no: order_no.value,
   };
 
-  proxy.$axios
-    .post(`/pay/order/status`, data)
+  request.post(`/pay/order/status`, data)
     .then((res) => {
       console.log("订单详情 res", res);
       detail.value = res;
@@ -89,8 +86,7 @@ const getOrderDetail = () => {
       if (!detail.value.sign_info) {
         detail.value.sign_info = {};
       }
-      proxy.$axios
-        .get(`/event-api/api/v1/events/${res.event_id}`)
+      request.get(`/event-api/api/v1/events/${res.event_id}`)
         .then((eventRes) => {
           detail.value.event_info = eventRes;
         });

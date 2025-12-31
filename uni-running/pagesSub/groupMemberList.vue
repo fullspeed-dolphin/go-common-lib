@@ -23,13 +23,11 @@
 <script setup>
 import { ref, nextTick } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
-import { getCurrentInstance } from "vue";
+import request from "@/utils/request.js"
 import { onPageScroll, onReachBottom } from "@dcloudio/uni-app";
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 const { mescrollInit, downCallback } = useMescroll(onPageScroll, onReachBottom);
 
-// 获取当前实例以访问全局属性
-const { proxy } = getCurrentInstance();
 
 // 模板引用
 const mescrollRef = ref(null);
@@ -52,8 +50,7 @@ const getList = (mescroll) => {
     groupId: Number(group_id.value),
   };
 
-  proxy.$axios
-    .post(`/running-group/api/v1/groups/members`, data)
+  request.post(`/running-group/api/v1/groups/members`, data)
     .then(async (res) => {
       //联网成功的回调,隐藏下拉刷新和上拉加载的状态;
       mescroll.endSuccess(res.memberships.length);

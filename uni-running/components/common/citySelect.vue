@@ -23,12 +23,8 @@
 </template>
 <script setup>
 import { ref, watch, onMounted } from 'vue'
-import { getCurrentInstance } from 'vue'
+import request from "@/utils/request.js"
 
-// 获取当前实例以访问全局属性
-const { proxy } = getCurrentInstance()
-
-// Props定义
 const props = defineProps({
 	title: {
 		type: String,
@@ -166,7 +162,7 @@ const getList = (level = 0, address) => {
 	const type = ["province", "city", "district"][level];
 
 	tabListData[level].isLoading = true;
-	proxy.$axios.get(`/system/admin/dict/type/${type}`, data).then((res) => {
+	request.get(`/system/admin/dict/type/${type}`, data).then((res) => {
 		isFirstOpen.value = true;
 		tabListData[level].addressList = res;
 		tabListData[level].isLoading = false;
@@ -182,7 +178,7 @@ const getAddressString = async (locationCode1, table1 = []) => {
 
 	console.log("locationCode=======>", locationCode);
 
-	const ProvinceList = await proxy.$axios.get(
+	const ProvinceList = await request.get(
 		`/system/admin/dict/type/province`
 	);
 	let provice = "";
@@ -208,7 +204,7 @@ const getAddressString = async (locationCode1, table1 = []) => {
 		const data = {
 			code: locationCode[0],
 		};
-		const Cities = await proxy.$axios.get(
+		const Cities = await request.get(
 			`/system/admin/dict/type/city`,
 			data
 		);
@@ -234,7 +230,7 @@ const getAddressString = async (locationCode1, table1 = []) => {
 		const data = {
 			code: locationCode[1],
 		};
-		const Districts = await proxy.$axios.get(
+		const Districts = await request.get(
 			`/system/admin/dict/type/district`,
 			data
 		);

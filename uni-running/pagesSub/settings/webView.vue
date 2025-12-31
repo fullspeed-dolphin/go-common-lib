@@ -6,12 +6,7 @@
 <script setup>
 import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
-import { getCurrentInstance } from 'vue'
-
-// 获取当前实例以访问全局属性
-const { proxy } = getCurrentInstance()
-
-// 响应式数据
+import request from "@/utils/request.js"
 const link = ref("")
 
 // 页面加载
@@ -25,7 +20,7 @@ const getDetail = (ID) => {
 	const data = {
 		CallIndex: "RentalServices"
 	}
-	proxy.$axios.post(`/client/article/detail/callindex`, data).then(res => {
+	request.post(`/client/article/detail/callindex`, data).then(res => {
 		// detail.value = res
 		
 		uni.setNavigationBarTitle({

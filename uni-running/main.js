@@ -28,9 +28,6 @@ export function createApp() {
 
 	// console.log(uni.$u)
 
-	// 配置全局属性
-	app.config.globalProperties.$axios = request
-
 	// 获取用户信息
 	store.dispatch('getUserInfo')
 

@@ -152,16 +152,11 @@
 import { ref, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { useStore } from "vuex";
-import { getCurrentInstance } from "vue";
+import request from "@/utils/request.js"
 import Navbar from "@/components/navbar.vue";
 
-// 获取当前实例以访问全局属性
-const { proxy } = getCurrentInstance();
-
-// 使用store
 const store = useStore();
 
-// 模板引用
 const uForm = ref(null);
 
 // 响应式数据
@@ -282,8 +277,7 @@ const getInfo = () => {
   const data = {
     phone_number: userInfo.value.phone,
   };
-  proxy.$axios
-    .post("/booking-api/registration/getSignerInfo", data)
+  request.post("/booking-api/registration/getSignerInfo", data)
     .then((res) => {
       console.log(res);
       signerId.value = res.id;
@@ -371,8 +365,7 @@ const submit = () => {
 
     return;
 
-    proxy.$axios
-      .post(
+    request.post(
         `/booking-api/registration/${
           signerId.value ? "updateSignerInfo" : "saveSignerInfo"
         }`,

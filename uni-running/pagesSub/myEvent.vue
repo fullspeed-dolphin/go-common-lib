@@ -19,10 +19,7 @@
 </template>
 <script setup>
 import { ref } from 'vue'
-import { getCurrentInstance } from 'vue'
-
-// 获取当前实例以访问全局属性
-const { proxy } = getCurrentInstance()
+import request from "@/utils/request.js"
 
 // 响应式数据
 const isSignUp = ref(false)
@@ -42,7 +39,7 @@ const cancelSignUp = () => {
 		content: '确定取消报名吗？',
 		success: (res) => {
 			if (res.confirm) {
-				proxy.$axios({url: "api/index/logout"}).then(res => {
+				request.post({url: "api/index/logout"}).then(res => {
 					uni.$u.toast('已取消报名')
 				})
 			} else if (res.cancel) {

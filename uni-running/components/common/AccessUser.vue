@@ -86,14 +86,10 @@
 <script setup>
 import { ref } from "vue";
 import { useStore } from "vuex";
-import { getCurrentInstance } from "vue";
 import { baseLink } from "@/utils/config.js";
 import { uploadToken } from "../../utils/config";
+import request from "@/utils/request.js"
 
-// 获取当前实例以访问全局属性
-const { proxy } = getCurrentInstance();
-
-// 使用store
 const store = useStore();
 
 // Emits
@@ -187,7 +183,7 @@ const submit = async () => {
     uni.setStorageSync("token", store.state.globalToken);
   }
 
-  proxy.$axios.post(`/user-api/user/updateUserInfo`, data).then((res) => {
+  request.post(`/user-api/user/updateUserInfo`, data).then((res) => {
     // 去除缓存 token
     store.commit({
       type: "globalToken",

@@ -179,14 +179,12 @@
 <script setup>
 import { ref, onUnmounted, watch, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
-import { getCurrentInstance } from "vue";
+import request from "@/utils/request.js"
 import CommonDialog from "@/components/common/CommonDialog.vue";
 import dayjs from "dayjs";
 import Navbar from "@/components/navbar.vue";
 
 const refundDialogRef = ref(null);
-// 获取当前实例以访问全局属性
-const { proxy } = getCurrentInstance();
 
 // 响应式数据
 const detail = ref({
@@ -339,8 +337,7 @@ const getOrderDetail = () => {
     order_no: order_no.value,
   };
 
-  proxy.$axios
-    .post(`/pay/order/status`, data)
+  request.post(`/pay/order/status`, data)
     .then((res) => {
       console.log("订单详情 res", res);
 
@@ -358,8 +355,7 @@ const getOrderDetail = () => {
         detail.value.sign_info_list = [];
       }
 
-      proxy.$axios
-        .get(`/event-api/api/v1/events/${res.event_id}`)
+      request.get(`/event-api/api/v1/events/${res.event_id}`)
         .then((eventRes) => {
           detail.value.event_info = eventRes;
           // 事件信息加载后启动倒计时
@@ -407,8 +403,7 @@ const confirmRefund = () => {
     refund_amount: detail.value.amount,
   };
 
-  proxy.$axios
-    .post(`/pay/wechat/refund`, params)
+  request.post(`/pay/wechat/refund`, params)
     .then((res) => {
       uni.hideLoading();
       refundDialogRef.value.close();

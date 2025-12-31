@@ -33,13 +33,10 @@
 <script setup>
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
-import { getCurrentInstance } from "vue";
+import request from "@/utils/request.js"
 import { onPageScroll, onReachBottom } from "@dcloudio/uni-app";
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 const { mescrollInit, downCallback } = useMescroll(onPageScroll, onReachBottom);
-
-// 获取当前实例以访问全局属性
-const { proxy } = getCurrentInstance();
 
 const getList = (mescroll) => {
   uni.showLoading({ mask: true });
@@ -48,8 +45,7 @@ const getList = (mescroll) => {
     Size: "10",
   };
 
-  proxy.$axios
-    .post(`/api/store/purchase/order/list?page=${mescroll.num}`, data)
+  request.post(`/api/store/purchase/order/list?page=${mescroll.num}`, data)
     .then(async (res) => {
       uni.hideLoading();
 

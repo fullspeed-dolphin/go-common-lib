@@ -91,14 +91,7 @@
 		onMounted,
 		computed
 	} from "vue";
-	import {
-		onLoad,
-		onShow,
-		onPageScroll
-	} from "@dcloudio/uni-app";
-	import {
-		getCurrentInstance
-	} from "vue";
+
 	import {
 		useStore
 	} from "vuex";
@@ -106,15 +99,8 @@
 	import Navbar from "@/components/navbar.vue";
 	import UserLogin from "@/components/UserLogin.vue";
 
-	// 使用store
 	const store = useStore();
 
-	// 获取当前实例以访问全局属性
-	const {
-		proxy
-	} = getCurrentInstance();
-
-	// 模板引用
 	const refUserLogin = ref(null);
 
 	// 地图中心点坐标

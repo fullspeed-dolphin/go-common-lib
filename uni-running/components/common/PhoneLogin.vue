@@ -82,10 +82,7 @@
 <script setup>
 import { ref } from "vue";
 import { useStore } from "vuex";
-import { getCurrentInstance } from "vue";
-
-// 获取当前实例以访问全局属性
-const { proxy } = getCurrentInstance();
+import request from "@/utils/request.js"
 
 // 使用store
 const store = useStore();
@@ -139,7 +136,7 @@ const getPhoneNumber = async ({ detail }) => {
   };
 
   try {
-    const res = await proxy.$axios.post("/wechat-login/login", data);
+    const res = await request.post("/wechat-login/login", data);
 
     uni.$u.toast("登录成功");
     uni.setStorageSync("token", res.sessionToken);

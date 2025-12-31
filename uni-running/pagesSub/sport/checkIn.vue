@@ -101,14 +101,10 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { getCurrentInstance } from "vue";
 import Navbar from "@/components/navbar.vue";
 import { staticBaseUrl } from "@/utils/config";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
-
-// 获取当前实例以访问全局属性
-const { proxy } = getCurrentInstance();
 
 // 日历相关
 const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
@@ -247,12 +243,6 @@ const handleDayClick = (day) => {
 // 加载打卡数据
 const loadCheckInData = async () => {
   try {
-    // 这里应该调用API获取打卡记录
-    // const res = await proxy.$axios.get('/sport-api/checkin', {
-    //   year: currentYear.value,
-    //   month: currentMonth.value + 1
-    // });
-    // checkInRecords.value = res.data || [];
     const res = await request.get(`/sport-api/api/manual/getRecordByMonth`, {
       month: `${currentYear.value}-${String(currentMonth.value + 1).padStart(
         2,
@@ -290,9 +280,6 @@ const taskList = ref([
 // 加载任务列表
 const loadTaskList = async () => {
   try {
-    // 这里应该调用API获取任务列表
-    // const res = await proxy.$axios.get('/sport-api/tasks');
-    // taskList.value = res.data || [];
   } catch (error) {
     console.error("加载任务列表失败:", error);
   }

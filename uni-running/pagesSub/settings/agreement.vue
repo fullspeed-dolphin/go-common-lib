@@ -6,7 +6,7 @@
 <script setup>
 import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
-import { getCurrentInstance } from 'vue'
+import request from "@/utils/request.js"
 import agree_signUp from "../utils/agree_signUp.js"
 import agree_privy from "../utils/agree_privy.js"
 import faceScanPolicy from "../utils/faceScanPolicy.js"
@@ -15,10 +15,6 @@ import notices_ShuiLianHu from "../utils/notices_ShuiLianHu.js"
 import rule_ShuiLianHu from "../utils/rule_ShuiLianHu.js"
 import disclaimer_ShuiLianHu from "../utils/disclaimer_ShuiLianHu.js"
 
-// 获取当前实例以访问全局属性
-const { proxy } = getCurrentInstance()
-
-// 响应式数据
 const detail = ref({
 	Content: ""
 })
@@ -66,7 +62,7 @@ const getDetail = (ID) => {
 	const data = {
 		CallIndex: "RentalServices"
 	}
-	proxy.$axios.post(`/client/article/detail/callindex`, data).then(res => {
+	request.post(`/client/article/detail/callindex`, data).then(res => {
 		detail.value = res
 		
 		uni.setNavigationBarTitle({

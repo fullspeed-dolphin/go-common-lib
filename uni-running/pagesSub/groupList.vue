@@ -47,19 +47,14 @@
 	import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 	const { mescrollInit, downCallback, getMescroll } = useMescroll(onPageScroll, onReachBottom)
 
+	import request from "@/utils/request.js"
 	import {
 		useStore
 	} from "vuex";
-	import {
-		getCurrentInstance
-	} from "vue";
+
 	import GroupItem from "@/components/GroupItem.vue";
 	import UserLogin from "@/components/UserLogin.vue";
 
-	// 获取当前实例以访问全局属性
-	const {
-		proxy
-	} = getCurrentInstance();
 
 	// 使用store
 	const store = useStore();
@@ -179,8 +174,7 @@
 			keyword: searchTxt.value,
 			type: curTab.value.value === 1 ? "nearby" : "hot", // 根据标签页类型传参
 		};
-		proxy.$axios
-			.get(`/running-group/api/v1/groups/list`, data)
+		request.get(`/running-group/api/v1/groups/list`, data)
 			.then((res) => {
 				uni.hideLoading();
 

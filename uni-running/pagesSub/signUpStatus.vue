@@ -44,10 +44,7 @@
 <script setup>
 import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
-import { getCurrentInstance } from 'vue'
-
-// 获取当前实例以访问全局属性
-const { proxy } = getCurrentInstance()
+import request from "@/utils/request.js"
 
 // 响应式数据
 const isSuccess = ref(false)
@@ -72,8 +69,8 @@ const getOrder = () => {
 	const data = {
 		order_no: order_no.value
 	}
-	
-	proxy.$axios.post(`/pay/order/status`, data).then(res => {
+
+	request.post(`/pay/order/status`, data).then(res => {
 		console.log("res", res)
 		orderDetail.value = res;
 		isSuccess.value = res.status === 'SUCC';

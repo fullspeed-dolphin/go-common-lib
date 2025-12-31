@@ -34,12 +34,8 @@
 <script setup>
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
-import { getCurrentInstance } from "vue";
 import Navbar from "@/components/navbar.vue";
-// 获取当前实例以访问全局属性
-const { proxy } = getCurrentInstance();
 
-// 响应式数据
 const detail = ref({
   event_info: {},
   sign_info: {},

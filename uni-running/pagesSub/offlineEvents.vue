@@ -122,19 +122,11 @@
 	import {
 		useStore
 	} from "vuex";
-	import {
-		getCurrentInstance
-	} from "vue";
 	import PhoneLogin from "@/components/common/PhoneLogin.vue";
 	import Navbar from "@/components/navbar.vue";
 	import dayjs from "dayjs";
+	import request from "@/utils/request.js"
 
-	// 获取当前实例以访问全局属性
-	const {
-		proxy
-	} = getCurrentInstance();
-
-	// 使用store
 	const store = useStore();
 
 	// 模板引用
@@ -220,8 +212,7 @@
 		uni.showLoading({
 			mask: true,
 		});
-		proxy.$axios
-			.get(`/event-api/api/v1/events/${routerParams.value.id}`)
+		request.get(`/event-api/api/v1/events/${routerParams.value.id}`)
 			.then((res) => {
 				res.text = `<img src="${res.long_image_url}?x-oss-process=image/resize,w_500" style="max-width:100%;" />`;
 				res.eventItems = res.event_projects.split("、");
@@ -265,11 +256,7 @@
 			content: "确定取消报名吗？",
 			success: (res) => {
 				if (res.confirm) {
-					proxy.$axios({
-						url: "api/index/logout"
-					}).then((res) => {
-						uni.$u.toast("已取消报名");
-					});
+					
 				} else if (res.cancel) {
 					console.log("用户点击取消");
 				}

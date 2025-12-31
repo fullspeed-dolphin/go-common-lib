@@ -175,14 +175,11 @@
 
 <script setup>
 import Navbar from "@/components/navbar.vue";
-import { ref, computed, onMounted, getCurrentInstance } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import store from "@/store/index.js";
 
-const { proxy } = getCurrentInstance();
-
-// 地图相关
 const mapCenter = ref({
   latitude: 39.908823,
   longitude: 116.39747,
