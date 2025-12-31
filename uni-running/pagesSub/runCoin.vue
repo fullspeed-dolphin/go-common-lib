@@ -1,6 +1,6 @@
 <template>
   <view class="pt20">
-    <Navbar title="我的跑币" :bgHeight="666" :back="false" />
+    <u-navbar title="我的跑币" placeholder />
 
     <view class="col content">
       <image
@@ -122,7 +122,6 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useStore } from "vuex";
-import Navbar from "@/components/navbar.vue";
 
 // 使用store
 const store = useStore();

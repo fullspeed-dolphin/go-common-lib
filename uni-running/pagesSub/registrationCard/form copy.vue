@@ -1,6 +1,6 @@
 <template>
 	<view class="page">
-		<Navbar :title="pageTitle" :bgHeight="370" />
+		<u-navbar :title="pageTitle" placeholder />
 		<!-- <view class="form-tip">所有信息均为必填项</view> -->
 		<up-form ref="formRef" :model="form" :rules="formRules" labelWidth="150rpx">
 			<view class="section">
@@ -187,7 +187,6 @@
 	import {
 		onLoad
 	} from "@dcloudio/uni-app";
-	import Navbar from "@/components/navbar.vue";
 	import PickerCell from "@/components/common/PickerCell.vue";
 	import dayjs from "dayjs";
 	import {

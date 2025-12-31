@@ -1,6 +1,6 @@
 <template>
   <view class="page">
-    <Navbar title="运动打卡记录" :bgHeight="370" />
+    <u-navbar title="运动打卡记录" placeholder />
 
     <view class="content">
       <!-- 日历模块 -->
@@ -101,7 +101,6 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import Navbar from "@/components/navbar.vue";
 import { staticBaseUrl } from "@/utils/config";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";

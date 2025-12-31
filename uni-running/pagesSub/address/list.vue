@@ -1,6 +1,6 @@
 <template>
   <view class="page">
-    <Navbar title="选择地址" :bgHeight="370" />
+    <u-navbar title="选择地址" placeholder />
     <view v-if="!addressList.length" class="flex-col-center section-empty">
       <view class="empty-text">暂无地址信息</view>
     </view>
@@ -41,7 +41,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { onShow } from "@dcloudio/uni-app";
-import Navbar from "@/components/navbar.vue";
 import request from "@/utils/request.js";
 
 const addressList = ref([

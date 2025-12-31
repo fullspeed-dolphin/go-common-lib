@@ -1,6 +1,6 @@
 <template>
   <view class="page">
-    <Navbar :title="detail.event_info?.name || ''" placeholder />
+    <u-navbar :title="detail.event_info?.name || ''" placeholder />
     <view class="header">
       <view class="title">
         <view>报名成功！</view>
@@ -182,7 +182,6 @@ import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js"
 import CommonDialog from "@/components/common/CommonDialog.vue";
 import dayjs from "dayjs";
-import Navbar from "@/components/navbar.vue";
 
 const refundDialogRef = ref(null);
 

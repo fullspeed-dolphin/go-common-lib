@@ -1,6 +1,6 @@
 <template>
   <view>
-    <Navbar title="运动记录" :bgHeight="370" />
+    <u-navbar title="运动记录" placeholder />
 
     <view class="container">
       <section class="section-dashboard">
@@ -71,7 +71,6 @@
   </view>
 </template>
 <script setup>
-import Navbar from "@/components/navbar.vue";
 import SportItem from "@/components/SportItem.vue";
 import { ref, onMounted } from "vue";
 

@@ -175,7 +175,6 @@
 		useStore
 	} from "vuex";
 	import UserLogin from "@/components/UserLogin.vue";
-	import Navbar from "@/components/navbar.vue";
 	import EventItem from "@/components/EventItem.vue";
 	import request from "@/utils/request.js"
 

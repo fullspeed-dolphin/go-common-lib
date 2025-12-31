@@ -1,7 +1,7 @@
 <template>
   <view class="page">
-    <Navbar :title="detail.event_info?.name || ''" placeholder />
-
+    <u-navbar :title="detail.event_info?.name || ''" placeholder />
+    
     <view class="header">
       <view class="header-icon">
         <u-icon name="checkbox-mark" size="24" color="#8cc63e"></u-icon>
@@ -34,7 +34,6 @@
 <script setup>
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
-import Navbar from "@/components/navbar.vue";
 
 const detail = ref({
   event_info: {},

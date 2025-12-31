@@ -1,6 +1,6 @@
 <template>
   <view class="">
-    <Navbar title="智能设备" :bgHeight="370" />
+    <u-navbar title="智能设备" :bgHeight="370" />
     <view
       v-if="!deviceList.length"
       class="flex-col-center section-empty"
@@ -45,7 +45,6 @@
 <script setup>
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
-import Navbar from "@/components/navbar.vue";
 
 // 响应式数据
 const deviceList = ref([

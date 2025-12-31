@@ -1,6 +1,6 @@
 <template>
   <view>
-    <Navbar title="添加设备" :bgHeight="370" />
+    <u-navbar title="添加设备" placeholder/>
     <view class="" style="padding-top: 50rpx">
       <view
         v-if="options.value"
@@ -93,7 +93,6 @@
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import CommonDialog from "@/components/common/CommonDialog.vue";
-import Navbar from "@/components/navbar.vue";
 import { gaoChi, huaWei, jiaMing } from "./deviceBind.js";
 
 // 模板引用

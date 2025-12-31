@@ -1,6 +1,6 @@
 <template>
   <view class="page">
-    <Navbar :title="pageTitle" :bgHeight="370" />
+    <u-navbar :title="pageTitle" placeholder />
     <view class="form container">
       <view class="section">
         <view class="section-content">
@@ -100,7 +100,6 @@
 
 <script setup>
 import { ref, computed, watch, reactive } from "vue";
-import Navbar from "@/components/navbar.vue";
 
 const props = defineProps({
   modelValue: {

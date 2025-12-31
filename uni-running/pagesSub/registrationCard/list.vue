@@ -1,6 +1,6 @@
 <template>
   <view class="">
-    <Navbar :title="isSelectMode ? '请选择报名卡' : '报名卡'" :bgHeight="370" />
+    <u-navbar :title="isSelectMode ? '请选择报名卡' : '报名卡'" placeholder />
     <view
       v-if="!registrationCardList.length && !loading"
       class="flex-col-center section-empty"
@@ -75,7 +75,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
-import Navbar from "@/components/navbar.vue";
 import request from "@/utils/request.js";
 import { showRequestError } from "./utils.js";
 

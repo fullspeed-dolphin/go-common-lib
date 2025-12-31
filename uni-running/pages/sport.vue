@@ -96,7 +96,6 @@
 		useStore
 	} from "vuex";
 	import tabbar from "@/components/tabBar.vue";
-	import Navbar from "@/components/navbar.vue";
 	import UserLogin from "@/components/UserLogin.vue";
 
 	const store = useStore();

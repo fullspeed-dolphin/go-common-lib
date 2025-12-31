@@ -1,6 +1,6 @@
 <template>
   <view class="page">
-    <Navbar title="跑步轨迹" />
+    <u-navbar title="跑步轨迹" />
 
     <!-- 地图容器 -->
     <view class="map-container">
@@ -157,8 +157,6 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
-// import runningApi from '@/utils/runningApi.js'
-import Navbar from "@/components/navbar.vue";
 import request from "@/utils/request.js";
 
 // 地图相关

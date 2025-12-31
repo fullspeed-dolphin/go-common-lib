@@ -174,7 +174,6 @@
 </template>
 
 <script setup>
-import Navbar from "@/components/navbar.vue";
 import { ref, computed, onMounted } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";

@@ -1,6 +1,7 @@
 <template>
   <view class="page">
-    <Navbar :title="detail.event_info?.name || ''" placeholder />
+    <u-navbar :title="detail.event_info?.name || ''" placeholder />
+
     <view class="header">
       <view class="title">
         <view>报名失败！</view>
@@ -30,7 +31,6 @@
 <script setup>
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
-import Navbar from "@/components/navbar.vue";
 import request from "@/utils/request.js"
 
 // 响应式数据

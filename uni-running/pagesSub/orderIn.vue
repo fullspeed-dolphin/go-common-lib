@@ -144,7 +144,6 @@
 	} from "vuex";
 	import PickerCell from "@/components/common/PickerCell.vue"
 	import GroupList from "./components/groupList.vue";
-	import Navbar from "@/components/navbar.vue";
 	import SignerList from "./components/SignerList.vue"
 	import { asyncAlls } from "../utils/util";
 		import request from "@/utils/request.js"

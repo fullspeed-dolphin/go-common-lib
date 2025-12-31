@@ -123,7 +123,6 @@
 		useStore
 	} from "vuex";
 	import PhoneLogin from "@/components/common/PhoneLogin.vue";
-	import Navbar from "@/components/navbar.vue";
 	import dayjs from "dayjs";
 	import request from "@/utils/request.js"
 

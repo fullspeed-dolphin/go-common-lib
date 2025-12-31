@@ -50,10 +50,6 @@ const checkUpdate = () => {
 // onHide(() => {
 //   console.log("App Hide");
 // });
-onPageScroll((e) => {
-  console.log(e, "onPageScroll");
-  uni.$emit("pageScroll", e);
-});
 </script>
 
 <style lang="scss">

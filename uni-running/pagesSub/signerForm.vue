@@ -1,6 +1,6 @@
 <template>
   <view class="page">
-    <Navbar title="完善信息" :bgHeight="280" />
+    <u-navbar title="完善信息" placeholder />
     <view style="padding: 20rpx 34rpx">
       <u-form
         :model="form"
@@ -153,7 +153,6 @@ import { ref, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { useStore } from "vuex";
 import request from "@/utils/request.js"
-import Navbar from "@/components/navbar.vue";
 
 const store = useStore();
 

@@ -1,6 +1,6 @@
 <template>
   <view class="page">
-    <Navbar title="排行榜" :bgHeight="370" />
+    <u-navbar title="排行榜" placeholder />
     <view class="tab-container">
       <u-tabs
         lineHeight="2"
@@ -78,7 +78,6 @@
 <script setup>
 import { ref, computed, nextTick } from "vue";
 import { useStore } from "vuex";
-import Navbar from "@/components/navbar.vue";
 import GroupItem from "@/components/GroupItem.vue";
 import request from "@/utils/request.js";
 

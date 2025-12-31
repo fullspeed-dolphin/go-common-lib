@@ -89,7 +89,6 @@
 		onPageScroll,
 		onReachBottom
 	);
-	import Navbar from "@/components/navbar.vue";
 	import request from "@/utils/request.js";
 	import dayjs from "dayjs";
 

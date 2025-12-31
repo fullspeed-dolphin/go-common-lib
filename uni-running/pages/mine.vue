@@ -148,14 +148,7 @@
 	import tabbar from "@/components/tabBar.vue";
 	import UserLogin from "@/components/UserLogin.vue";
 	import AccessUser from "@/components/common/AccessUser.vue";
-	import Navbar from "@/components/navbar.vue";
 
-	// onPageScroll((e) => {
-	//   console.log(e, "onPageScroll mine");
-	//   handleScroll(e);
-	// });
-
-	// 使用store
 	const store = useStore();
 
 	// 模板引用

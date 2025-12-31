@@ -1,6 +1,6 @@
 <template>
   <view>
-    <Navbar title="添加设备" :bgHeight="370" />
+    <u-navbar title="添加设备" placeholder/>
     <view class="">
       <view
         class="brand-item flex-start"
@@ -17,7 +17,6 @@
 <script setup>
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
-import Navbar from "@/components/navbar.vue";
 // 响应式数据
 const brandList = ref([
   {
