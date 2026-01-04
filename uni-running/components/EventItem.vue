@@ -1,8 +1,8 @@
 <template>
 	<view class="event-item" @click="joinEvent">
-		<image class="poster"
-			:src="(item.image_url) + '?x-oss-process=image/resize,w_600,h_320,m_fill'"
-			mode="aspectFill"></image>
+		<up-lazy-load class="poster"
+			:image="(item.image_url) + '?x-oss-process=image/resize,w_600,h_320,m_fill'"
+			mode="aspectFill" />
 			
 		<view class="u-p-20">
 			<view class="event-item-title ellipsis2">{{ item.description }}</view>

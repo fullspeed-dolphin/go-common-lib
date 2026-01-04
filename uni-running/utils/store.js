@@ -1,7 +1,7 @@
 import { createStore } from 'vuex'
 import request from "@/utils/request.js"
 
-const store = createStore({
+export default createStore({
     state() {
         return {
             userInfo: uni.getStorageSync('userInfo') || {},
@@ -34,5 +34,3 @@ const store = createStore({
         }
     }
 })
-
-export default store

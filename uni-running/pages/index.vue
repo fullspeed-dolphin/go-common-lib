@@ -119,9 +119,6 @@
 		onShareTimeline
 	} from "@dcloudio/uni-app";
 	import {
-		getCurrentInstance
-	} from "vue";
-	import {
 		useStore
 	} from "vuex";
 	import tabbar from "@/components/tabBar.vue";
@@ -170,7 +167,7 @@
 	};
 
 	// 页面加载
-	onLoad((options) => {
+	onLoad((options) => {		
 		// #ifdef MP-WEIXIN
 		wx.showShareMenu({
 			withShareTicket: true,
