@@ -2,7 +2,7 @@ import {
 	createSSRApp
 } from 'vue'
 import App from './App'
-import store from './store'
+import store from './utils/store'
 
 // 引入全局uView
 import uviewPlus from '@/uni_modules/uview-plus/index.js'

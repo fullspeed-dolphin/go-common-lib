@@ -275,12 +275,6 @@
             "navigationStyle": "custom",
             "navigationBarTitleText": "编辑地址"
           }
-        },
-        {
-          "path": "angelForm",
-          "style": {
-            "navigationBarTitleText": "全速天使招募"
-          }
         }
       ]
     }
