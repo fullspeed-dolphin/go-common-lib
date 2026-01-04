@@ -541,12 +541,20 @@ export function queryParams(data = {}, isPrefix = true, arrayFormat = 'brackets'
  * @param {String} title 提示的内容，长度与 icon 取值有关。
  * @param {Number} duration 提示的延迟时间，单位毫秒，默认：2000
  */
-export function toast(title, duration = 2000) {
-	uni.showToast({
-		title: String(title),
-		icon: 'none',
-		duration
-	})
+export function toast(text, duration = 2000) {
+	const title = String(text)
+	if (title.length <= 10) {
+		uni.showToast({
+			title: title,
+			icon: 'none',
+			duration
+		})
+	} else {
+		uni.showModal({
+			title: '提示',
+			content: title
+		})
+	}
 }
 
 /**
