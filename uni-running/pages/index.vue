@@ -236,7 +236,7 @@
 			return;
 		}
 		if (item.redirect_url) {
-			uni.$u.route(`pagesSub/settings/webView?link=${item.redirect_url}`);
+			uni.$u.route(`pagesSub/settings/webView?link=${encodeURIComponent(item.redirect_url)}&title=${encodeURIComponent(item.description || '跑了没')}`);
 			return;
 		}
 	};

@@ -11,24 +11,30 @@
 </template>
 <script setup>
 	import {
-		ref,
-		computed
+		ref
 	} from 'vue'
 	import {
 		onShow,
 	} from "@dcloudio/uni-app";
 	import request from "@/utils/request.js"
 
-	// 获取小程序运行环境：develop(开发版)、trial(体验版)、release(正式版)
-	const envVersion = uni?.getAccountInfoSync?.().miniProgram.envVersion;
-
 	// 只在正式版中显示，开发版和体验版中隐藏（用于规避审核）
-	const shouldShow = computed(() => {
+	// 直接在组件中获取环境版本，确保准确
+	let shouldShow = false;
+	// #ifdef MP-WEIXIN
+	try {
+		const accountInfo = uni.getAccountInfoSync();
+		const envVersion = accountInfo.miniProgram.envVersion;
 		// release: 正式版（显示）
 		// develop: 开发者工具（不显示）
 		// trial: 体验版（不显示）
-		return envVersion === 'release';
-	});
+		shouldShow = envVersion === 'release';
+		console.log('[HomeNavigator] envVersion:', envVersion, 'shouldShow:', shouldShow);
+	} catch (e) {
+		console.error('[HomeNavigator] 获取环境版本失败:', e);
+		shouldShow = false;
+	}
+	// #endif
 
 	const navList = ref([])
 	// 页面显示
