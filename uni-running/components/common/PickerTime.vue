@@ -9,8 +9,10 @@
       isLink
     />
     <u-datetime-picker
-      mode="date"
+      :mode="mode"
       :show="isShowPop"
+			:minDate="minDate"
+			:maxDate="maxDate"
       title="选择时间"
       v-model="timeValue"
       @cancel="isShowPop = false"
@@ -27,6 +29,18 @@ const props = defineProps({
   title: {
     type: String,
     default: "",
+  },
+  minDate: {
+    type: String,
+    default: "",
+  },
+  maxDate: {
+    type: String,
+    default: "",
+  },
+  mode: {
+    type: String,
+    default: "date",
   },
   placeholder: {
     type: String,
@@ -55,7 +69,7 @@ const timeValue = ref("");
 
 // 计算属性
 const displayTime = computed(() => {
-  return dayjs(timeValue.value).format("YYYY-MM-DD");
+  return dayjs(timeValue.value).format("YYYY-MM-DD HH:mm");
 });
 
 // 监听value变化
@@ -97,14 +111,9 @@ defineExpose({
 .pickerTime {
   width: 100%;
   max-width: 100%;
-  display: block;
-  box-sizing: border-box;
   ::v-deep {
     .u-cell {
       width: 100% !important;
-      max-width: 100% !important;
-      display: block !important;
-      box-sizing: border-box !important;
     }
   }
 }

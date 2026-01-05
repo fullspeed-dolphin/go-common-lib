@@ -2,7 +2,7 @@
 	<view class="index-page">
 		<view class="header">
 			<view class="plaeholder" :style="{height: menuBtnInfo.placeholder} " ></view>
-			<view class="search-box flex-start" :style="menuBtnInfo" @click="$u.route('pagesSub/groupList')">
+			<view class="search-box flex-start" :style="menuBtnInfo" @click="$u.route('pagesSub/runningTeam/teamList')">
 				<u-icon name="search" size="24"></u-icon>
 				<view class="ml5">请输入名称或团号或地址</view>
 			</view>
@@ -67,7 +67,7 @@
 
 			<view class="section-title">
 				<view class="section-title-left">跑团风采</view>
-				<view class="section-title-right" @click="$u.route('pagesSub/groupList')">
+				<view class="section-title-right" @click="$u.route('pagesSub/runningTeam/teamList')">
 					<view class="section-title-right-item">查看更多</view>
 					<u-icon name="arrow-right" size="24rpx" color="#ff8c00"></u-icon>
 				</view>

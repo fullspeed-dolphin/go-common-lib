@@ -97,33 +97,14 @@
             "navigationBarTitleText": "我的活动"
           }
         },
-        {
-          "path": "groupList",
-          "style": {
-            "navigationStyle": "custom",
-            "navigationBarTitleText": "跑团招募"
-          }
-        },
-        {
-          "path": "groupDetail",
-          "style": {
-            "navigationStyle": "custom",
-            "navigationBarTitleText": "跑团详情"
-          }
-        },
-        {
-          "path": "groupForm",
-          "style": {
-            "navigationStyle": "custom",
-            "navigationBarTitleText": "创建跑团"
-          }
-        },
-        {
-          "path": "groupMemberList",
-          "style": {
-            "navigationBarTitleText": "跑团成员"
-          }
-        },
+        {"path": "runningTeam/teamList","style": { "navigationStyle": "custom","navigationBarTitleText": "跑团列表"}},
+        {"path": "runningTeam/teamDetail", "style": { "navigationStyle": "custom", "navigationBarTitleText": "跑团详情"}},
+        {"path": "runningTeam/teamForm","style": {"navigationStyle": "custom","navigationBarTitleText": "创建跑团"}},
+        {"path": "runningTeam/teamMemberList","style": {"navigationBarTitleText": "跑团成员"}},
+        {"path": "runningTeam/teamSetting","style": {"navigationBarTitleText": "跑团管理工具"}},
+        {"path": "runningTeam/teamEventForm","style": {"navigationBarTitleText": "跑团活动管理"}},
+        {"path": "runningTeam/teamSummary","style": {"navigationBarTitleText": "跑团数据"}},
+        {"path": "runningTeam/teamMaps","style": {"navigationBarTitleText": "跑团地图库"}},
         {
           "path": "sportDetail",
           "style": {

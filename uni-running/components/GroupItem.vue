@@ -101,8 +101,8 @@
 			return;
 		}
 
-		uni.setStorageSync("groupDetail", item);
-		uni.$u.route(`pagesSub/groupDetail?group_id=${item.group_id}`);
+		uni.setStorageSync("teamDetail", item);
+		uni.$u.route(`pagesSub/runningTeam/teamDetail?group_id=${item.group_id}`);
 	};
 
 	const joinGroup = (item) => {

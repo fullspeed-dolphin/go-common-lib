@@ -50,7 +50,7 @@
 				</u-cell>
 				<u-cell title="我的跑团" class="nav-cell" @click="
             routeTo(
-              `pagesSub/groupDetail?from=mine&group_id=${userInfo.running_group}`
+              `pagesSub/runningTeam/teamDetail?from=mine&group_id=${userInfo.running_group}`
             )
           " :border="false" isLink>
 					<template #icon>

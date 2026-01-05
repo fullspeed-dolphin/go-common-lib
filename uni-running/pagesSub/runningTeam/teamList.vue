@@ -131,7 +131,7 @@
 	// 方法定义
 	const viewDetail = (item) => {
 		uni.setStorageSync("orderDetail", item);
-		// uni.$u.route(`pagesSub/groupDetail?group_id=${item.group_id}`)
+		// uni.$u.route(`pagesSub/runningTeam/groupDetail?group_id=${item.group_id}`)
 	};
 
 	const openForm = () => {
@@ -143,11 +143,11 @@
 
 		if (userInfo.value.running_group) {
 			uni.$u.route(
-				`pagesSub/groupDetail?group_id=${userInfo.value.running_group}`
+				`pagesSub/runningTeam/groupDetail?group_id=${userInfo.value.running_group}`
 			);
 			return;
 		} else {
-			uni.$u.route(`pagesSub/groupForm`);
+			uni.$u.route(`pagesSub/runningTeam/teamForm`);
 		}
 	};
 

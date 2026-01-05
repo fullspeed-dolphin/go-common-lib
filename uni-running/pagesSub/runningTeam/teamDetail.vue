@@ -1,20 +1,20 @@
 <template>
 	<view>
-		<u-navbar :title="pageTitle" placeholder :bgColor="navBarBg"></u-navbar>
+		<u-navbar :title="null" bgColor="transparent"></u-navbar>
 
 		<mescroll-empty v-if="isEmpty" mode="data" :option="{
         btnText: '创建跑团',
-      }" @emptyclick="$u.route(`pagesSub/groupForm?from=mine`)" />
+      }" @emptyclick="$u.route(`pagesSub/runningTeam/teamForm?from=mine`)" />
 
 		<block v-if="!isEmpty">
-			<section class="flex-center" style="height: 432rpx;filter: blur(50px); ">
+			<section class="flex-center" style="height: 432rpx;filter: blur(50px);">
 				<image class="img" style="width:750rpx;height:432rpx;" :src="
 				    (detail.avatar_url ||
 				    'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_120,h_120,m_fill'
 				  " mode="aspectFill"></image>
 					
 			</section>
-			<section class="section-card flex-col-center" style="margin-top: -350rpx;">
+			<section class="section-card flex-col-center" style="margin-top: -180rpx;">
 				<image class="img" :src="
             (detail.avatar_url ||
             'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_120,h_120,m_fill'
@@ -89,7 +89,7 @@
 					<view style="width: 184rpx">
 						<u-button type="primary" color="#FF8C00" customStyle="width: 184rpx;height: 84rpx;" shape="circle"
 							@click="callPhone(memberLeader.user_phone)">
-							联系Ta
+							联系团长
 						</u-button>
 					</view>
 				</view>
@@ -133,7 +133,7 @@
 
 			<view class="" style="height: 120rpx"></view>
 
-			<section class="section-bottom flex-wrap u-flex flex-between-center">
+			<section class="section-bottom flex-center">
 				<button v-if="!isEmpty" class="share-btn flex-center" open-type="share">
 					分享跑团
 				</button>
@@ -144,7 +144,7 @@
 				</block>
 				<block v-if="detail.user_role === 'creator'">
 					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;"
-						@click="updateGroup()">更新跑团</u-button>
+						@click="$u.route(`pagesSub/runningTeam/teamSetting?group_id=${detail.group_id}`)">跑团管理工具</u-button>
 				</block>
 				<block v-if="detail.user_role === 'member'">
 					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;"
@@ -177,7 +177,7 @@
 	import UserLogin from "@/components/UserLogin.vue";
 	import EventItem from "@/components/EventItem.vue";
 	import request from "@/utils/request.js"
-
+			
 	// 使用store
 	const store = useStore();
 
@@ -252,7 +252,7 @@
 	// 方法定义
 	const viewMoreMembers = () => {
 		uni.$u.route(
-			`pagesSub/groupMemberList?group_id=${routeParams.value.group_id}`
+			`pagesSub/runningTeam/teamMemberList?group_id=${routeParams.value.group_id}`
 		);
 	};
 
@@ -317,48 +317,6 @@
 							getDetail();
 							uni.$u.toast("加入成功！");
 						});
-				} else if (res.cancel) {
-					console.log("用户点击取消");
-				}
-			},
-		});
-	};
-
-	const updateGroup = () => {
-		uni.$u.route(`pagesSub/groupForm?group_id=${detail.value.group_id}`);
-	};
-
-	const deleteGroup = () => {
-		uni.showModal({
-			title: "提示",
-			content: "是否确认删除该跑团？",
-			success: (res) => {
-				if (res.confirm) {
-					uni.showLoading({
-						mask: true
-					});
-					request.delete(
-							`/running-group/api/v1/groups?group_id=${detail.value.group_id}`
-						)
-						.then((res) => {
-							uni.$u.toast("删除成功！");
-
-							// 调用用户数据，检查参加或创建跑团标记
-							store.dispatch("getUserInfo");
-
-							setTimeout(() => {
-								uni.navigateBack();
-							}, 300);
-						}).catch(e => {
-							uni.hideLoading()
-							uni.showModal({
-								title: '提示',
-								content: e.msg,
-								showCancel: false, // 如果不需要“取消”按钮
-								confirmText: '我知道了'
-							});
-							console.log(e)
-						})
 				} else if (res.cancel) {
 					console.log("用户点击取消");
 				}
@@ -626,7 +584,7 @@
 
 	.section-bottom {
 		position: fixed;
-		bottom: 0;
+		bottom: 30rpx;
 		width: 100%;
 		z-index: 10;
 		padding: 0 30rpx 20rpx;
