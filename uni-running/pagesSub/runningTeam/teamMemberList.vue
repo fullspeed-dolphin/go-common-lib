@@ -1,7 +1,7 @@
 <template>
   <view class="">
     <mescroll-body @init="mescrollInit" @down="downCallback" @up="getList" top="0">
-      <view class="member-item flex-start" v-for="(item, index) in dataList" @click="openMemberDetail(item)" :key="index">
+      <view class="member-item flex-start panel" v-for="(item, index) in dataList" @click="openMemberDetail(item)" :key="index">
         <view class="img-box">
           <view class="img">
             <up-lazy-load borderRadius="100" :image="
@@ -81,6 +81,7 @@ const getList = (mescroll) => {
 .member-item {
   padding: 11rpx 34rpx;
   color: #666;
+  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.1);
   .img-box {
     border-radius: 999px;
     background: #ffffff;
