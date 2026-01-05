@@ -72,7 +72,7 @@
 			<section class="panel">
 				<view class="h4">团长</view>
 				<view class="flex-between-center">
-					<view class="leader-item flex-start">
+					<view class="leader-item flex-start" @click="openMemberDetail(memberLeader)">
 						<view class="img-box">
 							<image class="img" :src="
 					          (memberLeader.avatar_url ||
@@ -80,9 +80,9 @@
 					        " mode="aspectFill"></image>
 						</view>
 						<view class="">
-							<view class="mb10 ellipsis mt10" style="width: 300rpx">{{
-					        memberLeader.nickname || "成员"
-					      }}</view>
+							<view class="mb10 ellipsis mt10" style="width: 300rpx">
+								{{memberLeader.nickname || "成员"}}
+							</view>
 							<!-- {{memberLeader.user_phone}} -->
 						</view>
 					</view>
@@ -98,7 +98,7 @@
 			<section class="panel" style="padding-right:0;">
 				<view class="h4">成员</view>
 				<view class="flex-row flex-wrap" style="margin-left: 26rpx;">
-					<view class="member-item flex-col-center" v-for="(item, index) in memberList" :key="index">
+					<view class="member-item flex-col-center" v-for="(item, index) in memberList" @click="openMemberDetail(item)" :key="index">
 						<view class="img">
 							<up-lazy-load height="120" borderRadius="200" :image="
 								(item.avatar_url ||
@@ -152,6 +152,8 @@
 				</block>
 			</section>
 		</block>
+		
+		<MemberDetail ref="refMemberDetail" />
 
 		<UserLogin ref="refUserLogin" @success="getMemberList()"/>
 	</view>
@@ -176,12 +178,12 @@
 	} from "vuex";
 	import UserLogin from "@/components/UserLogin.vue";
 	import EventItem from "@/components/EventItem.vue";
+	import MemberDetail from "./memberDetail.vue";
 	import request from "@/utils/request.js"
 			
 	// 使用store
 	const store = useStore();
 
-	// 模板引用
 	const refUserLogin = ref(null);
 
 	// 响应式数据
@@ -198,6 +200,11 @@
 	});
 
 	const userInfo = computed(() => store.state.userInfo);
+	
+	const refMemberDetail = ref(null);
+	function openMemberDetail(item) {
+		refMemberDetail.value.open(item)
+	}
 
 	// 页面加载
 	onLoad((options) => {
