@@ -56,10 +56,17 @@
 				</section>
 		
 				<view style="height: 44px;">
-					<section class="section-tabs u-flex-y-center" :class="{isFixed: isShowBackTop}" 
+					<section class="section-tabs flex-between-center" :class="{isFixed: isShowBackTop}" 
 						:style="{ top: addUnit(getPx('44px') + getWindowInfo().statusBarHeight,'px') }">
-						<view class="item" :class="{active: displayType === 'photo'}" @click="changeTab('photo')">照片</view>
-						<view class="item" :class="{active: displayType === 'video'}" @click="changeTab('video')">视频</view>
+						<view class="u-flex-row">
+							<view class="item" :class="{active: displayType === 'photo'}" @click="changeTab('photo')">照片</view>
+							<view class="item" :class="{active: displayType === 'video'}" @click="changeTab('video')">视频</view>
+						</view>
+						<view class="">
+							<button class="share-btn flex-center" open-type="share">
+								<view class="iconfont icon-fenxiang"></view>
+							</button>
+						</view>
 					</section>
 				</view>
 				
@@ -176,7 +183,7 @@
 				// console.log(e.detail)
 				const { scrollHeight } = e.detail;
 				const scrollTop = parseInt(e.detail.scrollTop)
-				console.log('scrollTop=====>', scrollTop)
+				// console.log('scrollTop=====>', scrollTop)
 				this.isShowBackTop = scrollTop >= 385;
 				
 				// 提前10行图的时候 触发加载
@@ -204,7 +211,7 @@
 			  uni.showLoading({ mask: true });
 			  request.get(`/event-api/api/v1/events/${this.currentEvent.event_id}`).then((res) => {
 					res.event_id = res.id
-					res.event_time.slice(0, 10)
+					res.event_time = res.event_time?.slice(0, 10)
 					this.currentEvent = res
 				});
 				
@@ -290,6 +297,15 @@
 </script>
 
 <style lang="scss">
+	.share-btn {
+		margin: 0;
+		&:after {
+			display: none;
+		}
+		::v-deep{
+			background: none;
+		}
+	}
 	.albumDetail-page{
 		.PreviewMedia{
 			.u-popup__content__close {
