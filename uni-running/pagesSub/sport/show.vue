@@ -177,7 +177,7 @@
 import { ref, computed, onMounted } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
-import store from "@/store/index.js";
+import store from "@/utils/store.js";
 
 const mapCenter = ref({
   latitude: 39.908823,

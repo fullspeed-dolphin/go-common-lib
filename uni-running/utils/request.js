@@ -1,4 +1,3 @@
-import store from "@/store/index.js"
 import { clearUserInfo} from "@/utils/util.js"
 import { baseLink } from "@/utils/config.js"
 

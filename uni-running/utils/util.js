@@ -1,4 +1,4 @@
-import store from "@/store/index.js"
+import store from "@/utils/store.js"
 export function clearUserInfo() {
 	uni.removeStorageSync('token')
 	uni.removeStorageSync('userInfo')
