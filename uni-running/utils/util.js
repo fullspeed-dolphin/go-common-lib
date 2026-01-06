@@ -1,6 +1,7 @@
 import store from "@/utils/store.js"
 export function clearUserInfo() {
 	uni.removeStorageSync('token')
+	uni.removeStorageSync('tokenExpire')
 	uni.removeStorageSync('userInfo')
 	
 	store.commit('set', {
