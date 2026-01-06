@@ -48,12 +48,6 @@ export default createStore({
 			}
 		},
 		async getUserInfo({commit}) {
-			// 判断token是否过期
-			const tokenExpire = uni.getStorageSync('tokenExpire')
-			if (tokenExpire && tokenExpire < new Date().getTime()) {
-				clearUserInfo()
-			}
-
 			if (!uni.getStorageSync('token')) return {}
 
 			try {
@@ -63,9 +57,6 @@ export default createStore({
 					type: 'userInfo',
 					data: res
 				})
-
-				// 更新token过期时间 一小时
-				uni.setStorageSync('tokenExpire', new Date().getTime() + 60 * 60 * 1000)
 				
 				uni.setStorageSync('userInfo', res)
 				return res
