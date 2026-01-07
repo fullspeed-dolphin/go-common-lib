@@ -7,7 +7,7 @@
         <view class="xz-slider-range__bar-bg" />
         <view :style="sliderRangeStyle.activeBarStyle" class="xz-slider-range__bar-active" />
       </view>
-      <view v-for="(item, index) in sliderBlockCtx.blocks" :key="index" :style="item.style" class="xz-slider-range__controls" @touchmove="blockEvent($event, index)" @touchstart="showHandle(0)" @touchend="showHandle(1)">
+      <view v-for="(item, index) in sliderBlockCtx.blocks" :key="index" :style="item.style" class="xz-slider-range__controls" @touchmove="blockEvent($event, index)" @touchstart="showHandle($event, 0)" @touchend="showHandle($event, 1)">
         <!-- 滑块值提示 -->
         <!-- <view v-if="item.showHint"
               :class="{
@@ -36,12 +36,13 @@ const $props = defineProps(xzSilderRangeProps);
 const $emits = defineEmits(xzSilderRangeEmits);
 const isShow = ref(false);
 
-const showHandle = (num: number) => {
+const showHandle = (e, num: number) => {
   if (num) {
     isShow.value = false;
   } else {
     isShow.value = true;
   }
+
   $emits("showNum", isShow.value);
 };
 
@@ -56,24 +57,24 @@ defineExpose({
 <style lang="scss" scoped src="./scss/index.scss" />
 <style lang="scss" scoped>
 .xz-slider-range {
-  padding: 0 v-bind("sliderRangeStyle.barPadding");
+  padding: 0 16px;
 
   &__bar {
-    height: v-bind("$props.height");
-    border-radius: v-bind("$props.height");
+    height: 3px;
+    border-radius: 3px;
 
     &-bg {
-      background-color: v-bind("$props.bgc");
+      background-color: rgba(255, 255, 255, 0.4);
     }
 
     &-active {
-      background-color: v-bind("$props.activeBgc");
+      background-color: #fff;
     }
   }
 
   &__block {
     width: auto;
-    padding: 0 20rpx;
+    padding: 0 10rpx;
     display: flex;
     align-items: center;
     height: calc(v-bind("sliderRangeStyle.blockSize") / 2);

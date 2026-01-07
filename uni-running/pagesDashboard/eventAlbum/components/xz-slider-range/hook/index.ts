@@ -25,7 +25,7 @@ export function useXzSliderRange(
     rect: {} as NodeInfo
   });
   watch(()=>$props.modelValue,(val)=>{
-	  console.log('===val==监听',val)
+	  // console.log('===val==监听',val)
 	  execute()
   },{deep:true})
   const sliderRangeStyle = computed(() => {
@@ -74,7 +74,6 @@ export function useXzSliderRange(
         style: { left: rp + "%" }
       });
     }
-	console.log('blocks',blocks)
     return {
       blocks,
       decoration: $props.decoration && !["insert"].includes($props.hintMode)
@@ -149,7 +148,7 @@ export function useXzSliderRange(
     if ($props.modelValue && Array.isArray($props.modelValue) && $props.modelValue.length >= 1) {
       $state.values = $props.modelValue;
     }
-	console.log("$state.values",$state.values)
+	// console.log("$state.values",$state.values)
     $emits("update:modelValue", $state.values);
   }
 
@@ -170,7 +169,6 @@ export function getRect(target: string, range?: unknown) {
       .in(range)
       .select(target)
       .boundingClientRect((size) => {
-		console.log("size==================",size)
         resolve(size as NodeInfo);
       })
       .exec();

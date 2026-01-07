@@ -42,7 +42,7 @@ export const xzSilderRangeProps = {
   // 是否为禁用状态
   disabled: lieProp,
   // 滑块大小
-  size: makeNumberProp(26),
+  size: makeNumberProp(30),
   // 滑块颜色
   color: makeStringProp("#FFF"),
   // 背景条颜色

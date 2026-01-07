@@ -29,7 +29,7 @@ export default createStore({
 				let list = res.urls || []
 				
 				if (params.pageIndex !== 0) {
-					list = list.concat(state.album_data)
+					list = state.album_data.concat(list)
 				}
 				
 				commit('set', {
