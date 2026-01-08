@@ -80,10 +80,9 @@
 					        " mode="aspectFill"></image>
 						</view>
 						<view class="">
-							<view class="mb10 ellipsis mt10" style="width: 300rpx">
+							<view class="ellipsis" style="width: 300rpx;line-height: 44rpx;">
 								{{memberLeader.nickname || "成员"}}
 							</view>
-							<!-- {{memberLeader.user_phone}} -->
 						</view>
 					</view>
 					<view style="width: 184rpx">
@@ -426,6 +425,7 @@
 		background-color: #07C160 !important;
 		padding: 0 20rpx;
 		font-size: 28rpx;
+		font-weight: bold;
 
 		&:after {
 			display: none;
@@ -513,6 +513,7 @@
 	.member-item {
 		color: #000;
 		font-size: 32rpx;
+		font-weight: bold;
 		margin: 0 36rpx 16rpx 0;
 		.number {
 			font-weight: bold;
@@ -600,11 +601,17 @@
 		::v-deep {
 			.u-button {
 				margin: 0;
+				font-weight: bold;
 			}
 		}
 	}
 
 	.u-border-left {
 		border-color: #f3f3f3;
+	}
+
+	// 全局按钮字体粗细
+	::v-deep .u-button {
+		font-weight: bold;
 	}
 </style>

@@ -287,6 +287,7 @@
 				.u-cell__value {
 					color: #dadada;
 					font-size: 26rpx;
+					font-weight: bold;
 				}
 			}
 			

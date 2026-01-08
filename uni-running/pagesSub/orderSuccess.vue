@@ -126,24 +126,20 @@
       <view class="refund-content">
         <view>
           <text>退赛服务截止时间：</text>
-          <text>{{
-            dayjs(detail.created_at)
-              .add(24, "hour")
-              .format("YYYY-MM-DD HH:mm:ss")
-          }}</text>
+          <text>{{ refundDeadline }}</text>
         </view>
         <view> 规定： </view>
         <view>
-          1、支付成功起<text class="red">24小时</text>内退赛，全额退报名费
+          1、支付成功起<text class="red">{{ refundValidHour }}小时</text>内退赛，全额退报名费
         </view>
         <view>
-          2、报名后<text class="red">24小时</text>超出比赛结束时间的，无法退赛
+          2、报名后<text class="red">{{ refundValidHour }}小时</text>超出比赛结束时间的，无法退赛
         </view>
         <view>
-          3、支付成功后<text class="red">24小时</text>内如已发货，不支持退款
+          3、支付成功后<text class="red">{{ refundValidHour }}小时</text>内如已发货，不支持退款
         </view>
         <view>
-          4、报名后<text class="red">24小时</text>内完赛，不支持退赛退款
+          4、报名后<text class="red">{{ refundValidHour }}小时</text>内完赛，不支持退赛退款
         </view>
         <view> 5、退赛服务截止后，不再受理任何退赛申请 </view>
       </view>
@@ -201,18 +197,31 @@ const loading = ref(false);
 const countdownText = ref("");
 let countdownTimer = null;
 
-// 判断订单是否在24小时内
-const isWithin24Hours = (createdAt) => {
+// 获取退款有效时间（小时），默认24小时
+const refundValidHour = computed(() => {
+  return detail.value.refund_valid_hour || 24;
+});
+
+// 判断订单是否在退款有效期内
+const isWithinRefundPeriod = (createdAt, validHours) => {
   if (!createdAt) return false;
   const now = dayjs();
   const orderTime = dayjs(createdAt);
-  const hoursDiff = now.diff(orderTime, "hour");
-  return hoursDiff < 24;
+  const hoursDiff = now.diff(orderTime, "hour", true); // true 返回浮点数，更精确
+  return hoursDiff < validHours;
 };
 
 // 计算是否可以退赛
 const canRefund = computed(() => {
-  return isWithin24Hours(detail.value.created_at);
+  return isWithinRefundPeriod(detail.value.created_at, refundValidHour.value);
+});
+
+// 计算退款截止时间
+const refundDeadline = computed(() => {
+  if (!detail.value.created_at) return '';
+  return dayjs(detail.value.created_at)
+    .add(refundValidHour.value, "hour")
+    .format("YYYY-MM-DD HH:mm:ss");
 });
 
 // 格式化倒计时显示
