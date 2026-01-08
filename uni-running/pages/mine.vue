@@ -109,8 +109,8 @@
 
 				<u-cell title="关注全速体育" class="nav-cell" @click="openOfficialAccount" :border="false" isLink>
 					<template #icon>
-						<image class="nav-icon" style="width: 40rpx; height: 40rpx"
-							src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/wechat-logo.png"></image>
+						<image class="nav-icon" style="width: 43rpx; height: 34rpx"
+							src="/static/images/Wei20260108212025_5184_21.png"></image>
 					</template>
 				</u-cell>
 
