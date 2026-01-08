@@ -49,7 +49,8 @@ import {
   ref,
   watch,
   nextTick,
-  toRef
+  toRef,
+	computed
 } from 'vue';
 import { useStore } from "vuex";
 const store = useStore();
@@ -210,7 +211,6 @@ function getPhotoHeight(url, targetWidth = 750) {
   return newHeight + 'rpx';
 }
 
-}
 const showNum = (val) => {
   // console.log('val===是否显示隐藏',val)
   isShow.value = val

@@ -1,5 +1,5 @@
 <template>
-	<view class="page" style="background: #f3f3f3; min-height: 100vh;">
+	<view class="page" style="background: #f3f3f3;padding-top: 30rpx;">
 		<u-navbar autoBack placeholder title="提交活动申请"></u-navbar>
 		<view style="padding: 20rpx 34rpx">
 			<up-form :model="form" ref="uForm" :rules="rules" labelPosition="top" labelWidth="auto">

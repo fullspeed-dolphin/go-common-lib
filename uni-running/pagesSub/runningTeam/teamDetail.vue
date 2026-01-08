@@ -123,7 +123,7 @@
 				</view>
 			</section>
 
-			<section class="panel">
+			<section class="panel" style="box-shadow: none;">
 				<view class="h4">跑团活动</view>
 				<view v-for="(item, index) in eventList" :key="index">
 					<EventItem :item="item" :key="index" height="474rpx" />
