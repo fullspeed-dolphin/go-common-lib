@@ -3,7 +3,7 @@
 		onMounted,
 		reactive,
 		ref,
-		watch
+		watch,
 	} from 'vue';
 		
 	let props = defineProps({
@@ -15,15 +15,15 @@
 			type: Number,
 			default: 0,
 		},
-		total: {
-			type: Number,
-			default: 0,
+		isShow: { // 如果是滑块滑动，则不需要执行滚动方法
+			type: Boolean,
+			default: false,
 		}
 	})
 	let emits = defineEmits(['dirHandle'])
 	//用来设置virBox的宽度--为了帮助list去撑开父级，呈现滚动效果
 	const virWidth = ref(0)
-	const itemWidth = 150
+	const itemWidth = ref(0) // 一个item的宽度
 	const listObj = reactive({
 		list: [], //用来做列表渲染
 		totalList: [] ,//备份myList
@@ -32,61 +32,57 @@
 		originIndex: 0, // 当前图片
 	})
 	const transX = ref(0)
+	const timer = ref()
+	const isScroll = ref(false) // 是否执行滚动
+	const startNum = ref(props.originIndex) // 第一个的位置
+	const screenWidth = ref(0) // 屏幕宽度
 	watch(()=>props.dataList,(val)=>{
-		
 		let myList = val
-		// console.log("val====",val.length)
 		listObj.totalList = myList //因为myList外部无法访问到 备份一下
-		// listObj.list = myList.slice(0, 5) //把数据拿到后 先截取前5条
-		listObj.list = listObj.totalList.slice(props.originIndex, props.originIndex+5); // 每次显示 5 条数据
-		virWidth.value = itemWidth * myList.length //让scrollBox呈现滚动条--让virBox的宽度变大（宽度=每条的宽度*总条数）
+		virWidth.value = itemWidth.value * myList.length //让scrollBox呈现滚动条--让virBox的宽度变大（宽度=每条的宽度*总条数）
 	})
 		
 	watch(()=>props.originIndex,(val)=>{
-		console.log("val=====props.originIndex===",val)
-		// if(val < 4) {
-		// 	// listObj.originLeft = 0
-		// } else {
-		// 	// listObj.originLeft = (val-2) * 150
-		// }
-		// 更新列表数据  
-		listObj.list = listObj.totalList.slice(val, val+5); // 每次显示 5 条数据
-		// 更新位置
-		// let scrollLeft = 150 * val;
-		transX.value = 150 * val
+		startNum.value = val
+		scrollLefts.value =  val * itemWidth.value
 	})
+	watch(()=>props.isShow,(val)=>{
+		isScroll.value = val
+	})
+	const scrollLefts = ref(0)
 	const onScroll = (e) => {
-		// console.log("e======",e)
-		// e.detail.scrollTop 在 uniapp 的 scroll-view 组件中通常包含了滚动位置  
 		let scrollLeft = e.detail.scrollLeft;
-		// console.log('滚动位置:', scrollLeft);
- 
+		scrollLefts.value = scrollLeft
 		// 计算当前应该显示的列表项范围  
-		let start = Math.floor(scrollLeft / itemWidth);
-		let end = Math.ceil((scrollLeft + 750) / itemWidth); // 每次显示 5 条数据  
- 
+		let start = Math.floor(scrollLeft / itemWidth.value);
+		let end = Math.ceil((scrollLeft + screenWidth.value) / itemWidth.value); // 每次显示 5 条数据  
+		startNum.value = start
 		// 更新列表数据  
-		// let start = props.originIndex;
-		// let end = props.originIndex + 5;
-		listObj.list = listObj.totalList.slice(start, end);
-		// 获取中间位置图片
-		// listObj.middle = end - 2
-		emits('dirHandle',start)
-		//纵向偏移 把结构调整回来
-		transX.value = scrollLeft
-		// console.log('scroll===start=====',start)
+		timer.value && clearTimeout(timer.value)
+		timer.value = setTimeout(()=>{
+			emits('dirHandle',start)
+		},200)
 	};
+	onMounted(()=>{
+		const { windowWidth, windowHeight } = uni.getSystemInfoSync();
+		screenWidth.value = windowWidth
+		itemWidth.value = screenWidth.value / 5
+	})
 </script>
  
 <template>
 	<!-- 使用 scroll-view 组件来实现滚动 -->
-	<scroll-view class="scrollBox" scroll-x="true" scroll-y="false" @scroll="onScroll" :scroll-left="`${transX}`">
+	<scroll-view class="scrollBox" scroll-x="true" @scroll="onScroll" :scroll-left="scrollLefts">
 		<!-- 虚拟滚动容器，不需要实际渲染内容 -->
-		<view class="virBox" :style="{ width: virWidth*2 + 'rpx' }" :data-trans="`${transX}`"></view>
-		<!-- 列表渲染 -->
-		<view class="list" :style="{transform:`translateX(${transX*2}rpx)`}">
-			<view class="item" v-for="(item,index) in listObj.list" :key="item">
-				<image style="width:100rpx;height:96rpx;" :src="item + '?x-oss-process=image/resize,w_750'" :class="{active: index == 0}" />
+		<view class="virBox" :style="{ width: virWidth*2 + 'px' }">
+			<!-- 列表渲染 -->
+			<view class="list" :style="{width:listObj.totalList.length * itemWidth + 'px'}">
+				<view :style="{width: (startNum) * itemWidth + 'px' }"></view>
+				<template v-for="(item,index) in listObj.totalList" :key="item"> 
+					<view class="item" v-if="index >= startNum-1 && index <= (startNum+5)" >
+						<image style="width:96rpx;height:96rpx;border:2rpx solid #fff;"  :src="item + '?x-oss-process=image/resize,w_750'" :class="{active: index == 0}" />
+					</view>
+				</template>
 			</view>
 		</view>
 	</scroll-view>
@@ -106,9 +102,22 @@
 	.virBox {
 		width: 100%;
 		height: 100rpx;
+		display: flex;
+		position:relative;
 	}
- 
 	.list {
+		display: flex;
+		position: relative;
+		width:750rpx;
+	}
+	.item {
+		width: 100rpx;
+		line-height: 100rpx;
+		margin-left:50rpx;
+		
+		/* position:absolute; */
+	}
+	/* .list {
 		position: absolute;
 		top: 0rpx;
 		left: 0rpx;
@@ -125,5 +134,5 @@
 	.item .active {
 		border:2rpx solid #fff;
 		border-radius: 4rpx;
-	}
+	} */
 </style>
