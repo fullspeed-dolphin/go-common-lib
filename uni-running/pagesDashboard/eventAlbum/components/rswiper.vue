@@ -9,16 +9,16 @@
 		
     <view class="section-slider">
       <!-- 预览图 -->
-      <scrollimageview :dataList="originList" :originIndex="originIndex" @dirHandle="dirHandle" :isShow="isShow"
+      <!-- <scrollimageview :dataList="originList" :originIndex="originIndex" @dirHandle="dirHandle" :isShow="isShowAmount"
         :min="0" :total="Number(totalNumber || 0)" style="margin-bottom:20rpx;">
-      </scrollimageview>
+      </scrollimageview> -->
       <!-- :style="{opacity: !isShow ? 0 : 1}" -->
 
       <!-- // <slider :value="originIndex" @change="sliderChange" :step="1" :max="originList.length -1" /> -->
       <!-- 拖动滑块 -->
       <xzsliderrange v-model="originIndexArr" solo :decoration="false" @move="sliderChange" :size="30" height="2px"
         activeBgc="rgb(0, 122, 255)" :max="Number(originList.length || 0)" :min="0" :total="Number(totalNumber || 0)"
-        hintColor="#fff" @showNum="showNum" />
+        hintColor="#fff" @showNum="e => isShowAmount = e" />
       <view class="title" :style="{ opacity: !isShow ? 0 : 1 }">{{ originIndex + 1 }}/{{ originList.length }}(总
         {{ totalNumber }})
       </view>
@@ -73,15 +73,7 @@ const props = defineProps({
   }
 })
 const emits = defineEmits(['loadingMore'])
-watch(() => props.originList, (val) => {
-  console.log('val=props.originList========', props.originIndex)
-  originList.value = props.originList
-  originIndex.value = props.originIndex
-  displayIndex.value = 0
-  currentIndex.value = 0
-  isloading.value = false
-  initSwiperData(originIndex.value);
-})
+
 const originList = ref([]) // 源数据
 const displaySwiperList = ref([]) // swiper需要的数据
 const displayIndex = ref(0) // 用于显示swiper的真正的下标数值只有：0，1，2。
@@ -89,6 +81,7 @@ const originIndex = ref(0) // 记录源数据的下标
 const originIndexArr = ref([1])
 const currentIndex = ref(0) // 显示swiper的当前值只有：0，1，2。
 const disableTouch = ref(false) // 是否阻止触摸
+const isShowAmount = ref(false) // 是否阻止触摸
 const isloading = ref(false) // 加载动画内容
 const isShow = ref(false) // 图片数量的显示隐藏
 
@@ -211,10 +204,6 @@ function getPhotoHeight(url, targetWidth = 750) {
   return newHeight + 'rpx';
 }
 
-const showNum = (val) => {
-  // console.log('val===是否显示隐藏',val)
-  isShow.value = val
-}
 const startTime = ref(0)
 const startPosition = ref(0)
 const endPosition = ref(0)
@@ -309,11 +298,6 @@ function downloadPicture() {
 	});
 }
 
-onMounted(() => {
-  originList.value = props.originList
-  originIndex.value = props.originIndex
-  initSwiperData(originIndex.value);
-})
 defineExpose({
   originIndex,
   originList,

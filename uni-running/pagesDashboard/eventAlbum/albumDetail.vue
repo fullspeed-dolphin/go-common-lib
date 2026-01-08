@@ -230,22 +230,20 @@
 	}
 	.SwiperSection{
 		.section-btns{
-			::v-deep{
-				.u-button{
-					border:none;
-					margin:0;
-					padding:0;
-					background-color: transparent;
-					display: flex;
-					flex-direction: column;
-					justify-content: center;
-					align-items: center;
-					font-size: 20rpx;
-					font-weight: 400;
-					.u-icon{
-						margin-bottom: 10rpx;
-						display: block!important;
-					}
+			.u-button{
+				border:none;
+				margin:0;
+				padding:0;
+				background-color: transparent;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				font-size: 20rpx;
+				font-weight: 400;
+				.u-icon{
+					margin-bottom: 10rpx;
+					display: block!important;
 				}
 			}
 		}
