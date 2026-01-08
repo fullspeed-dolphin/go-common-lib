@@ -37,6 +37,7 @@
 						mode="aspectFill" v-for="(item, index) in virtualList" :id="'zp-id-' + item.zp_index" :key="item.zp_index"
 						@click="handleImg(item.item,item.zp_index)" />
 				</block>
+				
 				<block v-if="displayType === 'video'">
 					<view class="card-video" v-for="(item, index) in virtualList" :id="'zp-id-' + item.zp_index"
 						:key="item.zp_index" @click="$refs.refPreviewVideo.openModal(item.item)">
@@ -227,25 +228,44 @@
 			background: none;
 		}
 	}
-
-	.albumDetail-page {
-		.PreviewMedia {
-			.u-popup__content__close {
-				top: 300rpx !important;
-				width: 36px !important;
-				height: 36px !important;
-				background: rgba(34, 34, 34, 0.8) !important;
-				border-radius: 999px;
+	.SwiperSection{
+		.section-btns{
+			.u-button{
+				border:none;
+				margin:0;
+				padding:0;
+				background-color: transparent;
 				display: flex;
-				align-items: center;
+				flex-direction: column;
 				justify-content: center;
-
-				.u-icon__icon {
-					color: #fff !important;
+				align-items: center;
+				font-size: 20rpx;
+				font-weight: 400;
+				.u-icon{
+					margin-bottom: 10rpx;
+					display: block!important;
 				}
 			}
 		}
-
+	}
+	.PreviewMedia {
+		.u-popup__content__close {
+			top: 300rpx !important;
+			width: 36px !important;
+			height: 36px !important;
+			background: rgba(34, 34, 34, 0.8) !important;
+			border-radius: 999px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+	
+			.u-icon__icon {
+				color: #fff !important;
+			}
+		}
+	}
+	
+	.albumDetail-page {
 		.back-to-top {
 			position: fixed;
 			top: 240px;

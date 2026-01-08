@@ -1,33 +1,43 @@
 <template>
-  <view style="width:750rpx;" @touchstart="touchStart" @touchend="touchEnd">
-    <swiper class="swiper" circular @change="swiperChange" swiperDuration="250" :current="currentIndex"
-      :disable-touch="disableTouch">
+  <view class="SwiperSection" style="width:750rpx;" @touchstart="touchStart" @touchend="touchEnd">
+    <swiper class="swiper" circular @change="swiperChange" swiperDuration="30" :current="currentIndex" :disable-touch="disableTouch">
       <swiper-item class="flex-center" v-for="(item, index) in displaySwiperList" :key="index">
-        <image style="display: block;width:750rpx;" v-if="item" :src="item + '?x-oss-process=image/resize,w_750'"
-          mode="widthFix" />
+        <image class="poster" :style="'height:' + item.height" 
+				v-if="item.url" :src="item.url + '?x-oss-process=image/resize,w_750/quality,q_80/format,webp'" mode="widthFix" />
       </swiper-item>
     </swiper>
+		
     <view class="section-slider">
       <!-- 预览图 -->
-      <scrollimageview :dataList="originList" :originIndex="originIndex" @dirHandle="dirHandle" :isShow="isShow"
+      <!-- <scrollimageview :dataList="originList" :originIndex="originIndex" @dirHandle="dirHandle" :isShow="isShowAmount"
         :min="0" :total="Number(totalNumber || 0)" style="margin-bottom:20rpx;">
-      </scrollimageview>
+      </scrollimageview> -->
       <!-- :style="{opacity: !isShow ? 0 : 1}" -->
 
       <!-- // <slider :value="originIndex" @change="sliderChange" :step="1" :max="originList.length -1" /> -->
       <!-- 拖动滑块 -->
       <xzsliderrange v-model="originIndexArr" solo :decoration="false" @move="sliderChange" :size="30" height="2px"
         activeBgc="rgb(0, 122, 255)" :max="Number(originList.length || 0)" :min="0" :total="Number(totalNumber || 0)"
-        hintColor="#fff" @showNum="showNum" />
+        hintColor="#fff" @showNum="e => isShowAmount = e" />
       <view class="title" :style="{ opacity: !isShow ? 0 : 1 }">{{ originIndex + 1 }}/{{ originList.length }}(总
         {{ totalNumber }})
       </view>
     </view>
     <!-- loading -->
     <view class="loading">
-      <up-loading-page bg-color="#e8e8e8" :loading="isloading" loading-text="加载中..."
-        style="background-color:rgba(0,0,0,.3)"></up-loading-page>
+      <up-loading-page bg-color="#e8e8e8" :loading="isloading" loading-text="加载中..." style="background-color:rgba(0,0,0,.3)" />
     </view>
+		
+		<section class="section-btns flex-center" style="position: fixed;right:34rpx;bottom: 90rpx;">
+			<!-- <up-button @click="downloadPicture" type="primary" icon="share"
+				customStyle="width:70rpx;height:130rpx;">
+				分享
+			</up-button> -->
+			<up-button @click="downloadPicture" type="primary" icon="download"
+				customStyle="width:70rpx;height:130rpx;">
+				下载
+			</up-button>
+		</section>
   </view>
 </template>
 
@@ -39,7 +49,8 @@ import {
   ref,
   watch,
   nextTick,
-  toRef
+  toRef,
+	computed
 } from 'vue';
 import { useStore } from "vuex";
 const store = useStore();
@@ -62,15 +73,7 @@ const props = defineProps({
   }
 })
 const emits = defineEmits(['loadingMore'])
-watch(() => props.originList, (val) => {
-  console.log('val=props.originList========', props.originIndex)
-  originList.value = props.originList
-  originIndex.value = props.originIndex
-  displayIndex.value = 0
-  currentIndex.value = 0
-  isloading.value = false
-  initSwiperData(originIndex.value);
-})
+
 const originList = ref([]) // 源数据
 const displaySwiperList = ref([]) // swiper需要的数据
 const displayIndex = ref(0) // 用于显示swiper的真正的下标数值只有：0，1，2。
@@ -78,6 +81,7 @@ const originIndex = ref(0) // 记录源数据的下标
 const originIndexArr = ref([1])
 const currentIndex = ref(0) // 显示swiper的当前值只有：0，1，2。
 const disableTouch = ref(false) // 是否阻止触摸
+const isShowAmount = ref(false) // 是否阻止触摸
 const isloading = ref(false) // 加载动画内容
 const isShow = ref(false) // 图片数量的显示隐藏
 
@@ -96,35 +100,37 @@ watch(
     immediate: true
   }
 );
-const initSwiperData = (originIndex) => {
-  setTimeout(() => {
-    if (originIndex == 0 && endDir.value == 'right') {
-      disableTouch.value = true
-      return;
-    } else {
-      disableTouch.value = false
-    }
-    const originListLength = originList.value.length; // 源数据长度
 
-    let displayList = [];
-    displayList[displayIndex.value] = originList.value[originIndex];
-    displayList[displayIndex.value - 1 == -1 ? 2 : displayIndex.value - 1] =
-      originList.value[
-      originIndex - 1 == -1 ? originListLength - 1 : originIndex - 1
-      ];
-    displayList[displayIndex.value + 1 == 3 ? 0 : displayIndex.value + 1] =
-      originList.value[
-      originIndex + 1 == originListLength ? 0 : originIndex + 1
-      ];
-    displaySwiperList.value = displayList;
-    // originIndexArr.value[0] = originIndex
-    // 防止干扰，拖动的时候不修改originIndexArr
-    if (!isShowAmount.value) {
-      originIndexArr.value[0] = originIndex;
-    }
-  }, 200)
+function initSwiperData(originIndex) {
+	if (originIndex == 0 && endDir?.value == "right") {
+		disableTouch.value = true;
+		return;
+	} else {
+		disableTouch.value = false;
+	}
+	const originListLength = originList.value.length; // 源数据长度
+	
+	let displayList = [];
+	displayList[displayIndex.value] = originList.value[originIndex];
+	displayList[displayIndex.value - 1 == -1 ? 2 : displayIndex.value - 1] =
+		originList.value[
+			originIndex - 1 == -1 ? originListLength - 1 : originIndex - 1
+		];
+	displayList[displayIndex.value + 1 == 3 ? 0 : displayIndex.value + 1] =
+		originList.value[
+			originIndex + 1 == originListLength ? 0 : originIndex + 1
+		];
+		
+	displaySwiperList.value = displayList.map(item => ({
+		url: item,
+		height: getPhotoHeight(item)
+	}));
 
-}
+	// 防止干扰，拖动的时候不修改originIndexArr
+	if (!isShowAmount.value) {
+		originIndexArr.value[0] = originIndex;
+	}
+};
 
 /**
  * swiper滑动时候
@@ -160,25 +166,44 @@ const swiperChange = (event) => {
 }
 const moveTimer = ref('')
 const sliderChange = (e) => {
-  if (originIndex.value == e[0]) return
-  originIndex.value = e[0]
-  moveTimer.value && clearTimeout(moveTimer.value)
-  moveTimer.value = setTimeout(() => {
+  // console.log("sliderChange===", e);
 
-    if (originIndex.value + 6 > originList.value.length && !isloading.value) {
-      emits('loadingMore', originIndex.value)
-      isloading.value = true
-      return;
-    }
-    initSwiperData(originIndex.value);
-  }, 300)
-  // console.log('e===',e)
+  if (originIndex.value == e[0]) return;
+  originIndex.value = e[0];
 
+  if (originIndex.value + 6 > originList.value.length && !isloading.value) {
+    emits("loadingMore", originIndex.value);
+    isloading.value = true;
+    return;
+  }
+
+  initSwiperData(originIndex.value);
+};
+
+
+function getPhotoHeight(url, targetWidth = 750) {
+  // 1. 提取文件名（不含查询参数）
+  const filename = url.substring(url.lastIndexOf('/') + 1);
+
+  // 2. 使用正则匹配 w数字 和 h数字
+  const widthMatch = filename.match(/_w(\d+)/);
+  const heightMatch = filename.match(/_h(\d+)/);
+
+  if (!widthMatch || !heightMatch) {
+    console.warn('无法从 URL 中提取宽高信息');
+    return null;
+  }
+
+  const originalWidth = parseInt(widthMatch[1], 10);
+  const originalHeight = parseInt(heightMatch[1], 10);
+
+  // 3. 计算等比缩放后的高度
+  const ratio = originalHeight / originalWidth;
+  const newHeight = Math.round(targetWidth * ratio);
+
+  return newHeight + 'rpx';
 }
-const showNum = (val) => {
-  // console.log('val===是否显示隐藏',val)
-  isShow.value = val
-}
+
 const startTime = ref(0)
 const startPosition = ref(0)
 const endPosition = ref(0)
@@ -227,21 +252,76 @@ const dirHandle = (start, end) => {
     isloading.value = true
     return;
   }
-  initSwiperData(start)
+  initSwiperData(start);
+};
+
+function downloadPicture() {
+	const imageUrl = displaySwiperList.value?.[currentIndex.value].url;
+	
+	console.log("imageUrl====>", imageUrl)
+
+	if (!imageUrl) {
+		uni.showToast({ title: '获取图片失败', icon: 'none' });
+		return;
+	}
+
+	uni.showLoading({ title: '下载中...' });
+
+	uni.downloadFile({
+		url: imageUrl,
+		success: (res) => {
+			if (res.statusCode === 200) {
+				uni.saveImageToPhotosAlbum({
+					filePath: res.tempFilePath,
+					success: () => {
+						uni.hideLoading();
+						uni.showToast({ title: '保存成功', icon: 'success' });
+					},
+					fail: (err) => {
+						uni.hideLoading();
+						if (err.errMsg?.includes('auth deny')) {
+							uni.showToast({ title: '请授权相册权限', icon: 'none' });
+						} else {
+							uni.showToast({ title: '保存失败', icon: 'none' });
+						}
+					}
+				});
+			} else {
+				uni.hideLoading();
+				uni.showToast({ title: '下载失败', icon: 'none' });
+			}
+		},
+		fail: () => {
+			uni.hideLoading();
+			uni.showToast({ title: '下载失败', icon: 'none' });
+		}
+	});
 }
 
-onMounted(() => {
-  originList.value = props.originList
-  originIndex.value = props.originIndex
-  initSwiperData(originIndex.value);
-})
 defineExpose({
   originIndex,
   originList,
 });
+
 </script>
 
 <style lang="scss" scoped>
+	.poster{
+		position: relative;
+		display: block;
+		width:750rpx;
+		background: center center no-repeat url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAKlBMVEVHcEzDw8Ovr6+pqamUlJTCwsKenp61tbWxsbGysrLNzc2bm5u5ubmjo6MpovhuAAAACnRSTlMA/P79/sHDhiZS0DxZowAABBBJREFUWMPtl89rE0EUx7ctTXatB3MI1SWnDbUKPUgXqh4ED8Uf7KUVSm3ooVSpSii0Fn/gD4j4o+APiEoVmos9FO2celiqZVgwgaKHPQiCCkv+F99kM7Ozm5kxq1dfD91k9pPve9/3ZjbRNHHok/mKli4eIPNgSuRObuN9SqSEzM20iGnm0yIbqCuV7NSSSIV7uyPM6JMBYdeTOanh/QihJYZsUCSby+VkMj2AvOt0rAeQAwqE3lfKMZVlQCZk1QOCKkkVPadITCfIRNKxfoJI5+0OIFtJx14CMSg1mRSDko7VAfksRQzEbGYqxOJcVTWMCH2I1/IACNW0PWU2M8cmAVHtnH5mM1VRWtwKZjOd5JbF6s1IbaYqaotjNlPHgDAnlAizubTR6ovMYn052g/U5qcmOpi0WL8xTS/3IfSet5m8MEr5ajjF5le6dq/OJpobrdY0t3i9QgefWrxW9/1BLhk0E9m8FeUMhhXal499iD0eQRfDF+ts/tttORRerfp+oV7f4xJj82iUYm1Yzod+ZQEAlS/8mMBwKebVmCVp1f0JLS6zKd17+iwRKTARVg2SHtz3iEbBH+Q+U28zW2Jiza8Tjb1YFoYZMsJyjDqp3M9XBQdSdPLFdxEpvOB37JrHcmR/y9+LgoTlCFGZEa2sc6d4PGlweEa2JSVPoVm+IfGG3ZL037iV9oH+P+Jxc4HGVflNq1M0pivao/EopO4b/ojVCP9GjmiXOeS0DOn1o/iiccT4ORnyvBGF3yUywkQajW4Ti0SGuiy/wVSg/L8w+X/8Q+hvUx8Xd90z4oV5a1i88MbFWHz0WZZ1UrTwBGPX3Rat9AFiXRMRjoMdIdJLEOt2h7jrYOzgOamKZSWSNspOS0X8SAqRYmxRL7sg4eLzYmNehcxh3uoyud/BH2Udux4ywxFTc1xC7Mgf4vMhc5S+kSH3Y7yj+qpwIWSoPTVCOOPVthGx9FbGqrwFw6wSFxJr+17zeKcztt3u+2roAEVgUjDd+AHGuxHy2rZHaa8JMkTHEeyi85ANPO9j9BVuBRD2FY5LDMo/Sz/2hReqGIs/KiFin+CsPsYO/yvM3jL2vE8EbX7/Bf8ejtr2GLN65bioAdgLd8Bis/mD5GmP2qeqyo2ZwQEOtAjRIDH7mBKpUcMoApbZJ5UIxkEwxyMZyMxW/uKFvHCFR3SSmerHyDNQ2dF4JG6zIMpBgLfjSF9x1D6smFcYnGApjmSLICO3ecCDWrQ48geba9DI3STy2i7ax6WIB62fSyIZIiO3GFQqSURp8wCo7GhJBGwuSovJBNjb7kT6FPVnIa9qJ2Ko+l9mefGIdinaMp0yC1URYiwsdfNE45EuA5Cx9EhalfvN5s+UyItm81vaB3p4joniN+SCP7Qc1hblAAAAAElFTkSuQmCC);
+		background-size: 50rpx 50rpx;
+		&:before{
+			position: absolute;
+			content: "";
+			top:0;
+			right:0;
+			bottom:0;
+			left:0;
+			// background: red;
+		}
+	}
 .title {
   width: 100%;
   display: flex;

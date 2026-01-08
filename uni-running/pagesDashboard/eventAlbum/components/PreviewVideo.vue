@@ -46,14 +46,6 @@
 		isShowModal.value = false;
 	}
 
-	function downloadPicture() {
-		uni.saveImageToPhotosAlbum({
-			filePath: photoList.value[currentIndex.value] + '?x-oss-process=image/resize,w_750',
-			success() {
-				uni.$u.toast('下载完成')
-			}
-		})
-	}
 	async function downloadVideo() {
 	  uni.showLoading({ title: '下载中...' })
 	
