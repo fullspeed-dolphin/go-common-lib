@@ -1,25 +1,25 @@
 <template>
-  <view class="">
-    <view class="card-item panel u-flex-y-center" 
+  <view class="page-container">
+    <view class="card-item panel"
 			@click="$u.route(`pagesSub/runningTeam/teamMaps?group_id=${group_id}`)">
     	<image class="img" src="./img/组 1083@2x.png" mode="aspectFill"></image>
-			跑团地图库
+			<text class="card-text">跑团地图库</text>
     </view>
-    <view class="card-item panel u-flex-y-center" 
+    <view class="card-item panel"
 			@click="$u.route(`pagesSub/runningTeam/teamSummary?group_id=${group_id}`)">
     	<image class="img" src="./img/组 1084@2x.png" mode="aspectFill"></image>
-			跑团数据
+			<text class="card-text">跑团数据</text>
     </view>
-    <view class="card-item panel u-flex-y-center" 
-			@click="$u.route(`pagesSub/runningTeam/teamEventForm?group_id=${group_id}`)">
+    <view class="card-item panel"
+			@click="$u.route(`pagesSub/runningTeam/teamEventList?group_id=${group_id}`)">
     	<image class="img" src="./img/组 1085@2x.png" mode="aspectFill"></image>
-			跑团活动管理
+			<text class="card-text">跑团活动管理</text>
     </view>
-		
+
 		<section class="section-bottom flex-wrap u-flex flex-between-center">
-				<u-button type="primary" shape="circle" color="#F2F2F2" customStyle="color:#FF8C00;height: 80rpx;width: 312rpx;"
+				<u-button type="primary" shape="circle" color="#f7f7f7" customStyle="color:#FF8C00;height: 84rpx;width: 314rpx;"
 					@click="deleteGroup()">删除跑团</u-button>
-				<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;"
+				<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 84rpx;width: 314rpx;"
 					@click="$u.route(`pagesSub/runningTeam/teamForm?group_id=${group_id}`)">更新跑团</u-button>
 		</section>
   </view>
@@ -77,41 +77,53 @@ onLoad((options) => {
 </script>
 
 <style lang="scss">
+.page-container {
+  min-height: 100vh;
+  background: #f3f3f3;
+  padding: 24rpx 34rpx;
+  padding-bottom: 160rpx;
+}
+
 .card-item {
   width: 682rpx;
-  height: 170rpx;
-	padding-left: 150rpx;
+  height: 168rpx;
   background: #FFFFFF;
-  box-shadow: 10rpx 10rpx 10rpx 2rpx rgba(255,140,0,0.3);
-  border-radius: 32rpx 32rpx 32rpx 32rpx;
-  font-weight: 800;
+  box-shadow: 0 8rpx 8rpx 0 rgba(255, 140, 0, 0.4);
+  border-radius: 16rpx;
+  font-weight: 700;
   font-size: 36rpx;
-  .img-box {
-    border-radius: 999px;
-    background: #ffffff;
-    margin-right: 30rpx;
-    overflow: hidden;
-  }
+  margin-bottom: 24rpx;
+  display: flex;
+  align-items: center;
+  padding-left: 200rpx;
+
   .img {
     display: block;
-    width: 78rpx;
-    height: 78rpx;
-		margin-right: 22rpx;
+    width: 48rpx;
+    height: 48rpx;
+    margin-right: 16rpx;
+  }
+
+  .card-text {
+    color: #000000;
   }
 }
 
 .section-bottom {
-		position: fixed;
-		bottom: 0;
-		width: 100%;
-		z-index: 10;
-		padding: 0 30rpx 20rpx;
-		gap: 25px;
+  position: fixed;
+  bottom: 30rpx;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  padding: 0 30rpx 20rpx;
+  display: flex;
+  justify-content: space-between;
+  gap: 25px;
 
-		::v-deep {
-			.u-button {
-				margin: 0;
-			}
-		}
-	}
+  ::v-deep {
+    .u-button {
+      margin: 0;
+    }
+  }
+}
 </style>

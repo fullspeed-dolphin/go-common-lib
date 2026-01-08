@@ -278,9 +278,10 @@
 
 	.section-bottom {
 		position: fixed;
-		bottom: 0;
+		bottom: 30rpx;
 		width: 100%;
 		z-index: 10;
+		padding: 0 30rpx 20rpx;
 	}
 
 	.group-list {

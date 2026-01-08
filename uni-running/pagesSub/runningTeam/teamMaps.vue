@@ -95,10 +95,10 @@ const getList = (mescroll) => {
 
 .section-bottom {
 		position: fixed;
-		bottom: 0;
+		bottom: 30rpx;
 		width: 100%;
 		z-index: 10;
-		padding: 0 34rpx 20rpx;
+		padding: 0 30rpx 20rpx;
 		::v-deep {
 			.u-button {
 				margin: 0;

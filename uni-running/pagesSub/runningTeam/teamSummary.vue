@@ -226,10 +226,10 @@
 		background: #FFFFFF;
 		box-shadow: 10rpx 10rpx 10rpx 2rpx rgba(255,140,0,0.3);
 		border-radius: 32rpx 32rpx 32rpx 32rpx;
-		padding: 32rpx 20rpx;
+		padding: 40rpx 30rpx;
 		color: #000;
 		font-size: 32rpx;
-		margin: 0 36rpx 16rpx 0;
+		margin: 0 36rpx 24rpx 0;
 		font-size: 24rpx;
 		color: #707070;
 		.number {
@@ -242,11 +242,11 @@
 			color: #000;
 			font-size: 32rpx;
 			line-height: 1.2;
-			margin-bottom: 10rpx;
+			margin-bottom: 16rpx;
 		}
 		.score {
 			font-size: 24rpx;
-			line-height: 34rpx;
+			line-height: 48rpx;
 		}
 
 		.img {
