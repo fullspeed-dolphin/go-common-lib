@@ -69,6 +69,7 @@ const timeValue = ref("");
 
 // 计算属性
 const displayTime = computed(() => {
+  if (!props.value) return "";
   return dayjs(timeValue.value).format("YYYY-MM-DD HH:mm");
 });
 

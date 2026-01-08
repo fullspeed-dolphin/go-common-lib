@@ -63,7 +63,7 @@
 			</section>
 
 			<section class="panel">
-				<view class="h4">跑团简介</view>
+				<view class="h4">跑团宣言</view>
 				<view style="font-weight: 500; line-height: 40rpx; padding-left: 18rpx;">
 					{{ detail.introduction }}
 				</view>

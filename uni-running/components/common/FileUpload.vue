@@ -6,6 +6,8 @@
       :file-mediatype="accept"
       :maxCount="maxCount"
       :mode="mode"
+      :width="width"
+      :height="height"
       @afterRead="afterRead"
       @delete="deleteFile"
       :auto-upload="false"
@@ -89,6 +91,14 @@ const props = defineProps({
   deletable: {
     type: Boolean,
     default: true,
+  },
+  width: {
+    type: [String, Number],
+    default: 80,
+  },
+  height: {
+    type: [String, Number],
+    default: 80,
   },
 });
 

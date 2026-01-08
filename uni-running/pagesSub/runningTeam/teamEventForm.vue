@@ -1,52 +1,54 @@
 <template>
-	<view class="page">
-		<u-navbar autoBack placeholder title="创建活动"></u-navbar>
+	<view class="page" style="background: #f3f3f3; min-height: 100vh;">
+		<u-navbar autoBack placeholder title="提交活动申请"></u-navbar>
 		<view style="padding: 20rpx 34rpx">
 			<up-form :model="form" ref="uForm" :rules="rules" labelPosition="top" labelWidth="auto">
-				<view class="form-item-uploader">
-					<up-form-item label="活动背景图" prop="poster">
-						<FileUpload v-model="form.poster" @change="validateField('poster')">
+				<!-- 两个上传框并排 -->
+				<view class="upload-row">
+					<view class="upload-item">
+						<view class="upload-label">活动背景图(正方形)<text class="required-star">*</text></view>
+						<FileUpload v-model="form.poster" :width="164" :height="120" @change="validateField('poster')">
 							<template #trigger>
-								<view class="section-upload flex-col-center">
-									<view class="icon">
-										<up-icon name="plus" color="#E3E3E3" size="86rpx"></up-icon>
-									</view>
+								<view class="section-upload-box">
+									<u-icon name="photo" size="48" color="#cccccc"></u-icon>
 								</view>
 							</template>
 						</FileUpload>
-					</up-form-item>
+					</view>
+					<view class="upload-item">
+						<view class="upload-label">活动详情(H5长图)</view>
+						<FileUpload v-model="form.longImage" :width="164" :height="120" @change="validateField('longImage')">
+							<template #trigger>
+								<view class="section-upload-box">
+									<u-icon name="photo" size="48" color="#cccccc"></u-icon>
+								</view>
+							</template>
+						</FileUpload>
+					</view>
 				</view>
 
 				<up-form-item label="活动名称" prop="name" required>
-					<input v-model="form.name" class="u-input" @input="validateField('name')" maxlength="50" placeholder="请输入名称" />
+					<input v-model="form.name" class="u-input" @input="validateField('name')" maxlength="50" placeholder="请输入活动名称" />
 				</up-form-item>
 
-				<up-form-item label="活动人数" prop="fullName" required>
-					<input v-model="form.fullName" class="u-input" type="number" @input="validateField('fullName')" maxlength="50" placeholder="请输入活动人数" />
+				<up-form-item label="活动人数" prop="peopleCount" required>
+					<input v-model="form.peopleCount" class="u-input" type="number" @input="validateField('peopleCount')" maxlength="50" placeholder="请输入活动人数" />
 				</up-form-item>
-				<u-form-item label="活动时间" prop="gender" required>
-					<PickerTime v-model="form.gender" mode="datetime" 
+
+				<u-form-item label="活动时间" prop="eventTime" required>
+					<PickerTime v-model="form.eventTime" mode="datetime"
 						:minDate="new Date().getTime()"
 						:maxDate="maxDate"
-						placeholder="请选择时间" :title="null" @change="validateField('gender')" />
+						placeholder="请选择时间" :title="null" @change="validateField('eventTime')" />
 				</u-form-item>
-				<u-form-item label="是否付费" prop="gender" required>
-					<PickerCell v-model="form.gender" :title="null" @change="validateField('gender')" placeholder="请选择" :border="false" :columns="options_isFree" />
+
+				<u-form-item label="是否付费" prop="isPaid" required>
+					<PickerCell v-model="form.isPaid" :title="null" @change="validateField('isPaid')" placeholder="请选择" :border="false" :columns="options_isPaid" />
 				</u-form-item>
 			</up-form>
 
-			<!-- <view class="txt flex-start mt30 pt20" @click="isAgree = !isAgree">
-				<u-icon size="15" :color="isAgree ? '#FF8C00' : '#999'"
-					:name="isAgree ? 'checkmark-circle-fill' : 'checkmark-circle'"></u-icon>
-				<text>
-					<text class="ml5">我已阅读并同意该</text>
-				</text>
-				<text style="color: #ff8c00" @tap.stop="$u.route('pagesSub/settings/agreement?type=privy')">《用户隐私协议》</text>
-			</view> -->
-			
 			<view class="" style="padding: 60rpx 8rpx 30rpx">
-				<u-button type="primary" color="#FF8C00" shape="circle" @click="submitForm()">{{ group_id ? "更新活动" : "创建活动" }}
-				</u-button>
+				<u-button type="primary" color="#FF8C00" shape="circle" @click="submitForm()">提交活动申请</u-button>
 			</view>
 		</view>
 	</view>
@@ -82,16 +84,15 @@
 	const from = ref("");
 	const form = ref({
 		poster: "",
+		longImage: "",
 		name: "",
-		location: "",
-		description: "",
-		fullName: "",
-		phone: "",
-		// amount: '',
-		establish_time: dayjs().valueOf(),
+		peopleCount: "",
+		eventTime: "",
+		isPaid: "",
 	});
-	
-	const options_isFree = ref([{
+
+	const options_isPaid = ref([
+		{
 			label: "是",
 			value: "1"
 		},
@@ -112,35 +113,29 @@
 	const rules = ref({
 		poster: [{
 			required: true,
-			message: "请点击上传跑团 logo",
+			message: "请上传活动背景图",
 			trigger: ["blur", "change"],
-		}, ],
+		}],
 		name: [{
 			required: true,
-			message: "必填项",
+			message: "请输入活动名称",
 			trigger: ["blur", "change"],
-		}, ],
-		location: [{
+		}],
+		peopleCount: [{
 			required: true,
-			message: "必填项",
+			message: "请输入活动人数",
 			trigger: ["blur", "change"],
-		}, ],
-		fullName: [{
+		}],
+		eventTime: [{
 			required: true,
-			message: "必填项",
+			message: "请选择活动时间",
 			trigger: ["blur", "change"],
-		}, ],
-		description: [{
+		}],
+		isPaid: [{
 			required: true,
-			message: "必填项",
+			message: "请选择是否付费",
 			trigger: ["blur", "change"],
-		}, ],
-		phone: [{
-			required: true,
-			message: "请输入有效手机号",
-			pattern: /^1[3-9]\d{9}$/,
-			trigger: ["blur", "change"],
-		}, ],
+		}],
 	});
 
 	// 页面加载
@@ -248,6 +243,38 @@
 		background: rgba(255, 255, 255, 0.2);
 	}
 
+	.upload-row {
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: 20rpx;
+	}
+
+	.upload-item {
+		width: 328rpx;
+	}
+
+	.upload-label {
+		font-weight: bold;
+		font-size: 30rpx;
+		color: #000;
+		margin-bottom: 20rpx;
+	}
+
+	.required-star {
+		color: red;
+		margin-left: 4rpx;
+	}
+
+	.section-upload-box {
+		width: 328rpx;
+		height: 240rpx;
+		background: #fff;
+		border-radius: 16rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
 	.form-item-uploader {
 		display: flex;
 		justify-content: center;
@@ -258,7 +285,7 @@
 		.picker-cell {
 			&.placeholder{
 				.u-cell__value {
-					color: #BFBFBF;
+					color: #dadada;
 					font-size: 26rpx;
 				}
 			}
@@ -324,7 +351,7 @@
 				margin-left: 0 !important;
 				font-weight: bold;
 				font-size: 26rpx;
-				color: #707070;
+				color: #dadada;
 			}
 		}
 
@@ -382,8 +409,17 @@
 			margin-left: 0 !important;
 		}
 
+		.u-form-item__body__left__content {
+			display: flex !important;
+			flex-direction: row !important;
+		}
+
 		.u-form-item__body__left__content__required {
+			position: relative !important;
 			top: 0 !important;
+			left: 0 !important;
+			order: 1 !important;
+			margin-left: 4rpx !important;
 		}
 
 		.u-form-item__body__right__message {
@@ -447,13 +483,13 @@
 		.input-placeholder {
 			font-weight: bold !important;
 			font-size: 26rpx !important;
-			color: #707070 !important;
+			color: #dadada !important;
 		}
 
 		.textarea-placeholder {
 			font-weight: bold !important;
 			font-size: 26rpx !important;
-			color: #707070 !important;
+			color: #dadada !important;
 		}
 	}
 
@@ -471,26 +507,35 @@
 	}
 	
 	::v-deep {
-		.u-popup__content{
+		.u-navbar__content__title {
+			font-weight: 500;
+			font-family: PingFang SC, PingFang SC;
+		}
+
+		.u-popup__content {
 			border-radius: 20rpx 20rpx 0 0;
 		}
-		.section-upload {
-			width: 682rpx;
-			height: 258rpx;
-			background: #FFFFFF;
-			border-radius: 16rpx;
-			border: 2rpx dashed #ccc;
-			line-height: 40rpx;
-			color: #999;
-			.u-icon__icon {
-				color: #ccc;
+
+		.upload-item {
+			.flex1 {
+				width: 100%;
 			}
-		}
-		
-		.u-upload__wrap__preview__image{
-			width: 200rpx!important;
-			height: 200rpx!important;
-			border-radius: 16rpx;
+
+			.u-upload {
+				width: 100%;
+			}
+
+			.u-upload__wrap {
+				width: 100%;
+			}
+
+			.u-upload__wrap__preview {
+				margin: 0 !important;
+			}
+
+			.u-upload__wrap__preview__image {
+				border-radius: 16rpx !important;
+			}
 		}
 	}
 </style>

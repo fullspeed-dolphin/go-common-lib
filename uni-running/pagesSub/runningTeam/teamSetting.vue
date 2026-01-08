@@ -2,17 +2,17 @@
   <view class="page-container">
     <view class="card-item panel"
 			@click="$u.route(`pagesSub/runningTeam/teamMaps?group_id=${group_id}`)">
-    	<image class="img" src="./img/组 1083@2x.png" mode="aspectFill"></image>
+    	<image class="img" src="./img/地图.png" mode="aspectFill"></image>
 			<text class="card-text">跑团地图库</text>
     </view>
     <view class="card-item panel"
 			@click="$u.route(`pagesSub/runningTeam/teamSummary?group_id=${group_id}`)">
-    	<image class="img" src="./img/组 1084@2x.png" mode="aspectFill"></image>
+    	<image class="img" src="./img/跑团数据.png" mode="aspectFill"></image>
 			<text class="card-text">跑团数据</text>
     </view>
     <view class="card-item panel"
 			@click="$u.route(`pagesSub/runningTeam/teamEventList?group_id=${group_id}`)">
-    	<image class="img" src="./img/组 1085@2x.png" mode="aspectFill"></image>
+    	<image class="img" src="./img/跑团活动管理.png" mode="aspectFill"></image>
 			<text class="card-text">跑团活动管理</text>
     </view>
 

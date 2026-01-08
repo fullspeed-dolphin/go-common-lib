@@ -1,6 +1,6 @@
 <template>
 	<view class="page">
-		<u-navbar autoBack placeholder title="创建跑团"></u-navbar>
+		<u-navbar autoBack placeholder :title="group_id ? '更新跑团' : '创建跑团'"></u-navbar>
 		<view style="padding: 20rpx 34rpx">
 			<up-form :model="form" ref="uForm" :rules="rules" labelPosition="top" labelWidth="auto">
 				<view class="form-item-uploader">
@@ -20,15 +20,15 @@
 				<up-form-item label="跑团名称" prop="name" required>
 					<input v-model="form.name" class="u-input" @input="validateField('name')" maxlength="50" placeholder="请输入名称" />
 				</up-form-item>
-				<up-form-item label="跑团详情" prop="description" labelPosition="top" required>
+				<up-form-item label="跑团宣言" prop="description" labelPosition="top" required>
 					<view class="" style="position: relative;">
-						<textarea v-model="form.description" class="u-input" @input="validateField('description')" :height="110" maxlength="150" placeholder="请填写跑团详情" count></textarea>
+						<textarea v-model="form.description" class="u-input" @input="validateField('description')" :height="110" maxlength="150" placeholder="请填写跑团宣言" count></textarea>
 						<view class="" style="position: absolute;right:10rpx;bottom:10rpx;font-size: 24rpx;color: #999;">
 							{{form.description.length}}/150
 						</view>
 					</view>
 				</up-form-item>
-				<up-form-item label="跑团地址" prop="location" required>
+				<up-form-item label="跑团总部地址" prop="location" required>
 					<view class="select" @click="handleChooseLocation">
 						<input v-model="form.location" class="u-input" readonly placeholder="请选择地址" />
 						<view class="arrow-right">
@@ -52,7 +52,7 @@
 						</template>
 					</up-datetime-picker>
 				</up-form-item>
-				<up-form-item label="真实姓名" prop="fullName" required>
+				<up-form-item :label="group_id ? '团长真实姓名' : '真实姓名'" prop="fullName" required>
 					<input v-model="form.fullName" class="u-input" @input="validateField('fullName')" maxlength="50" placeholder="请输入您的真实姓名" />
 				</up-form-item>
 				<up-form-item label="联系电话" prop="phone" required>
@@ -410,8 +410,17 @@
 			margin-left: 0 !important;
 		}
 
+		.u-form-item__body__left__content {
+			display: flex !important;
+			flex-direction: row !important;
+		}
+
 		.u-form-item__body__left__content__required {
+			position: relative !important;
 			top: 0 !important;
+			left: 0 !important;
+			order: 1 !important;
+			margin-left: 4rpx !important;
 		}
 
 		.u-form-item__body__right__message {
