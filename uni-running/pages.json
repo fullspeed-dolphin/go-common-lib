@@ -70,13 +70,8 @@
             "navigationBarTitleText": ""
           }
         },
-        {
-          "path": "offlineEvents",
-          "style": {
-            "navigationStyle": "custom",
-            "navigationBarTitleText": "线下活动"
-          }
-        },
+        { "path": "offlineEvents", "style": { "navigationStyle": "custom", "navigationBarTitleText": "线下活动"}},
+        { "path": "eventDetail", "style": { "navigationStyle": "custom", "navigationBarTitleText": "线下活动"}},
         {
           "path": "orderIn",
           "style": {
