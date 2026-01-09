@@ -1,2 +1,4 @@
 .env
 prompt
+.DS_Store
+**/.DS_Store
