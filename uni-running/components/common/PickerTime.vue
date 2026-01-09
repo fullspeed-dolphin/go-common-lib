@@ -54,14 +54,14 @@ const props = defineProps({
     type: String,
     default: "",
   },
-  value: {
+  modelValue: {
     type: [String, Number],
     default: "",
   },
 });
 
 // Emits
-const emit = defineEmits(["input"]);
+const emit = defineEmits(["update:modelValue", "change"]);
 
 // 响应式数据
 const isShowPop = ref(false);
@@ -69,13 +69,13 @@ const timeValue = ref("");
 
 // 计算属性
 const displayTime = computed(() => {
-  if (!props.value) return "";
+  if (!props.modelValue) return "";
   return dayjs(timeValue.value).format("YYYY-MM-DD HH:mm");
 });
 
 // 监听value变化
 watch(
-  () => props.value,
+  () => props.modelValue,
   (val) => {
     // 初始化回显UI值
     if (val) {
@@ -99,7 +99,7 @@ const confrimTime = (detail) => {
   isShowPop.value = false;
   timeValue.value = detail.value;
   console.log("time=======>", detail);
-  emit("input", detail.value);
+  emit("update:modelValue", detail.value);
 };
 
 // 暴露方法给父组件
