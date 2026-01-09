@@ -270,17 +270,17 @@
 		
 		let res_capacity = await request.get(`/booking-api/capacity?event_id=${event_id.value}`, data);
 
-		res_capacity = {
-			"mode": "package",
-			"capacity": [
-				{"package": "个人组", "capacity": 800},
-				{"package": "亲子组", "capacity": 500}
-			],
-			"capacity_used": [
-				{"package": "个人组", "capacity_used": 320},
-				{"package": "亲子组", "capacity_used": 180}
-			]
-		};
+		// res_capacity = {
+		// 	"mode": "package",
+		// 	"capacity": [
+		// 		{"package": "个人组", "capacity": 800},
+		// 		{"package": "亲子组", "capacity": 500}
+		// 	],
+		// 	"capacity_used": [
+		// 		{"package": "个人组", "capacity_used": 320},
+		// 		{"package": "亲子组", "capacity_used": 180}
+		// 	]
+		// };
 
 		console.log('res_capacity=====>', res_capacity)
 
