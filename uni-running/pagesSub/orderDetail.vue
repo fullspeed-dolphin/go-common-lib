@@ -5,7 +5,7 @@
       <view class="h4"> 活动信息 </view>
       <view
         class="flex-row"
-        @click="$u.route(`pagesSub/offlineEvents?id=${detail.event_id}`)"
+        @click="$u.route(`pagesSub/eventDetail?id=${detail.event_id}`)"
       >
         <image
           class="poster"
