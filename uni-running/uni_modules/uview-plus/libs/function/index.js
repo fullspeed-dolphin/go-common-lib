@@ -543,7 +543,7 @@ export function queryParams(data = {}, isPrefix = true, arrayFormat = 'brackets'
  */
 export function toast(text, duration = 2000) {
 	const title = String(text)
-	if (title.length <= 10) {
+	if (title.length <= 14) {
 		uni.showToast({
 			title: title,
 			icon: 'none',
