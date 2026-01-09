@@ -413,18 +413,11 @@ const confirmRefund = () => {
 
   request.post(`/pay/wechat/refund`, params)
     .then((res) => {
-      uni.hideLoading();
       refundDialogRef.value.close();
-      // 显示后端返回的消息
-      const message = res.msg || res.message || res.data || JSON.stringify(res);
-      uni.$u.toast(message);
+      uni.$u.toast("申请成功，请注意退款信息");
     })
     .catch((err) => {
-      uni.hideLoading();
       refundDialogRef.value.close();
-      // 显示后端返回的错误消息
-      const errorMessage = err.msg || err.message || err.data || JSON.stringify(err);
-      uni.$u.toast(errorMessage);
     });
 };
 
@@ -449,7 +442,7 @@ const viewCertificate = (signInfo) => {
 };
 
 const viewEventDetail = () => {
-  uni.$u.route(`pagesSub/offlineEvents?id=${detail.value.event_id}`);
+  uni.$u.route(`pagesSub/eventDetail?id=${detail.value.event_id}`);
 };
 
 // 组件卸载时清除定时器

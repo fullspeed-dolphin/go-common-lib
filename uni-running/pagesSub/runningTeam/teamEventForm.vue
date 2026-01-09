@@ -7,7 +7,7 @@
 				<view class="upload-row">
 					<view class="upload-item">
 						<view class="upload-label">活动背景图(正方形)<text class="required-star">*</text></view>
-						<FileUpload v-model="form.poster" :width="164" :height="120" @change="validateField('poster')">
+						<FileUpload v-model="form.background_image" :width="164" :height="120" @change="validateField('background_image')">
 							<template #trigger>
 								<view class="section-upload-box">
 									<u-icon name="photo" size="48" color="#cccccc"></u-icon>
@@ -17,7 +17,7 @@
 					</view>
 					<view class="upload-item">
 						<view class="upload-label">活动详情(H5长图)</view>
-						<FileUpload v-model="form.longImage" :width="164" :height="120" @change="validateField('longImage')">
+						<FileUpload v-model="form.long_image" :width="164" :height="120" @change="validateField('long_image')">
 							<template #trigger>
 								<view class="section-upload-box">
 									<u-icon name="photo" size="48" color="#cccccc"></u-icon>
@@ -30,9 +30,38 @@
 				<up-form-item label="活动名称" prop="name" required>
 					<input v-model="form.name" class="u-input" @input="validateField('name')" maxlength="50" placeholder="请输入活动名称" />
 				</up-form-item>
+				<up-form-item label="活动描述" prop="description" labelPosition="top" required>
+					<view class="" style="position: relative;">
+						<textarea v-model="form.description" class="u-input" @input="validateField('description')" :height="110" maxlength="150" placeholder="请填写跑团宣言" count></textarea>
+						<view class="" style="position: absolute;right:10rpx;bottom:10rpx;font-size: 24rpx;color: #999;">
+							{{form.description.length}}/150
+						</view>
+					</view>
+				</up-form-item>
+				
+				<up-form-item label="活动地址" prop="event_location" required>
+					<view class="select" @click="handleChooseLocation">
+						<input v-model="form.event_location" class="u-input" readonly placeholder="请选择地址" />
+						<view class="arrow-right">
+							<u-icon name="arrow-right" size="20" color="#707070" />
+						</view>
+					</view>
+				</up-form-item>
+				
+				<TagForm 
+					title="活动项目" v-model="form.event_project" 
+					required prop="event_project" name="event_project" 
+					@input="validateField('event_project')" maxlength="50" placeholder="请添加活动项目" />
+				
+				<up-form-item label="联系人" prop="contact" required>
+					<input v-model="form.contact" class="u-input" @input="validateField('contact')" maxlength="50" placeholder="请输入活动名称" />
+				</up-form-item>
 
-				<up-form-item label="活动人数" prop="peopleCount" required>
-					<input v-model="form.peopleCount" class="u-input" type="number" @input="validateField('peopleCount')" maxlength="50" placeholder="请输入活动人数" />
+				<up-form-item label="活动人数" prop="capacity" required>
+					<input v-model="form.capacity" class="u-input" type="number" @input="validateField('capacity')" maxlength="50" placeholder="请输入活动人数" />
+				</up-form-item>
+				<up-form-item label="套餐数量" prop="multi_package" required>
+					<input v-model="form.multi_package" class="u-input" type="number" @input="validateField('multi_package')" maxlength="50" placeholder="请输入活动人数" />
 				</up-form-item>
 
 				<u-form-item label="活动时间" prop="eventTime" required>
@@ -42,8 +71,12 @@
 						placeholder="请选择时间" :title="null" @change="validateField('eventTime')" />
 				</u-form-item>
 
-				<u-form-item label="是否付费" prop="isPaid" required>
-					<PickerCell v-model="form.isPaid" :title="null" @change="validateField('isPaid')" placeholder="请选择" :border="false" :columns="options_isPaid" />
+				<u-form-item label="是否付费" prop="is_free" required>
+					<PickerCell v-model="form.is_free" :title="null" @change="validateField('is_free')" placeholder="请选择" :border="false" :columns="options_is_free" />
+				</u-form-item>
+				
+				<u-form-item label="退款时间" v-if="form.is_free === '1'" prop="refund_valid_hour" required>
+					<PickerCell v-model="form.refund_valid_hour" :title="null" @change="validateField('refund_valid_hour')" placeholder="请选择" :border="false" :columns="options_hour" />
 				</u-form-item>
 			</up-form>
 
@@ -68,6 +101,7 @@
 	} from "vuex";
 	
 	import PickerCell from "@/components/common/PickerCell.vue";
+	import TagForm from "@/components/common/TagForm.vue";
 	import PickerTime from "@/components/common/PickerTime.vue";
 	import FileUpload from "@/components/common/FileUpload.vue";
 	import dayjs from "dayjs";
@@ -83,24 +117,30 @@
 	const group_id = ref("");
 	const from = ref("");
 	const form = ref({
-		poster: "",
-		longImage: "",
+		background_image: "",
+		long_image: "",
+		contact: "",
+		description: "",
 		name: "",
-		peopleCount: "",
+		capacity: "",
 		eventTime: "",
-		isPaid: "",
+		event_location: "",
+		event_project: "5公里,10公里",
+		is_free: "1",
+		multi_package: "",
+		status: "",
+		refund_valid_hour: "24",
 	});
 
-	const options_isPaid = ref([
-		{
-			label: "是",
-			value: "1"
-		},
-		{
-			label: "否",
-			value: "0"
-		},
+	const options_is_free = ref([
+		{ label: "是", value: "1" },
+		{ label: "否", value: "0" }
 	]);
+	
+	const options_hour = Array.from({ length: 24 }, (_, i) => ({
+  label: `${i + 1}小时`,
+  value: i + 1
+}));
 
 	const maxDate = dayjs().add(3, 'M').valueOf();
 
@@ -111,32 +151,46 @@
 	}
 
 	const rules = ref({
-		poster: [{
-			required: true,
-			message: "请上传活动背景图",
-			trigger: ["blur", "change"],
-		}],
-		name: [{
-			required: true,
-			message: "请输入活动名称",
-			trigger: ["blur", "change"],
-		}],
-		peopleCount: [{
-			required: true,
-			message: "请输入活动人数",
-			trigger: ["blur", "change"],
-		}],
+		background_image: [{ required: true, message: "请上传活动背景图", trigger: ["blur", "change"]}],
+		name: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
+		description: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
+		capacity: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
+		event_project: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
+		contact: [
+			{ required: true, message: "必填项", trigger: ["blur", "change"]},
+			{
+				validator: (rule, value, callback) => {
+					return uni.$u.test.mobile(value);
+				},
+				message: '手机号码不正确',
+				trigger: ['change','blur'],
+			}
+		],
 		eventTime: [{
 			required: true,
 			message: "请选择活动时间",
 			trigger: ["blur", "change"],
 		}],
-		isPaid: [{
+		is_free: [{
 			required: true,
 			message: "请选择是否付费",
 			trigger: ["blur", "change"],
 		}],
 	});
+	
+	const handleChooseLocation = () => {
+		uni.chooseLocation({
+			success: (res) => {
+				console.log(res, "返回地址");
+				form.value.event_location = res.address;
+				
+				validateField('event_location')
+			},
+			fail: (e) => {
+				console.log(e, "选择地址失败");
+			},
+		});
+	};
 
 	// 页面加载
 	onLoad((options) => {
@@ -355,6 +409,8 @@
 				color: #dadada;
 			}
 		}
+		
+		
 
 		.pickermap {
 			width: 100% !important;
@@ -429,7 +485,9 @@
 		}
 
 		.pickermap,
-		.u-input {
+		.u-input,
+		.TagForm .tag-box,
+		{
 			width: 682rpx;
 			font-size: 26rpx;
 			padding: 20rpx;

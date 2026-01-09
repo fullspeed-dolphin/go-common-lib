@@ -33,7 +33,7 @@
 		<view class="section" style="margin-top:30rpx;">
 			<view class="section-title">选择套餐<text v-if="multiPackageCount > 1" style="font-size: 24rpx; color: #999; margin-left: 10rpx;">（可选{{ multiPackageCount }}个套餐）</text></view>
 			<view class="section-content">
-				<view class="price-item" v-for="(item, index) in priceList" :key="index" 
+				<view class="price-item" v-for="(item, index) in packageList" :key="index" 
 					:class="{ disabled: item.isFull, active: item.isChecked }">
 					<view class="price-item-header" @click="togglePackage(item)">
 						<view class="flex-between-center" style="width:100%; align-items: flex-start;">
@@ -59,9 +59,12 @@
 
 					<view v-if="item.isToggle && item.isChecked" class="price-item-signers u-pl-10">
 						<view class="u-flex u-flex-wrap" style="gap:20rpx; justify-content: flex-start; align-items: flex-end;">
-							<block v-if="item.signerList">
-								<view class="flex-col-center" v-for="(signer, indexSigner) in item.signerList" :key="signer.id">
-									<view  class="add-btn flex-center rel"  @click="removeSigner(item, indexSigner)">
+							<view v-for="(signerGroup, groupIndex) in item.groups" :key="groupIndex" 
+								class="u-flex-row group-item" style="gap:20rpx;"
+								:class="{mutil_tag: item.isMutliGroup}"
+							>
+								<view class="flex-col-center" v-for="(signer, personIndex) in signerGroup" :key="signer.id">
+									<view  class="add-btn flex-center rel"  @click="removePerson(item, groupIndex, personIndex)">
 										<view style="position: absolute;right:-8rpx;top:-8rpx;z-index:6;">
 											<u-icon name="close-circle" color="#999" size="20"></u-icon>
 										</view>
@@ -69,11 +72,20 @@
 									</view>
 									<view class="u-mt-10" style="color:#333;font-weight:400;font-size: 24rpx;">{{signer.full_name}}</view>
 								</view>
-							</block>
-
-							<view v-if="!item.isFull || (item.capacity - (item.capacityUsed || 0) > 0)" class="add-btn flex-center" v-for="(item1) in item.signers" @click="refSignerList.open(item)">
-								<u-icon name="plus" color="#fff" size="16"></u-icon>
 							</view>
+							
+							<!-- 人数未满才可添加 -->
+							<block v-if="!item.isFull || (item.capacity - (item.capacityUsed || 0) > 0)">
+								<view class="u-flex u-flex-wrap" 
+									style="gap:20rpx; justify-content: flex-start; align-items: flex-end;"
+									:class1="{mutil_tag: item.isMutliGroup}"
+								>
+								<!-- v-for="(item1) in item.signers" :key="item1"  -->
+									<view  class="add-btn flex-center" @click="openSignerList(item)">
+										<u-icon name="plus" color="#fff" size="16"></u-icon>
+									</view>
+								</view>
+							</block>
 
 							<view v-if="!item.signerList" style="flex: 1; font-size: 24rpx; color: #E53935; text-align: right;">
 								请选择报名卡
@@ -85,7 +97,7 @@
 		</view>
 
 		<section class="section" style="margin-top:30rpx;">
-			<section v-if="priceList.length" class="section-content payment-content">
+			<section v-if="packageList.length" class="section-content payment-content">
 				<view class="money flex-row u-mb-20" style="align-items: baseline">
 					￥{{ totalPrice }}
 					<view class="txt"> {{ !totalPrice ? '(请添加报名人员）' :'' }} </view>
@@ -126,7 +138,7 @@
 			</view>
 		</section>
 
-		<SignerList ref="refSignerList" @select="addSigner"/>
+		<SignerList ref="refSignerList" @select="onSelectSigner"/>
 		<GroupList ref="refGroupList" @success="getUserGroup()" />
 </template>
 <script setup>
@@ -147,8 +159,9 @@
 	import SignerList from "./components/SignerList.vue"
 	import { asyncAlls } from "../utils/util";
 		import request from "@/utils/request.js"
+	import { isUnder14, wxPay, getPackageData, parseBirthDateFromIdCard, parseGenderFromIdCard } from "./utils/orderTool.js";
+	import { deepClone } from '@/uni_modules/uview-plus/libs/function/index';
 
-	// 使用store
 	const store = useStore();
 
 	// 模板引用
@@ -164,7 +177,7 @@
 	const isAgree = ref(false);
 	const SignerInfo = ref({});
 	const eventInfo = ref({});
-	const priceList = ref([]);
+	const packageList = ref([]);
 	const computedCode = ref({});
 	const event_id = ref("");
 	const isSubmitting = ref(false);
@@ -172,22 +185,24 @@
 	const addressPickerColumns = ref([]);
 	const multiPackageCount = ref(1); // 存储 multi_package 字段值
 
-	// 计算属性
 	const userInfo = computed(() => store.state.userInfo);
 
-	// 判断是否多选
 	const isMultiSelect = computed(() => {
 		return multiPackageCount.value > 1;
 	});
 	
 	const totalPrice = ref(0)
 	watch(
-		() => priceList.value,
+		() => packageList.value,
 		(newVal) => {
 			let total = 0
-			priceList.value.forEach(item => {
+
+			const isEventLevel = eventCapacity.value?.mode === 'event';
+			packageList.value.forEach(item => {
 				if (item.isChecked) {
-					total += (item.price || 0) * (item.signerList?.length || 0)
+					const ticket = isEventLevel ? item.groups?.length : item.groups.flat().length;
+
+					total += (item.price || 0) * ticket
 				}
 			})
 			
@@ -199,22 +214,11 @@
 	function selectPackage(item) {
 		item.isChecked = !item.isChecked;
 		
-		if (priceList.value.filter(i => i.isChecked).length > multiPackageCount.value) {
+		if (packageList.value.filter(i => i.isChecked).length > multiPackageCount.value) {
 			item.isChecked = false
 		}
 	}
 	
-	// 计算选中的标签（用于显示）
-	const selectedLabels = computed(() => {
-		if (isMultiSelect.value) {
-			// 多选：用顿号连接所有选中项
-			return selectedPackages.value.map(pkg => pkg.label).join('、') || '请选择套餐';
-		} else {
-			// 单选：返回选中项的标签
-			return activeType.value?.label || '请选择套餐';
-		}
-	});
-
 	// 监听verifyCode变化
 	watch(
 		() => verifyCode.value,
@@ -236,104 +240,55 @@
 			// }
 
 			uni.$u.debounce(() => {
-				getEventPrice()
+				getEventPackageList()
 			}, 300);
 		}
 	);
 
-	// 页面加载
-	onLoad((options) => {
-		event_id.value = options.event_id;
-		getEventPrice();
-		getUserGroup();
-		getEventAddresses();
-	});
+	function openSignerList(item) {
+		if (eventCapacity.value?.mode === 'event') {
+			const availableCapacity = eventCapacity.value.capacity - eventCapacity.value.capacity_used;
+			const signerCapacity = packageList.value.reduce((sum, pkg) => {
+				return sum + (pkg.signerList ? pkg.signerList.length : 0);
+			}, 0);
 
-	// 方法定义
-	const openGroupPop = () => {
-		if (myGroup.value.group_id) return;
-
-		refGroupList.value.open();
-	};
-
-	// 获取活动地址列表
-	const getEventAddresses = async () => {
-		if (!event_id.value) return;
-
-		try {
-			const res = await request.get(`/event-api/api/v1/events/${event_id.value}`);
-
-			// 获取 multi_package 字段，判断是否多选
-			if (res && res.multi_package !== undefined && res.multi_package !== null) {
-				multiPackageCount.value = Number(res.multi_package);
-			} else {
-				multiPackageCount.value = 1; // 默认单选
+			if (availableCapacity - signerCapacity  <= 0) {
+				return uni.$u.toast('本活动报名人数已满');
 			}
-
-			console.log("multi_package:", multiPackageCount.value, "isMultiSelect:", isMultiSelect.value);
-
-			if (res?.racekit_pickup_address) {
-				try {
-					// racekit_pickup_address 是 JSON 字符串，需要解析
-					const addressData =
-						typeof res.racekit_pickup_address === "string" ?
-						JSON.parse(res.racekit_pickup_address) :
-						res.racekit_pickup_address;
-						
-					
-					
-					if (
-						addressData?.addresses &&
-						Array.isArray(addressData.addresses)
-					) {
-						// 转换为 picker 需要的格式
-						addressPickerColumns.value = addressData?.addresses.map(
-							(addr, index) => ({
-								label: addr,
-								value: addr,
-							})
-						);
-						
-						const addressList = addressData?.addresses || []
-						
-						if (addressList.length === 1) {
-							selectedAddress.value = addressPickerColumns.value[0].value
-						}
-					}
-				} catch (error) {
-					console.error("解析地址数据失败:", error);
-				}
-			}
-		} catch (error) {
-			console.error("获取活动地址失败:", error);
-		}
-	};
-
-	const getUserGroup = () => {
-		uni.showLoading({
-			mask: true
-		});
-
-		if (!userInfo.value.running_group) {
-			myGroup.value = {};
-
-			return;
 		}
 
-		request.get(`/running-group/api/v1/groups/info?group_id=${userInfo.value.running_group}`).then(res => {
-			if (res) {
-				myGroup.value = res;
-			}
-		})
-	};
+		refSignerList.value.open(item);
+	}
 
-	const getEventPrice = (spxcode = null) => {
+	const eventCapacity = ref({});
+
+	const getEventPackageList = async (spxcode = null) => {
 		const data = {
 			event_id: event_id.value,
 			spxcode: verifyCode.value,
 		};
+		
+		let res_capacity = await request.get(`/booking-api/capacity?event_id=${event_id.value}`, data);
+
+		// res_capacity = {
+		// 	"mode": "package",
+		// 	"capacity": [
+		// 		{"package": "个人组", "capacity": 800},
+		// 		{"package": "亲子组", "capacity": 500}
+		// 	],
+		// 	"capacity_used": [
+		// 		{"package": "个人组", "capacity_used": 320},
+		// 		{"package": "亲子组", "capacity_used": 180}
+		// 	]
+		// };
+
+		console.log('res_capacity=====>', res_capacity)
+
+		if (res_capacity?.mode === 'event') {
+			eventCapacity.value = res_capacity;
+		}
+
 		request.post("/booking-api/user/price", data).then((res) => {
-			// request.post('/booking-api/user/price?test_for_fullspeed', data).then(res => {
 			eventInfo.value = res;
 
 			if (res.spxcode_status === "ACT") {
@@ -348,112 +303,171 @@
 				};
 			}
 
-			let priceListData = [];
-			res?.tickets?.map((ticket) => {
-				Object.keys(ticket?.price || {}).forEach((i) => {
-					const priceValue = ticket?.price[i];
+			let packageData = getPackageData(res?.tickets, res_capacity);
 
-					// 判断是新格式还是旧格式
-					let itemData = {};
-					if (typeof priceValue === 'object' && priceValue !== null) {
-						// 新格式：带容量限制
-						const capacity = priceValue.capacity;
-						const capacityUsed = priceValue.capacity_used;
-
-						// 判断是否已满：capacity_used >= capacity（只有两者都不为 null 时才判断）
-						const isFull = (capacity !== null && capacity !== undefined) &&
-							(capacityUsed !== null && capacityUsed !== undefined) &&
-							capacityUsed >= capacity;
-
-						itemData = {
-							...priceValue,
-							price: priceValue.price,
-							label: i,
-							capacity: capacity,
-							capacityUsed: capacityUsed,
-							isFull: isFull,
-						};
-
-						console.log(`套餐 ${i}: 容量 ${capacityUsed}/${capacity}, 已满: ${isFull}`);
-					} else {
-						// 旧格式：直接是数字
-						itemData = {
-							price: priceValue,
-							label: i,
-							isFull: false, // 旧格式默认不限制
-						};
-					}
-
-					// console.log("data", itemData, ticket?.price);
-
-					// 如果没有选中的套餐，且当前套餐未满，则设为默认选中
-					if (!activeType?.value?.label && !itemData.isFull) {
-						activeType.value = itemData;
-					}
-
-					priceListData.push(itemData);
-				});
-			});
-
-			console.log("priceListData======>", priceListData)
-
-			priceList.value = priceListData;
+			packageList.value = packageData;
 
 			// 如果有选中数据，更新选中的数据
 			if (isMultiSelect.value) {
 				// 多选模式：更新已选中的套餐价格，移除已满的套餐
 				// selectedPackages.value = selectedPackages.value
-				// 	.map(pkg => priceListData.find(i => i.label === pkg.label))
+				// 	.map(pkg => packageData.find(i => i.label === pkg.label))
 				// 	.filter(pkg => pkg !== undefined && !pkg.isFull);
 			} else {
 				// 单选模式：更新选中的套餐，如果已满则清空
 				if (activeType.value.label) {
-					const updatedItem = priceListData.find(i => i.label === activeType.value.label);
+					const updatedItem = packageData.find(i => i.label === activeType.value.label);
 					if (updatedItem && !updatedItem.isFull) {
 						activeType.value = updatedItem;
 					} else {
 						// 如果选中的套餐已满，选择第一个未满的套餐
-						activeType.value = priceListData.find(i => !i.isFull) || {};
+						activeType.value = packageData.find(i => !i.isFull) || {};
 					}
 				}
 			}
 		});
 	};
 	
-	function removeSigner (item, indexSigner) {
-		item.signerList.splice(indexSigner, 1);
-		item.signers ++
-		item.capacityUsed --
+	function addPersonToGroup({signerInfo, eventInfo}) {
+		// 2. 查找 Package
+		const curPackage = packageList.value.find(item => item.label === eventInfo.label);
+		
+		if (!curPackage) {
+			return { success: false, message: '套餐不存在' }
+		}
+
+		const { groups, maxGroups, groupSize } = curPackage;
+
+		// 3. 检查当前套餐中是否已有同一个人报名
+		const isIncludes = groups.flat().some(i => i.id === signerInfo.id)
+
+		if (isIncludes) {
+			return { success: false, message: `「${signerInfo.full_name}」已报名本套餐，请勿重复添加` }
+		}
+
+		// 4. 检查是否已满
+		const isLastGroupFull = groups.length > 0 && groups[groups.length - 1].length >= groupSize
+		const canCreateNewGroup = groups.length < maxGroups
+
+		// console.log("isLastGroupFull=====>", isLastGroupFull, groups)
+		// console.log("canCreateNewGroup=====>", canCreateNewGroup)
+
+		// 首次添加
+		if (groups.length === 0) {
+			if (isUnder14(signerInfo.cert_number) && groupSize === 1) {
+				return { success: false, message: '未满14岁不能报名成人套餐' }
+			}
+			groups.push([signerInfo])
+
+			// 如果新建的组已达到组容量，则记为已使用一个容量单位
+			if (groups[0].length >= groupSize) {
+				curPackage.capacityUsed = (curPackage.capacityUsed || 0) + 1;
+				if (curPackage.capacity !== null && curPackage.capacity !== undefined && curPackage.capacityUsed >= curPackage.capacity) {
+					curPackage.isFull = true;
+				}
+			}
+
+			return { success: true }
+		}
+
+		// 当前最后一组还有空位
+		if (!isLastGroupFull) {
+			// 亲子套餐必须包含儿童，一个暂缓数组判断是否存在儿童
+			const temp_groups = deepClone(groups[groups.length - 1]);
+			temp_groups.push(signerInfo);
+
+			if (!temp_groups.some(i => isUnder14(i.cert_number)) && eventInfo.label.includes('亲子')) {
+				return { success: false, message: '至少需要选定一个儿童' }
+			}
+
+			groups[groups.length - 1].push(signerInfo)
+
+			// 如果添加后该组达到组容量，则计入已用容量
+			const lastGroup = groups[groups.length - 1];
+			if (lastGroup.length >= groupSize) {
+				curPackage.capacityUsed = (curPackage.capacityUsed || 0) + 1;
+				if (curPackage.capacity !== null && curPackage.capacity !== undefined && curPackage.capacityUsed >= curPackage.capacity) {
+					curPackage.isFull = true;
+				}
+			}
+
+			return { success: true }
+		}
+
+		// 新建一组
+		if (canCreateNewGroup) {
+			if (isUnder14(signerInfo.cert_number) && groupSize === 1) {
+				return { success: false, message: '未满14岁不能报名成人套餐' }
+			}
+			
+			groups.push([signerInfo])
+
+			// 新建组如果已满足组容量，则计入已用容量
+			const lastIdx = groups.length - 1;
+			if (groups[lastIdx].length >= groupSize) {
+				curPackage.capacityUsed = (curPackage.capacityUsed || 0) + 1;
+				if (curPackage.capacity !== null && curPackage.capacity !== undefined && curPackage.capacityUsed >= curPackage.capacity) {
+					curPackage.isFull = true;
+				}
+			}
+
+			return { success: true }
+		}
+
+		// 5. 已满
+		return { success: false, message: '本套餐报名人数已满' }
 	}
 
-	// 从身份证号码解析出生日期
-	const parseBirthDateFromIdCard = (idCard) => {
-		if (!idCard || idCard.length !== 18) return null;
-		const birthStr = idCard.substring(6, 14); // YYYYMMDD
-		const year = parseInt(birthStr.substring(0, 4));
-		const month = parseInt(birthStr.substring(4, 6));
-		const day = parseInt(birthStr.substring(6, 8));
-		return new Date(year, month - 1, day);
-	};
+	function removePerson(curPackage, groupIndex, personIndex) {
+		const groups = curPackage.groups || [];
 
-	// 从身份证号码解析性别 (第17位,奇数为男,偶数为女)
-	const parseGenderFromIdCard = (idCard) => {
-		if (!idCard || idCard.length !== 18) return null;
-		const genderCode = parseInt(idCard.charAt(16));
-		return genderCode % 2 === 1 ? '男' : '女';
-	};
+		// 边界保护：不存在该组时直接返回
+		if (!groups[groupIndex]) return;
 
-	const addSigner = (data) => {
-		// console.log(data, priceList.value)
+		// 记录删除前的组长度，用于判断是否从满组中删除成员
+		const prevLen = groups[groupIndex].length;
+		const groupSize = curPackage.groupSize || 1;
 
-		const curOption = priceList.value.find(item => item.label === data.eventInfo.label);
+		// 执行删除
+		groups[groupIndex].splice(personIndex, 1);
+
+		// 如果该组为空，则移除该组
+		if (groups[groupIndex] && groups[groupIndex].length === 0) {
+			groups.splice(groupIndex, 1);
+		}
+
+		// 如果删除前该组已满（计入了 capacityUsed），则删除后需要回退 capacityUsed
+		if (prevLen >= groupSize) {
+			curPackage.capacityUsed = Math.max(0, (curPackage.capacityUsed || 0) - 1);
+			if (curPackage.capacity !== null && curPackage.capacity !== undefined && curPackage.capacityUsed < curPackage.capacity) {
+				curPackage.isFull = false;
+			}
+		}
+
+		// 如果所有组都被移除，确保 groups 变为空数组（而不是包含空子数组）
+		if (groups.length === 0) {
+			curPackage.groups = [];
+		}
+	}
+
+	// 选择了报名卡后的回调
+	const onSelectSigner = (data) => {
+		console.log(data, packageList.value)
+
+		const result = addPersonToGroup(data);
+
+		if (result.success) {
+			// uni.$u.toast('添加成功')
+		} else {
+			uni.$u.toast(result.message)
+		}
 
 		// 硬编码逻辑:仅对特定活动生效
 		if (event_id.value === '01KCRXHMXF7SEBYCMZ1X2M4E0Y') {
 			const idCard = data.signerInfo.cert_number;
 
 			// 验证1:如果套餐价格为0,只能选择2016年1月1日之后出生的报名卡
-			if (curOption.price === 0) {
+			if (curPackage.price === 0) {
 				const birthDate = parseBirthDateFromIdCard(idCard);
 				const limitDate = new Date(2016, 0, 1); // 2016-01-01
 				if (!birthDate || birthDate < limitDate) {
@@ -462,7 +476,7 @@
 			}
 
 			// 验证2:套餐名称包含'男'或'女',强制匹配性别
-			const packageName = curOption.label;
+			const packageName = curPackage.label;
 			const genderFromIdCard = parseGenderFromIdCard(idCard);
 
 			if (packageName.includes('男') && genderFromIdCard !== '男') {
@@ -473,42 +487,11 @@
 				return uni.$u.toast('请选择正确性别的报名卡');
 			}
 		}
-
-		// if (!isMultiSelect.value) {
-		// 	const isSigned = priceList.value.some(item => {
-		// 		return item?.signerList?.some(i => i.id === data.signerInfo.id)
-		// 	})
-		// 	if (isSigned) {
-		// 		return uni.$u.toast('重复添加，只能单个项目报名~')
-		// 	}
-		// }
-		
-		if (!curOption.signerList) {
-			curOption.signerList = [data.signerInfo]
-			curOption.signers --
-			curOption.capacityUsed ++
-		} else {
-			if (curOption.signerList.some(i => i.id === data.signerInfo.id)) {
-				return uni.$u.toast('重复添加~')
-			}
-
-			curOption.signerList.push(data.signerInfo)
-			curOption.signers --
-			curOption.capacityUsed ++
-		}
-
-		// 添加报名卡后自动选中套餐
-		if (!curOption.isChecked) {
-			const checkedCount = priceList.value.filter(i => i.isChecked).length
-			if (checkedCount < multiPackageCount.value) {
-				curOption.isChecked = true
-			}
-		}
 	};
 	
 	function canSelectPackage(item) {
 		if (item.isChecked) return true
-		const checkedCount = priceList.value.filter(i => i.isChecked).length
+		const checkedCount = packageList.value.filter(i => i.isChecked).length
 		return checkedCount < multiPackageCount.value
 	}
 
@@ -566,18 +549,26 @@
 		}
 		
 		if (!isAgree.value) return uni.$u.toast("请勾选同意协议");
+
+		if (!selectedAddress.value) return uni.$u.toast("请选择参赛包领取地址");
 		
 		// 校验：所有被选中的套餐都必须添加人员
-		const checkedPackages = priceList.value.filter(item => item.isChecked)
+		const checkedPackages = packageList.value.filter(item => item.isChecked)
 		if (!checkedPackages.length) return uni.$u.toast("请选择套餐");
 
-		const packagesWithoutSigners = checkedPackages.filter(item => !item?.signerList?.length)
+		const packagesWithoutSigners = checkedPackages.filter(item => !item?.groups?.length)
 		if (packagesWithoutSigners.length > 0) {
 			const names = packagesWithoutSigners.map(p => p.label).join('、')
 			return uni.$u.toast(`请在「${names}」套餐内添加人员`);
 		}
 
-		if (!selectedAddress.value) return uni.$u.toast("请选择参赛包领取地址");
+		// 单个套餐内人数未满
+		const isUnFull = checkedPackages.some(item =>  {
+			return item.groups.some(i => i.flat().length < item.groupSize)
+		})
+		if (isUnFull) {
+			return uni.$u.toast("请补全所有套餐内的报名人数");
+		}
 
 		// const reg = /^[0-9a-zA-Z]*$/g;
 		// if (verifyCode.value) {
@@ -595,17 +586,16 @@
 			});
 			return;
 		}
+
 		if (isSubmitting.value) return;
 		isSubmitting.value = true;
-		uni.showLoading({
-			mask: true,
-		});
+		uni.showLoading({ mask: true });
 		
 		try {
 			let allSignerList = []
-			priceList.value.filter(i => i.isChecked).forEach(item => {
-				if (item.signerList) {
-					item.signerList?.forEach(user => {
+			packageList.value.filter(i => i.isChecked).forEach(item => {
+				if (item.groups) {
+					item.groups.flat()?.forEach(user => {
 						allSignerList.push({
 							...user,
 							eventInfo: item
@@ -613,6 +603,8 @@
 					})
 				}
 			})
+			console.log('allSignerList=====>', allSignerList)
+
 			const promiseList = allSignerList.map(item => createSingleOrder(item))
 			
 			const orderNoList = await asyncAlls(promiseList)
@@ -713,33 +705,92 @@
 		});
 	};
 
-	const wxPay = (respay) => {
-		// 触发微信支付
-		wx.requestPayment({
-			timeStamp: respay.timeStamp,
-			nonceStr: respay.nonceStr,
-			package: respay.package,
-			signType: respay.signType,
-			paySign: respay.paySign,
-			success: (res) => {
-				uni.hideLoading();
-				uni.$u.toast("支付成功");
-				setTimeout(() => {
-					// uni.navigateBack()
-					uni.$u.route("pagesSub/orderSuccess?order_no=" + respay.order_no);
-				}, 300);
-			},
-			fail: (res) => {
-				uni.hideLoading();
-				console.log("res======>", res);
-				uni.$u.toast("支付未完成");
-				setTimeout(() => {
-					// uni.navigateBack()
-					uni.$u.route("pagesSub/orderFail?order_no=" + respay.order_no);
-				}, 300);
-			},
-		});
+	
+
+	// 获取活动地址列表
+	const getEventAddresses = async () => {
+		if (!event_id.value) return;
+
+		try {
+			const res = await request.get(`/event-api/api/v1/events/${event_id.value}`);
+
+			// 获取 multi_package 字段，判断是否多选
+			if (res && res.multi_package !== undefined && res.multi_package !== null) {
+				multiPackageCount.value = Number(res.multi_package);
+			} else {
+				multiPackageCount.value = 1; // 默认单选
+			}
+
+			console.log("multi_package:", multiPackageCount.value, "isMultiSelect:", isMultiSelect.value);
+
+			if (res?.racekit_pickup_address) {
+				try {
+					// racekit_pickup_address 是 JSON 字符串，需要解析
+					const addressData =
+						typeof res.racekit_pickup_address === "string" ?
+						JSON.parse(res.racekit_pickup_address) :
+						res.racekit_pickup_address;
+					
+					if (
+						addressData?.addresses &&
+						Array.isArray(addressData.addresses)
+					) {
+						// 转换为 picker 需要的格式
+						addressPickerColumns.value = addressData?.addresses.map(
+							(addr, index) => ({
+								label: addr,
+								value: addr,
+							})
+						);
+						
+						const addressList = addressData?.addresses || []
+						
+						if (addressList.length === 1) {
+							selectedAddress.value = addressPickerColumns.value[0].value
+						}
+					}
+				} catch (error) {
+					console.error("解析地址数据失败:", error);
+				}
+			}
+		} catch (error) {
+			console.error("获取活动地址失败:", error);
+		}
 	};
+
+	const getUserGroup = () => {
+		uni.showLoading({
+			mask: true
+		});
+
+		if (!userInfo.value.running_group) {
+			myGroup.value = {};
+
+			return;
+		}
+
+		request.get(`/running-group/api/v1/groups/info?group_id=${userInfo.value.running_group}`).then(res => {
+			if (res) {
+				myGroup.value = res;
+			}
+		})
+	};
+
+	// 页面加载
+	onLoad((options) => {
+		event_id.value = options.event_id;
+		getEventPackageList();
+		getUserGroup();
+		getEventAddresses();
+	});
+
+	// 方法定义
+	const openGroupPop = () => {
+		if (myGroup.value.group_id) return;
+
+		refGroupList.value.open();
+	};
+
 	defineOptions({
 		options: {
 			styleIsolation: "shared",
@@ -748,6 +799,11 @@
 </script>
 
 <style lang="less">
+	.mutil_tag{
+		border: 1px dashed #E53935; 
+		padding: 10rpx 20rpx;
+		border-radius: 10rpx;
+	}
 	.add-btn{
 		width: 88rpx;
 		height: 88rpx;

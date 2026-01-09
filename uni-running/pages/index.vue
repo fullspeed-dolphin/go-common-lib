@@ -54,7 +54,7 @@
 			</swiper>
 
 			<!-- <view class="section-title">线上赛事</view>
-			<section class="section-offline"  @click="$u.route('pagesSub/offlineEvents')">
+			<section class="section-offline"  @click="$u.route('pagesSub/eventDetail')">
 				<image class="poster" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
 				<view class="flex-start">
 					<view class="text">
@@ -229,7 +229,7 @@
 		}
 
 		if (item.event_id) {
-			uni.$u.route(`pagesSub/offlineEvents?id=${item.event_id}`);
+			uni.$u.route(`pagesSub/eventDetail?id=${item.event_id}`);
 			return;
 		}
 		if (item.redirect_url) {
