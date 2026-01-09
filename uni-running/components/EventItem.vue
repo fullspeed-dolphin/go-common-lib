@@ -61,7 +61,7 @@
 	const joinEvent = () => {
 		if (props.from === "order") return;
 		uni.$u.route(
-			`pagesSub/offlineEvents?id=${props.item.event_id || props.item.id}`
+			`pagesSub/eventDetail?id=${props.item.event_id || props.item.id}`
 		);
 	};
 </script>
