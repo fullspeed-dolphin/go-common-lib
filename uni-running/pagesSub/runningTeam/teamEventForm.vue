@@ -30,10 +30,11 @@
 				<up-form-item label="活动名称" prop="name" required>
 					<input v-model="form.name" class="u-input" @input="validateField('name')" maxlength="50" placeholder="请输入活动名称" />
 				</up-form-item>
+				
 				<up-form-item label="活动描述" prop="description" labelPosition="top" required>
 					<view class="" style="position: relative;">
-						<textarea v-model="form.description" class="u-input" @input="validateField('description')" :height="110" maxlength="150" placeholder="请填写跑团宣言" count></textarea>
-						<view class="" style="position: absolute;right:10rpx;bottom:10rpx;font-size: 24rpx;color: #999;">
+						<textarea v-model="form.description" class="u-input" @input="validateField('description')" :height="90" maxlength="150" placeholder="请填写跑团宣言" count></textarea>
+						<view v-if="form.description" class="" style="position: absolute;right:10rpx;bottom:10rpx;font-size: 24rpx;color: #999;">
 							{{form.description.length}}/150
 						</view>
 					</view>
@@ -53,23 +54,28 @@
 					required prop="event_project" name="event_project" 
 					@input="validateField('event_project')" maxlength="50" placeholder="请添加活动项目" />
 				
-				<up-form-item label="联系人" prop="contact" required>
-					<input v-model="form.contact" class="u-input" @input="validateField('contact')" maxlength="50" placeholder="请输入活动名称" />
+				<up-form-item label="联系方式" prop="contact" required>
+					<input v-model="form.contact" class="u-input" @input="validateField('contact')" maxlength="50" placeholder="请输入联系方式" />
 				</up-form-item>
 
 				<up-form-item label="活动人数" prop="capacity" required>
-					<input v-model="form.capacity" class="u-input" type="number" @input="validateField('capacity')" maxlength="50" placeholder="请输入活动人数" />
+					<input v-model="form.capacity" class="u-input" type="number" maxlength="3" placeholder="请输入活动人数" @input="validateField('capacity')" />
 				</up-form-item>
 				<up-form-item label="套餐数量" prop="multi_package" required>
-					<input v-model="form.multi_package" class="u-input" type="number" @input="validateField('multi_package')" maxlength="50" placeholder="请输入活动人数" />
+					<input v-model="form.multi_package" class="u-input" type="number" maxlength="2" placeholder="请输入套餐数量" @input="validateField('multi_package')"  />
 				</up-form-item>
 
-				<u-form-item label="活动时间" prop="eventTime" required>
-					<PickerTime v-model="form.eventTime" mode="datetime"
+				<u-form-item label="活动时间" prop="event_time" required>
+					<PickerTime v-model="form.event_time" mode="datetime"
 						:minDate="new Date().getTime()"
 						:maxDate="maxDate"
-						placeholder="请选择时间" :title="null" @change="validateField('eventTime')" />
+						placeholder="请选择时间" :title="null" @change="validateField('event_time')" />
 				</u-form-item>
+				
+				<TagForm
+					title="参赛包地址" v-model="form.racekit_pickup_address" 
+					required prop="racekit_pickup_address" name="racekit_pickup_address" 
+					@input="validateField('racekit_pickup_address')" maxlength="500" placeholder="请添加参赛包地址" />
 
 				<u-form-item label="是否付费" prop="is_free" required>
 					<PickerCell v-model="form.is_free" :title="null" @change="validateField('is_free')" placeholder="请选择" :border="false" :columns="options_is_free" />
@@ -123,18 +129,18 @@
 		description: "",
 		name: "",
 		capacity: "",
-		eventTime: "",
+		event_time: "",
 		event_location: "",
 		event_project: "5公里,10公里",
 		is_free: "1",
 		multi_package: "",
-		status: "",
+		status: "PND",
 		refund_valid_hour: "24",
 	});
 
 	const options_is_free = ref([
-		{ label: "是", value: "1" },
-		{ label: "否", value: "0" }
+		{ label: "是", value: 1 },
+		{ label: "否", value: 0 }
 	]);
 	
 	const options_hour = Array.from({ length: 24 }, (_, i) => ({
@@ -155,6 +161,8 @@
 		name: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
 		description: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
 		capacity: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
+		racekit_pickup_address: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
+		multi_package: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
 		event_project: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
 		contact: [
 			{ required: true, message: "必填项", trigger: ["blur", "change"]},
@@ -166,7 +174,7 @@
 				trigger: ['change','blur'],
 			}
 		],
-		eventTime: [{
+		event_time: [{
 			required: true,
 			message: "请选择活动时间",
 			trigger: ["blur", "change"],
@@ -196,28 +204,31 @@
 	onLoad((options) => {
 		console.log("option", options);
 		group_id.value = options.group_id;
-
-		from.value = options.from;
-		// getDetail();
+		form.value.phone = store.state.userInfo.phone;
+		
+		getDetail();
 	});
 
 	// 方法定义
 	const getDetail = (page) => {
-		form.value.phone = store.state.userInfo.phone;
 		if (!group_id.value) return;
-		request.get(`/running-group/api/v1/groups/info?group_id=${group_id.value}`)
+		request.get(`/event-api/fsc_events?id=${group_id.value}`)
 			.then((res) => {
-				form.value = {
-					poster: res.avatar_url,
-					name: res.name,
-					location: res.establish_location,
-					description: res.introduction,
-					fullName: res.creator_real_name,
-					phone: res.creator_phone,
-					// amount: String(res.total_members),
+				console.log('res=====>', res)
+				res = res.fsc_events?.[0] || {}
+				// merge into existing form to preserve reactivity and default keys
+				Object.assign(form.value, {
+					...res,
+					racekit_pickup_address: res.racekit_pickup_address?.addresses?.[0] || "",
 					establish_time: dayjs(res.establish_time).valueOf(),
-				};
-
+					// ensure these fields are strings so validator treats them as filled
+					capacity: res.capacity != null ? String(res.capacity) : form.value.capacity,
+					multi_package: res.multi_package != null ? String(res.multi_package) : form.value.multi_package,
+					is_free: res.is_free != null ? String(res.is_free) : form.value.is_free,
+				});
+				
+				validateField('event_time')
+				
 				isAgree.value = true;
 			});
 	};
@@ -233,59 +244,53 @@
 				return;
 			}
 
-			if (!isAgree.value) return uni.$u.toast("请勾选同意协议");
 
 			const data = {
-				avatar_url: form.value.poster,
-				name: form.value.name,
-				establish_location: form.value.location,
-				creator_real_name: form.value.fullName,
-				// "total_members": form.value.amount,
-				introduction: form.value.description,
-				creator_phone: form.value.phone,
-				establish_time: form.value.establish_time,
+				...form.value,
+				fsc_id: group_id.value,
+				establish_time: dayjs(res.establish_time).format("YYYY-MM-DDTHH:mm:00+08:00"),
+				racekit_pickup_address: {
+					addresses: form.value.racekit_pickup_address.split(",")
+				}
 			};
 			uni.showLoading({
 				mask: true,
 			});
 
-			let url = "/running-group/api/v1/groups";
+			let url = "/event-api/fsc_events";
 
 			// 更新跑团
 			if (group_id.value) {
-				url = "/running-group/api/v1/groups/update";
+				url = "/event-api/fsc_events";
 			}
 			request.post(url, data).then(async (res) => {
 				console.log(res);
 
 				uni.$u.toast(group_id.value ? "更新成功" : "创建成功");
 
-				const res1 = await store.dispatch("getUserInfo");
+				// const res1 = await store.dispatch("getUserInfo");
 
-				// 跳转回上一级页面，返回上一页并传递参数
-				uni.$emit("updateList", {
-					isChange: true,
-					from: from.value,
-					group_id: res1.running_group,
-				});
+				// // 跳转回上一级页面，返回上一页并传递参数
+				// uni.$emit("updateList", {
+				// 	isChange: true,
+				// 	from: from.value,
+				// 	group_id: res1.running_group,
+				// });
 
 				setTimeout(() => {
 					uni.navigateBack();
 				}, 500);
-			}).catch(e => {
-				uni.hideLoading()
-				uni.showModal({
-				  title: '提示',
-				  content: e.msg,
-				  showCancel: false, // 如果不需要“取消”按钮
-				  confirmText: '我知道了'
-				});
 			})
 		});
 	};
 </script>
 
 <style lang="less" scoped>
+	::v-deep{
+		.u-form-item__body{
+			flex-direction: column!important;
+		}
+	}
 	.submit-btn {
 		width: 682rpx;
 		height: 72rpx;
@@ -406,7 +411,7 @@
 				margin-left: 0 !important;
 				font-weight: bold;
 				font-size: 26rpx;
-				color: #dadada;
+				// color: #dadada;
 			}
 		}
 		
@@ -466,11 +471,6 @@
 			margin-left: 0 !important;
 		}
 
-		.u-form-item__body__left__content {
-			display: flex !important;
-			flex-direction: row !important;
-		}
-
 		.u-form-item__body__left__content__required {
 			position: relative !important;
 			top: 0 !important;
@@ -486,7 +486,7 @@
 
 		.pickermap,
 		.u-input,
-		.TagForm .tag-box,
+		.TagForm .tag-box
 		{
 			width: 682rpx;
 			font-size: 26rpx;

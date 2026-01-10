@@ -9,6 +9,7 @@
       isLink
     />
     <u-datetime-picker
+		
       :mode="mode"
       :show="isShowPop"
 			:minDate="minDate"
@@ -31,11 +32,11 @@ const props = defineProps({
     default: "",
   },
   minDate: {
-    type: String,
+    type: [String, Number],
     default: "",
   },
   maxDate: {
-    type: String,
+    type: [String, Number],
     default: "",
   },
   mode: {
@@ -69,7 +70,7 @@ const timeValue = ref("");
 
 // 计算属性
 const displayTime = computed(() => {
-  if (!props.modelValue) return "";
+  if (!timeValue.value) return "";
   return dayjs(timeValue.value).format("YYYY-MM-DD HH:mm");
 });
 
@@ -79,7 +80,8 @@ watch(
   (val) => {
     // 初始化回显UI值
     if (val) {
-      timeValue.value = dayjs(val).valueOf();
+			console.log('val=====>', Number(val))
+      timeValue.value = Number(val);
     } else {
       timeValue.value = dayjs().valueOf();
     }
@@ -98,8 +100,9 @@ const open = () => {
 const confrimTime = (detail) => {
   isShowPop.value = false;
   timeValue.value = detail.value;
-  console.log("time=======>", detail);
-  emit("update:modelValue", detail.value);
+  console.log("ti====>", detail, dayjs(detail.value).format("YYYY-MM-DD HH:mm"));
+  emit("update:modelValue", String(detail.value));
+  emit("change", String(detail.value));
 };
 
 // 暴露方法给父组件

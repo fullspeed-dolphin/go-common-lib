@@ -3,7 +3,7 @@
     <!-- 活动列表 -->
     <view class="event-list">
       <view class="event-card" v-for="(item, index) in eventList" :key="index">
-        <image class="event-poster" :src="item.poster || '/static/default-event.png'" mode="aspectFill"></image>
+        <image class="event-poster" :src="item.background_image_url || '/static/default-event.png'" mode="aspectFill"></image>
         <view class="event-info">
           <view class="event-header">
             <text class="event-name">{{ item.name }}</text>
@@ -18,7 +18,7 @@
             </view>
             <view class="meta-item">
               <u-icon name="map" size="24rpx" color="#999"></u-icon>
-              <text class="meta-text">{{ item.location }}</text>
+              <text class="meta-text">{{ item.event_location }}</text>
             </view>
           </view>
           <view class="event-actions">
@@ -62,8 +62,8 @@ const getEventList = async () => {
   if (!group_id.value) return;
   loading.value = true;
   try {
-    const res = await request.get(`/running-group/api/v1/events?group_id=${group_id.value}`);
-    eventList.value = (res.list || res || []).map(item => ({
+    const res = await request.get(`/event-api/fsc_events?group_id=${group_id.value}`);
+    eventList.value = (res.fsc_events || []).map(item => ({
       ...item,
       event_time: item.event_time ? dayjs(item.event_time).format('YYYY-MM-DD') : ''
     }));
