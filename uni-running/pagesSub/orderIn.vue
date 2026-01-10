@@ -31,64 +31,66 @@
 		</section>
 
 		<view class="section" style="margin-top:30rpx;">
-			<view class="section-title">选择套餐<text v-if="multiPackageCount > 1" style="font-size: 24rpx; color: #999; margin-left: 10rpx;">（可选{{ multiPackageCount }}个套餐）</text></view>
+			<view class="section-title">
+				<text>选择套餐</text>
+				<text v-if="eventCapacity.mode === 'event'" class="remaining-quota">（剩余名额：{{ (eventCapacity.capacity || 0) - (eventCapacity.capacity_used || 0) }}）</text>
+			</view>
 			<view class="section-content">
-				<view class="price-item" v-for="(item, index) in packageList" :key="index" 
-					:class="{ disabled: item.isFull, active: item.isChecked }">
-					<view class="price-item-header" @click="togglePackage(item)">
-						<view class="flex-between-center" style="width:100%; align-items: flex-start;">
-							<view class="price-item-content" >
-								<view class="price-item-row">
-									<view class="price-item-label">{{ item.label }}</view>
-								</view>
-								<view class="flex-start">
-									<view class="price-item-price u-mr-20">￥{{ item.price }}</view>
-									<view v-if="item.isFull" class="price-item-status">已满</view>
-									<view v-else-if="item.capacity !== null && item.capacity !== undefined" class="price-item-capacity">
-										剩余 {{ item.capacity - (item.capacityUsed || 0) }}
-									</view>
-								</view>
-							</view>
+				<view class="price-item" v-for="(item, index) in packageList" :key="index"
+					:class="{ disabled: item.isFull, active: item.count > 0 }">
 
-							<view v-if="!item.isFull" class="flex-center u-mt-10" style="font-size: 24rpx;" :class="{active: item.isToggle}">
-								{{item.isToggle ? '收起' : '展开' }}
-								<u-icon name="arrow-right" :color="item.isChecked ? '#fff' : '#999'" size="10"></u-icon>
+					<!-- 套餐头部：左侧信息 + 右侧数量选择器 -->
+					<view class="price-item-header" @click="onPackageClick(item)">
+						<view class="price-item-left">
+							<view class="price-item-label">{{ item.label }}<text v-if="item.groupSize > 1" class="group-size-hint">（{{ item.groupSize }}人/组）</text></view>
+							<view class="price-item-meta">
+								<text class="price-item-price">￥{{ item.price }}</text>
+								<text v-if="item.isFull" class="price-item-status">已满</text>
+								<text v-else-if="item.capacity !== null && item.capacity !== undefined" class="price-item-capacity">
+									剩余 {{ item.capacity - (item.capacityUsed || 0) }}
+								</text>
+							</view>
+						</view>
+
+						<!-- 数量选择器 -->
+						<view class="price-item-right">
+							<view class="quantity-selector" v-if="!item.isFull">
+								<view class="qty-btn minus" :class="{ disabled: item.count <= 0 }"
+									@click.stop="decreaseCount(item)">
+									<u-icon name="minus" size="14" :color="item.count <= 0 ? '#ccc' : '#333'"></u-icon>
+								</view>
+								<view class="qty-value">{{ item.count || 0 }}</view>
+								<view class="qty-btn plus" :class="{ disabled: isMaxCount(item) }"
+									@click.stop="increaseCount(item)">
+									<u-icon name="plus" size="14" :color="isMaxCount(item) ? '#ccc' : '#333'"></u-icon>
+								</view>
 							</view>
 						</view>
 					</view>
 
-					<view v-if="item.isToggle && item.isChecked" class="price-item-signers u-pl-10">
-						<view class="u-flex u-flex-wrap" style="gap:20rpx; justify-content: flex-start; align-items: flex-end;">
-							<view v-for="(signerGroup, groupIndex) in item.groups" :key="groupIndex" 
-								class="u-flex-row group-item" style="gap:20rpx;"
-								:class="{mutil_tag: item.isMutliGroup}"
-							>
-								<view class="flex-col-center" v-for="(signer, personIndex) in signerGroup" :key="signer.id">
-									<view  class="add-btn flex-center rel"  @click="removePerson(item, groupIndex, personIndex)">
-										<view style="position: absolute;right:-8rpx;top:-8rpx;z-index:6;">
+					<!-- 报名卡空位区域：count > 0 时显示 -->
+					<view v-if="item.count > 0" class="price-item-slots">
+						<view v-for="(group, groupIndex) in item.groups" :key="groupIndex"
+							class="slot-group" :class="{ 'multi-group': item.groupSize > 1 }">
+							<view v-for="(slot, slotIndex) in group" :key="slotIndex"
+								class="slot-item" @click="handleSlotClick(item, groupIndex, slotIndex)">
+								<!-- 已填充 -->
+								<template v-if="slot">
+									<view class="slot-filled">
+										<image class="slot-avatar" src="/static/images/user.png" mode="aspectFill"></image>
+										<view class="slot-remove" @click.stop="removeSlot(item, groupIndex, slotIndex)">
 											<u-icon name="close-circle" color="#999" size="20"></u-icon>
 										</view>
-										<image style="width:88rpx;height:88rpx;" src="/static/images/user.png" mode="aspectFill"></image>
 									</view>
-									<view class="u-mt-10" style="color:#333;font-weight:400;font-size: 24rpx;">{{signer.full_name}}</view>
-								</view>
-							</view>
-							
-							<!-- 人数未满才可添加 -->
-							<block v-if="!item.isFull || (item.capacity - (item.capacityUsed || 0) > 0)">
-								<view class="u-flex u-flex-wrap" 
-									style="gap:20rpx; justify-content: flex-start; align-items: flex-end;"
-									:class1="{mutil_tag: item.isMutliGroup}"
-								>
-								<!-- v-for="(item1) in item.signers" :key="item1"  -->
-									<view  class="add-btn flex-center" @click="openSignerList(item)">
-										<u-icon name="plus" color="#fff" size="16"></u-icon>
+									<view class="slot-name">{{ slot.full_name }}</view>
+								</template>
+								<!-- 空位 -->
+								<template v-else>
+									<view class="slot-empty">
+										<u-icon name="plus" color="#999" size="20"></u-icon>
 									</view>
-								</view>
-							</block>
-
-							<view v-if="!item.signerList" style="flex: 1; font-size: 24rpx; color: #E53935; text-align: right;">
-								请选择报名卡
+									<view class="slot-name">请选择</view>
+								</template>
 							</view>
 						</view>
 					</view>
@@ -187,6 +189,103 @@
 
 	const userInfo = computed(() => store.state.userInfo);
 
+	// 当前正在填充的空位信息
+	const currentSlotInfo = ref({ item: null, groupIndex: 0, slotIndex: 0 });
+
+	// 计算套餐最大可选数量
+	function getMaxCount(item) {
+		if (item.capacity === null || item.capacity === undefined) {
+			return item.maxGroups || 20;
+		}
+		return Math.min(
+			item.capacity - (item.capacityUsed || 0),
+			item.maxGroups || 20
+		);
+	}
+
+	// 是否已达最大数量
+	function isMaxCount(item) {
+		return (item.count || 0) >= getMaxCount(item);
+	}
+
+	// 增加数量
+	function increaseCount(item) {
+		if (isMaxCount(item)) return;
+
+		if (!item.count) item.count = 0;
+		item.count++;
+
+		// 新增一组空位
+		const groupSize = item.groupSize || 1;
+		const newGroup = new Array(groupSize).fill(null);
+		if (!item.groups) item.groups = [];
+		item.groups.push(newGroup);
+	}
+
+	// 点击套餐卡片
+	function onPackageClick(item) {
+		if (item.isFull) return;
+
+		if (item.count > 0) {
+			// 已选中：弹窗确认是否取消
+			confirmClearPackage(item);
+		} else {
+			// 未选中：自动 +1
+			increaseCount(item);
+		}
+	}
+
+	// 确认清空套餐
+	function confirmClearPackage(item) {
+		uni.showModal({
+			title: '提示',
+			content: '取消选中套餐会清空所有选中的报名卡信息，是否继续？',
+			confirmText: '是',
+			cancelText: '否',
+			success: (res) => {
+				if (res.confirm) {
+					// 清空该套餐
+					item.count = 0;
+					item.groups = [];
+				}
+			}
+		});
+	}
+
+	// 减少数量
+	function decreaseCount(item) {
+		if (!item.count || item.count <= 0) return;
+
+		// 如果减到 0，弹窗确认
+		if (item.count === 1) {
+			confirmClearPackage(item);
+			return;
+		}
+
+		item.count--;
+		// 移除最后一组
+		if (item.groups && item.groups.length > 0) {
+			item.groups.pop();
+		}
+	}
+
+	// 点击空位
+	function handleSlotClick(item, groupIndex, slotIndex) {
+		// 如果已有报名卡，不处理（用户需要先删除）
+		if (item.groups[groupIndex][slotIndex]) return;
+
+		// 记录当前要填充的位置
+		currentSlotInfo.value = { item, groupIndex, slotIndex };
+		refSignerList.value.open(item);
+	}
+
+	// 移除空位中的报名卡
+	function removeSlot(item, groupIndex, slotIndex) {
+		if (item.groups && item.groups[groupIndex]) {
+			item.groups[groupIndex][slotIndex] = null;
+		}
+	}
+
 	const isMultiSelect = computed(() => {
 		return multiPackageCount.value > 1;
 	});
@@ -195,29 +294,27 @@
 	watch(
 		() => packageList.value,
 		(newVal) => {
-			let total = 0
+			let total = 0;
 
 			const isEventLevel = eventCapacity.value?.mode === 'event';
 			packageList.value.forEach(item => {
-				if (item.isChecked) {
-					const ticket = isEventLevel ? item.groups?.length : item.groups.flat().length;
-
-					total += (item.price || 0) * ticket
+				if (item.count > 0) {
+					if (isEventLevel) {
+						// 事件级容量：按组数计算
+						total += (item.price || 0) * item.count;
+					} else {
+						// 套餐级容量：按人数计算
+						const groupSize = item.groupSize || 1;
+						total += (item.price || 0) * item.count * groupSize;
+					}
 				}
-			})
-			
+			});
+
 			totalPrice.value = total;
 		},
-		 { deep: true }
+		{ deep: true }
 	);
 	
-	function selectPackage(item) {
-		item.isChecked = !item.isChecked;
-		
-		if (packageList.value.filter(i => i.isChecked).length > multiPackageCount.value) {
-			item.isChecked = false
-		}
-	}
 	
 	// 监听verifyCode变化
 	watch(
@@ -245,20 +342,6 @@
 		}
 	);
 
-	function openSignerList(item) {
-		if (eventCapacity.value?.mode === 'event') {
-			const availableCapacity = eventCapacity.value.capacity - eventCapacity.value.capacity_used;
-			const signerCapacity = packageList.value.reduce((sum, pkg) => {
-				return sum + (pkg.signerList ? pkg.signerList.length : 0);
-			}, 0);
-
-			if (availableCapacity - signerCapacity  <= 0) {
-				return uni.$u.toast('本活动报名人数已满');
-			}
-		}
-
-		refSignerList.value.open(item);
-	}
 
 	const eventCapacity = ref({});
 
@@ -328,146 +411,29 @@
 		});
 	};
 	
-	function addPersonToGroup({signerInfo, eventInfo}) {
-		// 2. 查找 Package
-		const curPackage = packageList.value.find(item => item.label === eventInfo.label);
-		
-		if (!curPackage) {
-			return { success: false, message: '套餐不存在' }
-		}
 
-		const { groups, maxGroups, groupSize } = curPackage;
-
-		// 3. 检查当前套餐中是否已有同一个人报名
-		const isIncludes = groups.flat().some(i => i.id === signerInfo.id)
-
-		if (isIncludes) {
-			return { success: false, message: `「${signerInfo.full_name}」已报名本套餐，请勿重复添加` }
-		}
-
-		// 4. 检查是否已满
-		const isLastGroupFull = groups.length > 0 && groups[groups.length - 1].length >= groupSize
-		const canCreateNewGroup = groups.length < maxGroups
-
-		// console.log("isLastGroupFull=====>", isLastGroupFull, groups)
-		// console.log("canCreateNewGroup=====>", canCreateNewGroup)
-
-		// 首次添加
-		if (groups.length === 0) {
-			if (isUnder14(signerInfo.cert_number) && groupSize === 1) {
-				return { success: false, message: '未满14岁不能报名成人套餐' }
-			}
-			groups.push([signerInfo])
-
-			// 如果新建的组已达到组容量，则记为已使用一个容量单位
-			if (groups[0].length >= groupSize) {
-				curPackage.capacityUsed = (curPackage.capacityUsed || 0) + 1;
-				if (curPackage.capacity !== null && curPackage.capacity !== undefined && curPackage.capacityUsed >= curPackage.capacity) {
-					curPackage.isFull = true;
-				}
-			}
-
-			return { success: true }
-		}
-
-		// 当前最后一组还有空位
-		if (!isLastGroupFull) {
-			// 亲子套餐必须包含儿童，一个暂缓数组判断是否存在儿童
-			const temp_groups = deepClone(groups[groups.length - 1]);
-			temp_groups.push(signerInfo);
-
-			if (!temp_groups.some(i => isUnder14(i.cert_number)) && eventInfo.label.includes('亲子')) {
-				return { success: false, message: '至少需要选定一个儿童' }
-			}
-
-			groups[groups.length - 1].push(signerInfo)
-
-			// 如果添加后该组达到组容量，则计入已用容量
-			const lastGroup = groups[groups.length - 1];
-			if (lastGroup.length >= groupSize) {
-				curPackage.capacityUsed = (curPackage.capacityUsed || 0) + 1;
-				if (curPackage.capacity !== null && curPackage.capacity !== undefined && curPackage.capacityUsed >= curPackage.capacity) {
-					curPackage.isFull = true;
-				}
-			}
-
-			return { success: true }
-		}
-
-		// 新建一组
-		if (canCreateNewGroup) {
-			if (isUnder14(signerInfo.cert_number) && groupSize === 1) {
-				return { success: false, message: '未满14岁不能报名成人套餐' }
-			}
-			
-			groups.push([signerInfo])
-
-			// 新建组如果已满足组容量，则计入已用容量
-			const lastIdx = groups.length - 1;
-			if (groups[lastIdx].length >= groupSize) {
-				curPackage.capacityUsed = (curPackage.capacityUsed || 0) + 1;
-				if (curPackage.capacity !== null && curPackage.capacity !== undefined && curPackage.capacityUsed >= curPackage.capacity) {
-					curPackage.isFull = true;
-				}
-			}
-
-			return { success: true }
-		}
-
-		// 5. 已满
-		return { success: false, message: '本套餐报名人数已满' }
-	}
-
-	function removePerson(curPackage, groupIndex, personIndex) {
-		const groups = curPackage.groups || [];
-
-		// 边界保护：不存在该组时直接返回
-		if (!groups[groupIndex]) return;
-
-		// 记录删除前的组长度，用于判断是否从满组中删除成员
-		const prevLen = groups[groupIndex].length;
-		const groupSize = curPackage.groupSize || 1;
-
-		// 执行删除
-		groups[groupIndex].splice(personIndex, 1);
-
-		// 如果该组为空，则移除该组
-		if (groups[groupIndex] && groups[groupIndex].length === 0) {
-			groups.splice(groupIndex, 1);
-		}
-
-		// 如果删除前该组已满（计入了 capacityUsed），则删除后需要回退 capacityUsed
-		if (prevLen >= groupSize) {
-			curPackage.capacityUsed = Math.max(0, (curPackage.capacityUsed || 0) - 1);
-			if (curPackage.capacity !== null && curPackage.capacity !== undefined && curPackage.capacityUsed < curPackage.capacity) {
-				curPackage.isFull = false;
-			}
-		}
-
-		// 如果所有组都被移除，确保 groups 变为空数组（而不是包含空子数组）
-		if (groups.length === 0) {
-			curPackage.groups = [];
-		}
-	}
 
 	// 选择了报名卡后的回调
 	const onSelectSigner = (data) => {
-		console.log(data, packageList.value)
+		const { item, groupIndex, slotIndex } = currentSlotInfo.value;
+		const signerInfo = data.signerInfo;
 
-		const result = addPersonToGroup(data);
+		if (!item || !item.groups || !item.groups[groupIndex]) {
+			return uni.$u.toast('选择位置无效，请重试');
+		}
 
-		if (result.success) {
-			// uni.$u.toast('添加成功')
-		} else {
-			uni.$u.toast(result.message)
+		// 检查是否重复添加（同一套餐内）
+		const isExists = item.groups.flat().some(s => s && s.id === signerInfo.id);
+		if (isExists) {
+			return uni.$u.toast(`「${signerInfo.full_name}」已在本套餐中`);
 		}
 
 		// 硬编码逻辑:仅对特定活动生效
 		if (event_id.value === '01KCRXHMXF7SEBYCMZ1X2M4E0Y') {
-			const idCard = data.signerInfo.cert_number;
+			const idCard = signerInfo.cert_number;
 
 			// 验证1:如果套餐价格为0,只能选择2016年1月1日之后出生的报名卡
-			if (curPackage.price === 0) {
+			if (item.price === 0) {
 				const birthDate = parseBirthDateFromIdCard(idCard);
 				const limitDate = new Date(2016, 0, 1); // 2016-01-01
 				if (!birthDate || birthDate < limitDate) {
@@ -476,7 +442,7 @@
 			}
 
 			// 验证2:套餐名称包含'男'或'女',强制匹配性别
-			const packageName = curPackage.label;
+			const packageName = item.label;
 			const genderFromIdCard = parseGenderFromIdCard(idCard);
 
 			if (packageName.includes('男') && genderFromIdCard !== '男') {
@@ -487,87 +453,46 @@
 				return uni.$u.toast('请选择正确性别的报名卡');
 			}
 		}
+
+		// 填充到指定位置
+		item.groups[groupIndex][slotIndex] = signerInfo;
 	};
 	
-	function canSelectPackage(item) {
-		if (item.isChecked) return true
-		const checkedCount = packageList.value.filter(i => i.isChecked).length
-		return checkedCount < multiPackageCount.value
-	}
 
-	function togglePackage (item) {
-		if (item.isFull) return;
-		
-		// 如果套餐未选中且已达选择上限，不响应点击
-		if (!item.isChecked && !canSelectPackage(item)) {
-			return
-		}
-
-		item.isToggle = !item.isToggle
-		if (item.isToggle) {
-			// 展开时自动选中套餐
-			if (!item.isChecked) {
-				item.isChecked = true
-			}
-		} else {
-			// 收起时取消选中套餐
-			item.isChecked = false
-		}
-	}
-
-	const changeTab = (item) => {
-		// 检查套餐是否已满
-		if (item.isFull) {
-			uni.$u.toast("该套餐已满，无法选择");
-			return;
-		}
-
-		if (isMultiSelect.value) {
-			// 多选逻辑：toggle 选中状态
-			const index = selectedPackages.value.findIndex(pkg => pkg.label === item.label);
-			if (index > -1) {
-				// 已选中，移除
-				selectedPackages.value.splice(index, 1);
-			} else {
-				// 未选中，添加（检查是否超过限制）
-				if (selectedPackages.value.length >= multiPackageCount.value) {
-					uni.$u.toast(`最多只能选择 ${multiPackageCount.value} 个套餐`);
-					return;
-				}
-				selectedPackages.value.push(item);
-			}
-			console.log("已选中套餐:", selectedPackages.value);
-		} else {
-			// 单选逻辑：直接替换
-			activeType.value = item;
-		}
-	};
 
 	const submitOrder = async () => {
 		if (!store.state.userInfo.id) {
 			return refUserLogin.value.open();
 		}
-		
+
 		if (!isAgree.value) return uni.$u.toast("请勾选同意协议");
 
 		if (!selectedAddress.value) return uni.$u.toast("请选择参赛包领取地址");
-		
-		// 校验：所有被选中的套餐都必须添加人员
-		const checkedPackages = packageList.value.filter(item => item.isChecked)
-		if (!checkedPackages.length) return uni.$u.toast("请选择套餐");
 
-		const packagesWithoutSigners = checkedPackages.filter(item => !item?.groups?.length)
-		if (packagesWithoutSigners.length > 0) {
-			const names = packagesWithoutSigners.map(p => p.label).join('、')
-			return uni.$u.toast(`请在「${names}」套餐内添加人员`);
+		// 获取所有选中的套餐（count > 0）
+		const selectedPackages = packageList.value.filter(item => item.count > 0);
+		if (!selectedPackages.length) {
+			return uni.$u.toast("请选择套餐");
 		}
 
-		// 单个套餐内人数未满
-		const isUnFull = checkedPackages.some(item =>  {
-			return item.groups.some(i => i.flat().length < item.groupSize)
-		})
-		if (isUnFull) {
-			return uni.$u.toast("请补全所有套餐内的报名人数");
+		// 检查所有空位是否已填充
+		for (const pkg of selectedPackages) {
+			const emptySlots = pkg.groups.flat().filter(slot => slot === null);
+			if (emptySlots.length > 0) {
+				return uni.$u.toast(`请完成「${pkg.label}」的报名卡选择`);
+			}
+		}
+
+		// 亲子组校验：至少一个儿童
+		for (const pkg of selectedPackages) {
+			if (pkg.label.includes('亲子')) {
+				for (const group of pkg.groups) {
+					const hasChild = group.some(s => s && isUnder14(s.cert_number));
+					if (!hasChild) {
+						return uni.$u.toast('亲子套餐每组至少需要一个儿童');
+					}
+				}
+			}
 		}
 
 		// const reg = /^[0-9a-zA-Z]*$/g;
@@ -593,13 +518,15 @@
 		
 		try {
 			let allSignerList = []
-			packageList.value.filter(i => i.isChecked).forEach(item => {
+			packageList.value.filter(i => i.count > 0).forEach(item => {
 				if (item.groups) {
 					item.groups.flat()?.forEach(user => {
-						allSignerList.push({
-							...user,
-							eventInfo: item
-						})
+						if (user) {
+							allSignerList.push({
+								...user,
+								eventInfo: item
+							})
+						}
 					})
 				}
 			})
@@ -799,24 +726,6 @@
 </script>
 
 <style lang="less">
-	.mutil_tag{
-		border: 1px dashed #E53935; 
-		padding: 10rpx 20rpx;
-		border-radius: 10rpx;
-	}
-	.add-btn{
-		width: 88rpx;
-		height: 88rpx;
-		background: #FF8C00;
-		border-radius: 16rpx 16rpx 16rpx 16rpx;
-	}
-	.check-icon{
-		border-radius: 50rpx;
-		width: 40rpx;height: 40rpx;background: #FF8C00;
-		&.active{
-			transform: rotate(90deg);
-		}
-	}
 	.page {
 		background: #fafafa;
 	}
@@ -895,6 +804,13 @@
 		font-size: 30rpx;
 		color: #000000;
 		margin-bottom: 24rpx;
+
+		.remaining-quota {
+			font-size: 26rpx;
+			font-weight: normal;
+			color: #E53935;
+			margin-left: 8rpx;
+		}
 	}
 	
 	.section-content {
@@ -906,92 +822,198 @@
 	}
 
 		.price-item {
-			min-height: 90rpx;
 			background: #f6fafb;
 			border-radius: 16rpx;
-			font-weight: bold;
-			font-size: 30rpx;
-			color: #000000;
-			overflow: hidden;
 			margin-bottom: 20rpx;
+			overflow: hidden;
+
 			&.active {
-				border: 1px solid #ff8c00;
-				box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.3);
-				.price-item-header{
+				border: 2rpx solid #ff8c00;
+				box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.15);
+
+				.price-item-header {
 					background: #ff8c00;
-					color: #ffffff;
-					border-radius: 0;
 				}
-				.price-item-content {
-					.price-item-price,
-					.price-item-status,
-					.price-item-capacity {
-						color: #ffffff;
+
+				.price-item-label {
+					color: #ffffff;
+
+					.group-size-hint {
+						color: rgba(255, 255, 255, 0.8);
 					}
 				}
-			}
 
-			.price-item-header {
-				padding: 20rpx;
-				background: #f6fafb;
-				border-radius: 16rpx;
-				// transition: background 0.3s ease;
-			}
+				.price-item-price,
+				.price-item-capacity {
+					color: #ffffff;
+				}
 
-			.price-item-signers {
-				padding: 20rpx 20rpx 20rpx 0;
-				background: #ffffff;
+				.quantity-selector {
+					background: rgba(255, 255, 255, 0.95);
+				}
 			}
 
 			&.disabled {
 				background: #e0e0e0;
-				color: #9e9e9e;
-				cursor: not-allowed;
 				opacity: 0.6;
 
 				.price-item-status {
 					color: #d32f2f;
 				}
+			}
 
-				.price-item-capacity {
-					color: #9e9e9e;
+			.price-item-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 24rpx 20rpx;
+				background: #f6fafb;
+				transition: background 0.2s ease;
+			}
+
+			.price-item-left {
+				flex: 1;
+			}
+
+			.price-item-right {
+				flex-shrink: 0;
+				margin-left: 20rpx;
+			}
+
+			.price-item-label {
+				font-weight: bold;
+				font-size: 30rpx;
+				color: #000000;
+				transition: color 0.2s ease;
+
+				.group-size-hint {
+					font-size: 24rpx;
+					font-weight: normal;
+					color: #999;
+					transition: color 0.2s ease;
 				}
 			}
 
-			.price-item-content {
+			.price-item-meta {
 				display: flex;
-				flex-direction: column;
-				align-items: flex-start;
-				gap: 4rpx;
+				align-items: center;
+				gap: 16rpx;
+				margin-top: 8rpx;
+			}
 
-				.price-item-row {
+			.price-item-price {
+				font-size: 28rpx;
+				color: #ff8c00;
+				font-weight: bold;
+				transition: color 0.2s ease;
+			}
+
+			.price-item-status {
+				font-size: 22rpx;
+				color: #d32f2f;
+				font-weight: normal;
+			}
+
+			.price-item-capacity {
+				font-size: 22rpx;
+				color: #666666;
+				font-weight: normal;
+				transition: color 0.2s ease;
+			}
+
+			// 数量选择器
+			.quantity-selector {
+				display: flex;
+				align-items: center;
+				background: #fff;
+				border-radius: 8rpx;
+				border: 1rpx solid #e0e0e0;
+
+				.qty-btn {
+					width: 56rpx;
+					height: 56rpx;
 					display: flex;
 					align-items: center;
-					gap: 16rpx;
+					justify-content: center;
+
+					&.disabled {
+						opacity: 0.4;
+					}
 				}
 
-				.price-item-label {
+				.qty-value {
+					width: 60rpx;
+					text-align: center;
+					font-size: 28rpx;
 					font-weight: bold;
-					font-size: 30rpx;
+					color: #333;
+				}
+			}
+
+			// 报名卡空位区域
+			.price-item-slots {
+				padding: 20rpx;
+				background: #fff;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 20rpx;
+			}
+
+			.slot-group {
+				display: flex;
+				gap: 16rpx;
+
+				&.multi-group {
+					border: 1rpx dashed #E53935;
+					padding: 16rpx;
+					border-radius: 12rpx;
+				}
+			}
+
+			.slot-item {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 8rpx;
+			}
+
+			.slot-empty,
+			.slot-filled {
+				width: 88rpx;
+				height: 88rpx;
+				border-radius: 16rpx;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.slot-empty {
+				background: #f5f5f5;
+				border: 2rpx dashed #ccc;
+			}
+
+			.slot-filled {
+				position: relative;
+				background: #fff;
+				border: 1rpx solid #eee;
+
+				.slot-avatar {
+					width: 100%;
+					height: 100%;
+					border-radius: 16rpx;
 				}
 
-				.price-item-price {
-					font-size: 26rpx;
-					color: #ff8c00;
-					font-weight: bold;
+				.slot-remove {
+					position: absolute;
+					right: -8rpx;
+					top: -8rpx;
 				}
+			}
 
-				.price-item-status {
-					font-size: 22rpx;
-					color: #d32f2f;
-					font-weight: normal;
-				}
-
-				.price-item-capacity {
-					font-size: 22rpx;
-					color: #666666;
-					font-weight: normal;
-				}
+			.slot-name {
+				font-size: 24rpx;
+				color: #666;
+				font-weight: normal;
 			}
 		}
 
