@@ -13,7 +13,7 @@
 			</view>
 		</section>
 		<view class="mescroll-wrapper">
-			<mescroll-uni @init="mescrollInit" @down="downCallback" @up="getList" :top="230" bottom="246"
+			<mescroll-uni @init="mescrollInit" @down="downCallback" @up="getList" :top="200" bottom="200"
 				:safearea="true" :fixed="false" height="100%">
 				<view class="container group-list">
 					<GroupItem :item="item" variant="detail" v-for="(item, index) in dataList" :key="index" />
@@ -22,11 +22,9 @@
 		</view>
 
 		<section class="section-bottom">
-			<view style="padding: 48rpx 54rpx">
 				<u-button type="primary" height="80rpx" shape="circle" customStyle="height: 80rpx" color="#FF8C00"
 					@click="openForm()">{{ userInfo.running_group ? "我的跑团" : "创建跑团" }}
 				</u-button>
-			</view>
 		</section>
 
 		<UserLogin ref="refUserLogin" />
@@ -264,7 +262,6 @@
 		width: 100%;
 		z-index: 10;
 		background: #f5f5f5;
-		height: 230rpx;
 	}
 
 	.section-tabs {
@@ -273,7 +270,7 @@
 	}
 
 	.section-search {
-		padding: 20rpx 24rpx;
+		padding: 20rpx 24rpx 0;
 	}
 
 	.section-bottom {
@@ -281,7 +278,7 @@
 		bottom: 30rpx;
 		width: 100%;
 		z-index: 10;
-		padding: 0 30rpx 20rpx;
+		padding: 0 30rpx 0rpx;
 	}
 
 	.group-list {

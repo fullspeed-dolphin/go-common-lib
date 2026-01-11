@@ -101,6 +101,7 @@
         {"path": "runningTeam/teamEventForm","style": {"navigationStyle": "custom", "navigationBarTitleText": "提交活动申请"}},
         {"path": "runningTeam/teamSummary","style": {"navigationBarTitleText": "跑团数据"}},
         {"path": "runningTeam/teamMaps","style": {"navigationBarTitleText": "跑团地图库"}},
+        {"path": "runningTeam/teamEventDetail","style": {"navigationBarTitleText": "详情", "navigationStyle": "custom"}},
         {
           "path": "sportDetail",
           "style": {

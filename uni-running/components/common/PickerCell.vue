@@ -153,5 +153,7 @@ defineExpose({
 </script>
 
 <style lang="scss">
-	
+	.picker-cell{
+		width: 100%;
+	}
 </style>

@@ -60,6 +60,10 @@
 
 	const joinEvent = () => {
 		if (props.from === "order") return;
+		if (props.from === "team") {
+			uni.$u.route(`/pagesSub/runningTeam/teamEventDetail?id=${props.item.id}`);
+			return
+		};
 		uni.$u.route(
 			`pagesSub/eventDetail?id=${props.item.event_id || props.item.id}`
 		);

@@ -9,12 +9,12 @@
       isLink
     />
     <u-datetime-picker
-		
       :mode="mode"
       :show="isShowPop"
 			:minDate="minDate"
 			:maxDate="maxDate"
       title="选择时间"
+      :filter="filter"
       v-model="timeValue"
       @cancel="isShowPop = false"
       @confirm="confrimTime"
@@ -30,6 +30,10 @@ const props = defineProps({
   title: {
     type: String,
     default: "",
+  },
+  filter: {
+    type: [Function, null],
+    default: null,
   },
   minDate: {
     type: [String, Number],
@@ -80,10 +84,9 @@ watch(
   (val) => {
     // 初始化回显UI值
     if (val) {
-			console.log('val=====>', Number(val))
       timeValue.value = Number(val);
     } else {
-      timeValue.value = dayjs().valueOf();
+      timeValue.value = "";
     }
   },
   {

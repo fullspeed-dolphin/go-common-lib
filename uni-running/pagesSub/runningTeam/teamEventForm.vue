@@ -54,6 +54,23 @@
 					required prop="event_project" name="event_project" 
 					@input="validateField('event_project')" maxlength="50" placeholder="请添加活动项目" />
 				
+				<u-form-item label="活动时间" prop="event_time" required>
+					<PickerTime v-model="form.event_time" mode="datetime"
+						:minDate="new Date().getTime()"
+						:maxDate="maxDate"
+						:filter="timeFilter"
+						:border="false"
+						placeholder="请选择时间" :title="null" @change="validateField('event_time')" />
+				</u-form-item>
+
+				<u-form-item label="报名时间" prop="registration_time" required>
+					<DatetimePicker v-model="form.registration_time" 
+						:start="new Date().getTime()"
+						:clear-icon="false"
+						:border="false"
+					@change="validateField('registration_time')" rangeSeparator="至" type="datetimerange" />
+				</u-form-item>
+				
 				<up-form-item label="联系方式" prop="contact" required>
 					<input v-model="form.contact" class="u-input" @input="validateField('contact')" maxlength="50" placeholder="请输入联系方式" />
 				</up-form-item>
@@ -65,13 +82,6 @@
 					<input v-model="form.multi_package" class="u-input" type="number" maxlength="2" placeholder="请输入套餐数量" @input="validateField('multi_package')"  />
 				</up-form-item>
 
-				<u-form-item label="活动时间" prop="event_time" required>
-					<PickerTime v-model="form.event_time" mode="datetime"
-						:minDate="new Date().getTime()"
-						:maxDate="maxDate"
-						placeholder="请选择时间" :title="null" @change="validateField('event_time')" />
-				</u-form-item>
-				
 				<TagForm
 					title="参赛包地址" v-model="form.racekit_pickup_address" 
 					required prop="racekit_pickup_address" name="racekit_pickup_address" 
@@ -110,6 +120,8 @@
 	import TagForm from "@/components/common/TagForm.vue";
 	import PickerTime from "@/components/common/PickerTime.vue";
 	import FileUpload from "@/components/common/FileUpload.vue";
+	// import DatetimePicker from "./uni-datetime-picker/components/uni-datetime-picker/uni-datetime-picker.vue";
+	import DatetimePicker from "@/uni_modules/uni-datetime-picker/components/uni-datetime-picker/uni-datetime-picker.vue";
 	import dayjs from "dayjs";
 	import request from "@/utils/request.js"
 
@@ -130,12 +142,15 @@
 		name: "",
 		capacity: "",
 		event_time: "",
+		startTime: "",
+		endTime: "",
 		event_location: "",
-		event_project: "5公里,10公里",
+		event_project: "欢乐跑",
 		is_free: "1",
 		multi_package: "",
 		status: "PND",
 		refund_valid_hour: "24",
+		registration_time: [],
 	});
 
 	const options_is_free = ref([
@@ -144,11 +159,11 @@
 	]);
 	
 	const options_hour = Array.from({ length: 24 }, (_, i) => ({
-  label: `${i + 1}小时`,
-  value: i + 1
-}));
+		label: `${i + 1}小时`,
+		value: i + 1
+	}));
 
-	const maxDate = dayjs().add(3, 'M').valueOf();
+	const maxDate = dayjs().add(4, 'M').valueOf();
 
 	const isAgree = ref(false);
 	
@@ -164,6 +179,7 @@
 		racekit_pickup_address: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
 		multi_package: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
 		event_project: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
+		registration_time: [{ required: true, type: "array", message: "必填项", trigger: ["blur", "change"]}],
 		contact: [
 			{ required: true, message: "必填项", trigger: ["blur", "change"]},
 			{
@@ -185,6 +201,16 @@
 			trigger: ["blur", "change"],
 		}],
 	});
+
+	// 时间过滤器
+  function timeFilter(type, options) {
+		if (type === 'minute') {
+			// 只保留 0 和 30 分钟
+			return ["00", "30"];
+		}
+		// 其他类型（如 hour）不做过滤
+		return options
+	}
 	
 	const handleChooseLocation = () => {
 		uni.chooseLocation({
@@ -201,9 +227,12 @@
 	};
 
 	// 页面加载
+	const routerParams = ref({})
 	onLoad((options) => {
 		console.log("option", options);
 		group_id.value = options.group_id;
+		
+		routerParams.value = options
 		form.value.phone = store.state.userInfo.phone;
 		
 		getDetail();
@@ -211,23 +240,20 @@
 
 	// 方法定义
 	const getDetail = (page) => {
-		if (!group_id.value) return;
-		request.get(`/event-api/fsc_events?id=${group_id.value}`)
+		if (!routerParams.value.id) return;
+		request.get(`/event-api/fsc_events/${routerParams.value.id}`)
 			.then((res) => {
 				console.log('res=====>', res)
-				res = res.fsc_events?.[0] || {}
 				// merge into existing form to preserve reactivity and default keys
 				Object.assign(form.value, {
 					...res,
 					racekit_pickup_address: res.racekit_pickup_address?.addresses?.[0] || "",
-					establish_time: dayjs(res.establish_time).valueOf(),
+					event_time: dayjs(res.event_time).valueOf(),
 					// ensure these fields are strings so validator treats them as filled
 					capacity: res.capacity != null ? String(res.capacity) : form.value.capacity,
 					multi_package: res.multi_package != null ? String(res.multi_package) : form.value.multi_package,
 					is_free: res.is_free != null ? String(res.is_free) : form.value.is_free,
 				});
-				
-				validateField('event_time')
 				
 				isAgree.value = true;
 			});
@@ -244,14 +270,18 @@
 				return;
 			}
 
-
 			const data = {
 				...form.value,
-				fsc_id: group_id.value,
-				establish_time: dayjs(res.establish_time).format("YYYY-MM-DDTHH:mm:00+08:00"),
-				racekit_pickup_address: {
+				fsc_id: Number(group_id.value),
+				capacity: Number(form.value.capacity),
+				is_free: Number(form.value.is_free),
+				multi_package: Number(form.value.multi_package),
+				refund_valid_hour: Number(form.value.refund_valid_hour),
+				event_time: dayjs(res.event_time).format("YYYY-MM-DDTHH:mm:00+08:00"),
+				registration_time: JSON.stringify(form.value.registration_time),
+				racekit_pickup_address: JSON.stringify({
 					addresses: form.value.racekit_pickup_address.split(",")
-				}
+				})
 			};
 			uni.showLoading({
 				mask: true,
@@ -289,6 +319,12 @@
 	::v-deep{
 		.u-form-item__body{
 			flex-direction: column!important;
+		}
+		.uni-date-range{
+			height: 100rpx;
+		}
+		.u-cell__body{
+			border-radius: 8px;
 		}
 	}
 	.submit-btn {
@@ -399,6 +435,7 @@
 				width: 100% !important;
 				background: #ffffff;
 				border: 2rpx solid rgba(0, 0, 0, 0.06);
+				border-radius: 8px;
 			}
 
 			.u-cell__body__content {
@@ -430,7 +467,7 @@
 				max-width: 100% !important;
 				box-sizing: border-box !important;
 				border: 0;
-				min-height: 88rpx;
+				min-height: 80rpx;
 				background: #ffffff;
 				border-radius: 16rpx;
 				border: 2rpx solid rgba(0, 0, 0, 0.06);

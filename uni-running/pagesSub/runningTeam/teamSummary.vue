@@ -8,8 +8,8 @@
 			<view class="">
 				<view class="name ellipsis2">{{ detail.name }}</view>
 				<view class="b" style="margin-top: 30rpx;">
-					<view class="">总举办活动次数：<text style="color:#FF8C00">23次</text></view>
-					<view class="" style="margin-top: 30rpx;">跑团活动参与总人数：<text style="color:#FF8C00">2345人</text></view>
+					<view class="">总举办活动次数：<text style="color:#FF8C00">0次</text></view>
+					<view class="" style="margin-top: 30rpx;">跑团活动参与总人数：<text style="color:#FF8C00">0人</text></view>
 				</view>
 			</view>
 		</section>
@@ -17,28 +17,28 @@
 		<section class="section-summary panel flex-row">
 			<view class="flex-1 flex-col-center">
 				<view class="number">
-					{{ detail.total_members }}
+					{{ detail.test || 0 }}
 				</view>
 				跑团总跑量
 			</view>
 			<view class="divider"></view>
 			<view class="flex-1 flex-col-center">
 				<view class="number">
-					{{ detail.total_members }}
+					{{ detail.test || 0 }}
 				</view>
 				今日总跑量
 			</view>
 			<view class="divider"></view>
 			<view class="flex-1 flex-col-center">
 				<view class="number">
-					{{ detail.total_members }}
+					{{ detail.test || 0 }}
 				</view>
 				上周总跑量
 			</view>
 			<view class="divider"></view>
 			<view class="flex-1 flex-col-center">
 				<view class="number">
-					{{ detail.total_members }}
+					{{ detail.test || 0 }}
 				</view>
 				上月总跑量
 			</view>
@@ -54,10 +54,10 @@
 				</view>
 				<view class="">
 					<view class="ellipsis name">{{item.nickname}}</view>
-					<view class="score">今日跑量 <text style="color:#FF8C00;">100km</text> </view>
-					<view class="score">上周跑量 <text style="color:#FF8C00;">100km</text> </view>
-					<view class="score">上月跑量 <text style="color:#FF8C00;">100km</text> </view>
-					<view class="score">年度跑量 <text style="color:#FF8C00;">100km</text> </view>
+					<view class="score">今日跑量 <text style="color:#FF8C00;">0km</text> </view>
+					<view class="score">上周跑量 <text style="color:#FF8C00;">0km</text> </view>
+					<view class="score">上月跑量 <text style="color:#FF8C00;">0km</text> </view>
+					<view class="score">年度跑量 <text style="color:#FF8C00;">0km</text> </view>
 				</view>
 			</view>
 		</view>

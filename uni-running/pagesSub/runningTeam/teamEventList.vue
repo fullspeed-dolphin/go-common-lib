@@ -1,9 +1,9 @@
 <template>
   <view class="page-container">
-    <!-- 活动列表 -->
+    <mescroll-body @init="mescrollInit" @down="downCallback" @up="getList" :top="0">
     <view class="event-list">
       <view class="event-card" v-for="(item, index) in eventList" :key="index">
-        <image class="event-poster" :src="item.background_image_url || '/static/default-event.png'" mode="aspectFill"></image>
+        <image class="event-poster" :src="item.background_image_url" mode="aspectFill"></image>
         <view class="event-info">
           <view class="event-header">
             <text class="event-name">{{ item.name }}</text>
@@ -22,10 +22,13 @@
             </view>
           </view>
           <view class="event-actions">
-            <u-button type="primary" plain size="mini" shape="circle" color="#FF8C00"
+            <!-- <u-button type="primary" plain size="mini" shape="circle" color="#FF8C00"
               customStyle="height: 50rpx; padding: 0 24rpx;"
-              @click.stop="editEvent(item)">更新</u-button>
+              @click.stop="editEvent(item)">更新</u-button> -->
             <u-button type="primary" size="mini" shape="circle" color="#FF8C00"
+              customStyle="height: 50rpx; padding: 0 24rpx;"
+              @click.stop="removeItem(item)">删除</u-button>
+            <u-button type="primary" size="mini" plain shape="circle" color="#FF8C00"
               customStyle="height: 50rpx; padding: 0 24rpx;"
               @click.stop="viewEvent(item)">详情</u-button>
           </view>
@@ -37,6 +40,7 @@
         <u-empty mode="data" text="暂无活动"></u-empty>
       </view>
     </view>
+	</mescroll-body>
 
     <!-- 底部按钮 -->
     <view class="section-bottom">
@@ -52,27 +56,56 @@ import { ref } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
+import {
+	onPageScroll,
+	onReachBottom
+} from "@dcloudio/uni-app";
+import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
+const {
+	mescrollInit,
+	downCallback,
+	getMescroll
+} = useMescroll(
+	onPageScroll,
+	onReachBottom
+);
+	
 
 const group_id = ref("");
 const eventList = ref([]);
 const loading = ref(false);
 
 // 获取活动列表
-const getEventList = async () => {
+const getList = async (mescroll) => {
   if (!group_id.value) return;
   loading.value = true;
-  try {
-    const res = await request.get(`/event-api/fsc_events?group_id=${group_id.value}`);
-    eventList.value = (res.fsc_events || []).map(item => ({
-      ...item,
-      event_time: item.event_time ? dayjs(item.event_time).format('YYYY-MM-DD') : ''
-    }));
-  } catch (e) {
-    console.error('获取活动列表失败:', e);
-    eventList.value = [];
-  } finally {
-    loading.value = false;
-  }
+	
+	const data = {
+		pageIndex: mescroll.num - 1,
+		pageSize: 10,
+	};
+	
+	request.get(`/event-api/fsc_events?group_id=${group_id.value}`, data).then(res => {
+		loading.value = false;
+		res = (res.fsc_events || []).map(item => ({
+			...item,
+			event_time: isNaN(item.event_time) ?dayjs(item.event_time).format('YYYY-MM-DD') : dayjs(Number(item.event_time)).format('YYYY-MM-DD')
+		}));
+		
+		mescroll.endSuccess(res.length);
+		
+		//如果是第一页需手动制空列表
+		if (mescroll.num == 1) {
+			eventList.value = [];
+		}
+		
+		eventList.value = eventList.value.concat(res); //追加新数据
+	})
+};
+
+const refreshList = () => {
+	getMescroll().resetUpScroll(); // 重置列表数据为第一页
+	getMescroll().scrollTo(0, 0); // 重置列表数据为第一页时,建议把滚动条也重置到顶部,避免无法再次翻页的问题
 };
 
 // 获取状态样式类
@@ -95,6 +128,24 @@ const getStatusText = (status) => {
   return statusMap[status] || '报名中';
 };
 
+const removeItem = (item) => {
+	uni.showModal({
+		title: "提示",
+		content: "确定删除该活动吗？",
+		success: (res) => {
+			if (res.confirm) {
+				request.delete(`/event-api/fsc_events/${item.id}`).then(res => {
+					uni.$u.toast('操作成功')
+					
+					refreshList()
+				})
+			} else if (res.cancel) {
+				console.log("用户点击取消");
+			}
+		},
+	});
+};
+	
 // 创建活动
 const createEvent = () => {
   uni.$u.route(`pagesSub/runningTeam/teamEventForm?group_id=${group_id.value}`);
@@ -102,20 +153,16 @@ const createEvent = () => {
 
 // 编辑活动
 const editEvent = (item) => {
-  uni.$u.route(`pagesSub/runningTeam/teamEventForm?group_id=${group_id.value}&event_id=${item.event_id}`);
+  uni.$u.route(`pagesSub/runningTeam/teamEventForm?id=${item.id}`);
 };
 
 // 查看活动详情
 const viewEvent = (item) => {
-  uni.$u.route(`pagesSub/orderIn?event_id=${item.event_id}`);
+  uni.$u.route(`pagesSub/runningTeam/teamEventDetail?id=${item.id}`);
 };
 
 onLoad((options) => {
   group_id.value = options.group_id;
-});
-
-onShow(() => {
-  getEventList();
 });
 </script>
 

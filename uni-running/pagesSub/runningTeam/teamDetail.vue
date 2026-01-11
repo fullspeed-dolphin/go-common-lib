@@ -126,7 +126,7 @@
 			<section class="panel" style="box-shadow: none;">
 				<view class="h4">跑团活动</view>
 				<view v-for="(item, index) in eventList" :key="index">
-					<EventItem :item="item" :key="index" height="474rpx" />
+					<EventItem :item="item" :key="index" height="474rpx" from="team" />
 				</view>
 			</section>
 
@@ -230,8 +230,13 @@
 	});
 	
 	const getEvents = () => {
-		request.get(`/event-api/getOfflineEventSwiper`).then(res => {
-			eventList.value = res;
+		request.get(`/event-api/fsc_events?group_id=${routeParams.value.group_id}`).then(res => {
+			eventList.value = res.fsc_events.map(item => {
+				return {
+					...item,
+					image_url: item.background_image_url
+				}
+			});
 		});
 	};
 	
