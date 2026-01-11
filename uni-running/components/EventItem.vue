@@ -16,10 +16,11 @@
 						活动日期: {{ dayjs(item.event_time).format("YYYY-MM-DD") }}
 					</view>
 				</view>
-				<view class="event-item-button">
+				<view class="event-item-button" :style="item.status === 'REJ'? 'background: #999;' : ''">
 					<block v-if="item.status === 'ACT'">立即报名</block>
-					<block v-if="item.status === 'PND'">暂未开始</block>
+					<block v-if="item.status === 'PND'">{{from === 'team' ? "审核中" : "暂未开始"}} </block>
 					<block v-if="item.status === 'EXP'">查看详情</block>
+					<block v-if="item.status === 'REJ'">审核未通过</block>
 				</view>
 			</view>
 		</view>
@@ -77,6 +78,7 @@
 		flex-direction: column;
 		background: #fff;
 		border-radius: 16rpx;
+		overflow: hidden;
 	}
 
 	.poster {
@@ -89,7 +91,7 @@
 	.event-item-title {
 		position: absolute;
 		width: 100%;
-		bottom: 124rpx;
+		bottom: 118rpx;
 		left: 0;
 		font-weight: 500;
 		line-height: 44rpx;

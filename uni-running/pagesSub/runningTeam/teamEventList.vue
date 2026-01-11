@@ -21,24 +21,24 @@
               <text class="meta-text">{{ item.event_location }}</text>
             </view>
           </view>
-          <view class="event-actions">
+          <view class="event-actions u-mt-10">
             <!-- <u-button type="primary" plain size="mini" shape="circle" color="#FF8C00"
-              customStyle="height: 50rpx; padding: 0 24rpx;"
+              customStyle="height: 50rpx; width: 80rpx;"
               @click.stop="editEvent(item)">更新</u-button> -->
-            <u-button type="primary" size="mini" shape="circle" color="#FF8C00"
-              customStyle="height: 50rpx; padding: 0 24rpx;"
+            <u-button type="error" size="small" shape="circle" color="#FF8C00"
+              customStyle="width: 120rpx;margin:0;"
               @click.stop="removeItem(item)">删除</u-button>
-            <u-button type="primary" size="mini" plain shape="circle" color="#FF8C00"
-              customStyle="height: 50rpx; padding: 0 24rpx;"
+            <u-button type="primary" size="small" plain shape="circle" color="#FF8C00"
+              customStyle="width: 120rpx;margin:0;"
               @click.stop="viewEvent(item)">详情</u-button>
           </view>
         </view>
       </view>
 
       <!-- 空状态 -->
-      <view class="empty-state" v-if="!loading && eventList.length === 0">
+      <!-- <view class="empty-state" v-if="!loading && eventList.length === 0">
         <u-empty mode="data" text="暂无活动"></u-empty>
-      </view>
+      </view> -->
     </view>
 	</mescroll-body>
 
@@ -85,7 +85,7 @@ const getList = async (mescroll) => {
 		pageSize: 10,
 	};
 	
-	request.get(`/event-api/fsc_events?group_id=${group_id.value}`, data).then(res => {
+	request.get(`/event-api/fsc_events?fsc_id=${group_id.value}`, data).then(res => {
 		loading.value = false;
 		res = (res.fsc_events || []).map(item => ({
 			...item,
@@ -111,21 +111,24 @@ const refreshList = () => {
 // 获取状态样式类
 const getStatusClass = (status) => {
   const statusMap = {
-    'ongoing': 'status-ongoing',
-    'ended': 'status-ended',
-    'upcoming': 'status-upcoming'
+    'PND': 'status-pending',
+    'ACT': 'status-active',
+    'EXP': 'status-expired',
+    'REJ': 'status-rejected'
   };
-  return statusMap[status] || 'status-ongoing';
+  return statusMap[status];
 };
 
 // 获取状态文本
 const getStatusText = (status) => {
   const statusMap = {
-    'ongoing': '报名中',
-    'ended': '已结束',
-    'upcoming': '即将开始'
+    'PND': '审核中',
+    'ACT': '进行中',
+    'EXP': '已结束',
+    'REJ': '已拒绝'
   };
-  return statusMap[status] || '报名中';
+
+  return statusMap[status];
 };
 
 const removeItem = (item) => {
@@ -163,6 +166,19 @@ const viewEvent = (item) => {
 
 onLoad((options) => {
   group_id.value = options.group_id;
+});
+
+onShow(() => {
+  // 移除全局自定义事件监听器
+  uni.$off("updateList");
+
+  // 监听全局的自定义事件
+  uni.$once("updateList", (data) => {
+    // 判断二级页面是否修改过数据，如果修改过，需要刷新首页，保持信息一致
+    if (data.isChange) {
+      refreshList();
+    }
+  });
 });
 </script>
 
@@ -210,7 +226,7 @@ onLoad((options) => {
   }
 
   .event-name {
-    font-size: 28rpx;
+    font-size: 32rpx;
     font-weight: 600;
     color: #333;
     flex: 1;
@@ -225,14 +241,24 @@ onLoad((options) => {
     border-radius: 8rpx;
     font-size: 22rpx;
 
-    &.status-ongoing {
+    &.status-pending {
       background: rgba(255, 140, 0, 0.1);
       color: #FF8C00;
     }
 
-    &.status-ended {
+    &.status-active {
+      background: rgba(0, 200, 83, 0.1);
+      color: #00C853;
+    }
+
+    &.status-expired {
       background: rgba(153, 153, 153, 0.1);
       color: #999;
+    }
+
+    &.status-rejected {
+      background: rgba(255, 0, 0, 0.1);
+      color: #FF0000;
     }
 
     &.status-upcoming {

@@ -7,7 +7,7 @@
 				<view class="upload-row">
 					<view class="upload-item">
 						<view class="upload-label">活动背景图(正方形)<text class="required-star">*</text></view>
-						<FileUpload v-model="form.background_image" :width="164" :height="120" @change="validateField('background_image')">
+						<FileUpload v-model="form.background_image_url" :width="164" :height="120" @change="validateField('background_image_url')">
 							<template #trigger>
 								<view class="section-upload-box">
 									<u-icon name="photo" size="48" color="#cccccc"></u-icon>
@@ -17,7 +17,7 @@
 					</view>
 					<view class="upload-item">
 						<view class="upload-label">活动详情(H5长图)</view>
-						<FileUpload v-model="form.long_image" :width="164" :height="120" @change="validateField('long_image')">
+						<FileUpload v-model="form.long_image_url" :width="164" :height="120" @change="validateField('long_image_url')">
 							<template #trigger>
 								<view class="section-upload-box">
 									<u-icon name="photo" size="48" color="#cccccc"></u-icon>
@@ -33,7 +33,7 @@
 				
 				<up-form-item label="活动描述" prop="description" labelPosition="top" required>
 					<view class="" style="position: relative;">
-						<textarea v-model="form.description" class="u-input" @input="validateField('description')" :height="90" maxlength="150" placeholder="请填写跑团宣言" count></textarea>
+						<textarea v-model="form.description" class="u-input" @input="validateField('description')" :height="90" maxlength="150" placeholder="请输入活动描述" count></textarea>
 						<view v-if="form.description" class="" style="position: absolute;right:10rpx;bottom:10rpx;font-size: 24rpx;color: #999;">
 							{{form.description.length}}/150
 						</view>
@@ -41,12 +41,20 @@
 				</up-form-item>
 				
 				<up-form-item label="活动地址" prop="event_location" required>
-					<view class="select" @click="handleChooseLocation">
+					<view class="pickermap" style="padding:0;">
+						<u-cell
+							:border="false"
+							:value="form.event_location || '请选择地址'"
+							@click="handleChooseLocation()"
+							isLink
+						/>
+					</view>
+					<!-- <view class="select" @click="handleChooseLocation">
 						<input v-model="form.event_location" class="u-input" readonly placeholder="请选择地址" />
 						<view class="arrow-right">
 							<u-icon name="arrow-right" size="20" color="#707070" />
 						</view>
-					</view>
+					</view> -->
 				</up-form-item>
 				
 				<TagForm 
@@ -72,7 +80,7 @@
 				</u-form-item>
 				
 				<up-form-item label="联系方式" prop="contact" required>
-					<input v-model="form.contact" class="u-input" @input="validateField('contact')" maxlength="50" placeholder="请输入联系方式" />
+					<input v-model="form.contact" class="u-input" @input="validateField('contact')" type="number" maxlength="11" placeholder="请输入联系方式" />
 				</up-form-item>
 
 				<up-form-item label="活动人数" prop="capacity" required>
@@ -135,8 +143,8 @@
 	const group_id = ref("");
 	const from = ref("");
 	const form = ref({
-		background_image: "",
-		long_image: "",
+		background_image_url: "",
+		long_image_url: "",
 		contact: "",
 		description: "",
 		name: "",
@@ -159,7 +167,7 @@
 	]);
 	
 	const options_hour = Array.from({ length: 24 }, (_, i) => ({
-		label: `${i + 1}小时`,
+		label: `${i + 1} 小时`,
 		value: i + 1
 	}));
 
@@ -172,7 +180,7 @@
 	}
 
 	const rules = ref({
-		background_image: [{ required: true, message: "请上传活动背景图", trigger: ["blur", "change"]}],
+		background_image_url: [{ required: true, message: "请上传活动背景图", trigger: ["blur", "change"]}],
 		name: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
 		description: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
 		capacity: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
@@ -283,6 +291,9 @@
 					addresses: form.value.racekit_pickup_address.split(",")
 				})
 			};
+
+			console.log(data, "提交数据");
+
 			uni.showLoading({
 				mask: true,
 			});
@@ -296,16 +307,12 @@
 			request.post(url, data).then(async (res) => {
 				console.log(res);
 
-				uni.$u.toast(group_id.value ? "更新成功" : "创建成功");
+				uni.$u.toast("创建成功");
 
-				// const res1 = await store.dispatch("getUserInfo");
-
-				// // 跳转回上一级页面，返回上一页并传递参数
-				// uni.$emit("updateList", {
-				// 	isChange: true,
-				// 	from: from.value,
-				// 	group_id: res1.running_group,
-				// });
+				// 跳转回上一级页面，返回上一页并传递参数
+				uni.$emit("updateList", {
+					isChange: true,
+				});
 
 				setTimeout(() => {
 					uni.navigateBack();
@@ -446,13 +453,17 @@
 				flex: 1;
 				text-align: left !important;
 				margin-left: 0 !important;
-				font-weight: bold;
-				font-size: 26rpx;
+				// font-weight: bold;
+				// font-size: 26rpx;
 				// color: #dadada;
 			}
 		}
 		
-		
+		.TagForm .placeholder {
+			// font-weight: 400 !important;
+			font-size: 26rpx !important;
+			// color: #dadada !important;
+		}
 
 		.pickermap {
 			width: 100% !important;
@@ -489,8 +500,8 @@
 				max-width: 100% !important;
 				text-align: left !important;
 				margin-left: 0 !important;
-				font-weight: bold;
-				font-size: 26rpx;
+				// font-weight: bold;
+				// font-size: 26rpx;
 				color: #707070;
 			}
 		}
@@ -526,12 +537,12 @@
 		.TagForm .tag-box
 		{
 			width: 682rpx;
-			font-size: 26rpx;
+			font-size: 30rpx;
 			padding: 20rpx;
 			border-radius: 16rpx;
 			min-height: 100rpx;
 			background: #ffffff;
-			font-weight: bold !important;
+			// font-weight: bold !important;
 			border: 2rpx solid rgba(0, 0, 0, 0.06);
 			box-sizing: border-box;
 		}

@@ -4,9 +4,9 @@
       <view class="flex-row-center tag-box">
         <view class="u-flex-row u-flex-wrap flex-reverse">
           <view class="ml10 mb10" v-for="(i,j) in tagList" :key="j">
-            <u-tag type="primary" plain size="large" :text='i' closable @close="deleteTag(j)" />
+            <u-tag type="primary" plain :text='i' closable @close="deleteTag(j)" />
           </view>
-					<view v-if="!tagList.length" class="placeholder">
+					<view v-if="!tagList.length" class="placeholder" @click="isShowPop = true">
 						{{ placeholder }}
 					</view>
         </view>

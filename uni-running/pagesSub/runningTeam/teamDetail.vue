@@ -128,6 +128,7 @@
 				<view v-for="(item, index) in eventList" :key="index">
 					<EventItem :item="item" :key="index" height="474rpx" from="team" />
 				</view>
+				<mescroll-empty v-if="!eventList.length" :option="{ tip: '暂无跑团活动~' }" />
 			</section>
 
 			<view class="" style="height: 120rpx"></view>
@@ -216,10 +217,12 @@
 		}
 
 		getDetail();
-		getEvents();
-
+		
 		// #ifdef MP-WEIXIN
-		wx.showShareMenu();
+		wx.showShareMenu({
+			withShareTicket: true,
+			menus: ['shareAppMessage', 'shareTimeline'] // 开启分享给朋友和分享到朋友圈
+		});
 		// #endif
 		
 		nextTick(() => {
@@ -230,10 +233,11 @@
 	});
 	
 	const getEvents = () => {
-		request.get(`/event-api/fsc_events?group_id=${routeParams.value.group_id}`).then(res => {
+		request.get(`/event-api/fsc_events?fsc_id=${routeParams.value.group_id}`).then(res => {
 			eventList.value = res.fsc_events.map(item => {
 				return {
 					...item,
+					event_time: isNaN(item.event_time) ? item.event_time :  Number(item.event_time),
 					image_url: item.background_image_url
 				}
 			});
@@ -258,6 +262,8 @@
 				getDetail();
 			}
 		});
+
+		getEvents();
 	});
 
 	// 方法定义
@@ -364,16 +370,6 @@
 			phoneNumber,
 		});
 	};
-
-	// 页面加载
-	onLoad((options) => {
-		// #ifdef MP-WEIXIN
-		wx.showShareMenu({
-			withShareTicket: true,
-			menus: ['shareAppMessage', 'shareTimeline'] // 开启分享给朋友和分享到朋友圈
-		});
-		// #endif
-	});
 
 	// #ifdef MP-WEIXIN
 	// 分享给朋友

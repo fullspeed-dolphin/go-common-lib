@@ -13,7 +13,7 @@
 			</view>
 		</section>
 		<view class="mescroll-wrapper">
-			<mescroll-uni @init="mescrollInit" @down="downCallback" @up="getList" :top="200" bottom="200"
+			<mescroll-uni @init="mescrollInit" @down="downCallback" @up="getList" :top="160" bottom="200"
 				:safearea="true" :fixed="false" height="100%">
 				<view class="container group-list">
 					<GroupItem :item="item" variant="detail" v-for="(item, index) in dataList" :key="index" />

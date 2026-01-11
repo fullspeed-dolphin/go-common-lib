@@ -78,24 +78,9 @@
 				</view>
 				<rich-text :nodes="detail.text"></rich-text>
 			</section>
-
-			<view class="section-bottom1">
-				<!-- <view class="txt">
-				  {{isSignUp ? '取消' : ''}}报名截止：2025.09.30 9:00
-			  </view> -->
-				<view class="u-border-top1" :class="{ isSignUp: isSignUp }">
-					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;" @click="routeTo()">
-						<block v-if="detail.status === 'ACT'">{{
-              isSignUp ? "取消报名" : "活动报名"
-            }}</block>
-						<block v-if="detail.status === 'PND'">活动暂未开始</block>
-						<block v-if="detail.status === 'EXP'">查看报名详情</block>
-					</u-button>
-				</view>
-			</view>
 		</view>
 
-		<button class="share-btn flex-center" :class="{ active: isScroll }" open-type="share">
+		<button v-if="detail.status === 'ACT'" class="share-btn flex-center" :class="{ active: isScroll }" open-type="share">
 			<u-icon name="share" color="#fff" size="18"></u-icon>
 		</button>
 
@@ -148,9 +133,9 @@
 		// #ifdef MP-WEIXIN
 		// 启用分享给好友和分享到朋友圈
 		// 实现了 onShareTimeline 后，微信会自动在右上角菜单显示"分享到朋友圈"选项
-		wx.showShareMenu({
-			withShareTicket: true,
-		});
+		// wx.showShareMenu({
+		// 	withShareTicket: true,
+		// });
 		// #endif
 
 		routerParams.value = options;
@@ -181,23 +166,23 @@
 		}
 	});
 
-	// 分享给好友
-	onShareAppMessage(() => {
-		return {
-			title: detail.value.name || "活动详情", // 分享标题
-			path: `/pagesSub/eventDetail?id=${routerParams.value.id}`, // 分享路径
-			imageUrl: detail.value.background_image_url || "", // 分享时显示的封面图
-		};
-	});
+	// // 分享给好友
+	// onShareAppMessage(() => {
+	// 	return {
+	// 		title: detail.value.name || "活动详情", // 分享标题
+	// 		path: `/pagesSub/eventDetail?id=${routerParams.value.id}`, // 分享路径
+	// 		imageUrl: detail.value.background_image_url || "", // 分享时显示的封面图
+	// 	};
+	// });
 
-	// 分享到朋友圈
-	onShareTimeline(() => {
-		return {
-			title: detail.value.name || "活动详情", // 分享标题
-			query: `id=${routerParams.value.id}`, // 分享参数
-			imageUrl: detail.value.background_image_url || "", // 分享时显示的封面图
-		};
-	});
+	// // 分享到朋友圈
+	// onShareTimeline(() => {
+	// 	return {
+	// 		title: detail.value.name || "活动详情", // 分享标题
+	// 		query: `id=${routerParams.value.id}`, // 分享参数
+	// 		imageUrl: detail.value.background_image_url || "", // 分享时显示的封面图
+	// 	};
+	// });
 
 	// 方法定义
 	const getDetail = () => {
@@ -211,11 +196,9 @@
 		});
 		request.get(`/event-api/fsc_events/${routerParams.value.id}`)
 			.then((res) => {
-				// res = res.fsc_events?.[0] || {}
 				res.text = `<img src="${res.long_image_url}?x-oss-process=image/resize,w_500" style="max-width:100%;" />`;
 				res.eventItems = res.event_project.split(",");
 
-				// test
 				// res.status = "ACT";
 				console.log("res", res);
 				const time = isNaN(res.event_time) ? res.event_time :  Number(res.event_time);

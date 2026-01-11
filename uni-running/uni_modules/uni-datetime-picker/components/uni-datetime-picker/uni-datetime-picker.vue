@@ -10,7 +10,7 @@
 					</view>
 
 					<view v-else class="uni-date-x uni-date-range">
-						<uni-icons class="icon-calendar" type="calendar" color="#c0c4cc" size="22"></uni-icons>
+						<!-- <uni-icons class="icon-calendar" type="calendar" color="#c0c4cc" size="22"></uni-icons> -->
 						<view class="uni-date__x-input text-center">{{ displayRangeValue.startDate || startPlaceholderText }}</view>
 
 						<view class="range-separator">{{rangeSeparator}}</view>
