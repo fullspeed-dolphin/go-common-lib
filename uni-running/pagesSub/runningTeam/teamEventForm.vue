@@ -95,6 +95,10 @@
 					required prop="racekit_pickup_address" name="racekit_pickup_address"
 					@input="validateField('racekit_pickup_address')" maxlength="500" placeholder="请添加参赛包领取地址" />
 
+				<u-form-item label="活动可见范围" prop="visibility" required>
+					<PickerCell v-model="form.visibility" :title="null" @change="validateField('visibility')" placeholder="请选择" :border="false" :columns="options_visibility" />
+				</u-form-item>
+
 				<u-form-item label="是否付费" prop="is_free" required>
 					<PickerCell v-model="form.is_free" :title="null" @change="validateField('is_free')" placeholder="请选择" :border="false" :columns="options_is_free" />
 				</u-form-item>
@@ -161,11 +165,17 @@
 		status: "PND",
 		refund_valid_hour: "24",
 		registration_time: [],
+		visibility: "private",
 	});
 
 	const options_is_free = ref([
 		{ label: "是", value: 1 },
 		{ label: "否", value: 0 }
+	]);
+
+	const options_visibility = ref([
+		{ label: "跑团内部可见", value: "private" },
+		{ label: "全平台可见", value: "public" }
 	]);
 	
 	const options_hour = Array.from({ length: 24 }, (_, i) => ({
