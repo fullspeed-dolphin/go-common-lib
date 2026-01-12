@@ -20,11 +20,11 @@
             'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_120,h_120,m_fill'
           " mode="aspectFill"></image>
 				<view class="name ellipsis2">{{ detail.name }}</view>
-				<view class="flex-between-center c3 b">
+				<view class="flex-between-center c3">
 					<view class="cell-item">{{ detail.establish_time }} 成立</view>
 					<view class="cell-item">跑团ID {{ detail.group_id }}</view>
 				</view>
-				<view class="cell-item flex-row c3 b">
+				<view class="cell-item flex-row c3">
 					<u-icon name="map" size="12" color="#333"></u-icon>
 					<view class="flex-1">
 						{{ detail.establish_location }}
@@ -64,7 +64,7 @@
 
 			<section class="panel">
 				<view class="h4">跑团宣言</view>
-				<view style="font-weight: 500; line-height: 40rpx; padding-left: 18rpx;">
+				<view style="line-height: 40rpx; padding-left: 18rpx;">
 					{{ detail.introduction }}
 				</view>
 			</section>
@@ -86,7 +86,7 @@
 						</view>
 					</view>
 					<view style="width: 184rpx">
-						<u-button type="primary" color="#FF8C00" customStyle="width: 184rpx;height: 84rpx;" shape="circle"
+						<u-button type="primary" plain color="#FF8C00" size="small" shape="circle"
 							@click="callPhone(memberLeader.user_phone)">
 							联系团长
 						</u-button>
@@ -101,7 +101,7 @@
 						<view class="img">
 							<up-lazy-load height="120" borderRadius="200" :image="
 								(item.avatar_url ||
-								'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_150,h_150,m_fill'
+								'/static/images/user.png')  + '?x-oss-process=image/resize,w_150,h_150,m_fill'
 							" mode="aspectFill" />
 						</view>
 						<view class="">
@@ -113,12 +113,12 @@
 				</view>
 				<mescroll-empty v-if="!memberList.length" :option="{ tip: '暂无跑团成员~' }" />
 				<view class="flex-center u-mt-15">
-					<u-button type="primary" color="#FF8C00"
+					<u-button type="text"
 						v-if="memberList.length >= 8"
 						customStyle="width: 236rpx;height: 84rpx;" shape="circle"
 						@click="viewMoreMembers()">
-						查看更多
-						<u-icon name="arrow-right" color="#fff" size="14"></u-icon>
+						<text style="color:#409eff;">查看更多</text>
+						<u-icon name="arrow-right" color="#409eff" size="14"></u-icon>
 					</u-button>
 				</view>
 			</section>
@@ -402,8 +402,6 @@
 
 <style lang="less" scoped>
 	.panel {
-		box-shadow: 10rpx 10rpx 10rpx 2rpx rgba(255, 140, 0, 0.3);
-		border-radius: 32rpx 32rpx 32rpx 32rpx;
 		border:0;
 		background: #fff;
 		padding: 30rpx 20rpx;
@@ -435,12 +433,12 @@
 
 	.section-summary {
 		height: 126rpx;
-		font-weight: bold;
 		color: #999999;
 
 		.number {
+			font-weight: bold;
 			font-size: 30rpx;
-			color: #000000;
+			color: #000;
 			line-height: 50rpx;
 			margin-bottom: 10rpx;
 		}
@@ -493,7 +491,6 @@
 	}
 
 	.leader-item {
-		font-weight: bold;
 		font-size: 32rpx;
 
 		.img-box {
@@ -512,9 +509,7 @@
 	}
 
 	.member-item {
-		color: #000;
-		font-size: 32rpx;
-		font-weight: bold;
+		// font-size: 32rpx;
 		margin: 0 36rpx 16rpx 0;
 		.number {
 			font-weight: bold;
@@ -602,17 +597,11 @@
 		::v-deep {
 			.u-button {
 				margin: 0;
-				font-weight: bold;
 			}
 		}
 	}
 
 	.u-border-left {
 		border-color: #f3f3f3;
-	}
-
-	// 全局按钮字体粗细
-	::v-deep .u-button {
-		font-weight: bold;
 	}
 </style>

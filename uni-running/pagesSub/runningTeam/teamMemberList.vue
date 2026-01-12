@@ -6,7 +6,7 @@
           <view class="img">
             <up-lazy-load borderRadius="100" :image="
 						  (item.avatar_url ||
-						  'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_110,h_110,m_fill'
+						  '/static/images/user.png')  + '?x-oss-process=image/resize,w_110,h_110,m_fill'
 						" mode="aspectFill" />
           </view>
         </view>
