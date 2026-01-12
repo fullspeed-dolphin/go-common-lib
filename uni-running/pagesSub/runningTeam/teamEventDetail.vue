@@ -208,7 +208,7 @@
 		request.get(`/event-api/fsc_events/${routerParams.value.id}`)
 			.then((res) => {
 				res.text = `<img src="${res.long_image_url}?x-oss-process=image/resize,w_500" style="max-width:100%;" />`;
-				res.eventItems = res.event_project.split(",");
+				res.eventItems = res.event_projects.split(",");
 
 				// res.status = "ACT";
 				console.log("res", res);

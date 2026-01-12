@@ -211,11 +211,18 @@
 		uni.showLoading({
 			mask: true,
 		});
-		request.get(`/event-api/api/v1/events/${routerParams.value.id}`)
+		let url = routerParams.value.fsc_id ? '/event-api/fsc_events/' : '/event-api/api/v1/events/';
+		request.get(`${url}${routerParams.value.id}`)
 			.then((res) => {
 				res.text = `<img src="${res.long_image_url}?x-oss-process=image/resize,w_500" style="max-width:100%;" />`;
 				res.eventItems = res.event_projects.split("、");
-
+				
+				try {
+					const list = JSON.parse(res.registration_time)
+					res.registration_time = `${dayjs(list[0]).format('YYYY-MM-DD HH:mm')} 至 ${dayjs(list[1]).format('YYYY-MM-DD HH:mm').slice(5)}`
+				} catch (e) {
+					console.error(e)
+				}
 				// test
 				// res.status = "ACT";
 				console.log("res", res);
@@ -459,11 +466,11 @@
 	.event-status {
 		position: absolute;
 		top: 200rpx;
-		right: 40rpx;
+		right: 0rpx;
 		z-index: 2;
-		background: #19be6b;
+		background: rgba(25, 190, 107, .8);
 		color: #fff;
-		border-radius: 888rpx;
+		border-radius: 99rpx 0 0 99rpx;
 		padding: 20rpx 30rpx;
 	}
 

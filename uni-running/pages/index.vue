@@ -229,7 +229,7 @@
 		}
 
 		if (item.event_id) {
-			uni.$u.route(`pagesSub/eventDetail?id=${item.event_id}`);
+			uni.$u.route(`pagesSub/eventDetail?id=${item.event_id}&fsc_id=${item.fsc_id || ''}`);
 			return;
 		}
 		if (item.redirect_url) {
@@ -244,8 +244,8 @@
 	};
 
 	const getEvents = () => {
-		request.get(`/event-api/getOfflineEventSwiper`).then(res => {
-			bannerEventList.value = res;
+		Promise.all([request.get(`/event-api/fsc_swipers?status=ACT&visibility=public`), request.get(`/event-api/getOfflineEventSwiper`)]).then(res => {
+			bannerEventList.value = res.flat();
 		});
 	};
 
@@ -261,9 +261,9 @@
 				mask: true
 			});
 		}
-
-		request.get(`/event-api/getTopSwiper`).then(res => {
-			bannerList.value = res;
+		
+		Promise.all([request.get(`/event-api/fsc_swipers?status=ACT&visibility=public&is_top=1`), request.get(`/event-api/getTopSwiper`)]).then(res => {
+			bannerList.value = res.flat();
 		});
 	};
 

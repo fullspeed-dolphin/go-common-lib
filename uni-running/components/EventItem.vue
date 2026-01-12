@@ -3,13 +3,15 @@
 		<up-lazy-load class="poster"
 			:image="(item.image_url) + '?x-oss-process=image/resize,w_600,h_320,m_fill'"
 			mode="aspectFill" />
-			
+		
+		<view class="event-tag">{{item.fsc_id ? '跑团活动' : '自营活动'}}</view>
+		
 		<view class="u-p-20">
 			<view class="event-item-title ellipsis2">{{ item.description }}</view>
 
 			<view class="event-item-meta flex-between-center" v-if="showButton">
 				<view>
-					<view v-if="item.event_location" class="event-item-meta b ellipsis u-mt-10" style="max-width: 430rpx;">
+					<view v-if="item.event_location" class="event-item-meta b ellipsis u-mt-10" style="max-width: 360rpx;">
 						{{ item.is_online ? "线上跑" : '地址: ' + item.event_location}}
 					</view>
 					<view v-if="item.event_time" class="event-item-location b u-mt-20 u-mb-5">
@@ -61,12 +63,13 @@
 
 	const joinEvent = () => {
 		if (props.from === "order") return;
+		
 		if (props.from === "team") {
 			uni.$u.route(`/pagesSub/runningTeam/teamEventDetail?id=${props.item.event_id}`);
 			return
 		};
 		uni.$u.route(
-			`pagesSub/eventDetail?id=${props.item.event_id || props.item.id}`
+			`pagesSub/eventDetail?id=${props.item.event_id || props.item.id}&fsc_id=${props.item.fsc_id || ''}`
 		);
 	};
 </script>
@@ -79,6 +82,16 @@
 		background: #fff;
 		border-radius: 16rpx;
 		overflow: hidden;
+		.event-tag{
+			position: absolute;
+			right: 0;
+			top:0;
+			color: #fff;
+			background: #8bc63d;
+			border-radius: 0 16rpx 0 16rpx;
+			font-size: 24rpx;
+			padding: 10rpx 20rpx;
+		}
 	}
 
 	.poster {

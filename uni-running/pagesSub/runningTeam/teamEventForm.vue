@@ -58,9 +58,9 @@
 				</up-form-item>
 				
 				<TagForm 
-					title="活动项目" v-model="form.event_project" 
-					required prop="event_project" name="event_project" 
-					@input="validateField('event_project')" maxlength="50" placeholder="请添加活动项目" />
+					title="活动项目" v-model="form.event_projects" 
+					required prop="event_projects" name="event_projects" 
+					@input="validateField('event_projects')" maxlength="50" placeholder="请添加活动项目" />
 				
 				<u-form-item label="活动时间" prop="event_time" required>
 					<PickerTime v-model="form.event_time" mode="datetime"
@@ -160,7 +160,7 @@
 		startTime: "",
 		endTime: "",
 		event_location: "",
-		event_project: "欢乐跑",
+		event_projects: "欢乐跑",
 		is_free: "1",
 		multi_package: "",
 		status: "PND",
@@ -199,7 +199,7 @@
 		capacity: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
 		racekit_pickup_address: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
 		multi_package: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
-		event_project: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
+		event_projects: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
 		registration_time: [{ required: true, type: "array", message: "必填项", trigger: ["blur", "change"]}],
 		contact: [
 			{ required: true, message: "必填项", trigger: ["blur", "change"]},
