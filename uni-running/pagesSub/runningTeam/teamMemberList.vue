@@ -31,9 +31,6 @@ import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 const { mescrollInit, downCallback } = useMescroll(onPageScroll, onReachBottom);
 import MemberDetail from "./memberDetail.vue";
 
-// 模板引用
-const mescrollRef = ref(null);
-
 // 响应式数据
 const dataList = ref([]);
 const group_id = ref("");

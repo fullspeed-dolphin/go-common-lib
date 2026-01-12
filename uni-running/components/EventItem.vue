@@ -10,8 +10,8 @@
 			<view class="event-item-title ellipsis2">{{ item.description }}</view>
 
 			<view class="event-item-meta flex-between-center" v-if="showButton">
-				<view>
-					<view v-if="item.event_location" class="event-item-meta b ellipsis u-mt-10" style="max-width: 360rpx;">
+				<view class="u-flex-1 ofh">
+					<view v-if="item.event_location" class="event-item-meta b ellipsis u-mt-10">
 						{{ item.is_online ? "线上跑" : '地址: ' + item.event_location}}
 					</view>
 					<view v-if="item.event_time" class="event-item-location b u-mt-20 u-mb-5">
@@ -128,7 +128,7 @@
 		color: #fff;
 		background: #ff8c00;
 		border-radius: 40rpx;
-		font-size: 26rpx;
+		font-size: 24rpx;
 	}
 
 	.event-item-button:active {
