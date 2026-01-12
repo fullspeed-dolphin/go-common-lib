@@ -87,6 +87,7 @@
 						}}</block>
 						<block v-if="detail.status === 'PND'">活动暂未开始</block>
 						<block v-if="detail.status === 'EXP'">查看报名详情</block>
+						<block v-if="detail.status === 'REJ'">修改活动信息并重新提交</block>
 					</u-button>
 				</view>
 			</view>
@@ -237,6 +238,11 @@
 			uni.$u.route(
 				`pagesSub/settings/webView?link=${detail.value.event_detail_url}`
 			);
+			return;
+		}
+
+		if (detail.value.status === "REJ") {
+			uni.$u.route(`pagesSub/runningTeam/teamEventForm?id=${routerParams.value.id}&group_id=${detail.value.group_id}`);
 			return;
 		}
 
