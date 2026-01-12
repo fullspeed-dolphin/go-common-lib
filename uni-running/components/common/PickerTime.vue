@@ -86,7 +86,7 @@ watch(
     if (val) {
       timeValue.value = Number(val);
     } else {
-      timeValue.value = "";
+      // timeValue.value = "";
     }
   },
   {

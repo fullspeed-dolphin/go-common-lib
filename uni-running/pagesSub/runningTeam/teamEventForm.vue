@@ -105,7 +105,9 @@
 			</up-form>
 
 			<view class="" style="padding: 60rpx 8rpx 30rpx">
-				<u-button type="primary" color="#FF8C00" shape="circle" @click="submitForm()">提交活动申请</u-button>
+				<u-button type="primary" color="#FF8C00" shape="circle" :disabled="isSubmitting" @click="submitForm()">
+					{{isSubmitting ? '提交中...' : '提交活动申请'}}
+				</u-button>
 			</view>
 		</view>
 	</view>
@@ -256,13 +258,17 @@
 				Object.assign(form.value, {
 					...res,
 					racekit_pickup_address: res.racekit_pickup_address?.addresses?.[0] || "",
-					event_time: dayjs(res.event_time).valueOf(),
+					event_time: res.event_time != null ? String(dayjs(res.event_time).valueOf()) : form.value.event_time,
 					// ensure these fields are strings so validator treats them as filled
 					capacity: res.capacity != null ? String(res.capacity) : form.value.capacity,
 					multi_package: res.multi_package != null ? String(res.multi_package) : form.value.multi_package,
 					is_free: res.is_free != null ? String(res.is_free) : form.value.is_free,
+					registration_time: [
+						dayjs(JSON.parse(res.registration_time)[0]).valueOf(),
+						dayjs(JSON.parse(res.registration_time)[1]).valueOf()
+					]
 				});
-				
+
 				isAgree.value = true;
 			});
 	};
@@ -278,6 +284,8 @@
 				return;
 			}
 
+			console.log("验证通过", form.value.event_time);
+
 			const data = {
 				...form.value,
 				fsc_id: Number(group_id.value),
@@ -285,7 +293,7 @@
 				is_free: Number(form.value.is_free),
 				multi_package: Number(form.value.multi_package),
 				refund_valid_hour: Number(form.value.refund_valid_hour),
-				event_time: dayjs(res.event_time).format("YYYY-MM-DDTHH:mm:00+08:00"),
+				event_time: dayjs(Number(form.value.event_time)).format("YYYY-MM-DDTHH:mm:00+08:00"),
 				registration_time: JSON.stringify(form.value.registration_time),
 				racekit_pickup_address: JSON.stringify({
 					addresses: form.value.racekit_pickup_address.split(",")
@@ -301,13 +309,16 @@
 			let url = "/event-api/fsc_events";
 
 			// 更新跑团
-			if (group_id.value) {
-				url = "/event-api/fsc_events";
+			if (data.id) {
+				data.status = "PND";
+				data.event_id = data.id;
+				delete data.id;
+				url = "/event-api/fsc_events/update";
 			}
 			request.post(url, data).then(async (res) => {
 				console.log(res);
 
-				uni.$u.toast("创建成功");
+				uni.$u.toast(data.event_id ? "更新成功" : "创建成功");
 
 				// 跳转回上一级页面，返回上一页并传递参数
 				uni.$emit("updateList", {

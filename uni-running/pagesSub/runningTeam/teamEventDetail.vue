@@ -239,7 +239,15 @@
 			return;
 		}
 
-		uni.$u.route("pagesSub/orderIn?event_id=" + routerParams.value.id);
+		if (detail.value.status === 'REJ') {
+			uni.$u.route("pagesSub/runningTeam/teamEventForm?event_id=" + routerParams.value.id);
+			return;
+		}
+
+		// if (detail.value.status === 'ACT') {
+		// 	uni.$u.route("pagesSub/orderIn?event_id=" + routerParams.value.id);
+		// 	return;
+		// }
 	};
 
 	const cancelSignUp = () => {

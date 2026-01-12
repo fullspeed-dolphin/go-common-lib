@@ -22,15 +22,15 @@
             </view>
           </view>
           <view class="event-actions u-mt-10">
-            <!-- <u-button type="primary" plain size="mini" shape="circle" color="#FF8C00"
-              customStyle="height: 50rpx; width: 80rpx;"
-              @click.stop="editEvent(item)">更新</u-button> -->
-            <u-button type="error" size="small" shape="circle" color="#FF8C00"
+            <u-button v-if="!['EXP', 'ACT'].includes(item.status)" type="primary" size="small" shape="circle" color="#2979ff"
               customStyle="width: 120rpx;margin:0;"
-              @click.stop="removeItem(item)">删除</u-button>
+              @click="editEvent(item)">更新</u-button>
+            <u-button v-if="!['EXP', 'ACT'].includes(item.status)"  type="error" size="small" shape="circle" color="#fa3534"
+              customStyle="width: 120rpx;margin:0;"
+              @click="removeItem(item)">删除</u-button>
             <u-button type="primary" size="small" plain shape="circle" color="#FF8C00"
               customStyle="width: 120rpx;margin:0;"
-              @click.stop="viewEvent(item)">详情</u-button>
+              @click="viewEvent(item)">详情</u-button>
           </view>
         </view>
       </view>
@@ -125,7 +125,7 @@ const getStatusText = (status) => {
     'PND': '审核中',
     'ACT': '进行中',
     'EXP': '已结束',
-    'REJ': '已拒绝'
+    'REJ': '审核未通过'
   };
 
   return statusMap[status];
@@ -156,7 +156,7 @@ const createEvent = () => {
 
 // 编辑活动
 const editEvent = (item) => {
-  uni.$u.route(`pagesSub/runningTeam/teamEventForm?id=${item.id}`);
+  uni.$u.route(`pagesSub/runningTeam/teamEventForm?id=${item.id}&group_id=${group_id.value}`);
 };
 
 // 查看活动详情
