@@ -85,7 +85,7 @@
 						<block v-if="detail.status === 'ACT'">报名中</block>
 						<block v-if="detail.status === 'PND'">审核中</block>
 						<block v-if="detail.status === 'EXP'">已过期</block>
-						<block v-if="detail.status === 'REJ'">审核未通过</block>
+						<block v-if="detail.status === 'REJ'">修改活动信息并重新提交</block>
 					</u-button>
 				</view>
 			</view>

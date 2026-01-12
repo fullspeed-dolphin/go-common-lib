@@ -91,9 +91,9 @@
 				</up-form-item>
 
 				<TagForm
-					title="参赛包地址" v-model="form.racekit_pickup_address" 
-					required prop="racekit_pickup_address" name="racekit_pickup_address" 
-					@input="validateField('racekit_pickup_address')" maxlength="500" placeholder="请添加参赛包地址" />
+					title="参赛包领取地址" v-model="form.racekit_pickup_address"
+					required prop="racekit_pickup_address" name="racekit_pickup_address"
+					@input="validateField('racekit_pickup_address')" maxlength="500" placeholder="请添加参赛包领取地址" />
 
 				<u-form-item label="是否付费" prop="is_free" required>
 					<PickerCell v-model="form.is_free" :title="null" @change="validateField('is_free')" placeholder="请选择" :border="false" :columns="options_is_free" />
