@@ -68,6 +68,7 @@
 						:maxDate="maxDate"
 						:filter="timeFilter"
 						:border="false"
+						returnType="YYYY-MM-DD hh:mm"
 						placeholder="请选择时间" :title="null" @change="validateField('event_time')" />
 				</u-form-item>
 
@@ -293,8 +294,11 @@
 				is_free: Number(form.value.is_free),
 				multi_package: Number(form.value.multi_package),
 				refund_valid_hour: Number(form.value.refund_valid_hour),
-				event_time: dayjs(Number(form.value.event_time)).format("YYYY-MM-DDTHH:mm:00+08:00"),
-				registration_time: JSON.stringify(form.value.registration_time),
+				event_time: dayjs(Number(form.value.event_time)).toISOString(),
+				registration_time: JSON.stringify([
+					dayjs(form.value.registration_time[0]).toISOString(),
+					dayjs(form.value.registration_time[1]).toISOString(),
+				]),
 				racekit_pickup_address: JSON.stringify({
 					addresses: form.value.racekit_pickup_address.split(",")
 				})
