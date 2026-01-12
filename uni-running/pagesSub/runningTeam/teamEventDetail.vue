@@ -78,6 +78,18 @@
 				</view>
 				<rich-text :nodes="detail.text"></rich-text>
 			</section>
+
+			<view class="section-bottom1">
+				<view class="u-border-top1" :class="{ isSignUp: isSignUp }">
+					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;" @click="routeTo()">
+						<block v-if="detail.status === 'ACT'">{{
+							isSignUp ? "取消报名" : "活动报名"
+						}}</block>
+						<block v-if="detail.status === 'PND'">活动暂未开始</block>
+						<block v-if="detail.status === 'EXP'">查看报名详情</block>
+					</u-button>
+				</view>
+			</view>
 		</view>
 
 		<button v-if="detail.status === 'ACT'" class="share-btn flex-center" :class="{ active: isScroll }" open-type="share">

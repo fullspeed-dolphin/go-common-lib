@@ -86,8 +86,8 @@
 				<up-form-item label="活动人数" prop="capacity" required>
 					<input v-model="form.capacity" class="u-input" type="number" maxlength="3" placeholder="请输入活动人数" @input="validateField('capacity')" />
 				</up-form-item>
-				<up-form-item label="套餐数量" prop="multi_package" required>
-					<input v-model="form.multi_package" class="u-input" type="number" maxlength="2" placeholder="请输入套餐数量" @input="validateField('multi_package')"  />
+				<up-form-item label="一个人最多报名几个套餐" prop="multi_package" required>
+					<input v-model="form.multi_package" class="u-input" type="number" maxlength="2" placeholder="请输入数量" @input="validateField('multi_package')"  />
 				</up-form-item>
 
 				<TagForm

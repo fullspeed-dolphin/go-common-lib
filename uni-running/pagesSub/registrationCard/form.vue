@@ -152,11 +152,11 @@
 							confirmColor="#FF8C00" @confirm="onBloodTypeConfirm" @cancel="showBloodTypePicker = false"
 							@close="showBloodTypePicker = false" />
 					</up-form-item>
-					<up-form-item label1="衣服尺寸" prop="clothesSize" required>
+					<up-form-item label1="参赛服尺寸" prop="clothesSize" required>
 						<template #label>
 							<div @click="showTip('参赛服所需')">
 								<view class="label-with-icon">
-									<text class="flex-row">衣服尺寸<text class="txt_required">*</text></text>
+									<text class="flex-row">参赛服尺寸<text class="txt_required">*</text></text>
 									<up-icon name="info-circle" size="16" color="#FF8C00" class="tip-icon" />
 								</view>
 							</div>
@@ -282,7 +282,7 @@
 	const bloodTypeIndex = ref([0]);
 	const selectedBloodType = ref([]);
 
-	// 衣服尺寸 picker 状态
+	// 参赛服尺寸 picker 状态
 	const showTshirtSizePicker = ref(false);
 	const tshirtSizeIndex = ref([0]);
 	const selectedTshirtSize = ref([]);
@@ -1120,7 +1120,7 @@
 		}],
 		clothesSize: [{
 			required: true,
-			message: "请选择衣服尺寸",
+			message: "请选择参赛服尺寸",
 			trigger: ["blur", "change"]
 		}],
 		emergencyContact: [{
