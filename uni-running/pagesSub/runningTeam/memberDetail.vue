@@ -16,10 +16,9 @@
       <view class="member-item flex-start">
         <view class="img-box">
           <view class="img">
-            <up-lazy-load borderRadius="100" :image="
-      			  (detail.avatar_url ||
-      			  '/static/images/user.png')  + '?x-oss-process=image/resize,w_110,h_110,m_fill'
-      			" mode="aspectFill" />
+            <up-lazy-load borderRadius="100" 
+						error-img="/static/images/user.png"
+						:image="detail.avatar_url + '?x-oss-process=image/resize,w_110,h_110,m_fill'" mode="aspectFill" />
           </view>
         </view>
         <view class="">

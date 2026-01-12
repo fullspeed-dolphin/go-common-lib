@@ -74,10 +74,9 @@
 				<view class="flex-between-center">
 					<view class="leader-item flex-start" @click="openMemberDetail(memberLeader)">
 						<view class="img-box">
-							<image class="img" :src="
-					          (memberLeader.avatar_url ||
-					          '/static/images/user.png') + '?x-oss-process=image/resize,w_70,h_70,m_fill'
-					        " mode="aspectFill"></image>
+							<up-lazy-load height="120" borderRadius="200" class="img" 
+								error-img="/static/images/user.png"
+								:src="memberLeader.avatar_url + '?x-oss-process=image/resize,w_70,h_70,m_fill'" mode="aspectFill"></image>
 						</view>
 						<view class="">
 							<view class="ellipsis" style="width: 300rpx;line-height: 44rpx;">
@@ -99,10 +98,9 @@
 				<view class="flex-row flex-wrap" style="margin-left: 26rpx;">
 					<view class="member-item flex-col-center" v-for="(item, index) in memberList" @click="openMemberDetail(item)" :key="index">
 						<view class="img">
-							<up-lazy-load height="120" borderRadius="200" :image="
-								(item.avatar_url ||
-								'/static/images/user.png')  + '?x-oss-process=image/resize,w_150,h_150,m_fill'
-							" mode="aspectFill" />
+							<up-lazy-load height="120" borderRadius="200" 
+							error-img="/static/images/user.png"
+							:image="item.avatar_url+ '?x-oss-process=image/resize,w_150,h_150,m_fill'" mode="aspectFill" />
 						</view>
 						<view class="">
 							<view class="mb10 ellipsis tac mt10" style="width: 120rpx;margin-top: 16rpx;line-height: 44rpx;">

@@ -4,10 +4,9 @@
       <view class="member-item flex-start panel" v-for="(item, index) in dataList" @click="openMemberDetail(item)" :key="index">
         <view class="img-box">
           <view class="img">
-            <up-lazy-load borderRadius="100" :image="
-						  (item.avatar_url ||
-						  '/static/images/user.png')  + '?x-oss-process=image/resize,w_110,h_110,m_fill'
-						" mode="aspectFill" />
+            <up-lazy-load borderRadius="100" 
+							error-img="/static/images/user.png"
+							:image="item.avatar_url + '?x-oss-process=image/resize,w_110,h_110,m_fill'" mode="aspectFill" />
           </view>
         </view>
         <view class="">
