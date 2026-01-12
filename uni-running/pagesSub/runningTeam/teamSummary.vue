@@ -7,14 +7,14 @@
           " mode="aspectFill"></image>
 			<view class="">
 				<view class="name ellipsis2">{{ detail.name }}</view>
-				<view class="b" style="margin-top: 30rpx;">
+				<view class="" style="margin-top: 30rpx;">
 					<view class="">总举办活动次数：<text style="color:#FF8C00">0次</text></view>
 					<view class="" style="margin-top: 30rpx;">跑团活动参与总人数：<text style="color:#FF8C00">0人</text></view>
 				</view>
 			</view>
 		</section>
 
-		<section class="section-summary panel flex-row">
+		<section class="section-summary panel flex-row bgf">
 			<view class="flex-1 flex-col-center">
 				<view class="number">
 					{{ detail.test || 0 }}
@@ -49,15 +49,15 @@
 				<view class="img" style="width:120rpx;height:120rpx;margin-right:30rpx;">
 					<up-lazy-load height="70" borderRadius="100" :image="
 							(item.avatar_url ||
-							'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_150,h_150,m_fill'
+							'/static/images/user.png')  + '?x-oss-process=image/resize,w_150,h_150,m_fill'
 						" mode="aspectFill" />
 				</view>
 				<view class="">
 					<view class="ellipsis name">{{item.nickname}}</view>
-					<view class="score">今日跑量 <text style="color:#FF8C00;">0km</text> </view>
-					<view class="score">上周跑量 <text style="color:#FF8C00;">0km</text> </view>
-					<view class="score">上月跑量 <text style="color:#FF8C00;">0km</text> </view>
-					<view class="score">年度跑量 <text style="color:#FF8C00;">0km</text> </view>
+					<view class="score">今日跑量 <text style="color:#FF8C00;">0 km</text> </view>
+					<view class="score">上周跑量 <text style="color:#FF8C00;">0 km</text> </view>
+					<view class="score">上月跑量 <text style="color:#FF8C00;">0 km</text> </view>
+					<view class="score">年度跑量 <text style="color:#FF8C00;">0 km</text> </view>
 				</view>
 			</view>
 		</view>
@@ -174,18 +174,6 @@
 </script>
 
 <style lang="less" scoped>
-	.panel {
-		box-shadow: 10rpx 10rpx 10rpx 2rpx rgba(255, 140, 0, 0.3);
-		border-radius: 32rpx 32rpx 32rpx 32rpx;
-		border: 0;
-		background: #fff;
-		padding: 30rpx 20rpx;
-	}
-	
-	.member-item{
-		
-	}
-
 	.section-card {
 		padding: 48rpx 0 30rpx 80rpx;
 
@@ -224,10 +212,8 @@
 
 	.member-item {
 		background: #FFFFFF;
-		box-shadow: 10rpx 10rpx 10rpx 2rpx rgba(255,140,0,0.3);
 		border-radius: 32rpx 32rpx 32rpx 32rpx;
-		padding: 40rpx 30rpx;
-		color: #000;
+		padding: 30rpx 30rpx 15rpx;
 		font-size: 32rpx;
 		margin: 0 36rpx 24rpx 0;
 		font-size: 24rpx;
@@ -246,7 +232,7 @@
 		}
 		.score {
 			font-size: 24rpx;
-			line-height: 48rpx;
+			line-height: 42rpx;
 		}
 
 		.img {

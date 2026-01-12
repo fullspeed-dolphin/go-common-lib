@@ -385,6 +385,7 @@
 				.section-title-right-item {
 					font-size: 28rpx;
 					color: #ff8c00;
+					font-weight: 400;
 				}
 			}
 		}

@@ -76,7 +76,7 @@ onLoad((options) => {
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .page-container {
   min-height: 100vh;
   background: #f3f3f3;
@@ -85,12 +85,9 @@ onLoad((options) => {
 }
 
 .card-item {
-  width: 682rpx;
   height: 168rpx;
   background: #FFFFFF;
-  box-shadow: 0 8rpx 8rpx 0 rgba(255, 140, 0, 0.4);
-  border-radius: 16rpx;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 36rpx;
   margin-bottom: 24rpx;
   display: flex;
