@@ -81,12 +81,11 @@
 
 			<view class="section-bottom1">
 				<view class="u-border-top1" :class="{ isSignUp: isSignUp }">
-					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;" @click="routeTo()">
-						<block v-if="detail.status === 'ACT'">{{
-							isSignUp ? "取消报名" : "活动报名"
-						}}</block>
-						<block v-if="detail.status === 'PND'">活动暂未开始</block>
-						<block v-if="detail.status === 'EXP'">查看报名详情</block>
+					<u-button type="primary" :color="['REJ','EXP'][detail.status] ? '#999;' : '#FF8C00'" shape="circle" customStyle="height: 80rpx;" @click="routeTo()">
+						<block v-if="detail.status === 'ACT'">报名中</block>
+						<block v-if="detail.status === 'PND'">审核中</block>
+						<block v-if="detail.status === 'EXP'">已过期</block>
+						<block v-if="detail.status === 'REJ'">审核未通过</block>
 					</u-button>
 				</view>
 			</view>
@@ -240,14 +239,6 @@
 			return;
 		}
 
-		if (detail.value.status !== "ACT") {
-			return uni.$u.toast("活动无效");
-		}
-
-		if (isSignUp.value) {
-			cancelSignUp();
-			return false;
-		}
 		uni.$u.route("pagesSub/orderIn?event_id=" + routerParams.value.id);
 	};
 

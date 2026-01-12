@@ -233,12 +233,12 @@
 	});
 	
 	const getEvents = () => {
-		request.get(`/event-api/fsc_events?fsc_id=${routeParams.value.group_id}`).then(res => {
-			eventList.value = res.fsc_events.map(item => {
+		// /event-api/fsc_swipers?fsc_id=1004 
+		request.get(`/event-api/fsc_swipers?fsc_id=${routeParams.value.group_id}`).then(res => {
+			eventList.value = res.map(item => {
 				return {
 					...item,
 					event_time: isNaN(item.event_time) ? item.event_time :  Number(item.event_time),
-					image_url: item.background_image_url
 				}
 			});
 		});

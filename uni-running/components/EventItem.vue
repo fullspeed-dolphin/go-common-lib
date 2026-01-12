@@ -18,8 +18,8 @@
 				</view>
 				<view class="event-item-button" :style="item.status === 'REJ'? 'background: #999;' : ''">
 					<block v-if="item.status === 'ACT'">立即报名</block>
-					<block v-if="item.status === 'PND'">{{from === 'team' ? "审核中" : "暂未开始"}} </block>
-					<block v-if="item.status === 'EXP'">查看详情</block>
+					<block v-if="item.status === 'PND'">{{from === 'team' ? "审核中" : "暂未开始"}}</block>
+					<block v-if="item.status === 'EXP'">{{from === 'team' ? "已过期" : "查看详情"}}</block>
 					<block v-if="item.status === 'REJ'">审核未通过</block>
 				</view>
 			</view>
@@ -62,7 +62,7 @@
 	const joinEvent = () => {
 		if (props.from === "order") return;
 		if (props.from === "team") {
-			uni.$u.route(`/pagesSub/runningTeam/teamEventDetail?id=${props.item.id}`);
+			uni.$u.route(`/pagesSub/runningTeam/teamEventDetail?id=${props.item.event_id}`);
 			return
 		};
 		uni.$u.route(
