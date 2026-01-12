@@ -87,7 +87,7 @@ const getList = async (mescroll) => {
 	
 	request.get(`/event-api/fsc_events?fsc_id=${group_id.value}`, data).then(res => {
 		loading.value = false;
-		res = (res.fsc_events || []).map(item => ({
+		res = (res.fsc_events || []).filter(i => i.status !== 'DELETED').map(item => ({
 			...item,
 			event_time: isNaN(item.event_time) ?dayjs(item.event_time).format('YYYY-MM-DD') : dayjs(Number(item.event_time)).format('YYYY-MM-DD')
 		}));
@@ -137,7 +137,11 @@ const removeItem = (item) => {
 		content: "确定删除该活动吗？",
 		success: (res) => {
 			if (res.confirm) {
-				request.delete(`/event-api/fsc_events/${item.id}`).then(res => {
+        const data = {
+          event_id: item.id,
+          status: 'DELETED' 
+        }
+				request.post(`/event-api/fsc_events/update`, data).then(res => {
 					uni.$u.toast('操作成功')
 					
 					refreshList()

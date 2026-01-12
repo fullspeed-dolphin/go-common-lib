@@ -117,7 +117,7 @@
 		</section>
 
 		<section class="section-bottom">
-			<view class="agreement-wrapper">
+			<view class="agreement-wrapper flex-start">
 				<up-checkbox shape="circle" activeColor="#8CC63E" v-model:checked="isAgree" :usedAlone="true"
 					size="32rpx" />
 				<view class="agreement-text">
@@ -734,8 +734,6 @@
 		margin: 30rpx 34rpx;
 
 		.agreement-wrapper {
-			display: flex;
-			align-items: flex-start;
 			gap: 10rpx;
 		}
 

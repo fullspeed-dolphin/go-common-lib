@@ -62,11 +62,11 @@
 				</view>
 
 				<view class="cell flex-start pl20 customer-phone">
-					<view class="label">客服电话：</view>
+					<view class="label">联系电话：</view>
 					<view class="value flex-start">
-						<view style="color: #43a047; margin-right: 10rpx" @click="callPhone('19927709895')">19927709895</view>
+						<view style="color: #43a047; margin-right: 10rpx" @click="callPhone(detail.contact)">{{detail.contact}}</view>
 					</view>
-					<u-button type="primary" color="#43A047" shape="circle" size="mini" @click="copyText('19927709895')"
+					<u-button type="primary" color="#43A047" shape="circle" size="mini" @click="copyText(detail.contact)"
 						class="copy-btn"
 						customStyle="min-width: 76rpx; width: 76rpx;height: 34rpx; padding: 0; margin-left: 20rpx; font-weight: bold;font-size: 24rpx;color: #FFFFFF;">
 						复制

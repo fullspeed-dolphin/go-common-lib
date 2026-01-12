@@ -154,23 +154,25 @@
 					</up-form-item>
 					<up-form-item label1="参赛服尺寸" prop="clothesSize" required>
 						<template #label>
-							<div @click="showTip('参赛服所需')">
+							<div @click="showTip('参赛服尺码仅为参赛者个人信息，活动是否包含参赛服以具体活动宣发为准，详询活动组织方，如活动不提供参赛服则任意选择一个参赛服尺码。')">
 								<view class="label-with-icon">
 									<text class="flex-row">参赛服尺寸<text class="txt_required">*</text></text>
 									<up-icon name="info-circle" size="16" color="#FF8C00" class="tip-icon" />
 								</view>
 							</div>
 						</template>
-						<view v-if="isReadOnlyClothSize" style="width:100%;padding-right:20rpx;">
-							<up-input v-model="form.clothesSize" placeholder="请选择" border="none" inputAlign="right" readonly>
-							</up-input>
-						</view>
-						<view v-if="!isReadOnlyClothSize" style="width:100%;padding-right:20rpx;" @click="showTshirtSizePicker = true">
-							<up-input :modelValue="tshirtSizeDisplayName" placeholder="请选择" border="none" inputAlign="right" readonly>
-								<template #suffix>
-									<up-icon name="arrow-right" size="18" color="#999" />
-								</template>
-							</up-input>
+						<view style="width:100%;" @click="showOnceTip">
+							<view v-if="isReadOnlyClothSize" style="width:100%;padding-right:20rpx;">
+								<up-input v-model="form.clothesSize" placeholder="请选择" border="none" inputAlign="right" readonly>
+								</up-input>
+							</view>
+							<view v-if="!isReadOnlyClothSize" style="width:100%;padding-right:20rpx;" @click="showTshirtSizePicker = true">
+								<up-input :modelValue="tshirtSizeDisplayName" placeholder="请选择" border="none" inputAlign="right" readonly>
+									<template #suffix>
+										<up-icon name="arrow-right" size="18" color="#999" />
+									</template>
+								</up-input>
+							</view>
 						</view>
 						<up-picker v-model="selectedTshirtSize" :show="showTshirtSizePicker" :columns="[tshirtSizeOptions]"
 							:defaultIndex="tshirtSizeIndex" keyName="name" valueName="value" cancelText="取消" confirmText="确认"
@@ -183,6 +185,14 @@
 					<up-form-item label="紧急联系人电话" prop="emergencyPhone" required>
 						<up-input v-model="form.emergencyPhone" placeholder="请填写" border="none" type="number" inputAlign="right" />
 					</up-form-item>
+				</view>
+			</view>
+
+			<view class="panel bgf" style="">
+				<view style="font-size: 32rpx;margin-bottom: 20rpx;color:rgb(255, 140, 0);">提示：</view>
+				<view style="color:#777;font-size:24rpx;line-height: 1.3;">
+					<div class="u-flex-row"><div style="width:30rpx;">1、</div><div>请如实填写姓名和身份证信息，以便我们为您购买赛事保险。</div></div>
+					<div class="u-flex-row"><div style="width:30rpx;">2、</div><div>参赛服尺码仅为参赛者个人信息，活动是否包含参赛服以具体活动宣发为准，详询活动组织方，如活动不提供参赛服则任意选择一个参赛服尺码。</div></div>
 				</view>
 			</view>
 
@@ -311,6 +321,13 @@
 		...defaultForm,
 		...props.modelValue
 	});
+
+	const isOnceShow = ref(false)
+	function showOnceTip() {
+		if (isOnceShow.value) return;
+		isOnceShow.value = true;
+		uni.$u.toast('参赛服尺码仅为参赛者个人信息，活动是否包含参赛服以具体活动宣发为准，详询活动组织方，如活动不提供参赛服则任意选择一个尺码。')
+	}
 
 	watch(
 		() => props.modelValue,
@@ -1429,11 +1446,11 @@
 	}
 
 	function showTip(title) {
-		uni.showToast({
-			title: title,
-			icon: "none",
-			duration: 2000,
-		});
+		// uni.$u.toast(title)
+		
+		uni.showModal({
+			title: title
+		})
 	}
 
 	const showValidationError = (message) => {
