@@ -76,7 +76,7 @@
 						<view class="img-box">
 							<image class="img" :src="
 					          (memberLeader.avatar_url ||
-					          'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png') + '?x-oss-process=image/resize,w_70,h_70,m_fill'
+					          '/static/images/user.png') + '?x-oss-process=image/resize,w_70,h_70,m_fill'
 					        " mode="aspectFill"></image>
 						</view>
 						<view class="">
