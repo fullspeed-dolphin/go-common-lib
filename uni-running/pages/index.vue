@@ -23,7 +23,7 @@
 
 			<view class="section-title">
 				<view class="section-title-left">线下活动</view>
-				<view class="section-title-right" @click="$u.route('pagesSub/orderList')">
+				<view class="section-title-right" @click="$u.route('pagesSub/eventList')">
 					<view class="section-title-right-item">查看更多</view>
 					<u-icon name="arrow-right" size="24rpx" color="#ff8c00"></u-icon>
 				</view>
@@ -98,6 +98,10 @@
 					</view>
 				</view>
 			</section> -->
+			
+			<view style="padding: 0 34rpx;">
+				<u-divider text="已经到底了~"></u-divider>
+			</view>
 		</view>
 
 		<tabbar type="index" />
