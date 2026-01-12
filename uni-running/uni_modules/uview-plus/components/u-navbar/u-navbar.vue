@@ -225,6 +225,7 @@
 				text-align: center;
 				font-size: 16px;
 				color: $u-main-color;
+				font-weight: 500;
 			}
 
 			&__right {

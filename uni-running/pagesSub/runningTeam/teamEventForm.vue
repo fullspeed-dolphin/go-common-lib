@@ -639,11 +639,6 @@
 	}
 	
 	::v-deep {
-		.u-navbar__content__title {
-			font-weight: 500;
-			font-family: PingFang SC, PingFang SC;
-		}
-
 		.u-popup__content {
 			border-radius: 20rpx 20rpx 0 0;
 		}
