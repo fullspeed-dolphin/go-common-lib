@@ -470,9 +470,15 @@
 				flex: 1;
 				text-align: left !important;
 				margin-left: 0 !important;
-				// font-weight: bold;
-				// font-size: 26rpx;
-				// color: #dadada;
+			}
+		}
+
+		.TimeRange{
+			.u-cell{
+				border: 0!important;
+			}
+			.u-cell__value{
+				text-align: center!important;
 			}
 		}
 		
@@ -494,7 +500,6 @@
 				width: 100% !important;
 				max-width: 100% !important;
 				box-sizing: border-box !important;
-				border: 0;
 				min-height: 80rpx;
 				background: #ffffff;
 				border-radius: 16rpx;
@@ -522,6 +527,8 @@
 				color: #707070;
 			}
 		}
+
+		
 
 		.u-form-item__body__left__content__label {
 			flex: unset !important;
@@ -563,6 +570,8 @@
 			border: 2rpx solid rgba(0, 0, 0, 0.06);
 			box-sizing: border-box;
 		}
+
+		
 
 		// .u-form-item__body{
 		// 	border:0;

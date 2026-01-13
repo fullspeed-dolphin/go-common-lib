@@ -153,13 +153,5 @@ function timeFilter(type, options) {
 .TimeRange{
 	border-radius: 8px;
 	background: #fff;
-	::v-deep{
-		.u-cell{
-			border:0!important;
-			.u-cell__value{
-				text-align: center!important;
-			}
-		}
-	}
 }
 </style>
