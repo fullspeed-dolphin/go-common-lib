@@ -1,24 +1,15 @@
 <template>
-	<view style="padding: 24rpx;background:#f3f3f3;">
-		<!-- <u-navbar autoBack placeholder title="提交活动申请"></u-navbar> -->
-		<u-steps :current="pageIndex">
-			<u-steps-item title="设置基础信息" @click="pageIndex = 0"/>
-			<u-steps-item title="设置套餐信息" />
-			<u-steps-item title="完成设置"/>
-		</u-steps>
-		
-		<view v-if="pageIndex === 0 " class="u-mb-30 u-mt-30">
-			设置基础信息
-		</view>
-		<view v-if="pageIndex === 0" class="panel-section">
-			<up-form :model="form" ref="uForm" :rules="rules" labelWidth="auto">
+	<view class="page" style="background: #f3f3f3;padding-top: 30rpx;">
+		<u-navbar autoBack placeholder title="提交活动申请"></u-navbar>
+		<view style="padding: 20rpx 34rpx">
+			<up-form :model="form" ref="uForm" :rules="rules" labelPosition="top" labelWidth="auto">
 				<!-- 两个上传框并排 -->
-				<view class="flex-between-center">
+				<view class="upload-row">
 					<view class="upload-item">
 						<view class="upload-label">活动背景图(正方形)<text class="required-star">*</text></view>
 						<FileUpload v-model="form.background_image_url" :width="164" :height="120" @change="validateField('background_image_url')">
 							<template #trigger>
-								<view class="section-upload-box flex-center">
+								<view class="section-upload-box">
 									<u-icon name="photo" size="48" color="#cccccc"></u-icon>
 								</view>
 							</template>
@@ -28,7 +19,7 @@
 						<view class="upload-label">活动详情(H5长图)</view>
 						<FileUpload v-model="form.long_image_url" :width="164" :height="120" @change="validateField('long_image_url')">
 							<template #trigger>
-								<view class="section-upload-box flex-center">
+								<view class="section-upload-box">
 									<u-icon name="photo" size="48" color="#cccccc"></u-icon>
 								</view>
 							</template>
@@ -40,16 +31,14 @@
 					<input v-model="form.name" class="u-input" @input="validateField('name')" maxlength="50" placeholder="请输入活动名称" />
 				</up-form-item>
 				
-				<view class="textarea-cell">
-					<up-form-item label="活动描述" prop="description" labelPosition="top" required>
-						<view  style="position: relative;">
-							<textarea v-model="form.description" class="u-input" @input="validateField('description')" :height="80" maxlength="150" placeholder="请输入活动描述" count></textarea>
-							<view v-if="form.description" class="" style="position: absolute;right:10rpx;bottom:10rpx;font-size: 24rpx;color: #999;">
-								{{form.description.length}}/150
-							</view>
+				<up-form-item label="活动描述" prop="description" labelPosition="top" required>
+					<view class="" style="position: relative;">
+						<textarea v-model="form.description" class="u-input" @input="validateField('description')" :height="90" maxlength="150" placeholder="请输入活动描述" count></textarea>
+						<view v-if="form.description" class="" style="position: absolute;right:10rpx;bottom:10rpx;font-size: 24rpx;color: #999;">
+							{{form.description.length}}/150
 						</view>
-					</up-form-item>
-				</view>
+					</view>
+				</up-form-item>
 				
 				<up-form-item label="活动地址" prop="event_location" required>
 					<view class="pickermap" style="padding:0;">
@@ -60,6 +49,12 @@
 							isLink
 						/>
 					</view>
+					<!-- <view class="select" @click="handleChooseLocation">
+						<input v-model="form.event_location" class="u-input" readonly placeholder="请选择地址" />
+						<view class="arrow-right">
+							<u-icon name="arrow-right" size="20" color="#707070" />
+						</view>
+					</view> -->
 				</up-form-item>
 				
 				<TagForm 
@@ -88,8 +83,8 @@
 				<up-form-item label="活动人数" prop="capacity" required>
 					<input v-model="form.capacity" class="u-input" type="number" maxlength="3" placeholder="请输入活动人数" @input="validateField('capacity')" />
 				</up-form-item>
-				<up-form-item label="报名数量" prop="multi_package" required>
-					<input v-model="form.multi_package" class="u-input" type="number" maxlength="2" placeholder="一个人最多报名几个套餐" @input="validateField('multi_package')"  />
+				<up-form-item label="一个人最多报名几个套餐" prop="multi_package" required>
+					<input v-model="form.multi_package" class="u-input" type="number" maxlength="2" placeholder="请输入数量" @input="validateField('multi_package')"  />
 				</up-form-item>
 
 				<TagForm
@@ -97,27 +92,24 @@
 					required prop="racekit_pickup_address" name="racekit_pickup_address"
 					@input="validateField('racekit_pickup_address')" maxlength="500" placeholder="请添加参赛包领取地址" />
 
-				<u-form-item label="可见范围" prop="visibility">
-					<PickerCell v-model="form.visibility" :title="null" @change="validateField('visibility')" placeholder="请选择活动可见范围" :border="false" :columns="options_visibility" />
+				<u-form-item label="活动可见范围" prop="visibility" required>
+					<PickerCell v-model="form.visibility" :title="null" @change="validateField('visibility')" placeholder="请选择" :border="false" :columns="options_visibility" />
 				</u-form-item>
 
-				<u-form-item label="是否付费" prop="is_free">
+				<u-form-item label="是否付费" prop="is_free" required>
 					<PickerCell v-model="form.is_free" :title="null" @change="validateField('is_free')" placeholder="请选择" :border="false" :columns="options_is_free" />
 				</u-form-item>
 				
-				<u-form-item label="退款时间" v-if="form.is_free === '1'" prop="refund_valid_hour">
+				<u-form-item label="退款时间" v-if="form.is_free === '1'" prop="refund_valid_hour" required>
 					<PickerCell v-model="form.refund_valid_hour" :title="null" @change="validateField('refund_valid_hour')" placeholder="请选择" :border="false" :columns="options_hour" />
 				</u-form-item>
 			</up-form>
-		</view>
 
-		<TeamEventFormPackage ref="refTeamEventFormPackage" v-if="pageIndex === 1" />
-
-		<view class="" style="padding: 60rpx 8rpx 30rpx">
-			<u-button type="primary" color="#FF8C00" shape="circle" :disabled="isSubmitting" @click="submitForm()">
-				
-				{{computedSubmitBtn}}
-			</u-button>
+			<view class="" style="padding: 60rpx 8rpx 30rpx">
+				<u-button type="primary" color="#FF8C00" shape="circle" :disabled="isSubmitting" @click="submitForm()">
+					{{isSubmitting ? '提交中...' : '提交活动申请'}}
+				</u-button>
+			</view>
 		</view>
 	</view>
 </template>
@@ -138,20 +130,15 @@
 	import PickerCell from "@/components/common/PickerCell.vue";
 	import TagForm from "@/components/common/TagForm.vue";
 	import PickerTime from "@/components/common/PickerTime.vue";
-	import PickerMap from "@/components/common/PickerMap.vue";
 	import FileUpload from "@/components/common/FileUpload.vue";
 	import TimeRange from "./TimeRange.vue";
-	import TeamEventFormPackage from "./TeamEventFormPackage.vue";
 	import dayjs from "dayjs";
 	import request from "@/utils/request.js"
-
-	const pageIndex = ref(0)
 
 	// 使用store
 	const store = useStore();
 
 	// 模板引用
-	const refTeamEventFormPackage = ref(null);
 	const uForm = ref(null);
 
 	// 响应式数据
@@ -177,8 +164,6 @@
 		visibility: "private",
 	});
 
-	const isSubmitting = ref(false)
-
 	const options_is_free = ref([
 		{ label: "是", value: 1 },
 		{ label: "否", value: 0 }
@@ -188,18 +173,6 @@
 		{ label: "跑团内部可见", value: "private" },
 		{ label: "全平台可见", value: "public" }
 	]);
-
-	const computedSubmitBtn = computed(() => {
-		if (isSubmitting.value) {
-			return '提交中...'
-		}
-
-		if (form.value.is_free === '1' && pageIndex.value === 0) {
-			return '下一步配置套餐价格'
-		}
-
-		return '提交'
-	})
 	
 	const options_hour = Array.from({ length: 24 }, (_, i) => ({
 		label: `${i + 1} 小时`,
@@ -307,10 +280,6 @@
 	};
 
 	const submitForm = () => {
-		if (pageIndex.value === 1) {
-			refTeamEventFormPackage.value.submitForm()
-			return;
-		}
 		uForm.value.validate().then((res) => {
 			const token = uni.getStorageSync("token");
 			if (!token) {
@@ -323,64 +292,65 @@
 
 			console.log("验证通过", form.value.event_time);
 
-			if (form.value.is_free === '1') {
-				if (pageIndex.value === 0) {
-					pageIndex.value = 1;
-				}
-			} else {
-				createEvent()
-			}
-		});
-	};
+			const data = {
+				...form.value,
+				fsc_id: Number(group_id.value),
+				capacity: Number(form.value.capacity),
+				is_free: Number(form.value.is_free),
+				multi_package: Number(form.value.multi_package),
+				refund_valid_hour: Number(form.value.refund_valid_hour),
+				event_time: dayjs(Number(form.value.event_time)).toISOString(),
+				// registration_time: JSON.stringify(form.value.registration_time),
+				racekit_pickup_address: JSON.stringify({
+					addresses: form.value.racekit_pickup_address.split(",")
+				})
+			};
 
-	function createEvent () {
-		const data = {
-			...form.value,
-			fsc_id: Number(group_id.value),
-			capacity: Number(form.value.capacity),
-			is_free: Number(form.value.is_free),
-			multi_package: Number(form.value.multi_package),
-			refund_valid_hour: Number(form.value.refund_valid_hour),
-			event_time: dayjs(Number(form.value.event_time)).toISOString(),
-			// registration_time: JSON.stringify(form.value.registration_time),
-			racekit_pickup_address: JSON.stringify({
-				addresses: form.value.racekit_pickup_address.split(",")
-			})
-		};
+			console.log(data, "提交数据");
 
-		console.log(data, "提交数据");
-
-		uni.showLoading({
-			mask: true,
-		});
-
-		let url = "/event-api/fsc_events";
-
-		// 更新跑团
-		if (data.id) {
-			data.status = "PND";
-			data.event_id = data.id;
-			delete data.id;
-			url = "/event-api/fsc_events/update";
-		}
-		request.post(url, data).then(async (res) => {
-			console.log(res);
-
-			uni.$u.toast(data.event_id ? "更新成功" : "创建成功");
-
-			// 跳转回上一级页面，返回上一页并传递参数
-			uni.$emit("updateList", {
-				isChange: true,
+			uni.showLoading({
+				mask: true,
 			});
 
-			setTimeout(() => {
-				uni.navigateBack();
-			}, 500);
-		})
-	}
+			let url = "/event-api/fsc_events";
+
+			// 更新跑团
+			if (data.id) {
+				data.status = "PND";
+				data.event_id = data.id;
+				delete data.id;
+				url = "/event-api/fsc_events/update";
+			}
+			request.post(url, data).then(async (res) => {
+				console.log(res);
+
+				uni.$u.toast(data.event_id ? "更新成功" : "创建成功");
+
+				// 跳转回上一级页面，返回上一页并传递参数
+				uni.$emit("updateList", {
+					isChange: true,
+				});
+
+				setTimeout(() => {
+					uni.navigateBack();
+				}, 500);
+			})
+		});
+	};
 </script>
 
 <style lang="less" scoped>
+	::v-deep{
+		.u-form-item__body{
+			flex-direction: column!important;
+		}
+		.uni-date-range{
+			height: 100rpx;
+		}
+		.u-cell__body{
+			border-radius: 8px;
+		}
+	}
 	.submit-btn {
 		width: 682rpx;
 		height: 72rpx;
@@ -392,8 +362,20 @@
 		background: rgba(255, 255, 255, 0.2);
 	}
 
+	.upload-row {
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: 20rpx;
+	}
+
+	.upload-item {
+		width: 328rpx;
+	}
+
 	.upload-label {
-		text-align: left;
+		font-weight: bold;
+		font-size: 30rpx;
+		color: #000;
 		margin-bottom: 20rpx;
 	}
 
@@ -403,85 +385,285 @@
 	}
 
 	.section-upload-box {
-		width: 320rpx;
+		width: 328rpx;
 		height: 240rpx;
-		background: #f7f8fa;
+		background: #fff;
 		border-radius: 16rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
-	::v-deep{
-		.u-steps{
-			background: #fff;
-			border-radius: 16rpx;
-			padding: 30rpx 20rpx;
-			margin-bottom: 20rpx;
-		}
-		.panel-section{
-			text-align: right;
-			background: #fff;
-			border-radius: 16rpx;
-			padding: 30rpx 20rpx;
-		}
+	.form-item-uploader {
+		display: flex;
+		justify-content: center;
+	}
+	
 
-		.u-form-item__body{
-			position: relative;
-				&:after {
-					
-				position: absolute;
-				box-sizing: border-box;
-				-webkit-transform-origin: center;
-				transform-origin: center;
-				content: " ";
-				pointer-events: none;
-				top: -50%;
-				right: -50%;
-				bottom: -50%;
-				left: -50%;
-				border: 0 solid #eee;
-				transform: scale(.5);
-				border-bottom-width: 1px;
+	::v-deep {
+		.picker-cell {
+			&.placeholder{
+				.u-cell__value {
+					color: #dadada;
+					font-size: 26rpx;
+					font-weight: bold;
+				}
 			}
-		}
-		.TimeRange{
-			.u-cell__body__content{
+			
+			.u-cell__body__content {
 				display: none;
 			}
-			.u-cell__value{
-				flex:1;
-				text-align: center;
+		
+			.u-cell__value {
+				flex: 1;
+				text-align: left;
+			}
+		
+			.u-cell__body {
+				border: 0;
+				height: 100rpx;
+				background: rgba(255, 255, 255);
+				border-radius: 16rpx;
+				background: #ffffff;
+				border: 2rpx solid rgba(0, 0, 0, 0.06);
+			}
+		}
+		
+		.u-form-item__body__right__content__slot {
+			width: 100% !important;
+			display: block !important;
+			flex: 1 !important;
+			min-width: 0 !important;
+		}
+
+		.u-form-item__body__right {
+			width: 100% !important;
+			flex: 1 !important;
+			min-width: 0 !important;
+		}
+
+		.u-form-item__body__right__content {
+			width: 100% !important;
+			flex: 1 !important;
+			min-width: 0 !important;
+		}
+
+		.pickerTime {
+			width: 100% !important;
+			max-width: 100% !important;
+			display: block !important;
+			box-sizing: border-box !important;
+
+			.u-cell {
+				display: block !important;
+				width: 100% !important;
+				background: #ffffff;
+				border: 2rpx solid rgba(0, 0, 0, 0.06);
+				border-radius: 8px;
+			}
+
+			.u-cell__body__content {
+				flex: none;
+			}
+
+			.u-cell__value {
+				flex: 1;
+				text-align: left !important;
+				margin-left: 0 !important;
 			}
 		}
 
-		.textarea-cell{
-			.u-form-item__body__left__content__label{
-				flex:none;
+		.TimeRange{
+			.u-cell{
+				border: 0!important;
 			}
-			.u-input{
-				width: 100%;
-				height: 200rpx;
-				border: 1px solid #eee;
-				border-radius: 16rpx;
-				padding: 10rpx;
-				box-sizing: border-box;
-				text-align: left;
+			.u-cell__value{
+				text-align: center!important;
 			}
 		}
-		.u-form-item__body__left__content__required{
-			top:0;
-			font-size: 14px;
+		
+		.TagForm .placeholder {
+			// font-weight: 400 !important;
+			font-size: 26rpx !important;
+			// color: #dadada !important;
+		}
+
+		.pickermap {
+			width: 100% !important;
+			max-width: 100% !important;
+			display: block !important;
+			box-sizing: border-box !important;
+			overflow: hidden;
+
+			.u-cell {
+				display: block !important;
+				width: 100% !important;
+				max-width: 100% !important;
+				box-sizing: border-box !important;
+				min-height: 80rpx;
+				background: #ffffff;
+				border-radius: 16rpx;
+				border: 2rpx solid rgba(0, 0, 0, 0.06);
+			}
+
+			.u-cell__body {
+				padding-right: 20rpx;
+				width: 100% !important;
+				max-width: 100% !important;
+				box-sizing: border-box !important;
+			}
+
+			.u-cell__body__content {
+				flex: none;
+			}
+
+			.u-cell__value {
+				flex: 1 !important;
+				max-width: 100% !important;
+				text-align: left !important;
+				margin-left: 0 !important;
+				// font-weight: bold;
+				// font-size: 26rpx;
+				color: #707070;
+			}
+		}
+
+		
+
+		.u-form-item__body__left__content__label {
+			flex: unset !important;
+		}
+
+		.u-textarea__count {
+			right: 20rpx !important;
+			bottom: 14rpx !important;
+		}
+
+		.u-cell__right-icon-wrap {
+			margin-left: 0 !important;
+		}
+
+		.u-form-item__body__left__content__required {
 			position: relative !important;
 			top: 0 !important;
 			left: 0 !important;
 			order: 1 !important;
 			margin-left: 4rpx !important;
 		}
-		.upload-label,
-		.u-form-item__body__left__content__label{
-			font-weight: 500;
-			color: #000;
+
+		.u-form-item__body__right__message {
+			margin-left: 0 !important;
+			margin-top: 6rpx;
 		}
-		.u-cell__value{
-			color: #333;
+
+		.pickermap,
+		.u-input,
+		.TagForm .tag-box
+		{
+			width: 682rpx;
+			font-size: 30rpx;
+			padding: 20rpx;
+			border-radius: 16rpx;
+			min-height: 100rpx;
+			background: #ffffff;
+			// font-weight: bold !important;
+			border: 2rpx solid rgba(0, 0, 0, 0.06);
+			box-sizing: border-box;
+		}
+
+		
+
+		// .u-form-item__body{
+		// 	border:0;
+		// 	padding:10rpx 16rpx!important;
+		// 	background: rgba(255,255,255);
+		// 	border-radius: 16rpx;
+		// 	background: #FFFFFF;
+		// 	box-shadow: 0rpx 4rpx 10rpx 2rpx rgba(0,0,0,0.16);
+		// }
+		.u-textarea__field {
+			color: #000000 !important;
+			font-size: 28rpx !important;
+		}
+
+		.u-input__content__field-wrapper__field {
+			color: #000000 !important;
+			font-size: 28rpx !important;
+		}
+
+		.u-form-item__body {
+			padding: 10px 0 5px !important;
+		}
+
+		.u-FileUploader {
+			.u-form-item__body {
+				box-shadow: none;
+			}
+
+			.u-upload__wrap {
+				display: flex;
+				justify-content: center;
+
+				.u-upload__button {
+					width: 202rpx !important;
+					height: 202rpx !important;
+					border-radius: 16rpx;
+					margin: 0;
+				}
+			}
+		}
+
+		.input-placeholder {
+			font-weight: bold !important;
+			font-size: 26rpx !important;
+			color: #dadada !important;
+		}
+
+		.textarea-placeholder {
+			font-weight: bold !important;
+			font-size: 26rpx !important;
+			color: #dadada !important;
 		}
 	}
-	</style>
+
+	.select {
+		position: relative;
+		display: flex;
+		align-items: center;
+
+		.arrow-right {
+			position: absolute;
+			right: 8rpx;
+			top: 50%;
+			transform: translateY(-50%);
+		}
+	}
+	
+	::v-deep {
+		.u-popup__content {
+			border-radius: 20rpx 20rpx 0 0;
+		}
+
+		.upload-item {
+			.flex1 {
+				width: 100%;
+			}
+
+			.u-upload {
+				width: 100%;
+			}
+
+			.u-upload__wrap {
+				width: 100%;
+			}
+
+			.u-upload__wrap__preview {
+				margin: 0 !important;
+			}
+
+			.u-upload__wrap__preview__image {
+				border-radius: 16rpx !important;
+			}
+		}
+	}
+</style>

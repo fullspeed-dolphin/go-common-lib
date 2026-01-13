@@ -1,5 +1,5 @@
 <template>
-  <view class="pickermap">
+  <view :class="'pickermap ' + (!valueString ? 'placeholder' : '')">
     <u-cell
       :title="title"
       titleStyle="min-width:100px;"

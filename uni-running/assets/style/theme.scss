@@ -119,3 +119,20 @@ uni-page-wrapper{
 .u-tag__close{
 	z-index: 1!important;
 }
+.u-input{
+	font-size: 28rpx;
+}
+
+.u-form-item{
+	.u-cell__body{
+		padding:0!important;
+	}
+}
+
+.placeholder .u-cell__value{
+	color: #dadada!important;
+}
+.uni-input-placeholder{
+	color: #dadada;
+	font-size: 14px;
+}

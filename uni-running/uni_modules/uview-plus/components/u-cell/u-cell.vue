@@ -115,7 +115,7 @@
 <style lang="scss" scoped>
 
 	$u-cell-padding: 13px 15px !default;
-	$u-cell-font-size: 15px !default;
+	$u-cell-font-size: 14px !default;
 	$u-cell-line-height: 24px !default;
 	$u-cell-color: $u-main-color !default;
 	$u-cell-icon-size: 16px !default;

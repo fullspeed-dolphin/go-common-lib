@@ -215,6 +215,14 @@ onMounted(async () => {
 				transform: scale(.5)
 			}
 		}
+    .u-radio-group{
+      justify-content: flex-end;
+    }
+    .u-form-item .u-form-item__body__left__content__label {
+      font-weight: bold;
+      font-size: 30rpx;
+      color: #000000;
+    }
 	}
 	:deep(.u-form-item__body__left__content){
 		flex-direction: row-reverse!important;

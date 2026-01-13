@@ -101,6 +101,8 @@ const submitForm = () => {
 <style lang="scss">
 	.TagForm{
 		.input-box {
+			text-align: left;
+			padding: 10rpx;
 		  margin: 30rpx 30rpx 120rpx;
 		}
 		.popup-con {
@@ -108,8 +110,6 @@ const submitForm = () => {
 		}
 		
 		.placeholder{
-			font-weight: bold;
-			font-size: 13px;
 			color: #dadada;
 		}
 	}

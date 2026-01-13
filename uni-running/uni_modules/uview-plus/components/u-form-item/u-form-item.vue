@@ -44,17 +44,17 @@
 				</view>
 			</slot>
 			<view class="u-form-item__body__right">
-				<view class="u-form-item__body__right__content">
-					<view class="u-form-item__body__right__content__slot">
+				<!-- <view class="u-form-item__body__right__content"> -->
+					<!-- <view class="u-form-item__body__right__content__slot"> -->
 						<slot />
-					</view>
+					<!-- </view> -->
 					<view
 						class="item__body__right__content__icon"
 						v-if="$slots.right"
 					>
 						<slot name="right" />
 					</view>
-				</view>
+				<!-- </view> -->
 			</view>
 		</view>
 		<slot name="error">
@@ -224,7 +224,6 @@
 						align-items: center;
 						flex: 1;
 						color: $u-main-color;
-						font-size: 15px;
 					}
 				}
 			}

@@ -1,5 +1,5 @@
 <template>
-  <view class="pickerTime">
+  <view :class="'pickerTime ' + (!displayTime ? 'placeholder' : '')">
     <u-cell
       :title="title"
       :required="required"
