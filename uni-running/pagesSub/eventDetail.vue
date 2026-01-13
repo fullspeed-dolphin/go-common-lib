@@ -87,7 +87,8 @@
 			  </view> -->
 				<view class="u-border-top1" :class="{ isSignUp: isSignUp }">
 					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;" @click="routeTo()">
-						<block v-if="detail.status === 'ACT'">{{
+						<block v-if="detail.status === 'ACT' && Number(detail.is_free) === 1">查看活动详情</block>
+						<block v-else-if="detail.status === 'ACT'">{{
               isSignUp ? "取消报名" : "活动报名"
             }}</block>
 						<block v-if="detail.status === 'PND'">活动暂未开始</block>
@@ -187,7 +188,7 @@
 	onShareAppMessage(() => {
 		return {
 			title: detail.value.name || "活动详情", // 分享标题
-			path: `/pagesSub/eventDetail?id=${routerParams.value.id}`, // 分享路径
+			path: `/pagesSub/eventDetail?id=${routerParams.value.id}&fsc_id=${routerParams.value.fsc_id || ''}`, // 分享路径
 			imageUrl: detail.value.background_image_url || "", // 分享时显示的封面图
 		};
 	});
@@ -196,7 +197,7 @@
 	onShareTimeline(() => {
 		return {
 			title: detail.value.name || "活动详情", // 分享标题
-			query: `id=${routerParams.value.id}`, // 分享参数
+			query: `id=${routerParams.value.id}&fsc_id=${routerParams.value.fsc_id || ''}`, // 分享参数
 			imageUrl: detail.value.background_image_url || "", // 分享时显示的封面图
 		};
 	});
@@ -242,6 +243,18 @@
 			uni.$u.route(
 				`pagesSub/settings/webView?link=${detail.value.event_detail_url}`
 			);
+			return;
+		}
+
+		// 免费活动跳转到活动详情页
+		if (detail.value.status === "ACT" && Number(detail.value.is_free) === 1) {
+			if (detail.value.event_detail_url) {
+				uni.$u.route(
+					`pagesSub/settings/webView?link=${detail.value.event_detail_url}`
+				);
+			} else {
+				uni.$u.toast("活动详情链接不存在");
+			}
 			return;
 		}
 
