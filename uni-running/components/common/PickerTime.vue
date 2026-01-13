@@ -6,7 +6,7 @@
       :border="false"
       :value="displayTime ? displayTime : placeholder"
       @click="isShowPop = true"
-      isLink
+      :isLink="isLink"
     />
     <u-datetime-picker
       :mode="mode"
@@ -30,6 +30,10 @@ const props = defineProps({
   title: {
     type: String,
     default: "",
+  },
+  isLink: {
+    type: Boolean,
+    default: true,
   },
   filter: {
     type: [Function, null],

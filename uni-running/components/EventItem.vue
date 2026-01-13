@@ -65,7 +65,7 @@
 		if (props.from === "order") return;
 		
 		if (props.from === "team") {
-			uni.$u.route(`/pagesSub/runningTeam/teamEventDetail?id=${props.item.event_id}`);
+			uni.$u.route(`pagesSub/runningTeam/teamEventDetail?id=${props.item.event_id}`);
 			return
 		};
 		uni.$u.route(

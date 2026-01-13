@@ -76,7 +76,7 @@
 						<view class="img-box">
 							<up-lazy-load height="120" borderRadius="200" class="img" 
 								error-img="/static/images/user.png"
-								:src="memberLeader.avatar_url + '?x-oss-process=image/resize,w_70,h_70,m_fill'" mode="aspectFill"></image>
+								:src="memberLeader.avatar_url + '?x-oss-process=image/resize,w_70,h_70,m_fill'" mode="aspectFill" />
 						</view>
 						<view class="">
 							<view class="ellipsis" style="width: 300rpx;line-height: 44rpx;">
@@ -223,11 +223,11 @@
 		});
 		// #endif
 		
-		nextTick(() => {
-			if (!store.state.userInfo.id) {
-				return refUserLogin.value.open();
-			}
-		})
+		// nextTick(() => {
+		// 	if (!store.state.userInfo.id) {
+		// 		return refUserLogin.value.open();
+		// 	}
+		// })
 	});
 	
 	const getEvents = () => {

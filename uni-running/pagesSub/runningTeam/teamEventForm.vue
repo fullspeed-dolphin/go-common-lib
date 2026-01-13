@@ -73,11 +73,7 @@
 				</u-form-item>
 
 				<u-form-item label="报名时间" prop="registration_time" required>
-					<DatetimePicker v-model="form.registration_time" 
-						:start="new Date().getTime()"
-						:clear-icon="false"
-						:border="false"
-					@change="validateField('registration_time')" rangeSeparator="至" type="datetimerange" />
+					<TimeRange v-model="form.registration_time" @change="validateField('registration_time')" />
 				</u-form-item>
 				
 				<up-form-item label="联系方式" prop="contact" required>
@@ -135,8 +131,7 @@
 	import TagForm from "@/components/common/TagForm.vue";
 	import PickerTime from "@/components/common/PickerTime.vue";
 	import FileUpload from "@/components/common/FileUpload.vue";
-	// import DatetimePicker from "./uni-datetime-picker/components/uni-datetime-picker/uni-datetime-picker.vue";
-	import DatetimePicker from "@/uni_modules/uni-datetime-picker/components/uni-datetime-picker/uni-datetime-picker.vue";
+	import TimeRange from "./TimeRange.vue";
 	import dayjs from "dayjs";
 	import request from "@/utils/request.js"
 
@@ -165,7 +160,7 @@
 		multi_package: "",
 		status: "PND",
 		refund_valid_hour: "24",
-		registration_time: [],
+		registration_time: "",
 		visibility: "private",
 	});
 
@@ -200,7 +195,7 @@
 		racekit_pickup_address: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
 		multi_package: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
 		event_projects: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
-		registration_time: [{ required: true, type: "array", message: "必填项", trigger: ["blur", "change"]}],
+		registration_time: [{ required: true, message: "必填项", trigger: ["blur", "change"]}],
 		contact: [
 			{ required: true, message: "必填项", trigger: ["blur", "change"]},
 			{
@@ -274,10 +269,10 @@
 					capacity: res.capacity != null ? String(res.capacity) : form.value.capacity,
 					multi_package: res.multi_package != null ? String(res.multi_package) : form.value.multi_package,
 					is_free: res.is_free != null ? String(res.is_free) : form.value.is_free,
-					registration_time: [
-						dayjs(JSON.parse(res.registration_time)[0]).valueOf(),
-						dayjs(JSON.parse(res.registration_time)[1]).valueOf()
-					]
+					// registration_time: [
+					// 	dayjs(JSON.parse(res.registration_time)[0]).valueOf(),
+					// 	dayjs(JSON.parse(res.registration_time)[1]).valueOf()
+					// ]
 				});
 
 				isAgree.value = true;
@@ -305,10 +300,7 @@
 				multi_package: Number(form.value.multi_package),
 				refund_valid_hour: Number(form.value.refund_valid_hour),
 				event_time: dayjs(Number(form.value.event_time)).toISOString(),
-				registration_time: JSON.stringify([
-					dayjs(form.value.registration_time[0]).toISOString(),
-					dayjs(form.value.registration_time[1]).toISOString(),
-				]),
+				// registration_time: JSON.stringify(form.value.registration_time),
 				racekit_pickup_address: JSON.stringify({
 					addresses: form.value.racekit_pickup_address.split(",")
 				})
