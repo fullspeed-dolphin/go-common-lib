@@ -87,12 +87,12 @@
 			  </view> -->
 				<view class="u-border-top1" :class="{ isSignUp: isSignUp }">
 					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;" @click="routeTo()">
-						<block v-if="detail.status === 'ACT' && Number(detail.is_free) === 1">查看活动详情</block>
+						<block v-if="Number(detail.is_free) === 1">进入活动</block>
 						<block v-else-if="detail.status === 'ACT'">{{
               isSignUp ? "取消报名" : "活动报名"
             }}</block>
-						<block v-if="detail.status === 'PND'">活动暂未开始</block>
-						<block v-if="detail.status === 'EXP'">查看报名详情</block>
+						<block v-else-if="detail.status === 'PND'">活动暂未开始</block>
+						<block v-else-if="detail.status === 'EXP'">查看报名详情</block>
 					</u-button>
 				</view>
 			</view>
@@ -239,22 +239,25 @@
 			return refPhoneLogin.value.open();
 		}
 
-		if (detail.value.status === "EXP" && !!detail.value.event_detail_url) {
-			uni.$u.route(
-				`pagesSub/settings/webView?link=${detail.value.event_detail_url}`
-			);
-			return;
-		}
-
-		// 免费活动跳转到活动详情页
-		if (detail.value.status === "ACT" && Number(detail.value.is_free) === 1) {
+		// 免费活动跳转到活动详情页（带 token）
+		if (Number(detail.value.is_free) === 1) {
 			if (detail.value.event_detail_url) {
+				const token = uni.getStorageSync("token");
+				const separator = detail.value.event_detail_url.includes('?') ? '&' : '?';
+				const url = `${detail.value.event_detail_url}${separator}token=${token}`;
 				uni.$u.route(
-					`pagesSub/settings/webView?link=${detail.value.event_detail_url}`
+					`pagesSub/settings/webView?link=${encodeURIComponent(url)}`
 				);
 			} else {
 				uni.$u.toast("活动详情链接不存在");
 			}
+			return;
+		}
+
+		if (detail.value.status === "EXP" && !!detail.value.event_detail_url) {
+			uni.$u.route(
+				`pagesSub/settings/webView?link=${detail.value.event_detail_url}`
+			);
 			return;
 		}
 
