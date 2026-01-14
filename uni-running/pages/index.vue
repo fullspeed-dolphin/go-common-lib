@@ -113,7 +113,8 @@
 	import {
 		ref,
 		onMounted,
-		computed
+		computed,
+		nextTick
 	} from "vue";
 	import {
 		onLoad,
@@ -137,13 +138,13 @@
 
 	// 使用store
 	const store = useStore();
+	const refUserLogin = ref(null);
 
 	const eventList = ref([]);
 	const bannerEventList = ref([]);
 	const bannerList = ref([]);
 	const GroupList = ref([]);
 	const onlineEventList = ref([]);
-	const refUserLogin = ref(null);
 
 	// 计算属性
 	const menuBtnInfo = computed(() => {
@@ -162,11 +163,11 @@
 	const ensureLogin = () => {
 		const token = uni.getStorageSync("token");
 		const hasLogin = !!(
-			token || (userInfo.value && Object.keys(userInfo.value).length)
+			token || userInfo.value.id
 		);
 		if (hasLogin) return true;
 
-		refUserLogin.value?.open();
+		openUserLogin();
 		return false;
 	};
 
@@ -178,7 +179,20 @@
 			menus: ['shareAppMessage', 'shareTimeline'] // 开启分享给朋友和分享到朋友圈
 		});
 		// #endif
+
+		openUserLogin()
 	});
+
+	function openUserLogin () {
+		// #ifdef MP-WEIXIN
+		const envVersion = uni.getAccountInfoSync().miniProgram.envVersion;
+		if (!userInfo.value.id && envVersion === 'release') {
+			nextTick(() => {
+				refUserLogin.value.open();
+			})
+		}
+		// #endif
+	}
 
 	// 分享给朋友
 	onShareAppMessage(() => {

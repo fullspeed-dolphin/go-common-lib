@@ -23,8 +23,7 @@
 	let shouldShow = false;
 	// #ifdef MP-WEIXIN
 	try {
-		const accountInfo = uni.getAccountInfoSync();
-		const envVersion = accountInfo.miniProgram.envVersion;
+		const envVersion = uni.getAccountInfoSync().miniProgram.envVersion;
 		// release: 正式版（显示）
 		// develop: 开发者工具（不显示）
 		// trial: 体验版（不显示）

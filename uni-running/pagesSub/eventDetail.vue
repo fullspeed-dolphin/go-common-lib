@@ -102,7 +102,7 @@
 			<u-icon name="share" color="#fff" size="18"></u-icon>
 		</button>
 
-		<PhoneLogin ref="refPhoneLogin" />
+		<UserLogin ref="refUserLogin" />
 	</view>
 </template>
 <script setup>
@@ -123,14 +123,14 @@
 	import {
 		useStore
 	} from "vuex";
-	import PhoneLogin from "@/components/common/PhoneLogin.vue";
+	import UserLogin from "@/components/UserLogin.vue";
 	import dayjs from "dayjs";
 	import request from "@/utils/request.js"
 
 	const store = useStore();
 
 	// 模板引用
-	const refPhoneLogin = ref(null);
+	const refUserLogin = ref(null);
 
 	// 响应式数据
 	const isScroll = ref(false);
@@ -236,7 +236,7 @@
 
 	const routeTo = () => {
 		if (!userInfo.value.id) {
-			return refPhoneLogin.value.open();
+			return refUserLogin.value.open();
 		}
 
 		// 免费活动跳转到活动详情页（带 token）
