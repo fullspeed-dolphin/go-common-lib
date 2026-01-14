@@ -114,12 +114,12 @@ export const props = defineMixin({
         // 内部预览图片区域和选择图片按钮的区域宽度
         width: {
             type: [String, Number],
-            default: () => defProps.upload.width
+            default: () => 100
         },
         // 内部预览图片区域和选择图片按钮的区域高度
         height: {
             type: [String, Number],
-            default: () => defProps.upload.height
+            default: () => 100
         },
         // 是否在上传完成后展示预览图
         previewImage: {

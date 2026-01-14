@@ -32,7 +32,7 @@
 							></up-icon>
 						</view>
 						<view
-							class="u-form-item__body__left__content__label flex-start"
+							class="u-form-item__body__left__content__label"
 							:style="[parentData.labelStyle, {
 								justifyContent: parentData.labelAlign === 'left' ? 'flex-start' : parentData.labelAlign === 'center' ? 'center' : 'flex-end'
 							}]"

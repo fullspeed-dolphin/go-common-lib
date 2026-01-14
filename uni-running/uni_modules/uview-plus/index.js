@@ -36,8 +36,8 @@ import color from './libs/config/color.js'
 import platform from './libs/function/platform'
 
 // http
-import http from './libs/function/http.js'
-
+// import http from './libs/function/http.js'
+const http = () => {}
 // fontUtil
 import fontUtil from './components/u-icon/util.js';
 

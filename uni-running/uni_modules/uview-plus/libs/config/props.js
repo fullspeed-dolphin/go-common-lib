@@ -9,7 +9,7 @@ import zIndex from './zIndex.js'
 // 关于颜色的配置，特殊场景使用
 import color from './color.js'
 // http
-import http from '../function/http.js'
+// import http from '../function/http.js'
 import { shallowMerge } from '../function/index.js'
 // 组件props
 import ActionSheet from '../../components/u-action-sheet/actionSheet'
@@ -206,7 +206,7 @@ if (uni && uni.upuiParams) {
 	console.log('setting uview-plus')
 	let temp = uni.upuiParams()
 	if (temp.httpIns) {
-		temp.httpIns(http)
+		// temp.httpIns(http)
 	}
 	if (temp.options) {
 		setConfig(temp.options)

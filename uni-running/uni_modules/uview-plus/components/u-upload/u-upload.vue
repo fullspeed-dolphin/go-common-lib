@@ -158,7 +158,7 @@
 				>
 					<up-icon
 					    :name="uploadIcon"
-					    size="26"
+					    size="40"
 					    :color="uploadIconColor"
 					></up-icon>
 					<text
@@ -746,8 +746,8 @@
 	$u-upload-message-margin-top:5px !default;
 	$u-upload-button-width:80px !default;
 	$u-upload-button-height:$u-upload-button-width;
-	$u-upload-button-bgColor:rgb(244, 245, 247) !default;
-	$u-upload-button-border-radius:2px !default;
+	$u-upload-button-bgColor:#f7f8fa !default;
+	$u-upload-button-border-radius:8px !default;
 	$u-upload-botton-margin: 0 8px 8px 0 !default;
 	$u-upload-text-font-size:11px !default;
 	$u-upload-text-color:$u-tips-color !default;
