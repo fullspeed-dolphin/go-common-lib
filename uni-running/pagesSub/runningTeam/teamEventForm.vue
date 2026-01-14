@@ -1,8 +1,10 @@
 <template>
 	<view style="padding: 24rpx;padding-bottom: 160rpx;background:#f3f3f3;min-height: 100vh;box-sizing: border-box;">
-		<!-- <u-navbar autoBack placeholder title="提交活动申请"></u-navbar> -->
+		<u-navbar @leftClick="leftClick" :autoBack="false" placeholder title="提交活动申请"></u-navbar>
 		<u-steps :current="pageIndex">
-			<u-steps-item title="设置基础信息" @click="pageIndex = 0"/>
+			<view class="" @click="pageIndex = 0">
+				<u-steps-item title="设置基础信息" />
+			</view>
 			<u-steps-item title="设置套餐信息" />
 			<u-steps-item title="完成设置"/>
 		</u-steps>
@@ -19,7 +21,7 @@
 						<FileUpload v-model="form.background_image_url" :width="164" :height="120" @change="validateField('background_image_url')">
 							<template #trigger>
 								<view class="section-upload-box flex-center">
-									<u-icon name="photo" size="48" color="#cccccc"></u-icon>
+									<u-icon name="photo" size="48" color="#cccccc" />
 								</view>
 							</template>
 						</FileUpload>
@@ -29,7 +31,7 @@
 						<FileUpload v-model="form.long_image_url" :width="164" :height="120" @change="validateField('long_image_url')">
 							<template #trigger>
 								<view class="section-upload-box flex-center">
-									<u-icon name="photo" size="48" color="#cccccc"></u-icon>
+									<u-icon name="photo" size="48" color="#cccccc" />
 								</view>
 							</template>
 						</FileUpload>
@@ -213,6 +215,16 @@
 	function validateField(propName) {
 		uForm.value.validateField(propName, () => {}, "change");
 	}
+	
+	function leftClick () {
+		console.log(';leftClick====>', pageIndex.value)
+		if (pageIndex.value === 1) {
+			pageIndex.value = 0
+			return;
+		}
+		
+		uni.navigateBack()
+	}
 
 	const rules = ref({
 		background_image_url: [{ required: true, message: "请上传活动背景图", trigger: ["blur", "change"]}],
@@ -307,12 +319,12 @@
 	};
 
 	// 监听 pageIndex 变化，编辑模式下切换到套餐页时加载数据
-	watch(pageIndex, async (newVal) => {
-		if (newVal === 1 && routerParams.value.id) {
-			await nextTick();
-			refTeamEventFormPackage.value?.loadTicketData(routerParams.value.id);
-		}
-	});
+	// watch(pageIndex, async (newVal) => {
+	// 	if (newVal === 1 && routerParams.value.id) {
+	// 		await nextTick();
+	// 		refTeamEventFormPackage.value?.loadTicketData(routerParams.value.id);
+	// 	}
+	// });
 
 	const submitForm = async () => {
 		// 第二步：提交套餐

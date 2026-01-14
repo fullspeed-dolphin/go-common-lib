@@ -112,7 +112,6 @@ function validateField(propName) {
 	console.log("propName=====>", propName)
   // 直接触发单字段校验，库实现会根据规则更新错误显示
   try {
-    // formRef.value.validateField(propName);
 		formRef.value.validateField(propName, () => {});
   } catch (e) {
     // 一些环境下 validateField 可能是异步或返回 Promise
@@ -135,15 +134,10 @@ watch(
 // 新增套餐
 const addPackage = () => {
   form.value.packages.push({ id: Date.now(), name: "", price: "", signers: "", capacity: "" });
-  // watch 会自动触发 initRules
 };
 
 // 删除套餐
 const removePackage = (index) => {
-  if (form.value.packages.length <= 1) {
-    // useToast().warning('至少保留一个套餐')
-    return;
-  }
   form.value.packages.splice(index, 1);
 };
 
@@ -176,7 +170,7 @@ const validatePackage = (item, index) => {
 // 提交
 const submitForm = async () => {
   console.log("form.packages=====>", form.value.packages)
-
+	// await formRef.value.validate();
   // 自定义验证所有套餐
   const allErrors = []
   form.value.packages.forEach((item, index) => {
@@ -244,33 +238,10 @@ onMounted(() => {
 
 // 暴露方法给父组件
 defineExpose({
-  submitForm,
-  loadTicketData,
+  submitForm
 });
 </script>
 
-<style lang="less" scoped>
-.package-manager {
-  padding: 20rpx;
+<style lang="less">
 
-  .package-item {
-    margin-bottom: 30rpx;
-    position: relative;
-    padding-bottom: 60rpx;
-  }
-
-  .delete-btn {
-    position: absolute;
-    bottom: 10rpx;
-    right: 20rpx;
-    display: flex;
-    align-items: center;
-    gap: 8rpx;
-  }
-
-  .delete-text {
-    color: #ff4d4f;
-    font-size: 24rpx;
-  }
-}
 </style>

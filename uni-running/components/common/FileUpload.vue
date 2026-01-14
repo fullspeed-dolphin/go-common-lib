@@ -108,6 +108,10 @@ const emit = defineEmits(["input", "update:modelValue", 'change']);
 const fileList = ref([]);
 const fileTempList = ref([]);
 
+
+function fail(e) {
+	console.error(e)
+}
 // 监听modelValue变化
 watch(
   () => props.modelValue,
