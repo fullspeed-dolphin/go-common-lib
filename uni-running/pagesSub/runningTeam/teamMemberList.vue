@@ -10,7 +10,7 @@
           </view>
         </view>
         <view class="">
-          <view class="mb10" style="color: #222">{{
+          <view class="u-mb-10" style="color: #222">{{
             item.nickname || "成员"
           }}</view>
         </view>

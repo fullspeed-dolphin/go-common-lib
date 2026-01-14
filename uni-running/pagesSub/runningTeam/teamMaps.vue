@@ -10,8 +10,8 @@
       			" mode="aspectFill" />
       		</view>
       	  <view class="flex-col-center">
-      	    <view class="mb20 ellipsis">黄埔体育中心体育馆</view>
-      	    <view class="mb10">里程：<text style="color:#FF8C00;">0 km</text></view>
+      	    <view class="u-mb-20 ellipsis">黄埔体育中心体育馆</view>
+      	    <view class="u-mb-10">里程：<text style="color:#FF8C00;">0 km</text></view>
       	  </view>
       	</view>
       </view>

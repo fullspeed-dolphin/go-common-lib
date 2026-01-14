@@ -25,7 +25,7 @@
                 style="width: 200rpx; justify-content: flex-end"
                 @click="openActionSheet('gender')"
               >
-                <view v-if="form.gender" class="mr10">
+                <view v-if="form.gender" class="u-mr-10">
                   {{ calcuValue("gender") }}
                 </view>
                 <view v-if="!form.gender" class="input-placeholder">
@@ -54,7 +54,7 @@
                 style="width: 200rpx; justify-content: flex-end"
                 @click="openActionSheet('blood_type')"
               >
-                <view v-if="form.blood_type" class="mr10">
+                <view v-if="form.blood_type" class="u-mr-10">
                   {{ calcuValue("blood_type") }}
                 </view>
                 <view v-if="!form.blood_type" class="input-placeholder">
@@ -84,7 +84,7 @@
                 style="width: 200rpx; justify-content: flex-end"
                 @click="openActionSheet('tshirt_size')"
               >
-                <view v-if="form.tshirt_size" class="mr10">
+                <view v-if="form.tshirt_size" class="u-mr-10">
                   {{ calcuValue("tshirt_size") }}
                 </view>
                 <view v-if="!form.tshirt_size" class="input-placeholder">
@@ -105,7 +105,7 @@
 					<view class="flex">
 						<u-form-item label="血型" prop="blood_type">
 							<view class="u-input flex-center" style="width:200rpx;" @click="openActionSheet('blood_type')">
-								<view v-if="form.blood_type" class="mr10">
+								<view v-if="form.blood_type" class="u-mr-10">
 									{{calcuValue('blood_type')}}
 								</view>
 								<view v-if="!form.blood_type" class="input-placeholder">

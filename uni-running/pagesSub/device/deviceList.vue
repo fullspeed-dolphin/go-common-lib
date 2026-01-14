@@ -17,7 +17,7 @@
         v-for="(item, index) in deviceList"
         :key="index"
       >
-        <view class="flex-start mb30">
+        <view class="flex-start u-mb-30">
           <image class="img" :src="item.img" mode="aspectFill"></image>
           <view class="label">{{ item.label }}</view>
         </view>

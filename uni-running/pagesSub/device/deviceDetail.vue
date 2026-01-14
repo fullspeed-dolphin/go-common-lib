@@ -36,7 +36,7 @@
         <u-button type="primary" shape="circle" @click="confirmAsync()"
           >手动同步</u-button
         >
-        <view class="mt30">
+        <view class="u-mt-30">
           <u-button
             type="primary"
             shape="circle"

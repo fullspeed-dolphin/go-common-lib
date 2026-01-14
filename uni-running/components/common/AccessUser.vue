@@ -10,18 +10,18 @@
     >
       <view class="u-p-20">
         <view class="section-box u-ml-10 flex-box">
-          <!-- <image class="logo mr10" src="../../static/img/basicprofile.jpeg"
+          <!-- <image class="logo u-mr-10" src="../../static/img/basicprofile.jpeg"
 						style="width: 40rpx;height:40rpx;border-radius: 999rpx;" mode="aspectFill"></image> -->
           <view class="title flex-center">跑了没小程序申请</view>
         </view>
         <view class="">
-          <view class="mt20 mb10"> 获取你的昵称、头像 </view>
+          <view class="u-mt-20 u-mb-10"> 获取你的昵称、头像 </view>
           <view class="c9 fs24 lh36">
             登录小程序，查看用户信息，开发者将在获取你的明示同意后，
             收集你的微信昵称、 头像
           </view>
         </view>
-        <view class="mt20">
+        <view class="u-mt-20">
           <view class="flex-start u-border-bottom input-line">
             头像
             <button
@@ -67,7 +67,7 @@
             </view>
           </view>
         </view>
-        <view class="mt20 u-pt-30" style="margin-top: 50rpx">
+        <view class="u-mt-20 u-pt-30" style="margin-top: 50rpx">
           <u-button
             type="primary"
             color="#19be6b"

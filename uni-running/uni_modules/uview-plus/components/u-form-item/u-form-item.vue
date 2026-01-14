@@ -225,6 +225,7 @@
 						flex: 1;
 						color: $u-main-color;
 						font-weight: 500;
+						font-size: 30rpx;
 					}
 				}
 			}

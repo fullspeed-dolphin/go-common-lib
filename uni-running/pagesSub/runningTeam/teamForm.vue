@@ -60,7 +60,7 @@
 				</up-form-item>
 			</up-form>
 
-			<view class="txt flex-start mt30 u-pt-20" @click="isAgree = !isAgree">
+			<view class="txt flex-start u-mt-30 u-pt-20" @click="isAgree = !isAgree">
 				<u-icon size="15" :color="isAgree ? '#FF8C00' : '#999'"
 					:name="isAgree ? 'checkmark-circle-fill' : 'checkmark-circle'"></u-icon>
 				<text>

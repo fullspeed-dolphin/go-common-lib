@@ -22,7 +22,7 @@
           </view>
         </view>
         <view class="">
-          <view class="mb10 ellipsis" style="color: #222">
+          <view class="u-mb-10 ellipsis" style="color: #222">
 						{{detail.nickname || "成员"}}
 					</view>
           <view class="u-mt-20" style="color: #222">

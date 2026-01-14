@@ -1,7 +1,7 @@
 <template>
   <view class="sport-item flex-between-center" @click="viewDetail(item)">
     <view class="flex-row flex-row-center">
-      <view class="poster mr10 flex-center">
+      <view class="poster u-mr-10 flex-center">
         <image
           class="icon"
           src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/checkicon@2x.png"
@@ -14,7 +14,7 @@
           <view class="">公里</view>
         </view>
         <view class="statics">
-          <text class="mr10">用时 01:30:31</text>
+          <text class="u-mr-10">用时 01:30:31</text>
           <text>配速7’29”</text>
         </view>
       </view>

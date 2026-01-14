@@ -14,7 +14,7 @@
 				
 				<view class="" style="width:510rpx;margin-left:12rpx;">
 					<view class="u-flex">
-						<view class="title ellipsis2 mb15" style="width:420rpx;line-height: 1.2;">
+						<view class="title ellipsis2 u-mb-15" style="width:420rpx;line-height: 1.2;">
 							{{item.description}}
 						</view>
 						<!-- <view class="u-ml-5">2345张</view> -->
@@ -22,14 +22,14 @@
 					<view class="">
 						<view class="u-flex-y-center" style="width:180rpx;">
 							<u-icon name="clock" labelPos="top" size="12" />
-							<view class="ml10">
+							<view class="u-ml-10">
 								{{item.event_time}}
 							</view>
 						</view>
 						
 						<view class="u-flex  u-ml-10">
 							<u-icon name="map" size="12" />
-							<view class="ml10 ellipsis2" style="line-height:1.2">
+							<view class="u-ml-10 ellipsis2" style="line-height:1.2">
 								{{item.event_location}}
 							</view>
 						</view>

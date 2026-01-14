@@ -3,7 +3,7 @@
     <up-form-item :label="title" :name="name" :required="required">
       <view class="flex-row-center tag-box">
         <view class="u-flex-row u-flex-wrap flex-reverse">
-          <view class="ml10 mb10" v-for="(i,j) in tagList" :key="j">
+          <view class="u-ml-10 u-mb-10" v-for="(i,j) in tagList" :key="j">
             <u-tag type="primary" plain :text='i' closable @close="deleteTag(j)" />
           </view>
 					<view v-if="!tagList.length" class="placeholder" @click="isShowPop = true">

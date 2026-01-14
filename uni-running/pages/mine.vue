@@ -18,7 +18,7 @@
 							<block v-if="userInfo.id">
 								<view class="name u-flex-y-center" @click="handleUserClick">
 									{{ userInfo.nickname || "微信用户" }}
-									<view class="ml10">
+									<view class="u-ml-10">
 										<u-icon name="edit-pen-fill" size="17"></u-icon>
 									</view>
 								</view>
