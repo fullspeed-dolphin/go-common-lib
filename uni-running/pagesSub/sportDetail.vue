@@ -28,7 +28,7 @@
         <view class="flex-between-center">
           <view class="">
             <view class="" style="font-size: 30rpx">总里程:</view>
-            <view class="amount mt10 flex-row" style="align-items: flex-end">
+            <view class="amount u-ml-10 flex-row" style="align-items: flex-end">
               <view class="total">12.42</view>
               公里
             </view>

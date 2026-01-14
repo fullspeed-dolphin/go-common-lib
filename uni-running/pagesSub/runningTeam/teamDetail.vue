@@ -103,7 +103,7 @@
 							:image="item.avatar_url+ '?x-oss-process=image/resize,w_150,h_150,m_fill'" mode="aspectFill" />
 						</view>
 						<view class="">
-							<view class="mb10 ellipsis tac mt10" style="width: 120rpx;margin-top: 16rpx;line-height: 44rpx;">
+							<view class="mb10 ellipsis tac u-ml-10" style="width: 120rpx;margin-top: 16rpx;line-height: 44rpx;">
 								{{ item.nickname}}
 							</view>
 						</view>

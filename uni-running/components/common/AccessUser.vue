@@ -8,8 +8,8 @@
       round="15"
       @close="cancel()"
     >
-      <view class="p20">
-        <view class="section-box mt10 flex-box">
+      <view class="u-p-20">
+        <view class="section-box u-ml-10 flex-box">
           <!-- <image class="logo mr10" src="../../static/img/basicprofile.jpeg"
 						style="width: 40rpx;height:40rpx;border-radius: 999rpx;" mode="aspectFill"></image> -->
           <view class="title flex-center">跑了没小程序申请</view>
@@ -67,7 +67,7 @@
             </view>
           </view>
         </view>
-        <view class="mt20 pt30" style="margin-top: 50rpx">
+        <view class="mt20 u-pt-30" style="margin-top: 50rpx">
           <u-button
             type="primary"
             color="#19be6b"

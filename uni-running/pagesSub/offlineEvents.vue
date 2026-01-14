@@ -1,7 +1,7 @@
 <template>
 	<u-navbar :title="null" bgColor="transparent"></u-navbar>
 	
-	<view class="pb30" style="background: #f5f5f5" :class="{
+	<view class="u-pb-30" style="background: #f5f5f5" :class="{
       isFixedNavbar: isFixedNavbar,
       isLoadedPage: isLoadedPage,
     }">
@@ -49,7 +49,7 @@
           }}</view>
 				</view>
 
-				<view class="cell flex-row1 pl20">
+				<view class="cell flex-row1 u-pl-20">
 					<view class="label">
 						<image class="icon" :src="staticBaseUrl + '/images/icon-event-item@2x.png'" mode="aspectFill"></image>
 						<text>活动项目：</text>
@@ -61,7 +61,7 @@
 					</view>
 				</view>
 
-				<view class="cell flex-start pl20 customer-phone">
+				<view class="cell flex-start u-pl-20 customer-phone">
 					<view class="label">联系电话：</view>
 					<view class="value flex-start">
 						<view style="color: #43a047; margin-right: 10rpx" @click="callPhone(detail.contact)">{{detail.contact}}</view>

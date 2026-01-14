@@ -21,7 +21,7 @@
           <view class="" style="margin-left: 28rpx">
             <u-form-item label="性别" prop="gender" required>
               <view
-                class="u-input flex-start pr20"
+                class="u-input flex-start u-pr-20"
                 style="width: 200rpx; justify-content: flex-end"
                 @click="openActionSheet('gender')"
               >
@@ -50,7 +50,7 @@
           <view class="" style="width: 200rpx; margin-left: 28rpx">
             <u-form-item label="血型" prop="blood_type">
               <view
-                class="u-input flex-start pr20"
+                class="u-input flex-start u-pr-20"
                 style="width: 200rpx; justify-content: flex-end"
                 @click="openActionSheet('blood_type')"
               >
@@ -80,7 +80,7 @@
           <view class="" style="width: 200rpx; margin-left: 28rpx">
             <u-form-item label="T恤尺码" prop="tshirt_size" required>
               <view
-                class="u-input flex-start pr20"
+                class="u-input flex-start u-pr-20"
                 style="width: 200rpx; justify-content: flex-end"
                 @click="openActionSheet('tshirt_size')"
               >

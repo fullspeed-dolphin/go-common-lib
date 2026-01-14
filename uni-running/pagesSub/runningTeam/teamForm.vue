@@ -60,11 +60,11 @@
 				</up-form-item>
 			</up-form>
 
-			<view class="txt flex-start mt30 pt20" @click="isAgree = !isAgree">
+			<view class="txt flex-start mt30 u-pt-20" @click="isAgree = !isAgree">
 				<u-icon size="15" :color="isAgree ? '#FF8C00' : '#999'"
 					:name="isAgree ? 'checkmark-circle-fill' : 'checkmark-circle'"></u-icon>
 				<text>
-					<text class="ml5">我已阅读并同意该</text>
+					<text class="u-ml-5">我已阅读并同意该</text>
 				</text>
 				<text style="color: #ff8c00" @tap.stop="$u.route('pagesSub/settings/agreement?type=privy')">《用户隐私协议》</text>
 			</view>

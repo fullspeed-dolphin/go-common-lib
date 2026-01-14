@@ -4,7 +4,7 @@
 			<view class="plaeholder" :style="{height: menuBtnInfo.placeholder} " ></view>
 			<view class="search-box flex-start" :style="menuBtnInfo" @click="$u.route('pagesSub/runningTeam/teamList')">
 				<u-icon name="search" size="24"></u-icon>
-				<view class="ml5">请输入名称或团号或地址</view>
+				<view class="u-ml-5">请输入名称或团号或地址</view>
 			</view>
 		</view>
 		<view class="content">

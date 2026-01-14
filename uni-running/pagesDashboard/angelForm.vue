@@ -69,7 +69,7 @@
 					<up-checkbox shape="circle" activeColor="#8CC63E" v-model:checked="isAgree" :usedAlone="true"
 						:customStyle="{ marginRight: '-10rpx' }" size="32rpx" />
 					<text @click="isAgree = !isAgree">
-						<text class="ml5">我已阅读并同意该</text>
+						<text class="u-ml-5">我已阅读并同意该</text>
 					</text>
 					<text style="color: #ff8c00" @click="$u.route('pagesSub/settings/agreement?type=signUp')">《用户协议》</text>以及
 					<text style="color: #ff8c00" @click="$u.route('pagesSub/settings/agreement?type=baoxian')">《保险须知》</text>

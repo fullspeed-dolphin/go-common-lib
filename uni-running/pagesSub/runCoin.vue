@@ -1,5 +1,5 @@
 <template>
-  <view class="pt20">
+  <view class="u-pt-20">
     <u-navbar title="我的跑币" placeholder />
 
     <view class="col content">

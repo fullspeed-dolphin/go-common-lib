@@ -7,7 +7,7 @@
     round="15"
     @close="isShowPop = false"
   >
-    <view class="p20 section-dialog">
+    <view class="u-p-20 section-dialog">
       <view class="section-box">
         <view class="title flex-center">欢迎登录 跑了没</view>
       </view>
@@ -63,7 +63,7 @@
           :name="isAgree ? 'checkmark-circle-fill' : 'checkmark-circle'"
         ></u-icon>
         <text @click="isAgree = !isAgree">
-          <text class="ml5">我已阅读并同意该</text>
+          <text class="u-ml-5">我已阅读并同意该</text>
         </text>
         <text
           style="color: #ff8c00"

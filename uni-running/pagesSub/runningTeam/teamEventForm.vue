@@ -1,7 +1,7 @@
 <template>
 	<view style="padding: 24rpx;padding-bottom: 160rpx;background:#f3f3f3;min-height: 100vh;box-sizing: border-box;">
 		<u-navbar @leftClick="leftClick" :autoBack="false" placeholder title="提交活动申请"></u-navbar>
-		<u-steps :current="pageIndex">
+		<u-steps :current="pageIndex" style="">
 			<view class="" @click="pageIndex = 0">
 				<u-steps-item title="设置基础信息" />
 			</view>
@@ -17,7 +17,7 @@
 				<!-- 两个上传框并排 -->
 				<view class="flex-between-center">
 					<view class="upload-item">
-						<view class="upload-label">活动背景图(正方形)<text class="required-star">*</text></view>
+						<view class="upload-label tal b c0 u-mb-20">活动背景图(正方形)<text class="required-star u-ml-5">*</text></view>
 						<FileUpload v-model="form.background_image_url" :width="164" :height="120" @change="validateField('background_image_url')">
 							<template #trigger>
 								<view class="section-upload-box flex-center">
@@ -27,7 +27,7 @@
 						</FileUpload>
 					</view>
 					<view class="upload-item">
-						<view class="upload-label">活动详情(H5长图)</view>
+						<view class="upload-label tal b c0 u-mb-20">活动详情(H5长图)</view>
 						<FileUpload v-model="form.long_image_url" :width="164" :height="120" @change="validateField('long_image_url')">
 							<template #trigger>
 								<view class="section-upload-box flex-center">
@@ -460,14 +460,8 @@
 		background: rgba(255, 255, 255, 0.2);
 	}
 
-	.upload-label {
-		text-align: left;
-		margin-bottom: 20rpx;
-	}
-
 	.required-star {
 		color: red;
-		margin-left: 4rpx;
 	}
 
 	.section-upload-box {
@@ -505,7 +499,7 @@
 				right: -50%;
 				bottom: -50%;
 				left: -50%;
-				border: 0 solid #eee;
+				border: 0 solid #ebedf0;
 				transform: scale(.5);
 				border-bottom-width: 1px;
 			}
@@ -527,7 +521,7 @@
 			.u-input{
 				width: 100%;
 				height: 200rpx;
-				border: 1px solid #eee;
+				border: 1px solid #ebedf0;
 				border-radius: 16rpx;
 				padding: 10rpx;
 				box-sizing: border-box;
@@ -542,14 +536,6 @@
 			left: 0 !important;
 			order: 1 !important;
 			margin-left: 4rpx !important;
-		}
-		.upload-label,
-		.u-form-item__body__left__content__label{
-			font-weight: 500;
-			color: #000;
-		}
-		.u-cell__value{
-			color: #333;
 		}
 	}
 

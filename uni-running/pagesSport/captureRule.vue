@@ -1,5 +1,5 @@
 <template>
-  <view class="p20">
+  <view class="u-p-20">
 		<rich-text class="richText" :nodes="ruleText"></rich-text>
   </view>
 </template>

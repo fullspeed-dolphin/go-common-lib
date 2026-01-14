@@ -9,10 +9,10 @@
 
       <view v-for="(item, index) in tabList" :key="index" :name="item.status">
         <scroll-view scroll-y class="serverPop" v-if="curTabActive === item.status">
-          <view v-if="item.isLoading" class="flex-center c9 pt30">
+          <view v-if="item.isLoading" class="flex-center c9 u-pt-30">
             加载中...
           </view>
-          <view class="flex-between-center u-border-top p20" v-for="(address, addressindex) in item.addressList" :key="addressindex" @click="getList(index + 1, address)">
+          <view class="flex-between-center u-border-top u-p-20" v-for="(address, addressindex) in item.addressList" :key="addressindex" @click="getList(index + 1, address)">
             {{address.name}}
             <uni-icons size="30" :type="address.name == item.currentValue.name ?'checkbox-filled' : 'circle'" :color="address.name == item.currentValue.name ?'rgba(86,188,174, 1)' : '#ccc'" />
           </view>
