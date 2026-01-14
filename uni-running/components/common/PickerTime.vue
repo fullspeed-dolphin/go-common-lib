@@ -67,6 +67,10 @@ const props = defineProps({
     type: [String, Number],
     default: "",
   },
+  displayFormat: {
+    type: String,
+    default: "YYYY-MM-DD HH:mm",
+  }
 });
 
 // Emits
@@ -79,7 +83,7 @@ const timeValue = ref("");
 // 计算属性
 const displayTime = computed(() => {
   if (!timeValue.value) return "";
-  return dayjs(timeValue.value).format("YYYY-MM-DD HH:mm");
+  return dayjs(timeValue.value).format(props.displayFormat);
 });
 
 // 监听value变化

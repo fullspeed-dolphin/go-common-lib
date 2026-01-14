@@ -32,25 +32,29 @@ const props = defineProps({
     type: String,
     default: "",
   },
-  value: {
+  modelValue: {
     type: [String, Number],
     default: "",
   },
 });
 
 // Emits
-const emit = defineEmits(["input", "change"]);
+const emit = defineEmits(["update:modelValue", "change"]);
 
 // 响应式数据
 const isShowPop = ref(false);
-const valueString = ref(props.value);
+const valueString = ref(props.modelValue);
 
 // 监听value变化
 watch(
-  () => props.value,
+  () => props.modelValue,
   (val) => {
     if (String(val)) {
-      valueString.value = val;
+      if (val.slice(0, 3).includes("广东省")) {
+        valueString.value = val.slice(3);
+      } else {
+        valueString.value = val;
+      }
     } else {
     }
   },
@@ -72,8 +76,12 @@ const chooseLocation = () => {
       // that.ruleForm.address = res.address;
       // that.ruleForm.latitude = res.latitude;
       // that.ruleForm.longitude = res.longitude;
-      valueString.value = res.address;
-      emit("input", res.address);
+      if (res.address.slice(0, 3).includes("广东省")) {
+        valueString.value = res.address.slice(3);
+      } else {
+        valueString.value = res.address;
+      }
+      emit("update:modelValue", res.address);
 
       console.log(res, "返回地址");
       emit("change", `${res.latitude},${res.longitude}`);

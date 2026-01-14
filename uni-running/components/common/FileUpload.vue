@@ -1,6 +1,5 @@
 <template>
   <view class="flex1">
-    <!-- <u-cell :title="title" :required="required" :border="false"> -->
     <u-upload
       :fileList="fileList"
       :file-mediatype="accept"
@@ -15,14 +14,9 @@
       :disable-preview="disablePreview"
       :deletable="deletable"
       @fail="fail"
-      upload-icon="plus"
+      upload-icon="photo"
     >
-			<template #trigger>
-				<slot name="trigger"/>
-			</template>
 		</u-upload>
-		
-    <!-- </u-cell> -->
   </view>
 </template>
 <script setup>
@@ -64,18 +58,6 @@ const props = defineProps({
     type: String,
     default: "grid",
   },
-  imageStyles: {
-    type: Object,
-    default() {
-      return {
-        width: 90,
-        height: 90,
-        border: {
-          radius: "8",
-        },
-      };
-    },
-  },
   maxCount: {
     type: [Number, String],
     default: 1,
@@ -94,11 +76,11 @@ const props = defineProps({
   },
   width: {
     type: [String, Number],
-    default: 80,
+    default: 100,
   },
   height: {
     type: [String, Number],
-    default: 80,
+    default: 100,
   },
 });
 
