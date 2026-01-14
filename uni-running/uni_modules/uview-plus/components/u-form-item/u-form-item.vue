@@ -224,6 +224,7 @@
 						align-items: center;
 						flex: 1;
 						color: $u-main-color;
+						font-weight: 500;
 					}
 				}
 			}
