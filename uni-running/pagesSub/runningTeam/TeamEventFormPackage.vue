@@ -106,13 +106,13 @@ function validateField(propName) {
   }
 }
 
-// 监听 packages 变化，自动更新 rules
+// 监听 packages 数组长度变化，自动更新 rules（不监听内容变化，避免输入时重复触发验证）
 watch(
-  () => form.value.packages,
+  () => form.value.packages.length,
   () => {
     initRules();
   },
-  { deep: true, immediate: true }
+  { immediate: true }
 );
 
 // 新增套餐
