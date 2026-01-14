@@ -21,10 +21,7 @@
 					<!-- 为了块对齐 -->
 					<view class="u-form-item__body__left__content">
 						<!-- nvue不支持伪元素before -->
-						<text
-							v-if="required"
-							class="u-form-item__body__left__content__required"
-						>*</text>
+						
 						<view
 							class="u-form-item__body__left__content__icon"
 							v-if="leftIcon"
@@ -34,12 +31,21 @@
 								:custom-style="leftIconStyle"
 							></up-icon>
 						</view>
-						<text
-							class="u-form-item__body__left__content__label"
+						<view
+							class="u-form-item__body__left__content__label flex-start"
 							:style="[parentData.labelStyle, {
 								justifyContent: parentData.labelAlign === 'left' ? 'flex-start' : parentData.labelAlign === 'center' ? 'center' : 'flex-end'
 							}]"
-						>{{ label }}</text>
+						>
+							{{ label }}
+						</view>
+						<text
+							v-if="required"
+							class="u-form-item__body__left__content__required"
+						>*</text>
+						<view v-if="tips" @click="showTip(tips)">
+								<up-icon name="info-circle" size="16" color="#FF8C00" class="tip-icon" />
+							</view>
 					</view>
 				</view>
 			</slot>
@@ -179,8 +185,16 @@
 			// 点击组件
 			clickHandler() {
 				this.$emit('click')
+			},
+			showTip(title) {
+			// uni.$u.toast(title)
+			
+				uni.showModal({
+					title: title
+				})
 			}
 		},
+		
 	}
 </script>
 

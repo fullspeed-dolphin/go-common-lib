@@ -7,6 +7,10 @@ export const props = defineMixin({
             type: String,
             default: () => defProps.formItem.label
         },
+        tips: {
+            type: String,
+            default: ""
+        },
         // 绑定的值
         prop: {
             type: String,

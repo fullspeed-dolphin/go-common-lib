@@ -188,11 +188,6 @@ onMounted(async () => {
 </script>
 
 <style lang="scss" scoped>
-	.txt_required{
-		color: #f56c6c;
-		line-height: 20px;
-		font-size: 20px;
-	}
 	::v-deep {
 		.u-form-item {
 			position: relative;
@@ -218,21 +213,17 @@ onMounted(async () => {
     .u-radio-group{
       justify-content: flex-end;
     }
-    .u-form-item .u-form-item__body__left__content__label {
-      font-weight: bold;
-      font-size: 30rpx;
-      color: #000000;
-    }
+
+    .u-form-item__body__left__content__required{
+			top:0;
+			font-size: 14px;
+			position: relative !important;
+			top: 0 !important;
+			left: 0 !important;
+			margin-left: 4rpx !important;
+		}
 	}
 	:deep(.u-form-item__body__left__content){
-		flex-direction: row-reverse!important;
-		justify-content: flex-end!important;
-		.u-form-item__body__left__content__required{
-			position: static!important;
-			color: #f56c6c;
-			line-height: 20px;
-			font-size: 20px;
-		}
 		.u-form-item__body__left__content__label{
 			flex: none!important;
 		}

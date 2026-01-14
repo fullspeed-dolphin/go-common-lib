@@ -1,194 +1,142 @@
 <template>
-	<view class="page">
-		<u-navbar :title="pageTitle" placeholder />
-		<!-- <view class="form-tip">所有信息均为必填项</view> -->
+	<view style="padding-bottom: 208rpx;">
+		<u-navbar :title="mode === 'edit' ? '编辑报名卡' : '添加报名卡'" placeholder />
 		<up-form ref="formRef" :model="form" :rules="rules" labelWidth="260rpx">
-			<view class="section">
-				<view class="section-title">基本信息</view>
-				<view class="section-content">
-					<up-form-item prop="name" required>
-						<template #label>
-							<view class="label-with-icon" @click="showTip('用于购买保险，必须实名')">
-								<text class="flex-row">姓名<text class="txt_required">*</text></text>
-								<up-icon name="info-circle" size="16" color="#FF8C00" class="tip-icon" />
-							</view>
-						</template>
-						<view class="row" style="width:100%;padding-right:20rpx;">
-							<up-input v-model="form.name" placeholder="请填写您的真实姓名" border="none" inputAlign="right" />
-							<view class="owner">
-								<up-checkbox v-model:checked="form.isOwner" :usedAlone="true" shape="circle" activeColor="#8CC63E"
-									size="16" />
-								<text class="owner-text">本人</text>
-							</view>
+			<view class="section-title">基本信息</view>
+			<view class="panel bgf">
+				<up-form-item label="姓名" tips="用于购买保险，必须实名" prop="name" required>
+					<view class="flex-start">
+						<up-input v-model="form.name" placeholder="请填写您的真实姓名" border="none" inputAlign="right" />
+						<view class="owner">
+							<up-checkbox v-model:checked="form.isOwner" :usedAlone="true" shape="circle" activeColor="#8CC63E" size="16" />
+							本人
 						</view>
-					</up-form-item>
+					</view>
+				</up-form-item>
 
-					<up-form-item label="中文拼音" prop="pinyin">
-						<up-input v-model="form.pinyin" placeholder="请填写" border="none" inputAlign="right" />
-					</up-form-item>
+				<up-form-item label="中文拼音" prop="pinyin">
+					<up-input v-model="form.pinyin" placeholder="请填写" border="none" inputAlign="right" />
+				</up-form-item>
 
-					<up-form-item label="性别" prop="gender" required>
-						<up-radio-group v-model="form.gender" activeColor="#8CC63E" shape="square"
-							customStyle="flex: 0 0 auto; margin-left: auto;">
-							<up-radio :name="'male'" label="男" />
-							<up-radio :name="'female'" label="女" />
-						</up-radio-group>
-					</up-form-item>
+				<up-form-item label="性别" prop="gender" required>
+					<up-radio-group v-model="form.gender" activeColor="#8CC63E" shape="square"
+						customStyle="flex: 0 0 auto; margin-left: auto;">
+						<up-radio :name="'male'" label="男" />
+						<up-radio :name="'female'" label="女" />
+					</up-radio-group>
+				</up-form-item>
 
-					<up-form-item label="证件类型" prop="idType" required>
-						<view @click="showIdTypePicker = true">
-							<up-input :modelValue="form.idType || ''" placeholder="请选择" border="none" inputAlign="right" readonly>
-								<template #suffix>
-									<up-icon name="arrow-right" size="18" color="#999" />
-								</template>
-							</up-input>
-						</view>
-						<up-picker v-model="selectedIdType" :show="showIdTypePicker" :columns="[idTypeOptions]"
-							:defaultIndex="idTypeIndex" keyName="name" valueName="id" cancelText="取消" confirmText="确认"
-							confirmColor="#FF8C00" @confirm="onIdTypeConfirm" @cancel="showIdTypePicker = false"
-							@close="showIdTypePicker = false" />
-					</up-form-item>
+				<!-- <up-form-item label="证件类型" prop="idType" required>
+					<view class="" style="width:540rpx;margin: -20rpx;">
+						<PickerCell v-model="form.idType" :border="false" :columns="idTypeOptions" />
+					</view>
+				</up-form-item> -->
 
-					<up-form-item label="证件号码" prop="idCardNumber" required>
-						<template #label>
-							<view class="label-with-icon" @click="showTip('用于购买保险，必须输入真实的证件号码')">
-								<text class="flex-row">证件号码<text class="txt_required">*</text></text>
-								<up-icon name="info-circle" size="16" color="#FF8C00" class="tip-icon"/>
-							</view>
-						</template>
-						<up-input v-model="form.idCardNumber" placeholder="请填写证件号码" border="none" inputAlign="right" />
-					</up-form-item>
-
-					<up-form-item label="出生日期" prop="birthday">
-						<up-datetime-picker hasInput v-model="birthdayTimestamp" mode="date" cancelText="取消" confirmText="确认"
-							confirmColor="#FF8C00" :minDate="startDate" :maxDate="endDate" @confirm="onBirthdayConfirm">
-							<template #trigger="{ value }">
-								<up-input :modelValue="value || ''" placeholder="请选择" border="none" inputAlign="right" readonly>
-									<template #suffix>
-										<up-icon name="arrow-right" size="18" color="#999" />
-									</template>
-								</up-input>
+				<up-form-item label="证件类型" prop="idType" required>
+					<view @click="showIdTypePicker = true">
+						<up-input :modelValue="form.idType || ''" placeholder="请选择" border="none" inputAlign="right" readonly>
+							<template #suffix>
+								<up-icon name="arrow-right" size="18" color="#999" />
 							</template>
-						</up-datetime-picker>
-					</up-form-item>
+						</up-input>
+					</view>
+					<up-picker v-model="selectedIdType" :show="showIdTypePicker" :columns="[idTypeOptions]"
+						:defaultIndex="idTypeIndex" keyName="name" valueName="id" cancelText="取消" confirmText="确认"
+						confirmColor="#FF8C00" @confirm="onIdTypeConfirm" @cancel="showIdTypePicker = false"
+						@close="showIdTypePicker = false" />
+				</up-form-item>
 
-					<up-form-item label="手机号码" prop="mobile" required>
-						<up-input v-model="form.mobile" placeholder="请输入手机号" border="none" type="number" inputAlign="right" />
-					</up-form-item>
+				<up-form-item label="证件号码" prop="idCardNumber" tips="'用于购买保险，必须输入真实的证件号码'" required>
+					<up-input v-model="form.idCardNumber" placeholder="请填写证件号码" border="none" inputAlign="right" />
+				</up-form-item>
 
-					<up-form-item label="邮箱" prop="email">
-						<up-input v-model="form.email" placeholder="请填写" border="none" inputAlign="right" />
-					</up-form-item>
-				</view>
-			</view>
-
-			<view class="section">
-				<view class="section-title">常住地址</view>
-				<view class="section-content">
-					<up-form-item label="国家/地区" prop="country">
-						<view @click="showCountryPicker = true">
-							<up-input :modelValue="countryDisplayName" placeholder="请选择" border="none" inputAlign="right" readonly>
+				<up-form-item label="出生日期" prop="birthday">
+					<up-datetime-picker hasInput v-model="birthdayTimestamp" mode="date" cancelText="取消" confirmText="确认"
+						confirmColor="#FF8C00" :minDate="startDate" :maxDate="endDate" @confirm="onBirthdayConfirm">
+						<template #trigger="{ value }">
+							<up-input :modelValue="value || ''" placeholder="请选择" border="none" inputAlign="right" readonly>
 								<template #suffix>
 									<up-icon name="arrow-right" size="18" color="#999" />
 								</template>
 							</up-input>
-						</view>
-						<up-picker v-model="selectedCountry" :show="showCountryPicker" :columns="[countryOptions]"
-							:defaultIndex="countryIndex" keyName="name" valueName="id" cancelText="取消" confirmText="确认"
-							confirmColor="#FF8C00" @confirm="onCountryConfirm" @cancel="showCountryPicker = false"
-							@close="showCountryPicker = false" />
-					</up-form-item>
-					<up-form-item label="省市区" prop="region" required>
-						<view @click="openProvincePicker">
-							<up-input :modelValue="regionDisplayName" placeholder="请选择" border="none" inputAlign="right" readonly>
-								<template #suffix>
-									<up-icon name="arrow-right" size="18" color="#999" />
-								</template>
-							</up-input>
-						</view>
-						<up-picker v-model="selectedProvince" :show="showProvincePicker" :columns="[provinceOptions]"
-							:defaultIndex="provinceIndex" keyName="name" valueName="code" cancelText="取消" confirmText="确认"
-							confirmColor="#FF8C00" @confirm="onProvinceConfirm" @cancel="showProvincePicker = false"
-							@close="showProvincePicker = false" />
-						<up-picker v-model="selectedCity" :show="showCityPicker" :columns="[cityOptions]" :defaultIndex="cityIndex"
-							keyName="name" valueName="code" cancelText="取消" confirmText="确认" confirmColor="#FF8C00"
-							@confirm="onCityConfirm" @cancel="showCityPicker = false" @close="showCityPicker = false" />
-						<up-picker v-model="selectedArea" :show="showAreaPicker" :columns="[areaOptions]" :defaultIndex="areaIndex"
-							keyName="name" valueName="code" cancelText="取消" confirmText="确认" confirmColor="#FF8C00"
-							@confirm="onAreaConfirm" @cancel="showAreaPicker = false" @close="showAreaPicker = false" />
-					</up-form-item>
-					<up-form-item label1="详细地址" prop="address" required>
-						<template #label>
-							<div @click="showTip('邮寄需要')">
-								<view class="label-with-icon">
-									<text class="flex-row">详细地址<text class="txt_required">*</text></text>
-									<up-icon name="info-circle" size="16" color="#FF8C00" class="tip-icon" />
-								</view>
-							</div>
 						</template>
-						<view class="address-input-wrapper">
-							<up-input v-model="form.address" placeholder="请填写详细地址" border="none" inputAlign="right" />
-							<view class="address-icon-wrapper" @click="handleChooseLocation">
-								<up-icon name="map" size="20" color="#FF8C00" />
-							</view>
-						</view>
-					</up-form-item>
-				</view>
+					</up-datetime-picker>
+				</up-form-item>
+
+				<up-form-item label="手机号码" prop="mobile" required>
+					<up-input v-model="form.mobile" placeholder="请输入手机号" border="none" type="number" inputAlign="right" />
+				</up-form-item>
+
+				<up-form-item label="邮箱" prop="email">
+					<up-input v-model="form.email" placeholder="请填写" border="none" inputAlign="right" />
+				</up-form-item>
 			</view>
 
-			<view class="section">
-				<view class="section-title">其他</view>
-				<view class="section-content">
-					<up-form-item label="血型" prop="bloodType">
-						<view @click="showBloodTypePicker = true">
-							<up-input :modelValue="bloodTypeDisplayName" placeholder="请选择" border="none" inputAlign="right" readonly>
-								<template #suffix>
-									<up-icon name="arrow-right" size="18" color="#999" />
-								</template>
-							</up-input>
+			<view class="section-title">常住地址</view>
+			<view class="panel bgf">
+				<up-form-item label="国家/地区" prop="country">
+					<view @click="showCountryPicker = true">
+						<up-input :modelValue="countryDisplayName" placeholder="请选择" border="none" inputAlign="right" readonly>
+							<template #suffix>
+								<up-icon name="arrow-right" size="18" color="#999" />
+							</template>
+						</up-input>
+					</view>
+					<up-picker v-model="selectedCountry" :show="showCountryPicker" :columns="[countryOptions]"
+						:defaultIndex="countryIndex" keyName="name" valueName="id" cancelText="取消" confirmText="确认"
+						confirmColor="#FF8C00" @confirm="onCountryConfirm" @cancel="showCountryPicker = false"
+						@close="showCountryPicker = false" />
+				</up-form-item>
+				<up-form-item label="省市区" prop="region" required>
+					<view @click="openProvincePicker">
+						<up-input :modelValue="regionDisplayName" placeholder="请选择" border="none" inputAlign="right" readonly>
+							<template #suffix>
+								<up-icon name="arrow-right" size="18" color="#999" />
+							</template>
+						</up-input>
+					</view>
+					<up-picker v-model="selectedProvince" :show="showProvincePicker" :columns="[provinceOptions]"
+						:defaultIndex="provinceIndex" keyName="name" valueName="code" cancelText="取消" confirmText="确认"
+						confirmColor="#FF8C00" @confirm="onProvinceConfirm" @cancel="showProvincePicker = false"
+						@close="showProvincePicker = false" />
+					<up-picker v-model="selectedCity" :show="showCityPicker" :columns="[cityOptions]" :defaultIndex="cityIndex"
+						keyName="name" valueName="code" cancelText="取消" confirmText="确认" confirmColor="#FF8C00"
+						@confirm="onCityConfirm" @cancel="showCityPicker = false" @close="showCityPicker = false" />
+					<up-picker v-model="selectedArea" :show="showAreaPicker" :columns="[areaOptions]" :defaultIndex="areaIndex"
+						keyName="name" valueName="code" cancelText="取消" confirmText="确认" confirmColor="#FF8C00"
+						@confirm="onAreaConfirm" @cancel="showAreaPicker = false" @close="showAreaPicker = false" />
+				</up-form-item>
+				<up-form-item label="详细地址" prop="address" tips="邮寄需要" required>
+					<view class="address-input-wrapper">
+						<up-input v-model="form.address" placeholder="请填写详细地址" border="none" inputAlign="right" />
+						<view class="address-icon-wrapper" @click="handleChooseLocation">
+							<up-icon name="map" size="20" color="#FF8C00" />
 						</view>
-						<up-picker v-model="selectedBloodType" :show="showBloodTypePicker" :columns="[bloodTypeOptions]"
-							:defaultIndex="bloodTypeIndex" keyName="name" valueName="value" cancelText="取消" confirmText="确认"
-							confirmColor="#FF8C00" @confirm="onBloodTypeConfirm" @cancel="showBloodTypePicker = false"
-							@close="showBloodTypePicker = false" />
-					</up-form-item>
-					<up-form-item label1="参赛服尺寸" prop="clothesSize" required>
-						<template #label>
-							<div @click="showTip('参赛服尺码仅为参赛者个人信息，活动是否包含参赛服以具体活动宣发为准，详询活动组织方，如活动不提供参赛服则任意选择一个参赛服尺码。')">
-								<view class="label-with-icon">
-									<text class="flex-row">参赛服尺寸<text class="txt_required">*</text></text>
-									<up-icon name="info-circle" size="16" color="#FF8C00" class="tip-icon" />
-								</view>
-							</div>
-						</template>
-						<view style="width:100%;" @click="showOnceTip">
-							<view v-if="isReadOnlyClothSize" style="width:100%;padding-right:20rpx;">
-								<up-input v-model="form.clothesSize" placeholder="请选择" border="none" inputAlign="right" readonly>
-								</up-input>
-							</view>
-							<view v-if="!isReadOnlyClothSize" style="width:100%;padding-right:20rpx;" @click="showTshirtSizePicker = true">
-								<up-input :modelValue="tshirtSizeDisplayName" placeholder="请选择" border="none" inputAlign="right" readonly>
-									<template #suffix>
-										<up-icon name="arrow-right" size="18" color="#999" />
-									</template>
-								</up-input>
-							</view>
-						</view>
-						<up-picker v-model="selectedTshirtSize" :show="showTshirtSizePicker" :columns="[tshirtSizeOptions]"
-							:defaultIndex="tshirtSizeIndex" keyName="name" valueName="value" cancelText="取消" confirmText="确认"
-							confirmColor="#FF8C00" @confirm="onTshirtSizeConfirm" @cancel="showTshirtSizePicker = false"
-							@close="showTshirtSizePicker = false" />
-					</up-form-item>
-					<up-form-item label="紧急联系人" prop="emergencyContact" required>
-						<up-input v-model="form.emergencyContact" placeholder="请填写" border="none" inputAlign="right" />
-					</up-form-item>
-					<up-form-item label="紧急联系人电话" prop="emergencyPhone" required>
-						<up-input v-model="form.emergencyPhone" placeholder="请填写" border="none" type="number" inputAlign="right" />
-					</up-form-item>
-				</view>
+					</view>
+				</up-form-item>
 			</view>
 
-			<view class="panel bgf" style="">
+			<view class="section-title">其他</view>
+			<view class="panel bgf">
+				<up-form-item label="血型" prop="bloodType">
+					<PickerCell v-model="form.bloodType" :border="false" :columns="bloodTypeOptions" />
+				</up-form-item>
+
+				<up-form-item label="参赛服尺寸" prop="clothesSize" tips="'参赛服尺码仅为参赛者个人信息，活动是否包含参赛服以具体活动宣发为准，详询活动组织方，如活动不提供参赛服则任意选择一个参赛服尺码。'" required>
+					<view @click="showOnceTip">
+						<PickerCell v-model="form.clothesSize" :disabled="isReadOnlyClothSize" :border="false" :columns="tshirtSizeOptions" />
+					</view>
+				</up-form-item>
+
+				<up-form-item label="紧急联系人" prop="emergencyContact" required>
+					<up-input v-model="form.emergencyContact" placeholder="请填写" border="none" inputAlign="right" />
+				</up-form-item>
+				<up-form-item label="紧急联系人电话" prop="emergencyPhone" required>
+					<up-input v-model="form.emergencyPhone" placeholder="请填写" border="none" type="number" inputAlign="right" />
+				</up-form-item>
+			</view>
+
+			<view class="panel bgf">
 				<view style="font-size: 32rpx;margin-bottom: 20rpx;color:rgb(255, 140, 0);">提示：</view>
 				<view style="color:#777;font-size:24rpx;line-height: 1.3;">
 					<div class="u-flex-row"><div style="width:30rpx;">1、</div><div>请如实填写姓名和身份证信息，以便我们为您购买赛事保险。</div></div>
@@ -196,17 +144,15 @@
 				</view>
 			</view>
 
-			<view class="section">
-				<view class="section-content agree u-pb-20">
-					<view class="agree-text">
-						<span>阅读并同意以下内容</span>
-						<up-checkbox v-model:checked="form.agreed" :usedAlone="true" shape="circle" activeColor="#8CC63E" />
-					</view>
-					<view class="agree-content">您已知晓您在跑了没录入的参赛人身份信息，并将用于报名
-						活动赛事等所有需要实名制的赛事产品，并在您保存时进行
-						验证，请确保此信息真实有效。
-						跑了没将通过加密等方式保护此信息。</view>
+			<view class="panel bgf">
+				<view class="agree-text">
+					<span>阅读并同意以下内容</span>
+					<up-checkbox v-model:checked="form.agreed" :usedAlone="true" shape="circle" activeColor="#8CC63E" />
 				</view>
+				<view class="agree-content">您已知晓您在跑了没录入的参赛人身份信息，并将用于报名
+					活动赛事等所有需要实名制的赛事产品，并在您保存时进行
+					验证，请确保此信息真实有效。
+					跑了没将通过加密等方式保护此信息。</view>
 			</view>
 
 			<section class="section-bottom">
@@ -240,6 +186,9 @@
 		loadCityData,
 		loadAreaData,
 	} from "../utils/regionData.js";
+	import PickerCell from "@/components/common/PickerCell.vue";
+		import { bloodTypeOptions, tshirtSizeOptions  } from "./tools.js"
+// idTypeOptions, countryOptions, tshirtSizeOptions
 
 	const props = defineProps({
 		modelValue: {
@@ -286,16 +235,6 @@
 	const cityData = ref([]);
 	const areaData = ref([]);
 	const regionDataLoaded = ref(false);
-
-	// 血型 picker 状态
-	const showBloodTypePicker = ref(false);
-	const bloodTypeIndex = ref([0]);
-	const selectedBloodType = ref([]);
-
-	// 参赛服尺寸 picker 状态
-	const showTshirtSizePicker = ref(false);
-	const tshirtSizeIndex = ref([0]);
-	const selectedTshirtSize = ref([]);
 
 	const defaultForm = {
 		name: "",
@@ -562,10 +501,6 @@
 		}
 	);
 
-	const pageTitle = computed(() =>
-		props.mode === "edit" ? "编辑报名卡" : "添加报名卡"
-	);
-
 	const countryDisplayName = computed(() => {
 		if (!form.country) return "";
 		const country = countryOptions.find((item) => item.id === form.country);
@@ -597,14 +532,6 @@
 		}
 
 		return parts.join("/");
-	});
-
-	const bloodTypeDisplayName = computed(() => {
-		if (!form.bloodType) return "";
-		const bloodType = bloodTypeOptions.find(
-			(item) => item.value === form.bloodType
-		);
-		return bloodType ? bloodType.name : form.bloodType;
 	});
 
 	const idTypeOptions = [
@@ -639,77 +566,6 @@
 			name: "中国澳门(Macau)"
 		},
 	];
-
-	const bloodTypeOptions = [{
-			name: "A型",
-			value: "A"
-		},
-		{
-			name: "B型",
-			value: "B"
-		},
-		{
-			name: "AB型",
-			value: "AB"
-		},
-		{
-			name: "O型",
-			value: "O"
-		},
-	];
-	const tshirtSizeOptions = [{
-			name: "120",
-			value: "120"
-		},
-		{
-			name: "130",
-			value: "130"
-		},
-		{
-			name: "140",
-			value: "140"
-		},
-		{
-			name: "XS",
-			value: "XS"
-		},
-		{
-			name: "S",
-			value: "S"
-		},
-		{
-			name: "M",
-			value: "M"
-		},
-		{
-			name: "L",
-			value: "L"
-		},
-		{
-			name: "XL",
-			value: "XL"
-		},
-		{
-			name: "2XL",
-			value: "2XL"
-		},
-		{
-			name: "3XL",
-			value: "3XL"
-		},
-		{
-			name: "4XL",
-			value: "4XL"
-		},
-	];
-
-	const tshirtSizeDisplayName = computed(() => {
-		if (!form.clothesSize) return "";
-		const tshirtSize = tshirtSizeOptions.find(
-			(item) => item.value === form.clothesSize
-		);
-		return tshirtSize ? tshirtSize.name : form.clothesSize;
-	});
 
 	const buttonCustomStyle = computed(() => {
 		return `font-weight: bold; font-size: 30rpx; ${
@@ -1009,69 +865,20 @@
 		showAreaPicker.value = false;
 	}
 
-	// 监听 bloodType 变化，设置默认 index 和 selectedBloodType
 	watch(
 		() => form.bloodType,
 		(val) => {
 			if (val) {
 				const index = bloodTypeOptions.findIndex((item) => item.value === val);
 				if (index !== -1) {
-					bloodTypeIndex.value = [index];
-					selectedBloodType.value = [val];
 				}
 			} else {
-				selectedBloodType.value = [];
 			}
 		}, {
 			immediate: true
 		}
 	);
 
-	// 监听 selectedBloodType 变化，同步到 form.bloodType
-	watch(
-		() => selectedBloodType.value,
-		(val) => {
-			if (val && val.length > 0) {
-				form.bloodType = val[0];
-			}
-		}
-	);
-
-	function onBloodTypeConfirm(e) {
-		showBloodTypePicker.value = false;
-	}
-
-	// 监听 clothesSize 变化，设置默认 index 和 selectedTshirtSize
-	watch(
-		() => form.clothesSize,
-		(val) => {
-			if (val) {
-				const index = tshirtSizeOptions.findIndex((item) => item.value === val);
-				if (index !== -1) {
-					tshirtSizeIndex.value = [index];
-					selectedTshirtSize.value = [val];
-				}
-			} else {
-				selectedTshirtSize.value = [];
-			}
-		}, {
-			immediate: true
-		}
-	);
-
-	// 监听 selectedTshirtSize 变化，同步到 form.clothesSize
-	watch(
-		() => selectedTshirtSize.value,
-		(val) => {
-			if (val && val.length > 0) {
-				form.clothesSize = val[0];
-			}
-		}
-	);
-
-	function onTshirtSizeConfirm(e) {
-		showTshirtSizePicker.value = false;
-	}
 
 	const rules = {
 		name: [{
@@ -1445,14 +1252,6 @@
 		});
 	}
 
-	function showTip(title) {
-		// uni.$u.toast(title)
-		
-		uni.showModal({
-			title: title
-		})
-	}
-
 	const showValidationError = (message) => {
 		uni.showModal({
 			title: "提示",
@@ -1490,11 +1289,6 @@
 </script>
 
 <style lang="less" scoped>
-	.page {
-		background: #fafafa;
-		padding-bottom: 208rpx;
-	}
-
 	.section {
 		padding: 0 34rpx;
 	}
@@ -1503,20 +1297,8 @@
 		font-weight: 500;
 		font-size: 24rpx;
 		color: #000000;
-		padding: 0 10rpx;
+		padding-left: 34rpx;
 		margin: 48rpx 0 30rpx 0;
-	}
-
-	.section-content {
-		background: #ffffff;
-		padding: 10rpx 20rpx 0rpx;
-		border-radius: 16rpx 16rpx 16rpx 16rpx;
-		border: 2rpx solid #f2f2f2;
-	}
-
-	.row {
-		display: flex;
-		align-items: center;
 	}
 
 	.owner {
@@ -1524,15 +1306,6 @@
 		align-items: center;
 		margin-left: 20rpx;
 		color: #333;
-	}
-
-	.owner-text {
-		margin-left: 10rpx;
-		font-size: 26rpx;
-	}
-
-	.agree {
-		margin-top: 48rpx;
 	}
 
 	.agree-text {
@@ -1561,10 +1334,6 @@
 		z-index: 9;
 	}
 
-	.picker-view {
-		width: 100%;
-	}
-
 	.address-input-wrapper {
 		display: flex;
 		align-items: center;
@@ -1583,32 +1352,9 @@
 		pointer-events: auto;
 	}
 
-	.label-with-icon {
-		display: flex;
-		align-items: center;
-		gap: 8rpx;
-		font-weight: 700;
-		font-size: 30rpx;
-		color: #000;
-	}
-
-	.tip-icon {
-		cursor: pointer;
-		flex-shrink: 0;
-	}
-
-	.form-tip {
-		font-size: 24rpx;
-		color: #ff4d4f;
-		font-weight: 600;
-		text-align: center;
-		margin: 20rpx 0;
-		transform: translateY(2px);
-	}
-
-	.txt_required {
-		color: #f56c6c;
-		line-height: 20px;
-		font-size: 20px;
+	::v-deep{
+		.u-form{
+			padding: 0 32rpx;
+		}
 	}
 </style>
