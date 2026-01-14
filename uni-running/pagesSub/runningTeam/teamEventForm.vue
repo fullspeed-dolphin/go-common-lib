@@ -1,5 +1,5 @@
 <template>
-	<view style="padding: 24rpx;background:#f3f3f3;">
+	<view style="padding: 24rpx;padding-bottom: 160rpx;background:#f3f3f3;min-height: 100vh;box-sizing: border-box;">
 		<!-- <u-navbar autoBack placeholder title="提交活动申请"></u-navbar> -->
 		<u-steps :current="pageIndex">
 			<u-steps-item title="设置基础信息" @click="pageIndex = 0"/>
@@ -111,11 +111,11 @@
 			</up-form>
 		</view>
 
-		<TeamEventFormPackage ref="refTeamEventFormPackage" v-if="pageIndex === 1" />
+		<TeamEventFormPackage ref="refTeamEventFormPackage" v-if="pageIndex === 1" :event-id="routerParams.id || ''" />
 
-		<view class="" style="padding: 60rpx 8rpx 30rpx">
+		<!-- 底部固定按钮 -->
+		<view class="fixed-bottom-btn">
 			<u-button type="primary" color="#FF8C00" shape="circle" :disabled="isSubmitting" @click="submitForm()">
-				
 				{{computedSubmitBtn}}
 			</u-button>
 		</view>
@@ -306,11 +306,58 @@
 			});
 	};
 
-	const submitForm = () => {
+	// 监听 pageIndex 变化，编辑模式下切换到套餐页时加载数据
+	watch(pageIndex, async (newVal) => {
+		if (newVal === 1 && routerParams.value.id) {
+			await nextTick();
+			refTeamEventFormPackage.value?.loadTicketData(routerParams.value.id);
+		}
+	});
+
+	const submitForm = async () => {
+		// 第二步：提交套餐
 		if (pageIndex.value === 1) {
-			refTeamEventFormPackage.value.submitForm()
+			const packageResult = await refTeamEventFormPackage.value.submitForm();
+			if (!packageResult?.success) return;
+
+			isSubmitting.value = true;
+
+			// 先创建/更新活动基础信息，获取 event_id
+			const eventId = await createEvent(true); // skipNavigation = true
+			if (!eventId) {
+				isSubmitting.value = false;
+				return;
+			}
+
+			// 调用 ticket_type API 创建/更新套餐价格
+			const isEdit = !!routerParams.value.id;
+			const ticketUrl = isEdit
+				? '/event-api/ticket_type/update'
+				: '/event-api/ticket_type';
+
+			try {
+				await request.post(ticketUrl, {
+					event_id: eventId,
+					ticket_type: 'ga',
+					price: JSON.stringify(packageResult.data),
+					currency: 'CNY'
+				});
+
+				uni.hideLoading();
+				uni.$u.toast(isEdit ? "更新成功" : "创建成功");
+				uni.$emit("updateList", { isChange: true });
+				setTimeout(() => uni.navigateBack(), 500);
+			} catch (e) {
+				uni.hideLoading();
+				console.error('保存套餐价格失败', e);
+				uni.$u.toast('保存套餐价格失败');
+			} finally {
+				isSubmitting.value = false;
+			}
 			return;
 		}
+
+		// 第一步：验证基础信息
 		uForm.value.validate().then((res) => {
 			const token = uni.getStorageSync("token");
 			if (!token) {
@@ -328,12 +375,13 @@
 					pageIndex.value = 1;
 				}
 			} else {
-				createEvent()
+				createEvent(); // 免费活动直接创建
 			}
 		});
 	};
 
-	function createEvent () {
+	// 创建/更新活动基础信息，返回 event_id
+	async function createEvent (skipNavigation = false) {
 		const data = {
 			...form.value,
 			fsc_id: Number(group_id.value),
@@ -342,7 +390,6 @@
 			multi_package: Number(form.value.multi_package),
 			refund_valid_hour: Number(form.value.refund_valid_hour),
 			event_time: dayjs(Number(form.value.event_time)).toISOString(),
-			// registration_time: JSON.stringify(form.value.registration_time),
 			racekit_pickup_address: JSON.stringify({
 				addresses: form.value.racekit_pickup_address.split(",")
 			})
@@ -355,28 +402,37 @@
 		});
 
 		let url = "/event-api/fsc_events";
+		const isEdit = !!data.id;
 
-		// 更新跑团
-		if (data.id) {
+		// 更新活动
+		if (isEdit) {
 			data.status = "PND";
 			data.event_id = data.id;
 			delete data.id;
 			url = "/event-api/fsc_events/update";
 		}
-		request.post(url, data).then(async (res) => {
+
+		try {
+			const res = await request.post(url, data);
 			console.log(res);
 
-			uni.$u.toast(data.event_id ? "更新成功" : "创建成功");
+			// 返回 event_id：新创建返回 res.id，编辑时返回 data.event_id
+			const eventId = isEdit ? data.event_id : res.id;
 
-			// 跳转回上一级页面，返回上一页并传递参数
-			uni.$emit("updateList", {
-				isChange: true,
-			});
+			// 如果不跳过导航（免费活动直接完成）
+			if (!skipNavigation) {
+				uni.hideLoading();
+				uni.$u.toast(isEdit ? "更新成功" : "创建成功");
+				uni.$emit("updateList", { isChange: true });
+				setTimeout(() => uni.navigateBack(), 500);
+			}
 
-			setTimeout(() => {
-				uni.navigateBack();
-			}, 500);
-		})
+			return eventId;
+		} catch (e) {
+			uni.hideLoading();
+			console.error('创建活动失败', e);
+			return null;
+		}
 	}
 </script>
 
@@ -483,5 +539,16 @@
 		.u-cell__value{
 			color: #333;
 		}
+	}
+
+	.fixed-bottom-btn {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		padding: 20rpx 48rpx;
+		padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+		background: #f3f3f3;
+		z-index: 99;
 	}
 	</style>
