@@ -18,13 +18,7 @@
 				<view class="flex-between-center">
 					<view class="upload-item">
 						<view class="upload-label tal b c0 u-mb-20">活动背景图(正方形)<text class="required-star u-ml-5">*</text></view>
-						<FileUpload v-model="form.background_image_url" :width="164" :height="120" @change="validateField('background_image_url')">
-							<template #trigger>
-								<view class="section-upload-box flex-center">
-									<u-icon name="photo" size="48" color="#cccccc" />
-								</view>
-							</template>
-						</FileUpload>
+						<FileUpload v-model="form.background_image_url" :width="164" :height="120" @change="validateField('background_image_url')" />
 					</view>
 					<view class="upload-item">
 						<view class="upload-label tal b c0 u-mb-20">活动详情(H5长图)</view>
