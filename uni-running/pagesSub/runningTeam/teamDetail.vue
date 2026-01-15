@@ -95,7 +95,7 @@
 
 			<section class="panel" style="padding-right:0;">
 				<view class="h4">成员</view>
-				<view class="flex-row flex-wrap" style="margin-left: 26rpx;">
+				<view class="flex-row flex-wrap">
 					<view class="member-item flex-col-center" v-for="(item, index) in memberList" @click="openMemberDetail(item)" :key="index">
 						<view class="img">
 							<up-lazy-load height="120" borderRadius="200" 
@@ -509,6 +509,9 @@
 	.member-item {
 		// font-size: 32rpx;
 		margin: 0 36rpx 16rpx 0;
+		&:nth-child(4n){
+			margin-right: 0;
+		}
 		.number {
 			font-weight: bold;
 			font-size: 30rpx;

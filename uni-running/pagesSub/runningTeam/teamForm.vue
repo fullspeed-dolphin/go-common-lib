@@ -247,8 +247,6 @@
 				&:after {
 					
 				position: absolute;
-				box-sizing: border-box;
-				-webkit-transform-origin: center;
 				transform-origin: center;
 				content: " ";
 				pointer-events: none;
@@ -262,9 +260,6 @@
 			}
 		}
 		.textarea-cell{
-			.u-form-item__body__left__content__label{
-				flex:none;
-			}
 			.u-input{
 				width: 100%;
 				height: 200rpx;
@@ -295,19 +290,6 @@
 					background: #fff;
 				}
 			}
-		}
-	}
-
-	.select {
-		position: relative;
-		display: flex;
-		align-items: center;
-
-		.arrow-right {
-			position: absolute;
-			right: 8rpx;
-			top: 50%;
-			transform: translateY(-50%);
 		}
 	}
 </style>
