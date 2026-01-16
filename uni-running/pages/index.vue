@@ -263,7 +263,11 @@
 
 	const getEvents = () => {
 		Promise.all([request.get(`/event-api/fsc_swipers?status=ACT&visibility=public`), request.get(`/event-api/getOfflineEventSwiper`)]).then(res => {
-			bannerEventList.value = res.flat();
+			const list = res.flat();
+			// dirty code: 将特定 swiper 标记为跑团活动
+			const targetItem = list.find(item => item.id === '01KEH51YPXSHF4QRT5C82HZFH1');
+			if (targetItem) targetItem.fsc_id = 'dirty';
+			bannerEventList.value = list;
 		});
 	};
 
