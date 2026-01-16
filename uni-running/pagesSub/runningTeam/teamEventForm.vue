@@ -2,9 +2,7 @@
 	<view style="padding: 24rpx;padding-bottom: 160rpx;background:#f3f3f3;min-height: 100vh;box-sizing: border-box;">
 		<u-navbar @leftClick="leftClick" :autoBack="false" placeholder title="提交活动申请"></u-navbar>
 		<u-steps :current="pageIndex" style="">
-			<view class="" @click="pageIndex = 0">
-				<u-steps-item title="设置基础信息" />
-			</view>
+			<u-steps-item title="设置基础信息" />
 			<u-steps-item title="设置套餐信息" />
 			<u-steps-item title="完成设置"/>
 		</u-steps>
@@ -18,17 +16,11 @@
 				<view class="flex-between-center">
 					<view class="upload-item">
 						<view class="upload-label tal b c0 u-mb-20">活动背景图(正方形)<text class="required-star u-ml-5">*</text></view>
-						<FileUpload v-model="form.background_image_url" :width="164" :height="120" @change="validateField('background_image_url')" />
+						<FileUpload v-model="form.background_image_url" width="324rpx" :height="120" @change="validateField('background_image_url')" />
 					</view>
 					<view class="upload-item">
 						<view class="upload-label tal b c0 u-mb-20">活动详情(H5长图)</view>
-						<FileUpload v-model="form.long_image_url" :width="164" :height="120" @change="validateField('long_image_url')">
-							<template #trigger>
-								<view class="section-upload-box flex-center">
-									<u-icon name="photo" size="48" color="#cccccc" />
-								</view>
-							</template>
-						</FileUpload>
+						<FileUpload v-model="form.long_image_url" width="324rpx" :height="120" @change="validateField('long_image_url')" />
 					</view>
 				</view>
 

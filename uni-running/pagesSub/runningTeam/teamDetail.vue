@@ -76,7 +76,7 @@
 						<view class="img-box">
 							<up-lazy-load height="120" borderRadius="200" class="img" 
 								error-img="/static/images/user.png"
-								:src="memberLeader.avatar_url + '?x-oss-process=image/resize,w_70,h_70,m_fill'" mode="aspectFill" />
+								:image="memberLeader.avatar_url + '?x-oss-process=image/resize,w_110,h_110,m_fill'" mode="aspectFill" />
 						</view>
 						<view class="">
 							<view class="ellipsis" style="width: 300rpx;line-height: 44rpx;">
@@ -302,11 +302,9 @@
 		};
 		request.post(`/running-group/api/v1/groups/members`, data)
 			.then((res) => {
-				memberLeader.value =
-					(res.memberships || []).find((i) => i.role === "creator") || {};
-				memberList.value = (res.memberships || []).filter(
-					(i) => i.role !== "creator"
-				);
+				res = res.memberships || []
+				memberLeader.value = res.find((i) => i.role === "creator") || {};
+				memberList.value = res.filter((i) => i.role !== "creator");
 			});
 	};
 
