@@ -14,7 +14,7 @@
 				  " mode="aspectFill"></image>
 					
 			</section>
-			<section class="section-card flex-col-center" style="margin-top: -180rpx;">
+			<section class="section-card flex-col-center" style="margin-top: -160rpx;">
 				<image class="img" :src="
             (detail.avatar_url ||
             'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_120,h_120,m_fill'
@@ -543,8 +543,8 @@
 		padding: 34rpx 34rpx 0;
 		.img {
 			display: block;
-			width: 142rpx;
-			height: 142rpx;
+			width: 200rpx;
+			height: 200rpx;
 			background: #f5f5f5;
 			border-radius: 16rpx 16rpx 16rpx 16rpx;
 		}
