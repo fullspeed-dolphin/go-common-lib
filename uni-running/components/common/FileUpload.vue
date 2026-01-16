@@ -1,22 +1,53 @@
 <template>
   <view class="flex1">
-    <u-upload
-      :fileList="fileList"
-      :file-mediatype="accept"
-      :maxCount="maxCount"
-      :mode="mode"
-      :width="width"
-      :height="height"
-      @afterRead="afterRead"
-      @delete="deleteFile"
-      :auto-upload="false"
-      :disabled="readonly"
-      :disable-preview="disablePreview"
-      :deletable="deletable"
-      @fail="fail"
-      upload-icon="photo"
-    >
-		</u-upload>
+    <template v-if="maxCountNum === 1">
+      <template v-if="!fileList.length">
+        <u-upload
+          :fileList="fileList"
+          :file-mediatype="accept"
+          :maxCount="maxCount"
+          :mode="mode"
+          :width="width"
+          :height="height"
+          @afterRead="afterRead"
+          @delete="deleteFile"
+          :auto-upload="false"
+          :disabled="readonly"
+          :disable-preview="disablePreview"
+          :deletable="deletable"
+          @fail="fail"
+          upload-icon="photo"
+        >
+        </u-upload>
+      </template>
+      <template v-else>
+        <view class="single-preview" :style="`width:${width}px;height:${height}px`">
+          <image :src="fileList[0].url" class="preview-image" @click="chooseAndReplace" mode="aspectFill" />
+          <view class="preview-actions">
+            <u-icon name="close" size="10" color="#fff" @click.stop="deleteFile({ tempFilePath: fileList[0] })" />
+          </view>
+        </view>
+      </template>
+    </template>
+    <template v-else>
+      <u-upload
+        :fileList="fileList"
+        :file-mediatype="accept"
+        :maxCount="maxCount"
+        :mode="mode"
+        :width="width"
+        :height="height"
+        @afterRead="afterRead"
+        @delete="deleteFile"
+        :auto-upload="false"
+        :disabled="readonly"
+        :disable-preview="disablePreview"
+        :deletable="deletable"
+        @fail="fail"
+        upload-icon="photo"
+      >
+      </u-upload>
+    </template>
   </view>
 </template>
 <script setup>
@@ -86,6 +117,8 @@ const props = defineProps({
 
 const emit = defineEmits(["input", "update:modelValue", 'change']);
 
+const maxCountNum = Number(props.maxCount) || 1;
+
 // 响应式数据
 const fileList = ref([]);
 const fileTempList = ref([]);
@@ -126,14 +159,53 @@ watch(
 );
 
 // 方法定义
-// 删除文件
+// 删除文件 (兼容 u-upload 的 event 或者直接传入的文件对象)
 const deleteFile = (event) => {
-  const index = fileList.value.findIndex((i) => i === event.tempFilePath);
-  fileList.value.splice(index, 1);
+  let target = event && (event.tempFilePath || event);
+  if (!target) return;
+  const index = fileList.value.findIndex((i) => i.uid === (target.uid || target.url) || i.url === target.url);
+  if (index > -1) {
+    fileList.value.splice(index, 1);
+  }
   const value = listToString(fileList.value);
   emit("input", value);
   emit("update:modelValue", value);
-	emit("change", value);
+  emit("change", value);
+};
+
+// 点击已上传图片，重新选择并覆盖（仅用于单文件模式）
+const chooseAndReplace = async () => {
+  try {
+    const res = await new Promise((resolve, reject) => {
+      uni.chooseImage({
+        count: 1,
+        sourceType: props.capture,
+        success: (r) => resolve(r.tempFilePaths[0]),
+        fail: (e) => reject(e),
+      });
+    });
+
+    if (!res) return;
+
+    uni.showLoading({ mask: true, title: '上传图片中' });
+    const uploadedUrl = await uploadFile({ url: res });
+    if (uploadedUrl) {
+      const newItem = {
+        name: uploadedUrl,
+        url: uploadedUrl,
+        extname: 'png',
+        uid: new Date().getTime(),
+      };
+      fileList.value = [newItem];
+      const value = listToString(fileList.value);
+      emit('update:modelValue', value);
+      emit('change', value);
+    }
+  } catch (e) {
+    console.error(e);
+  } finally {
+    uni.hideLoading();
+  }
 };
 
 const afterRead = async (event) => {
@@ -249,5 +321,24 @@ const uploadFile = async (file) => {
     width: 18px !important;
     height: 18px !important;
   }
+}
+
+.single-preview {
+  position: relative;
+  width: 100%;
+  display: flex;
+}
+.preview-image {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+.preview-actions {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 10rpx;
+  background: rgba(0,0,0,.3);
+  border-radius: 99px;
 }
 </style>
