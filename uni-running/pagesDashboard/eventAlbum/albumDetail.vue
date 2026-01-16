@@ -31,7 +31,7 @@
 				</view>
 			</view>
 
-			<view class="u-flex u-flex-wrap u-p-10">
+			<view class="u-flex u-flex-wrap u-pt-10 u-pl-5 u-pb-10">
 				<block v-if="displayType === 'photo'">
 					<image class="card-img" :src="item.item + '?x-oss-process=image/resize,w_250/quality,q_80/format,webp'"
 						mode="aspectFill" v-for="(item, index) in virtualList" :id="'zp-id-' + item.zp_index" :key="item.zp_index"
@@ -331,10 +331,19 @@
 
 		.card-img {
 			display: block;
-			width: 25%;
+			/* #ifndef MP-WEIXIN */
+			width: 174rpx;
+			/* #endif */
+			/* #ifdef MP-WEIXIN */
+			width: 178rpx;
+			/* #endif */
 			height: 180rpx;
-			padding: 5rpx;
+			margin: 5rpx;
 			box-sizing: border-box;
+			background: #f5f5f5;
+			&:nth-child(4n){
+				margin-right:0;
+			}
 		}
 
 		.card-video {
@@ -342,7 +351,6 @@
 			display: block;
 			width: 50%;
 			height: 270rpx;
-			padding: 5rpx;
 			box-sizing: border-box;
 			overflow: hidden;
 

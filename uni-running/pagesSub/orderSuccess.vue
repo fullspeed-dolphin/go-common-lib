@@ -12,11 +12,7 @@
         报名后开始运动才能算有效成绩。先报名后开跑，该赛事为线下赛，暂不支持历史完赛成绩
       </view>
     </view>
-    <view
-      class="section info"
-      v-for="(signInfo, index) in detail.sign_info_list"
-      :key="index"
-    >
+    <view class="section info" v-for="(signInfo, index) in detail.sign_info_list" :key="index">
       <view class="section-content">
         <view class="section-header">参赛人{{ index + 1 }}</view>
         <view class="section-items">
@@ -84,40 +80,10 @@
           </view>
         </view>
         <view class="section-actions">
-          <u-button
-            v-if="signInfo?.bib_url"
-            type="primary"
-            shape="circle"
-            color="#FF8C00"
-            @click="viewBib(signInfo)"
-            >查看号码布</u-button
-          >
-          <u-button
-            v-if="!signInfo?.bib_url"
-            type="primary"
-            plain
-            shape="circle"
-            color="#FF8C00"
-            @click="viewBib(signInfo)"
-            >查看号码布</u-button
-          >
-          <u-button
-            v-if="signInfo?.certificate_url"
-            type="primary"
-            shape="circle"
-            color="#FF8C00"
-            @click="viewCertificate(signInfo)"
-            >查看完赛证书</u-button
-          >
-          <u-button
-            v-if="!signInfo?.certificate_url"
-            type="primary"
-            plain
-            shape="circle"
-            color="#FF8C00"
-            @click="viewCertificate(signInfo)"
-            >查看完赛证书</u-button
-          >
+          <u-button v-if="signInfo?.bib_url" type="primary" shape="circle" color="#FF8C00" @click="viewBib(signInfo)">查看号码布</u-button>
+          <u-button v-if="!signInfo?.bib_url" type="primary" plain shape="circle" color="#FF8C00" @click="viewBib(signInfo)">查看号码布</u-button>
+          <u-button v-if="signInfo?.certificate_url" type="primary" shape="circle" color="#FF8C00" @click="viewCertificate(signInfo)">查看完赛证书</u-button>
+          <u-button v-if="!signInfo?.certificate_url" type="primary" plain shape="circle" color="#FF8C00" @click="viewCertificate(signInfo)">查看完赛证书</u-button>
         </view>
       </view>
     </view>
@@ -144,24 +110,12 @@
         <view> 5、退赛服务截止后，不再受理任何退赛申请 </view>
       </view>
       <view class="refund-button">
-        <u-button
-          type="primary"
-          :color="canRefund ? '#FF8C00' : '#CCCCCC'"
-          shape="circle"
-          :disabled="!canRefund"
-          @click="refundOrder(detail)"
-        >
+        <u-button type="primary" :color="canRefund ? '#FF8C00' : '#CCCCCC'" shape="circle" :disabled="!canRefund" @click="refundOrder(detail)">
           {{ canRefund ? '申请退赛' : '已超过退赛时间' }}
         </u-button>
       </view>
     </view>
-    <CommonDialog
-      ref="refundDialogRef"
-      confirmButtonTxt="确认"
-      cancelButtonTxt="取消"
-      @confirm="confirmRefund"
-      @close="closeRefund"
-    >
+    <CommonDialog ref="refundDialogRef" confirmButtonTxt="确认" cancelButtonTxt="取消" @confirm="confirmRefund" @close="closeRefund">
       <view class="refund-dialog-content">
         <view class="refund-dialog-title">确认退赛？</view>
         <view class="refund-dialog-desc">
@@ -175,7 +129,7 @@
 <script setup>
 import { ref, onUnmounted, watch, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
-import request from "@/utils/request.js"
+import request from "@/utils/request.js";
 import CommonDialog from "@/components/common/CommonDialog.vue";
 import dayjs from "dayjs";
 
@@ -218,7 +172,7 @@ const canRefund = computed(() => {
 
 // 计算退款截止时间
 const refundDeadline = computed(() => {
-  if (!detail.value.created_at) return '';
+  if (!detail.value.created_at) return "";
   return dayjs(detail.value.created_at)
     .add(refundValidHour.value, "hour")
     .format("YYYY-MM-DD HH:mm:ss");
@@ -312,7 +266,10 @@ onLoad((options) => {
       detail.value = storedDetail;
 
       // 兼容新旧数据结构
-      if (storedDetail.sign_info_list && Array.isArray(storedDetail.sign_info_list)) {
+      if (
+        storedDetail.sign_info_list &&
+        Array.isArray(storedDetail.sign_info_list)
+      ) {
         detail.value.sign_info_list = storedDetail.sign_info_list;
       } else if (storedDetail.sign_info) {
         detail.value.sign_info_list = [storedDetail.sign_info];
@@ -345,7 +302,8 @@ const getOrderDetail = () => {
     order_no: order_no.value,
   };
 
-  request.post(`/pay/order/status`, data)
+  request
+    .post(`/pay/order/status`, data)
     .then((res) => {
       console.log("订单详情 res", res);
 
@@ -363,7 +321,8 @@ const getOrderDetail = () => {
         detail.value.sign_info_list = [];
       }
 
-      request.get(`/event-api/api/v1/events/${res.event_id}`)
+      request
+        .get(`/event-api/api/v1/events/${res.event_id}`)
         .then((eventRes) => {
           detail.value.event_info = eventRes;
           // 事件信息加载后启动倒计时
@@ -411,7 +370,8 @@ const confirmRefund = () => {
     refund_amount: detail.value.amount,
   };
 
-  request.post(`/pay/wechat/refund`, params)
+  request
+    .post(`/pay/wechat/refund`, params)
     .then((res) => {
       refundDialogRef.value.close();
       uni.$u.toast("申请成功，请注意退款信息");
@@ -436,9 +396,7 @@ const viewCertificate = (signInfo) => {
   if (!signInfo?.certificate_url) {
     return uni.$u.toast("暂无完赛证书");
   }
-  uni.$u.route(
-    `pagesSub/settings/webView?link=${signInfo.certificate_url}`
-  );
+  uni.$u.route(`pagesSub/settings/webView?link=${signInfo.certificate_url}`);
 };
 
 const viewEventDetail = () => {

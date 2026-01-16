@@ -78,7 +78,8 @@ defineExpose({
     display: flex;
     align-items: center;
     height: calc(v-bind("sliderRangeStyle.blockSize") / 2);
-    background-color: v-bind("$props.color");
+    color: #fff;
+    background-color: #333;
     font-size: 18rpx;
     // line-height: calc(v-bind("sliderRangeStyle.blockSize") / 2);
     text-align: center;
