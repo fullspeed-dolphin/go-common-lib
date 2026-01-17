@@ -150,6 +150,17 @@
 		// #endif
 
 		routerParams.value = options;
+
+		// 如果状态是 REJ，弹窗显示拒绝原因
+		if (options.status === 'REJ' && options.status_message) {
+			uni.showModal({
+				title: '审核未通过',
+				content: decodeURIComponent(options.status_message),
+				showCancel: false,
+				confirmText: '我知道了'
+			});
+		}
+
 		getDetail();
 	});
 

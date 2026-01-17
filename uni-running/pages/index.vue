@@ -28,6 +28,21 @@
 					<u-icon name="arrow-right" size="24rpx" color="#ff8c00"></u-icon>
 				</view>
 			</view>
+			<view class="category-tags">
+				<view class="tags-inner">
+					<view class="tag-slider" :style="getSliderStyle(eventCategoryIndex, 'event')"></view>
+					<view
+						v-for="(item, index) in eventCategoryList"
+						:key="item.value"
+						:id="'event-tag-' + index"
+						class="tag-item"
+						:class="{ active: eventCategoryIndex === index }"
+						@click="onEventCategoryChange(index)"
+					>
+						{{ item.name }}
+					</view>
+				</view>
+			</view>
 			<swiper class="event-swiper" circular indicator-active-color="#FF8C00" :autoplay="true" :interval="3000"
 				:display-multiple-items="1.2">
 				<swiper-item v-for="(item, index) in bannerEventList" :key="index">
@@ -66,14 +81,32 @@
 			</section> -->
 
 			<view class="section-title">
-				<view class="section-title-left">跑团风采</view>
+				<view class="section-title-left">全速俱乐部</view>
 				<view class="section-title-right" @click="$u.route('pagesSub/runningTeam/teamList')">
 					<view class="section-title-right-item">查看更多</view>
 					<u-icon name="arrow-right" size="24rpx" color="#ff8c00"></u-icon>
 				</view>
 			</view>
-			<section class="section-group">
+			<view class="category-tags">
+				<view class="tags-inner">
+					<view class="tag-slider" :style="getSliderStyle(clubCategoryIndex, 'club')"></view>
+					<view
+						v-for="(item, index) in clubCategoryList"
+						:key="item.value"
+						:id="'club-tag-' + index"
+						class="tag-item"
+						:class="{ active: clubCategoryIndex === index }"
+						@click="onClubCategoryChange(index)"
+					>
+						{{ item.name }}
+					</view>
+				</view>
+			</view>
+			<section class="section-group" :class="['list-transition', listAnimationClass]">
 				<GroupItem :item="item" v-for="(item, index) in GroupList" :key="index" />
+				<view v-if="GroupList.length === 0 && !listAnimationClass" class="empty-state">
+					<text>暂无俱乐部</text>
+				</view>
 			</section>
 
 			<!-- <view class="section-title flex-between-center">
@@ -145,6 +178,110 @@
 	const bannerList = ref([]);
 	const GroupList = ref([]);
 	const onlineEventList = ref([]);
+
+	// 分类 tag 数据
+	const eventCategoryList = ref([
+		{ name: '全部', value: 'all' },
+		{ name: '跑步', value: 'running' },
+		{ name: '骑行', value: 'cycling' }
+	]);
+	const eventCategoryIndex = ref(0);
+
+	const clubCategoryList = ref([
+		{ name: '全部', value: 'all' },
+		{ name: '跑步', value: 'running' },
+		{ name: '骑行', value: 'cycling' }
+	]);
+	const clubCategoryIndex = ref(0);
+
+	// 列表切换动画状态
+	const listAnimationClass = ref('');
+	const slideDirection = ref('right'); // 'left' 或 'right'
+
+	// 存储每个 tag 的位置信息 { width, left }
+	const eventTagRects = ref([]);
+	const clubTagRects = ref([]);
+	const eventContainerLeft = ref(0);
+	const clubContainerLeft = ref(0);
+
+	// 获取滑块样式
+	const getSliderStyle = (activeIndex, type) => {
+		const rects = type === 'event' ? eventTagRects.value : clubTagRects.value;
+		const containerLeft = type === 'event' ? eventContainerLeft.value : clubContainerLeft.value;
+		if (!rects.length || activeIndex >= rects.length) return {};
+
+		const rect = rects[activeIndex];
+		// 计算相对于容器的偏移（需要减去容器的 left 和 padding 6rpx）
+		const padding = 6 * (uni.getSystemInfoSync().windowWidth / 750); // rpx to px
+		const left = rect.left - containerLeft;
+
+		return {
+			width: rect.width + 'px',
+			transform: `translateX(${left}px)`
+		};
+	};
+
+	// 获取 tag 宽度和位置
+	const getTagWidths = () => {
+		nextTick(() => {
+			// 获取线下活动分类容器位置
+			const eventContainerQuery = uni.createSelectorQuery();
+			eventContainerQuery.select('#event-tag-0').boundingClientRect();
+			eventContainerQuery.exec((res) => {
+				if (res[0]) {
+					eventContainerLeft.value = res[0].left;
+				}
+			});
+
+			// 获取线下活动分类 tag 位置
+			const eventQuery = uni.createSelectorQuery();
+			eventQuery.selectAll('#event-tag-0, #event-tag-1, #event-tag-2').boundingClientRect();
+			eventQuery.exec((res) => {
+				if (res[0]) {
+					eventTagRects.value = res[0].map(item => ({ width: item.width, left: item.left }));
+				}
+			});
+
+			// 获取全速俱乐部分类容器位置
+			const clubContainerQuery = uni.createSelectorQuery();
+			clubContainerQuery.select('#club-tag-0').boundingClientRect();
+			clubContainerQuery.exec((res) => {
+				if (res[0]) {
+					clubContainerLeft.value = res[0].left;
+				}
+			});
+
+			// 获取全速俱乐部分类 tag 位置
+			const clubQuery = uni.createSelectorQuery();
+			clubQuery.selectAll('#club-tag-0, #club-tag-1, #club-tag-2').boundingClientRect();
+			clubQuery.exec((res) => {
+				if (res[0]) {
+					clubTagRects.value = res[0].map(item => ({ width: item.width, left: item.left }));
+				}
+			});
+		});
+	};
+
+	// 分类切换
+	const onEventCategoryChange = (index) => {
+		eventCategoryIndex.value = index;
+	};
+
+	const onClubCategoryChange = (index) => {
+		if (index === clubCategoryIndex.value) return;
+
+		// 判断滑动方向
+		slideDirection.value = index > clubCategoryIndex.value ? 'right' : 'left';
+
+		// 触发滑出动画
+		listAnimationClass.value = slideDirection.value === 'right' ? 'slide-out-left' : 'slide-out-right';
+
+		// 动画结束后切换数据
+		setTimeout(() => {
+			clubCategoryIndex.value = index;
+			getGroupList();
+		}, 250);
+	};
 
 	// 计算属性
 	const menuBtnInfo = computed(() => {
@@ -218,6 +355,7 @@
 		getEvents();
 		getBannerList();
 		getOnlineEvents();
+		getTagWidths();
 	});
 
 	// 方法定义
@@ -290,13 +428,27 @@
 	};
 
 	const getGroupList = () => {
+		const clubType = clubCategoryList.value[clubCategoryIndex.value].value;
 		const data = {
 			pageIndex: 0,
 			pageSize: 5,
 			keyword: "",
 		};
+		// 如果不是"全部"，则添加 club_type 过滤
+		if (clubType !== 'all') {
+			data.club_type = clubType;
+		}
 		request.get(`/running-group/api/v1/groups/list`, data).then(res => {
 			GroupList.value = res.data;
+
+			// 触发滑入动画
+			if (listAnimationClass.value) {
+				listAnimationClass.value = slideDirection.value === 'right' ? 'slide-in-right' : 'slide-in-left';
+				// 动画结束后清除状态
+				setTimeout(() => {
+					listAnimationClass.value = '';
+				}, 350);
+			}
 		});
 	};
 </script>
@@ -418,5 +570,121 @@
 		display: flex;
 		flex-direction: column;
 		gap: 20rpx;
+		min-height: 900rpx;
+	}
+
+	.empty-state {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 900rpx;
+		color: #999;
+		font-size: 28rpx;
+	}
+
+	// 列表切换动画
+	.list-transition {
+		will-change: transform, opacity;
+	}
+
+	.slide-out-left {
+		animation: slideOutLeft 0.25s ease-in forwards;
+	}
+
+	.slide-out-right {
+		animation: slideOutRight 0.25s ease-in forwards;
+	}
+
+	.slide-in-left {
+		animation: slideInLeft 0.3s ease-out forwards;
+	}
+
+	.slide-in-right {
+		animation: slideInRight 0.3s ease-out forwards;
+	}
+
+	@keyframes slideOutLeft {
+		from {
+			transform: translateX(0);
+			opacity: 1;
+		}
+		to {
+			transform: translateX(-60rpx);
+			opacity: 0;
+		}
+	}
+
+	@keyframes slideOutRight {
+		from {
+			transform: translateX(0);
+			opacity: 1;
+		}
+		to {
+			transform: translateX(60rpx);
+			opacity: 0;
+		}
+	}
+
+	@keyframes slideInLeft {
+		from {
+			transform: translateX(-60rpx);
+			opacity: 0;
+		}
+		to {
+			transform: translateX(0);
+			opacity: 1;
+		}
+	}
+
+	@keyframes slideInRight {
+		from {
+			transform: translateX(60rpx);
+			opacity: 0;
+		}
+		to {
+			transform: translateX(0);
+			opacity: 1;
+		}
+	}
+
+	.category-tags {
+		padding: 0 34rpx;
+		margin-bottom: 20rpx;
+
+		.tags-inner {
+			display: inline-flex;
+			position: relative;
+			gap: 20rpx;
+			padding: 6rpx;
+			background: #f5f5f5;
+			border-radius: 999rpx;
+		}
+
+		.tag-slider {
+			position: absolute;
+			top: 6rpx;
+			left: 6rpx;
+			height: calc(100% - 12rpx);
+			background: #FF8C00;
+			border-radius: 999rpx;
+			transition: transform 0.3s ease-out, width 0.3s ease-out;
+			z-index: 0;
+		}
+
+		.tag-item {
+			position: relative;
+			z-index: 1;
+			padding: 12rpx 28rpx;
+			font-size: 28rpx;
+			color: #666;
+			line-height: 40rpx;
+			white-space: nowrap;
+			transition: color 0.3s ease;
+
+			&.active {
+				color: #fff;
+				font-weight: bold;
+			}
+		}
 	}
 </style>

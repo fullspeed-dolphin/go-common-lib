@@ -2,9 +2,16 @@
 	<view>
 		<u-navbar :title="null" bgColor="transparent"></u-navbar>
 
-		<mescroll-empty v-if="isEmpty" mode="data" :option="{
-        btnText: '创建跑团',
-      }" @emptyclick="$u.route(`pagesSub/runningTeam/teamForm?from=mine`)" />
+		<view v-if="isEmpty" class="empty-container">
+			<mescroll-empty mode="data" :option="{ tip: '您还没有加入或创建俱乐部' }" />
+			<!-- 底部固定按钮 -->
+			<view class="section-bottom">
+				<u-button type="primary" color="#FF8C00" shape="circle"
+					customStyle="height: 84rpx; width: 100%;"
+					@click="$u.route(`pagesSub/runningTeam/teamForm?from=mine`)">创建俱乐部
+				</u-button>
+			</view>
+		</view>
 
 		<block v-if="!isEmpty">
 			<section class="flex-center" style="height: 432rpx;filter: blur(50px);">
@@ -22,7 +29,7 @@
 				<view class="name ellipsis2">{{ detail.name }}</view>
 				<view class="flex-between-center c3">
 					<view class="cell-item">{{ detail.establish_time }} 成立</view>
-					<view class="cell-item">跑团ID {{ detail.group_id }}</view>
+					<view class="cell-item">{{clubTypeName}}ID {{ detail.group_id }}</view>
 				</view>
 				<view class="cell-item flex-row c3">
 					<u-icon name="map" size="12" color="#333"></u-icon>
@@ -63,7 +70,7 @@
 			</section>
 
 			<section class="panel">
-				<view class="h4">跑团宣言</view>
+				<view class="h4">{{clubTypeName}}宣言</view>
 				<view style="line-height: 40rpx; padding-left: 18rpx;">
 					{{ detail.introduction }}
 				</view>
@@ -109,7 +116,7 @@
 						</view>
 					</view>
 				</view>
-				<mescroll-empty v-if="!memberList.length" :option="{ tip: '暂无跑团成员~' }" />
+				<mescroll-empty v-if="!memberList.length" :option="{ tip: `暂无${clubTypeName}成员~` }" />
 				<view class="flex-center u-mt-15">
 					<u-button type="text"
 						v-if="memberList.length >= 8"
@@ -122,31 +129,31 @@
 			</section>
 
 			<section class="panel" style="box-shadow: none;">
-				<view class="h4">跑团活动</view>
+				<view class="h4">{{clubTypeName}}活动</view>
 				<view v-for="(item, index) in eventList" :key="index">
 					<EventItem :item="item" :key="index" height="474rpx" from="team" />
 				</view>
-				<mescroll-empty v-if="!eventList.length" :option="{ tip: '暂无跑团活动~' }" />
+				<mescroll-empty v-if="!eventList.length" :option="{ tip: `暂无${clubTypeName}活动~` }" />
 			</section>
 
 			<view class="" style="height: 120rpx"></view>
 
 			<section class="section-bottom flex-center">
 				<button v-if="!isEmpty" class="share-btn flex-center" open-type="share">
-					分享跑团
+					分享{{clubTypeName}}
 				</button>
-				<!-- 未加入跑团，才可加入跑团 -->
+				<!-- 未加入，才可加入 -->
 				<block v-if="!userInfo.running_group && detail.user_role === 'guest'">
 					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;"
-						@click="joinGroup()">加入跑团</u-button>
+						@click="joinGroup()">加入{{clubTypeName}}</u-button>
 				</block>
 				<block v-if="detail.user_role === 'creator'">
 					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;"
-						@click="$u.route(`pagesSub/runningTeam/teamSetting?group_id=${detail.group_id}`)">跑团管理工具</u-button>
+						@click="$u.route(`pagesSub/runningTeam/teamSetting?group_id=${detail.group_id}`)">Club管理工具</u-button>
 				</block>
 				<block v-if="detail.user_role === 'member'">
 					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;"
-						@click="leaveGroup()">退出跑团</u-button>
+						@click="leaveGroup()">退出{{clubTypeName}}</u-button>
 				</block>
 			</section>
 		</block>
@@ -193,8 +200,13 @@
 	const memberLeader = ref({});
 
 	// 计算属性
+	// 根据 club_type 返回对应文字：running=跑团，cycling=车队
+	const clubTypeName = computed(() => {
+		return detail.value.club_type === 'cycling' ? '车队' : '跑团';
+	});
+
 	const pageTitle = computed(() => {
-		return routeParams.value.from === "mine" ? "我的跑团" : "跑团详情";
+		return routeParams.value.from === "mine" ? `我的${clubTypeName.value}` : `${clubTypeName.value}详情`;
 	});
 
 	const userInfo = computed(() => store.state.userInfo);
@@ -254,7 +266,7 @@
 
 		// 监听全局的自定义事件
 		uni.$once("updateList", (data) => {
-			// 判断从我的跑团创建，返回没有跑团 ID，页面空白的问题
+			// 判断从我的俱乐部创建，返回没有俱乐部 ID，页面空白的问题
 			if (data.from === "mine" && data.group_id) {
 				routeParams.value.group_id = data.group_id;
 				getDetail();
@@ -314,7 +326,7 @@
 		}
 		uni.showModal({
 			title: "提示",
-			content: "是否确认加入该跑团？",
+			content: `是否确认加入该${clubTypeName.value}？`,
 			success: (res) => {
 				if (res.confirm) {
 					const data = {
@@ -340,7 +352,7 @@
 	const leaveGroup = () => {
 		uni.showModal({
 			title: "提示",
-			content: "是否确认退出该跑团？",
+			content: `是否确认退出该${clubTypeName.value}？`,
 			success: (res) => {
 				if (res.confirm) {
 					uni.showLoading({
@@ -349,7 +361,7 @@
 					request.post(`/user-api/user/quitRunningGroup`).then((res) => {
 						uni.$u.toast("操作成功！");
 
-						// 调用用户数据，检查参加或创建跑团标记
+						// 调用用户数据，检查参加或创建俱乐部标记
 						store.dispatch("getUserInfo");
 
 						getDetail();
@@ -602,5 +614,13 @@
 
 	.u-border-left {
 		border-color: #f3f3f3;
+	}
+
+	.empty-container {
+		min-height: 100vh;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		padding-bottom: 160rpx;
 	}
 </style>

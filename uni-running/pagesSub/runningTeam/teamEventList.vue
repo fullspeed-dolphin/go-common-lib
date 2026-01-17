@@ -1,5 +1,6 @@
 <template>
   <view class="page-container">
+    <u-navbar :title="clubTypeName + '活动列表'" autoBack placeholder></u-navbar>
     <mescroll-body @init="mescrollInit" @down="downCallback" @up="getList" :top="0">
     <view class="event-list">
       <view class="event-card" v-for="(item, index) in eventList" :key="index">
@@ -52,7 +53,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
@@ -69,11 +70,25 @@ const {
 	onPageScroll,
 	onReachBottom
 );
-	
+
 
 const group_id = ref("");
 const eventList = ref([]);
 const loading = ref(false);
+const detail = ref({});
+
+// 根据 club_type 返回对应文字：running=跑团，cycling=车队
+const clubTypeName = computed(() => {
+	return detail.value.club_type === 'cycling' ? '车队' : '跑团';
+});
+
+// 获取俱乐部详情
+const getDetail = () => {
+	request.get(`/running-group/api/v1/groups/info?group_id=${group_id.value}`)
+		.then((res) => {
+			detail.value = res;
+		});
+};
 
 // 获取活动列表
 const getList = async (mescroll) => {
@@ -160,16 +175,17 @@ const createEvent = () => {
 
 // 编辑活动
 const editEvent = (item) => {
-  uni.$u.route(`pagesSub/runningTeam/teamEventForm?id=${item.id}&group_id=${group_id.value}`);
+  uni.$u.route(`pagesSub/runningTeam/teamEventForm?id=${item.id}&group_id=${group_id.value}&status=${item.status}&status_message=${encodeURIComponent(item.status_message || '')}`);
 };
 
 // 查看活动详情
 const viewEvent = (item) => {
-  uni.$u.route(`pagesSub/runningTeam/teamEventDetail?id=${item.id}`);
+  uni.$u.route(`pagesSub/runningTeam/teamEventDetail?id=${item.id}&status=${item.status}&status_message=${encodeURIComponent(item.status_message || '')}`);
 };
 
 onLoad((options) => {
   group_id.value = options.group_id;
+  getDetail();
 });
 
 onShow(() => {

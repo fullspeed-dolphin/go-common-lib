@@ -125,10 +125,17 @@
 			</view>
 		</u-popup>
 		
-		<up-action-sheet round="16"
-			@close="isShowEventModal = false"
-			:actions="eventList" title="请选择活动" 
-			:show="isShowEventModal" @select="changeEvent" />
+		<u-picker
+			round="14"
+			title="请选择活动"
+			:show="isShowEventModal"
+			:columns="[eventList]"
+			keyName="label"
+			:defaultIndex="eventDefaultIndex"
+			confirmColor="#FF8C00"
+			@confirm="onEventConfirm"
+			@cancel="isShowEventModal = false"
+		/>
 		
 		<UserLogin ref="refUserLogin" @success="getEvents()"/>
   </view>
@@ -176,6 +183,8 @@ function getClockTime() {
 }
 
 const eventList = ref([])
+const eventDefaultIndex = ref([0])
+
 function getEvents () {
 	uni.showLoading({
 		mask: true
@@ -186,13 +195,15 @@ function getEvents () {
 			const end_time = item.checkin_end_time?.replace("T", " ").slice(0, 16)
 			return {
 				...item,
+				label: item.name,
+				value: item.id,
 				checkin_start_time: start_time,
 				checkin_end_time: end_time,
 				checkInRangeTime: start_time ? `${start_time}~${end_time?.slice(11, 16)}` : null
 			}
 		});
 		eventList.value = res
-		
+
 		changeEvent(res[0])
 	});
 };
@@ -220,13 +231,25 @@ const disableReason = computed(() => {
 
 function selectSigner(item) {
 	item.checked = !item.checked
-	
+
 	punchInStatus.value = 'pending'
+}
+
+// u-picker 确认事件
+function onEventConfirm(detail) {
+	const e = detail.value[0]
+	changeEvent(e)
 }
 
 function changeEvent(e) {
 	console.log(e)
 	if (selectedEvent.value.id === e.id) return;
+
+	// 更新 defaultIndex
+	const idx = eventList.value.findIndex(item => item.id === e.id)
+	if (idx !== -1) {
+		eventDefaultIndex.value = [idx]
+	}
 
 	selectedEvent.value = e
 

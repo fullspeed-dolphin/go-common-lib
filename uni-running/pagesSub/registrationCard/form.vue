@@ -46,7 +46,7 @@
 						@close="showIdTypePicker = false" />
 				</up-form-item>
 
-				<up-form-item label="证件号码" prop="idCardNumber" tips="'用于购买保险，必须输入真实的证件号码'" required>
+				<up-form-item label="证件号码" prop="idCardNumber" tips="用于购买保险，必须输入真实的证件号码" required>
 					<up-input v-model="form.idCardNumber" placeholder="请填写证件号码" border="none" inputAlign="right" />
 				</up-form-item>
 
@@ -122,7 +122,7 @@
 					<PickerCell v-model="form.bloodType" :border="false" :columns="bloodTypeOptions" />
 				</up-form-item>
 
-				<up-form-item label="参赛服尺寸" prop="clothesSize" tips="'参赛服尺码仅为参赛者个人信息，活动是否包含参赛服以具体活动宣发为准，详询活动组织方，如活动不提供参赛服则任意选择一个参赛服尺码。'" required>
+				<up-form-item label="参赛服尺寸" prop="clothesSize" tips="参赛服尺码仅为参赛者个人信息，活动是否包含参赛服以具体活动宣发为准，详询活动组织方，如活动不提供参赛服则任意选择一个参赛服尺码。" required>
 					<view @click="showOnceTip">
 						<PickerCell v-model="form.clothesSize" :disabled="isReadOnlyClothSize" :border="false" :columns="tshirtSizeOptions" />
 					</view>

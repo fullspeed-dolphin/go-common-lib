@@ -186,11 +186,12 @@
 			clickHandler() {
 				this.$emit('click')
 			},
-			showTip(title) {
-			// uni.$u.toast(title)
-			
+			showTip(tips) {
 				uni.showModal({
-					title: title
+					title: '提示',
+					content: tips,
+					showCancel: false,
+					confirmText: '我知道了'
 				})
 			}
 		},

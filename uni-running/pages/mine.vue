@@ -42,13 +42,13 @@
         </view> -->
 			</view>
 			<view class="section-box">
-				<u-cell title="我的活动" class="nav-cell" @click="routeTo(`pagesSub/orderList`)" :border="false" isLink>
+				<u-cell title="我的订单" class="nav-cell" @click="routeTo(`pagesSub/orderList`)" :border="false" isLink>
 					<template #icon>
 						<image class="nav-icon" style="width: 32rpx; height: 40rpx"
 							src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-mine-event@2x.png"></image>
 					</template>
 				</u-cell>
-				<u-cell title="我的跑团" class="nav-cell" @click="
+				<u-cell title="全速俱乐部" class="nav-cell" @click="
             routeTo(
               `pagesSub/runningTeam/teamDetail?from=mine&group_id=${userInfo.running_group}`
             )

@@ -1,6 +1,6 @@
 <template>
 	<view class="page" style="padding: 24rpx">
-		<u-navbar autoBack placeholder :title="group_id ? '更新跑团' : '创建跑团'"></u-navbar>
+		<u-navbar autoBack placeholder :title="group_id ? '更新俱乐部' : '创建俱乐部'"></u-navbar>
 		<up-form :model="form" ref="uForm" :rules="rules" labelWidth="auto">
 			<view class="flex-center">
 				<up-form-item :label="null" prop="poster">
@@ -9,20 +9,23 @@
 			</view>
 
 			<div class="panel-section">
-				<up-form-item label="跑团名称" prop="name" required>
+				<up-form-item label="俱乐部类型" prop="club_type" required>
+					<PickerCell v-model="form.club_type" :title="null" @change="validateField('club_type')" placeholder="请选择俱乐部类型" :border="false" :columns="clubTypeOptions" />
+				</up-form-item>
+				<up-form-item label="俱乐部名称" prop="name" required>
 					<input v-model="form.name" class="u-input" @input="validateField('name')" maxlength="50" placeholder="请输入名称" />
 				</up-form-item>
 				<view class="textarea-cell">
-					<up-form-item label="跑团宣言" prop="description" labelPosition="top" required>
+					<up-form-item label="俱乐部宣言" prop="description" labelPosition="top" required>
 						<view class="" style="position: relative;">
-							<textarea v-model="form.description" class="u-input" @input="validateField('description')" :height="110" maxlength="150" placeholder="请填写跑团宣言" count></textarea>
+							<textarea v-model="form.description" class="u-input" @input="validateField('description')" :height="110" maxlength="150" placeholder="请填写俱乐部宣言" count></textarea>
 							<view class="" style="position: absolute;right:10rpx;bottom:10rpx;font-size: 24rpx;color: #999;">
 								{{form.description.length}}/150
 							</view>
 						</view>
 					</up-form-item>
 				</view>
-				<up-form-item label="跑团总部地址" prop="establish_location" required>
+				<up-form-item label="俱乐部总部地址" prop="establish_location" required>
 					<PickerMap v-model="form.establish_location" placeholder="请选择地址" />
 				</up-form-item>
 				<up-form-item label="成立时间" prop="establish_time">
@@ -51,7 +54,7 @@
 			<text style="color: #ff8c00" @tap.stop="$u.route('pagesSub/settings/agreement?type=privy')">《用户隐私协议》</text>
 		</view>
 		<view class="" style="padding: 60rpx 8rpx 30rpx">
-			<u-button type="primary" color="#FF8C00" shape="circle" @click="submitForm()">{{ group_id ? "更新跑团" : "创建跑团" }}
+			<u-button type="primary" color="#FF8C00" shape="circle" @click="submitForm()">{{ group_id ? "更新俱乐部" : "创建俱乐部" }}
 			</u-button>
 		</view>
 	</view>
@@ -73,8 +76,15 @@
 	import FileUpload from "@/components/common/FileUpload.vue";
 	import PickerMap from "@/components/common/PickerMap.vue";
 	import PickerTime from "@/components/common/PickerTime.vue";
+	import PickerCell from "@/components/common/PickerCell.vue";
 	import dayjs from "dayjs";
 	import request from "@/utils/request.js"
+
+	// 俱乐部类型选项
+	const clubTypeOptions = ref([
+		{ label: "跑步", value: "running" },
+		{ label: "骑行", value: "cycling" }
+	]);
 
 	// 使用store
 	const store = useStore();
@@ -88,6 +98,7 @@
 	const form = ref({
 		poster: "",
 		name: "",
+		club_type: "running",
 		establish_location: "",
 		description: "",
 		fullName: "",
@@ -107,7 +118,12 @@
 	const rules = ref({
 		poster: [{
 			required: true,
-			message: "请点击上传跑团 logo",
+			message: "请点击上传俱乐部 logo",
+			trigger: ["blur", "change"],
+		}, ],
+		club_type: [{
+			required: true,
+			message: "请选择俱乐部类型",
 			trigger: ["blur", "change"],
 		}, ],
 		name: [{
@@ -157,6 +173,7 @@
 					...res,
 					poster: res.avatar_url,
 					name: res.name,
+					club_type: res.club_type || 'running',
 					establish_location: res.establish_location,
 					description: res.introduction,
 					fullName: res.creator_real_name,
@@ -176,6 +193,7 @@
 			const data = {
 				avatar_url: form.value.poster,
 				name: form.value.name,
+				club_type: form.value.club_type,
 				establish_location: form.value.establish_location,
 				creator_real_name: form.value.fullName,
 				// "total_members": form.value.amount,

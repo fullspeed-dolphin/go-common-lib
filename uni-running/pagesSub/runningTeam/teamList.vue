@@ -1,6 +1,6 @@
 <template>
 	<view class="page">
-		<u-navbar title="跑团风采" placeholder></u-navbar>
+		<u-navbar title="全速俱乐部" placeholder></u-navbar>
 		<section class="section-filter" :style="{ top: navbarHeight + 'px' }">
 			<view class="section-search">
 				<u-search v-model="searchTxt" @search="refreshList" placeholder="请输入名称或团号或地址" shape="round" bgColor="#fff"
@@ -8,14 +8,27 @@
 			</view>
 
 			<view class="section-tabs">
-				<u-tabs lineHeight="2" :duration="0" :inactiveStyle="{ color: '#000' }" :activeStyle="{ color: '#FF8C00' }"
-					:list="tabList" @change="changeTab" :scrollable="false" keyName="label" lineColor="#FF8C00" />
+				<view class="category-tags">
+					<view class="tags-inner">
+						<view class="tag-slider" :style="getSliderStyle()"></view>
+						<view
+							v-for="(item, index) in tabList"
+							:key="item.value"
+							:id="'tab-' + index"
+							class="tag-item"
+							:class="{ active: tabActive === index }"
+							@click="changeTab(item, index)"
+						>
+							{{ item.label }}
+						</view>
+					</view>
+				</view>
 			</view>
 		</section>
 		<view class="mescroll-wrapper">
 			<mescroll-uni @init="mescrollInit" @down="downCallback" @up="getList" :top="160" bottom="200"
 				:safearea="true" :fixed="false" height="100%">
-				<view class="container group-list">
+				<view class="container group-list" :class="['list-transition', listAnimationClass]">
 					<GroupItem :item="item" variant="detail" v-for="(item, index) in dataList" :key="index" />
 				</view>
 			</mescroll-uni>
@@ -23,7 +36,7 @@
 
 		<section class="section-bottom">
 				<u-button type="primary" height="80rpx" shape="circle" customStyle="height: 80rpx" color="#FF8C00"
-					@click="openForm()">{{ userInfo.running_group ? "我的跑团" : "创建跑团" }}
+					@click="openForm()">{{ userInfo.running_group ? "我的俱乐部" : "创建俱乐部" }}
 				</u-button>
 		</section>
 
@@ -65,20 +78,68 @@
 	const searchTxt = ref("");
 	const tabActive = ref(0);
 	const tabList = ref([{
-			label: "热门",
-			value: 0
+			label: "全部",
+			value: "all"
 		},
 		{
-			label: "附近",
-			value: 1
+			label: "跑步",
+			value: "running"
+		},
+		{
+			label: "骑行",
+			value: "cycling"
 		},
 	]);
 	const curTab = ref({
-		label: "热门",
-		value: 0
+		label: "全部",
+		value: "all"
 	});
 	const dataList = ref([]);
 	const navbarHeight = ref(0);
+
+	// 列表切换动画状态
+	const listAnimationClass = ref('');
+	const slideDirection = ref('right');
+
+	// 存储每个 tab 的位置信息
+	const tabRects = ref([]);
+	const tabContainerLeft = ref(0);
+
+	// 获取滑块样式
+	const getSliderStyle = () => {
+		if (!tabRects.value.length || tabActive.value >= tabRects.value.length) return {};
+
+		const rect = tabRects.value[tabActive.value];
+		const left = rect.left - tabContainerLeft.value;
+
+		return {
+			width: rect.width + 'px',
+			transform: `translateX(${left}px)`
+		};
+	};
+
+	// 获取 tab 宽度和位置
+	const getTabWidths = () => {
+		nextTick(() => {
+			// 获取容器基准位置
+			const containerQuery = uni.createSelectorQuery();
+			containerQuery.select('#tab-0').boundingClientRect();
+			containerQuery.exec((res) => {
+				if (res[0]) {
+					tabContainerLeft.value = res[0].left;
+				}
+			});
+
+			// 获取所有 tab 位置
+			const query = uni.createSelectorQuery();
+			query.selectAll('#tab-0, #tab-1, #tab-2').boundingClientRect();
+			query.exec((res) => {
+				if (res[0]) {
+					tabRects.value = res[0].map(item => ({ width: item.width, left: item.left }));
+				}
+			});
+		});
+	};
 	// section-filter 固定高度 230rpx，转换为 px
 
 	// 计算属性
@@ -110,6 +171,7 @@
 	// 页面挂载
 	onMounted(() => {
 		computeNavbarHeight();
+		getTabWidths();
 	});
 
 	// 页面显示
@@ -149,9 +211,24 @@
 		}
 	};
 
-	const changeTab = (item) => {
-		curTab.value = item;
-		refreshList();
+	const changeTab = (item, index) => {
+		if (index === tabActive.value) return;
+
+		// 判断滑动方向
+		slideDirection.value = index > tabActive.value ? 'right' : 'left';
+
+		// 立即将滚动位置重置到顶部，避免列表为空时页面跳动
+		getMescroll().scrollTo(0, 0);
+
+		// 触发滑出动画
+		listAnimationClass.value = slideDirection.value === 'right' ? 'slide-out-left' : 'slide-out-right';
+
+		// 动画结束后切换数据
+		setTimeout(() => {
+			tabActive.value = index;
+			curTab.value = item;
+			refreshList();
+		}, 250);
 	};
 
 	const refreshList = () => {
@@ -170,8 +247,11 @@
 			pageIndex: mescroll.num - 1,
 			pageSize: 10,
 			keyword: searchTxt.value,
-			type: curTab.value.value === 1 ? "nearby" : "hot", // 根据标签页类型传参
 		};
+		// 如果不是"全部"，则添加 club_type 过滤
+		if (curTab.value.value !== 'all') {
+			data.club_type = curTab.value.value;
+		}
 		request.get(`/running-group/api/v1/groups/list`, data)
 			.then((res) => {
 				uni.hideLoading();
@@ -182,6 +262,14 @@
 				//如果是第一页需手动制空列表
 				if (mescroll.num == 1) {
 					dataList.value = [];
+
+					// 触发滑入动画（仅第一页，即 tab 切换后）
+					if (listAnimationClass.value) {
+						listAnimationClass.value = slideDirection.value === 'right' ? 'slide-in-right' : 'slide-in-left';
+						setTimeout(() => {
+							listAnimationClass.value = '';
+						}, 350);
+					}
 				}
 
 				dataList.value = dataList.value.concat(res.data); //追加新数据
@@ -265,8 +353,47 @@
 	}
 
 	.section-tabs {
-		margin: 0 auto;
-		width: 500rpx;
+		display: flex;
+		justify-content: flex-start;
+		padding: 16rpx 24rpx;
+	}
+
+	.category-tags {
+		.tags-inner {
+			display: inline-flex;
+			position: relative;
+			gap: 20rpx;
+			padding: 6rpx;
+			background: #fff;
+			border-radius: 999rpx;
+		}
+
+		.tag-slider {
+			position: absolute;
+			top: 6rpx;
+			left: 6rpx;
+			height: calc(100% - 12rpx);
+			background: #FF8C00;
+			border-radius: 999rpx;
+			transition: transform 0.3s ease-out, width 0.3s ease-out;
+			z-index: 0;
+		}
+
+		.tag-item {
+			position: relative;
+			z-index: 1;
+			padding: 12rpx 48rpx;
+			font-size: 28rpx;
+			color: #666;
+			line-height: 40rpx;
+			white-space: nowrap;
+			transition: color 0.3s ease;
+
+			&.active {
+				color: #fff;
+				font-weight: bold;
+			}
+		}
 	}
 
 	.section-search {
@@ -286,5 +413,70 @@
 		flex-direction: column;
 		gap: 24rpx;
 		padding-top: 32rpx;
+	}
+
+	// 列表切换动画
+	.list-transition {
+		will-change: transform, opacity;
+	}
+
+	.slide-out-left {
+		animation: slideOutLeft 0.25s ease-in forwards;
+	}
+
+	.slide-out-right {
+		animation: slideOutRight 0.25s ease-in forwards;
+	}
+
+	.slide-in-left {
+		animation: slideInLeft 0.3s ease-out forwards;
+	}
+
+	.slide-in-right {
+		animation: slideInRight 0.3s ease-out forwards;
+	}
+
+	@keyframes slideOutLeft {
+		from {
+			transform: translateX(0);
+			opacity: 1;
+		}
+		to {
+			transform: translateX(-60rpx);
+			opacity: 0;
+		}
+	}
+
+	@keyframes slideOutRight {
+		from {
+			transform: translateX(0);
+			opacity: 1;
+		}
+		to {
+			transform: translateX(60rpx);
+			opacity: 0;
+		}
+	}
+
+	@keyframes slideInLeft {
+		from {
+			transform: translateX(-60rpx);
+			opacity: 0;
+		}
+		to {
+			transform: translateX(0);
+			opacity: 1;
+		}
+	}
+
+	@keyframes slideInRight {
+		from {
+			transform: translateX(60rpx);
+			opacity: 0;
+		}
+		to {
+			transform: translateX(0);
+			opacity: 1;
+		}
 	}
 </style>

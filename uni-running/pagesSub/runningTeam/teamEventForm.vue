@@ -102,8 +102,10 @@
 		<TeamEventFormPackage ref="refTeamEventFormPackage" v-if="pageIndex === 1" :event-id="routerParams.id || ''" />
 
 		<!-- 底部固定按钮 -->
-		<view class="fixed-bottom-btn">
-			<u-button type="primary" color="#FF8C00" shape="circle" :disabled="isSubmitting" @click="submitForm()">
+		<view class="section-bottom">
+			<u-button type="primary" color="#FF8C00" shape="circle" :disabled="isSubmitting"
+				customStyle="height: 84rpx; width: 100%;"
+				@click="submitForm()">
 				{{computedSubmitBtn}}
 			</u-button>
 		</view>
@@ -184,6 +186,11 @@
 
 		if (form.value.is_free === '1' && pageIndex.value === 0) {
 			return '下一步配置套餐价格'
+		}
+
+		// 被拒绝的活动显示"重新提交"
+		if (routerParams.value.status === 'REJ') {
+			return '重新提交'
 		}
 
 		return '提交'
@@ -271,11 +278,22 @@
 	const routerParams = ref({})
 	onLoad((options) => {
 		console.log("option", options);
+		console.log("status from router:", options.status);
 		group_id.value = options.group_id;
-		
+
 		routerParams.value = options
 		form.value.phone = store.state.userInfo.phone;
-		
+
+		// 如果状态是 REJ，弹窗显示拒绝原因
+		if (options.status === 'REJ' && options.status_message) {
+			uni.showModal({
+				title: '审核未通过',
+				content: decodeURIComponent(options.status_message),
+				showCancel: false,
+				confirmText: '我知道了'
+			});
+		}
+
 		getDetail();
 	});
 
@@ -461,20 +479,21 @@
 		.u-steps{
 			background: #fff;
 			border-radius: 16rpx;
-			padding: 30rpx 20rpx;
-			margin-bottom: 20rpx;
+			padding: 60rpx 40rpx;
+			margin-bottom: 40rpx;
 		}
 		.panel-section{
 			text-align: right;
 			background: #fff;
 			border-radius: 16rpx;
-			padding: 30rpx 20rpx;
+			padding: 60rpx 40rpx;
 		}
 
 		.u-form-item__body{
 			position: relative;
+			padding: 20px 0;
 				&:after {
-					
+
 				position: absolute;
 				box-sizing: border-box;
 				-webkit-transform-origin: center;
@@ -525,14 +544,12 @@
 		}
 	}
 
-	.fixed-bottom-btn {
+	.section-bottom {
 		position: fixed;
-		bottom: 0;
+		bottom: 30rpx;
 		left: 0;
 		right: 0;
-		padding: 20rpx 48rpx;
-		padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
-		background: #f3f3f3;
-		z-index: 99;
+		z-index: 10;
+		padding: 0 30rpx 20rpx;
 	}
 	</style>

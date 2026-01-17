@@ -5,7 +5,7 @@
         (item.avatar_url ||
         item.image ||
         item.group_image ||
-        'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png') + '?x-oss-process=image/resize,w_600,h_300,m_fill'
+        'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png') + '?x-oss-process=image/resize,w_300,h_300,m_fill'
       " mode="aspectFill"></image>
 		<view class="group-item-content">
 			<view class="group-name">{{ item.name || item.group_name }}</view>
@@ -129,8 +129,8 @@
 		border-radius: 16rpx;
 
 		.poster {
-			width: 104rpx;
-			height: 104rpx;
+			width: 134rpx;
+			height: 134rpx;
 			background: #c1c5c6;
 			margin-right: 24rpx;
 			border-radius: 16rpx;

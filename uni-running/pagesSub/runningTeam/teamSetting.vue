@@ -3,39 +3,54 @@
     <view class="card-item panel"
 			@click="$u.route(`pagesSub/runningTeam/teamMaps?group_id=${group_id}`)">
     	<image class="img" src="./img/地图.png" mode="aspectFill"></image>
-			<text class="card-text">跑团地图库</text>
+			<text class="card-text">{{clubTypeName}}地图库</text>
     </view>
     <view class="card-item panel"
 			@click="$u.route(`pagesSub/runningTeam/teamSummary?group_id=${group_id}`)">
     	<image class="img" src="./img/跑团数据.png" mode="aspectFill"></image>
-			<text class="card-text">跑团数据</text>
+			<text class="card-text">{{clubTypeName}}数据</text>
     </view>
     <view class="card-item panel"
 			@click="$u.route(`pagesSub/runningTeam/teamEventList?group_id=${group_id}`)">
     	<image class="img" src="./img/跑团活动管理.png" mode="aspectFill"></image>
-			<text class="card-text">跑团活动管理</text>
+			<text class="card-text">{{clubTypeName}}活动管理</text>
     </view>
 
 		<section class="section-bottom flex-wrap u-flex flex-between-center">
 				<u-button type="primary" shape="circle" color="#f7f7f7" customStyle="color:#FF8C00;height: 84rpx;width: 314rpx;"
-					@click="deleteGroup()">删除跑团</u-button>
+					@click="deleteGroup()">删除{{clubTypeName}}</u-button>
 				<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 84rpx;width: 314rpx;"
-					@click="$u.route(`pagesSub/runningTeam/teamForm?group_id=${group_id}`)">更新跑团</u-button>
+					@click="$u.route(`pagesSub/runningTeam/teamForm?group_id=${group_id}`)">更新{{clubTypeName}}</u-button>
 		</section>
   </view>
 </template>
 
 <script setup>
-import { ref, nextTick } from "vue";
+import { ref, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
+import { useStore } from "vuex";
 import request from "@/utils/request.js"
 
+const store = useStore();
 const group_id = ref("");
+const detail = ref({});
+
+// 根据 club_type 返回对应文字：running=跑团，cycling=车队
+const clubTypeName = computed(() => {
+	return detail.value.club_type === 'cycling' ? '车队' : '跑团';
+});
+
+const getDetail = () => {
+	request.get(`/running-group/api/v1/groups/info?group_id=${group_id.value}`)
+		.then((res) => {
+			detail.value = res;
+		});
+};
 
 const deleteGroup = () => {
 	uni.showModal({
 		title: "提示",
-		content: "是否确认删除该跑团？",
+		content: `是否确认删除该${clubTypeName.value}？`,
 		success: (res) => {
 			if (res.confirm) {
 				uni.showLoading({
@@ -47,7 +62,7 @@ const deleteGroup = () => {
 					.then((res) => {
 						uni.$u.toast("删除成功！");
 
-						// 调用用户数据，检查参加或创建跑团标记
+						// 调用用户数据，检查参加或创建俱乐部标记
 						store.dispatch("getUserInfo");
 
 						setTimeout(() => {
@@ -73,6 +88,7 @@ const deleteGroup = () => {
 onLoad((options) => {
   console.log(options);
   group_id.value = options.group_id;
+  getDetail();
 });
 </script>
 
