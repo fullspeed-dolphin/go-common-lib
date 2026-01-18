@@ -1,16 +1,17 @@
 <template>
-	<view class="event-page">
-		<!-- 顶部导航 -->
-		<view class="header">
-			<view class="placeholder" :style="{ height: statusBarHeight + 'px' }"></view>
-			<view class="nav-bar">
-				<text class="nav-title">跑团活动</text>
+	<view class="page-wrapper">
+		<view class="event-page">
+			<!-- 顶部导航 -->
+			<view class="header">
+				<view class="placeholder" :style="{ height: statusBarHeight + 'px' }"></view>
+				<view class="nav-bar">
+					<text class="nav-title">跑团活动</text>
+				</view>
 			</view>
-		</view>
 
-		<!-- 内容区域 -->
-		<view class="content">
-			<mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="loadData" :top="0">
+			<!-- 内容区域 -->
+			<view class="content">
+				<mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="loadData" :up="upOption" :top="0" :bottom="200" :safearea="true">
 				<!-- 瀑布流列表 -->
 				<view class="waterfall-container" v-if="eventList.length > 0">
 					<view class="waterfall-column">
@@ -98,14 +99,9 @@
 						</view>
 					</view>
 				</view>
-
-				<!-- 空状态 -->
-				<view class="empty-state" v-if="!loading && eventList.length === 0">
-					<u-empty mode="data" text="暂无跑团活动"></u-empty>
-				</view>
 			</mescroll-body>
+			</view>
 		</view>
-
 		<tabbar type="event" />
 	</view>
 </template>
@@ -116,8 +112,17 @@ import { onLoad, onShow, onPageScroll, onReachBottom } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
+import tabbar from "@/components/tabBar.vue";
 
 const { mescrollInit, downCallback, getMescroll } = useMescroll(onPageScroll, onReachBottom);
+
+// mescroll 上拉加载配置
+const upOption = {
+	empty: {
+		use: true,
+		icon: 'https://www.mescroll.com/img/mescroll-empty.png'
+	}
+};
 
 // 状态栏高度
 const statusBarHeight = ref(0);
@@ -125,6 +130,24 @@ const statusBarHeight = ref(0);
 // 数据
 const eventList = ref([]);
 const loading = ref(false);
+
+// 缓存跑团信息，避免重复请求
+const fscInfoCache = ref({});
+
+// 获取跑团信息
+const getFscInfo = async (fscId) => {
+	if (fscInfoCache.value[fscId]) {
+		return fscInfoCache.value[fscId];
+	}
+	try {
+		const res = await request.get(`/running-group/api/v1/groups/info?group_id=${fscId}`);
+		fscInfoCache.value[fscId] = res;
+		return res;
+	} catch (e) {
+		console.error('获取跑团信息失败', e);
+		return null;
+	}
+};
 
 // 瀑布流左右列
 const leftColumn = computed(() => {
@@ -153,7 +176,7 @@ const loadData = async (mescroll) => {
 	};
 
 	try {
-		const res = await request.get('/event-api/fsc_events/list', params);
+		const res = await request.get('/event-api/fsc_events', params);
 		loading.value = false;
 
 		let list = (res.fsc_events || [])
@@ -162,6 +185,22 @@ const loadData = async (mescroll) => {
 				...item,
 				event_time: item.event_time
 			}));
+
+		// 获取所有唯一的 fsc_id
+		const uniqueFscIds = [...new Set(list.map(item => item.fsc_id).filter(Boolean))];
+
+		// 批量获取跑团信息
+		await Promise.all(uniqueFscIds.map(id => getFscInfo(id)));
+
+		// 合并跑团信息到活动数据
+		list = list.map(item => {
+			const fscInfo = fscInfoCache.value[item.fsc_id];
+			return {
+				...item,
+				fsc_name: fscInfo?.name || '跑团活动',
+				fsc_avatar: fscInfo?.avatar_url || ''
+			};
+		});
 
 		mescroll.endSuccess(list.length);
 
@@ -228,6 +267,11 @@ onShow(() => {
 </script>
 
 <style lang="scss" scoped>
+.page-wrapper {
+	min-height: 100vh;
+	position: relative;
+}
+
 .event-page {
 	min-height: 100vh;
 	background: #f5f5f5;
@@ -240,7 +284,8 @@ onShow(() => {
 	left: 0;
 	right: 0;
 	z-index: 100;
-	background: linear-gradient(135deg, #FF8C00 0%, #FF6B00 100%);
+	background: #fff;
+	border-bottom: 1rpx solid #eee;
 }
 
 .nav-bar {
@@ -253,7 +298,7 @@ onShow(() => {
 .nav-title {
 	font-size: 36rpx;
 	font-weight: 600;
-	color: #fff;
+	color: #333;
 }
 
 // 内容区域
@@ -402,11 +447,6 @@ onShow(() => {
 	font-size: 22rpx;
 	color: #FF8C00;
 	font-weight: 500;
-}
-
-// 空状态
-.empty-state {
-	padding: 200rpx 0;
 }
 
 // 辅助类
