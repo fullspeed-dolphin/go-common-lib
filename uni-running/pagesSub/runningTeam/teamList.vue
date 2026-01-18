@@ -10,13 +10,13 @@
 			<view class="section-tabs">
 				<view class="category-tags">
 					<view class="tags-inner">
-						<view class="tag-slider" :style="getSliderStyle()"></view>
+						<view class="tag-slider" :style="getSliderStyle()" :class="sliderAnimClass"></view>
 						<view
 							v-for="(item, index) in tabList"
 							:key="item.value"
 							:id="'tab-' + index"
 							class="tag-item"
-							:class="{ active: tabActive === index }"
+							:class="{ active: sliderPosition === index }"
 							@click="changeTab(item, index)"
 						>
 							{{ item.label }}
@@ -25,7 +25,9 @@
 				</view>
 			</view>
 		</section>
-		<view class="mescroll-wrapper">
+		<view class="mescroll-wrapper"
+			@touchstart="onTouchStart"
+			@touchend="onTouchEnd">
 			<mescroll-uni @init="mescrollInit" @down="downCallback" @up="getList" :top="160" bottom="200"
 				:safearea="true" :fixed="false" height="100%">
 				<view class="container group-list" :class="['list-transition', listAnimationClass]">
@@ -101,16 +103,22 @@
 	const listAnimationClass = ref('');
 	const slideDirection = ref('right');
 
+	// 滑块动画状态
+	const sliderAnimClass = ref('');
+	const sliderPosition = ref(0); // 当前滑块显示的 index
+	const sliderOffset = ref(0); // 额外偏移量（用于循环动画）
+	const isTabSwitching = ref(false); // 防止动画重叠
+
 	// 存储每个 tab 的位置信息
 	const tabRects = ref([]);
 	const tabContainerLeft = ref(0);
 
-	// 获取滑块样式
+	// 获取滑块样式（使用 sliderPosition 支持循环动画）
 	const getSliderStyle = () => {
-		if (!tabRects.value.length || tabActive.value >= tabRects.value.length) return {};
+		if (!tabRects.value.length || sliderPosition.value >= tabRects.value.length) return {};
 
-		const rect = tabRects.value[tabActive.value];
-		const left = rect.left - tabContainerLeft.value;
+		const rect = tabRects.value[sliderPosition.value];
+		const left = rect.left - tabContainerLeft.value + sliderOffset.value;
 
 		return {
 			width: rect.width + 'px',
@@ -211,24 +219,97 @@
 		}
 	};
 
-	const changeTab = (item, index) => {
-		if (index === tabActive.value) return;
+	// direction: 'left' 表示内容从左边进入，'right' 表示内容从右边进入
+	// isLoop: 是否是循环切换（用于滑块动画）
+	const changeTab = (item, index, direction = null, isLoop = false) => {
+		if (index === tabActive.value || isTabSwitching.value) return;
+		isTabSwitching.value = true;
 
-		// 判断滑动方向
-		slideDirection.value = index > tabActive.value ? 'right' : 'left';
+		// 如果没有指定方向，根据 index 位置自动判断
+		if (direction === null) {
+			direction = index > tabActive.value ? 'right' : 'left';
+		}
+		slideDirection.value = direction;
 
 		// 立即将滚动位置重置到顶部，避免列表为空时页面跳动
 		getMescroll().scrollTo(0, 0);
 
-		// 触发滑出动画
+		// 触发列表滑出动画
 		listAnimationClass.value = slideDirection.value === 'right' ? 'slide-out-left' : 'slide-out-right';
+
+		// 处理滑块动画
+		if (isLoop) {
+			// 循环切换：滑块从目标位置的边缘滑入
+			// 计算偏移量（从左侧或右侧进入）
+			const slideOffset = direction === 'left' ? -60 : 60; // 左滑从左边进入，右滑从右边进入
+
+			// 1. 隐藏滑块，禁用过渡
+			sliderAnimClass.value = 'no-transition slider-hidden';
+			// 2. 设置起始偏移位置
+			sliderOffset.value = slideOffset;
+			// 3. 更新目标位置
+			sliderPosition.value = index;
+
+			// 4. 等待 DOM 更新后，开始滑入动画
+			setTimeout(() => {
+				sliderAnimClass.value = ''; // 恢复过渡
+				sliderOffset.value = 0; // 滑动到正确位置
+			}, 30);
+		} else {
+			// 普通切换：滑块直接过渡
+			sliderAnimClass.value = '';
+			sliderOffset.value = 0;
+			sliderPosition.value = index;
+		}
 
 		// 动画结束后切换数据
 		setTimeout(() => {
 			tabActive.value = index;
 			curTab.value = item;
+			// 列表滑入动画
+			listAnimationClass.value = slideDirection.value === 'right' ? 'slide-in-right' : 'slide-in-left';
 			refreshList();
+			// 动画完成后解锁
+			setTimeout(() => {
+				isTabSwitching.value = false;
+				listAnimationClass.value = '';
+			}, 350);
 		}, 250);
+	};
+
+	// 滑动切换相关
+	const touchStartX = ref(0);
+	const touchStartY = ref(0);
+
+	const onTouchStart = (e) => {
+		touchStartX.value = e.touches[0].clientX;
+		touchStartY.value = e.touches[0].clientY;
+	};
+
+	const onTouchEnd = (e) => {
+		const touchEndX = e.changedTouches[0].clientX;
+		const touchEndY = e.changedTouches[0].clientY;
+		const deltaX = touchEndX - touchStartX.value;
+		const deltaY = touchEndY - touchStartY.value;
+
+		// 确保是水平滑动（水平距离大于垂直距离）且滑动距离超过阈值
+		if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+			const maxIndex = tabList.value.length - 1;
+			// 左滑（手指从右往左）：内容从左边进入
+			// 右滑（手指从左往右）：内容从右边进入
+			const swipeDirection = deltaX < 0 ? 'left' : 'right';
+			if (deltaX < 0) {
+				// 左滑，切换到下一个 tab（循环到第一个）
+				const nextIndex = tabActive.value >= maxIndex ? 0 : tabActive.value + 1;
+				const isLoop = tabActive.value >= maxIndex; // 从最后一个循环到第一个
+				changeTab(tabList.value[nextIndex], nextIndex, swipeDirection, isLoop);
+			} else if (deltaX > 0) {
+				// 右滑，切换到上一个 tab（循环到最后一个）
+				const prevIndex = tabActive.value <= 0 ? maxIndex : tabActive.value - 1;
+				const isLoop = tabActive.value <= 0; // 从第一个循环到最后一个
+				changeTab(tabList.value[prevIndex], prevIndex, swipeDirection, isLoop);
+			}
+		}
 	};
 
 	const refreshList = () => {
@@ -262,14 +343,6 @@
 				//如果是第一页需手动制空列表
 				if (mescroll.num == 1) {
 					dataList.value = [];
-
-					// 触发滑入动画（仅第一页，即 tab 切换后）
-					if (listAnimationClass.value) {
-						listAnimationClass.value = slideDirection.value === 'right' ? 'slide-in-right' : 'slide-in-left';
-						setTimeout(() => {
-							listAnimationClass.value = '';
-						}, 350);
-					}
 				}
 
 				dataList.value = dataList.value.concat(res.data); //追加新数据
@@ -377,6 +450,15 @@
 			border-radius: 999rpx;
 			transition: transform 0.3s ease-out, width 0.3s ease-out;
 			z-index: 0;
+
+			// 滑块循环动画
+			&.no-transition {
+				transition: none !important;
+			}
+
+			&.slider-hidden {
+				opacity: 0;
+			}
 		}
 
 		.tag-item {
