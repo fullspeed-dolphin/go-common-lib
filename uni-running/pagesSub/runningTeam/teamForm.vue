@@ -15,7 +15,7 @@
 			<!-- 基本信息分组 -->
 			<view class="card-section">
 				<view class="section-header">
-					<u-icon name="info-circle-fill" color="#FF8C00" size="36rpx" class="section-icon"></u-icon>
+					<text class="section-icon">🏃</text>
 					<text class="section-title">基本信息</text>
 				</view>
 				<view class="section-content">
@@ -52,7 +52,7 @@
 			<!-- 联系方式分组 -->
 			<view class="card-section">
 				<view class="section-header">
-					<u-icon name="account-fill" color="#FF8C00" size="36rpx" class="section-icon"></u-icon>
+					<text class="section-icon">👤</text>
 					<text class="section-title">联系方式</text>
 				</view>
 				<view class="section-content">
@@ -301,6 +301,7 @@
 	}
 
 	.section-icon {
+		font-size: 36rpx;
 		margin-right: 12rpx;
 	}
 
