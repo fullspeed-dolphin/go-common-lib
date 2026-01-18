@@ -257,13 +257,14 @@
 			text-align: right;
 			background: #fff;
 			border-radius: 16rpx;
-			padding: 10rpx 20rpx 0;
+			padding: 20rpx 20rpx 10rpx;
 		}
 	::v-deep {
 		.u-form-item__body{
+			padding: 20rpx 0;
 			position: relative;
 				&:after {
-					
+
 				position: absolute;
 				transform-origin: center;
 				content: " ";
@@ -278,6 +279,13 @@
 			}
 		}
 		.textarea-cell{
+			.u-form-item__body__left__content {
+				flex: none !important;  // 取消 flex: 1，不占满整行
+			}
+			.u-form-item__body__left__content__required {
+				position: static !important;  // 取消绝对定位
+				margin-left: 4rpx !important; // 与 label 保持间距
+			}
 			.u-input{
 				width: 100%;
 				height: 200rpx;
