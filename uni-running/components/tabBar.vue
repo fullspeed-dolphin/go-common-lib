@@ -55,6 +55,16 @@ const tabList = ref([
       "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/tab_01.png",
   },
   {
+    text: "活动",
+    name: "event",
+    pagePath: "/pages/event",
+    icon: "icon-rili",
+    normal:
+      "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/tab_00.png",
+    active:
+      "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/tab_01.png",
+  },
+  {
     text: "运动",
     name: "sport",
     pagePath: "/pages/sport",

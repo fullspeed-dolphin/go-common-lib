@@ -11,6 +11,10 @@
       "style": { "navigationStyle": "custom", "navigationBarTitleText": "跑了没" }
     },
     {
+      "path": "pages/event",
+      "style": { "navigationStyle": "custom", "navigationBarTitleText": "活动" }
+    },
+    {
       "path": "pages/sport",
       "style": { "navigationBarTitleText": "运动" }
     },
@@ -265,6 +269,10 @@
       {
         "text": "",
         "pagePath": "pages/index"
+      },
+      {
+        "text": "",
+        "pagePath": "pages/event"
       },
       {
         "text": "",
