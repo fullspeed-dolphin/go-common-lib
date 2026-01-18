@@ -1,5 +1,6 @@
 <template>
   <view class="page-container">
+    <u-navbar :title="clubTypeName + '管理工具'" autoBack placeholder></u-navbar>
     <view class="card-item panel"
 			@click="$u.route(`pagesSub/runningTeam/teamMaps?group_id=${group_id}`)">
     	<image class="img" src="./img/地图.png" mode="aspectFill"></image>

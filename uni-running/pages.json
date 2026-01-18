@@ -97,7 +97,7 @@
         {"path": "runningTeam/teamDetail", "style": { "navigationStyle": "custom", "navigationBarTitleText": "跑团详情"}},
         {"path": "runningTeam/teamForm","style": {"navigationStyle": "custom","navigationBarTitleText": "创建跑团"}},
         {"path": "runningTeam/teamMemberList","style": {"navigationBarTitleText": "跑团成员"}},
-        {"path": "runningTeam/teamSetting","style": {"navigationBarTitleText": "Club管理工具"}},
+        {"path": "runningTeam/teamSetting","style": {"navigationStyle": "custom", "navigationBarTitleText": "Club管理工具"}},
         {"path": "runningTeam/teamEventList","style": {"navigationStyle": "custom", "navigationBarTitleText": "活动列表"}},
         {"path": "runningTeam/teamEventForm","style": {"navigationStyle": "custom","navigationBarTitleText": "提交活动申请"}},
         {"path": "runningTeam/teamSummary","style": {"navigationBarTitleText": "跑团数据"}},
