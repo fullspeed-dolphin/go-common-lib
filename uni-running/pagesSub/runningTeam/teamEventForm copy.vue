@@ -170,7 +170,8 @@
 	]);
 
 	const options_visibility = ref([
-		{ label: "跑团内部可见", value: "private" },
+		{ label: "全速俱乐部活动可见", value: "private" },
+		{ label: "跑团内部可见", value: "rg_member_only" },
 		{ label: "全平台可见", value: "public" }
 	]);
 	

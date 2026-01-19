@@ -8,8 +8,9 @@
 						<!-- 滑块 -->
 						<view class="tag-slider" :style="sliderStyle" :class="sliderAnimClass"></view>
 						<!-- Tab 项 -->
-						<view class="tag-item" id="tab-0" :class="{ active: sliderPosition === 0 }" @click="onTabChange('running', 0)">跑步</view>
-						<view class="tag-item" id="tab-1" :class="{ active: sliderPosition === 1 }" @click="onTabChange('cycling', 1)">骑行</view>
+						<view class="tag-item" id="tab-0" :class="{ active: sliderPosition === 0 }" @click="onTabChange('mine', 0)">我的</view>
+						<view class="tag-item" id="tab-1" :class="{ active: sliderPosition === 1 }" @click="onTabChange('running', 1)">跑步</view>
+						<view class="tag-item" id="tab-2" :class="{ active: sliderPosition === 2 }" @click="onTabChange('cycling', 2)">骑行</view>
 					</view>
 				</view>
 			</view>
@@ -31,28 +32,44 @@
 							<view class="card-info">
 								<text class="card-title">{{ item.name }}</text>
 								<view class="info-row">
-									<u-icon name="tags-fill" size="24rpx" color="#FF8C00" />
-									<text>{{ item.fsc_name }}</text>
+									<image class="icon-img" src="/static/images/跑团.png" mode="aspectFill" />
+									<text>跑团: {{ item.fsc_name }}</text>
 								</view>
 								<view class="info-row">
 									<u-icon name="map-fill" size="24rpx" color="#FF8C00" />
-									<text>{{ item.event_location }}</text>
+									<text>地点: {{ item.event_location }}</text>
 								</view>
 								<view class="info-row">
 									<u-icon name="calendar-fill" size="24rpx" color="#FF8C00" />
-									<text>{{ formatTime(item.event_time) }}</text>
+									<text>时间: {{ formatTime(item.event_time) }}</text>
 								</view>
 								<!-- 底部人数 -->
 								<view class="card-footer">
 									<u-icon name="account-fill" size="24rpx" color="#FF8C00" />
-									<text class="capacity-text">{{ item.capacity }}人</text>
+									<text class="capacity-text">人数限制: {{ item.capacity }}人</text>
 								</view>
 							</view>
 						</view>
 					</view>
+
+					<!-- 未加入俱乐部提示 -->
+					<view v-if="selectedType === 'mine' && !userInfo.running_group && myEventLoaded" class="empty-state">
+						<text class="empty-text">你当前未加入任何全速俱乐部，请加入</text>
+					</view>
+
+					<!-- 俱乐部没有活动提示 -->
+					<view v-if="selectedType === 'mine' && userInfo.running_group && myEventLoaded && myEventList.length === 0" class="empty-state">
+						<text class="empty-text">俱乐部没有活动，快联系负责人创建一个吧</text>
+					</view>
 				</mescroll-body>
 			</view>
 		</view>
+
+		<!-- 底部"加入俱乐部"按钮 -->
+		<view v-if="selectedType === 'mine' && !userInfo.running_group && myEventLoaded" class="join-btn-wrapper">
+			<button class="join-btn" @click="goJoinClub">加入俱乐部</button>
+		</view>
+
 		<tabbar type="event" />
 	</view>
 </template>
@@ -60,10 +77,15 @@
 <script setup>
 import { ref, computed, nextTick } from "vue";
 import { onLoad, onShow, onPageScroll, onReachBottom } from "@dcloudio/uni-app";
+import { useStore } from "vuex";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 import tabbar from "@/components/tabBar.vue";
+
+// Vuex store
+const store = useStore();
+const userInfo = computed(() => store.state.userInfo);
 
 const { mescrollInit, downCallback, getMescroll } = useMescroll(onPageScroll, onReachBottom);
 
@@ -75,8 +97,8 @@ const upOption = {
 	}
 };
 
-// 分类筛选，默认跑步
-const selectedType = ref('running');
+// 分类筛选，默认"我的"
+const selectedType = ref('mine');
 
 // Tab 切换动画相关
 const slideDirection = ref('');
@@ -120,7 +142,7 @@ const getTabWidths = () => {
 
 		// 获取所有 tab 位置
 		const query = uni.createSelectorQuery();
-		query.selectAll('#tab-0, #tab-1').boundingClientRect();
+		query.selectAll('#tab-0, #tab-1, #tab-2').boundingClientRect();
 		query.exec((res) => {
 			if (res[0]) {
 				tabRects.value = res[0].map(item => ({ width: item.width, left: item.left }));
@@ -179,7 +201,7 @@ const onTabChange = (type, index, direction = null, isLoop = false) => {
 // 滑动切换相关
 const touchStartX = ref(0);
 const touchStartY = ref(0);
-const tabTypes = ['running', 'cycling'];
+const tabTypes = ['mine', 'running', 'cycling'];
 
 const onTouchStart = (e) => {
 	touchStartX.value = e.touches[0].clientX;
@@ -218,11 +240,18 @@ const onTouchEnd = (e) => {
 const eventList = ref([]);
 const loading = ref(false);
 
+// "我的"活动列表（独立存储）
+const myEventList = ref([]);
+const myEventLoaded = ref(false);
+
 // 缓存跑团信息，避免重复请求
 const fscInfoCache = ref({});
 
 // 根据 club_type 过滤（无值或 running = 跑步，cycling = 骑行）
 const filteredList = computed(() => {
+	if (selectedType.value === 'mine') {
+		return myEventList.value;
+	}
 	return eventList.value.filter(item => {
 		const type = item.club_type || 'running';
 		return type === selectedType.value;
@@ -296,6 +325,50 @@ const loadData = async (mescroll) => {
 	}
 };
 
+// 加载"我的"活动数据
+const loadMyEvents = async () => {
+	if (!userInfo.value.running_group) {
+		myEventLoaded.value = true;
+		return;
+	}
+
+	loading.value = true;
+	const params = {
+		fsc_id: userInfo.value.running_group,
+		visibility: 'rg_member_only',
+		is_free: 1,
+		status: 'ACT'
+	};
+
+	try {
+		const res = await request.get('/event-api/fsc_events', params);
+		let list = (res.fsc_events || []).map(item => ({
+			...item,
+			event_time: item.event_time
+		}));
+
+		// 获取跑团信息
+		const uniqueFscIds = [...new Set(list.map(item => item.fsc_id).filter(Boolean))];
+		await Promise.all(uniqueFscIds.map(id => getFscInfo(id)));
+
+		list = list.map(item => {
+			const fscInfo = fscInfoCache.value[item.fsc_id];
+			return {
+				...item,
+				fsc_name: fscInfo?.name || '跑团活动',
+				fsc_avatar: fscInfo?.avatar_url || ''
+			};
+		});
+
+		myEventList.value = list;
+		myEventLoaded.value = true;
+	} catch (e) {
+		console.error('加载我的活动失败', e);
+	} finally {
+		loading.value = false;
+	}
+};
+
 // 格式化时间
 const formatTime = (time) => {
 	if (!time) return '';
@@ -308,15 +381,28 @@ const goDetail = (item) => {
 	uni.$u.route(`pagesSub/runningTeam/teamEventDetail?id=${item.id}`);
 };
 
+// 跳转到加入俱乐部页面
+const goJoinClub = () => {
+	uni.$u.route('pagesSub/runningTeam/teamList');
+};
+
 onLoad(() => {
 	getTabWidths();
 });
 
 onShow(() => {
+	// 加载"我的"活动
+	if (selectedType.value === 'mine') {
+		loadMyEvents();
+	}
+
 	// 监听刷新事件
 	uni.$off("refreshEventList");
 	uni.$once("refreshEventList", () => {
 		getMescroll()?.resetUpScroll();
+		if (selectedType.value === 'mine') {
+			loadMyEvents();
+		}
 	});
 });
 </script>
@@ -531,6 +617,12 @@ onShow(() => {
 	line-height: 36rpx;
 	margin-bottom: 6rpx;
 
+	.icon-img {
+		width: 24rpx;
+		height: 24rpx;
+		flex-shrink: 0;
+	}
+
 	text {
 		font-size: 24rpx;
 		color: #666;
@@ -557,6 +649,50 @@ onShow(() => {
 	font-weight: 500;
 	color: #FF8C00;
 	line-height: 36rpx;
+}
+
+// 空状态提示
+.empty-state {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 60vh;
+	padding: 40rpx;
+}
+
+.empty-text {
+	font-size: 28rpx;
+	color: #999;
+	text-align: center;
+}
+
+// 加入俱乐部按钮
+.join-btn-wrapper {
+	position: fixed;
+	bottom: 200rpx;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 100;
+}
+
+.join-btn {
+	margin: 0;
+	height: 80rpx;
+	width: 312rpx;
+	border-radius: 200rpx;
+	color: #fff;
+	border: 1px solid #FF8C00;
+	background-color: #FF8C00 !important;
+	padding: 0 20rpx;
+	font-size: 28rpx;
+	font-weight: bold;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	&:after {
+		display: none;
+	}
 }
 
 </style>

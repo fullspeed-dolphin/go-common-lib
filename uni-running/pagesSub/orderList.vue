@@ -102,7 +102,8 @@
 <script setup>
 import {
 	ref,
-	computed
+	computed,
+	watch
 } from "vue";
 import {
 	onLoad,
@@ -149,19 +150,23 @@ const curTab = computed(() => tabList.value[currentIndex.value]);
 // 数据
 const dataList = ref([]);
 
-// 根据状态过滤列表
-const filteredList = computed(() => {
-	const status = curTab.value.value;
-	if (!status) {
-		return dataList.value;
-	}
-	return dataList.value.filter(item => item.status === status);
-});
+// 列表数据（后端已根据 status 过滤，无需前端再过滤）
+const filteredList = computed(() => dataList.value);
 
 // Tab 切换处理
 const handleTabChange = (item, index) => {
+	if (currentIndex.value === index) return;
 	changeTab(index);
 };
+
+// 监听 tab 切换，重新加载数据
+watch(currentIndex, () => {
+	// 立即清空旧数据，避免切换时显示旧 tab 的数据
+	dataList.value = [];
+	setTimeout(() => {
+		refreshList();
+	}, 300);
+});
 
 // 手势切换处理
 const handleTouchEnd = (e) => {
@@ -215,6 +220,12 @@ const getList = (mescroll) => {
 		pageIndex: mescroll.num - 1,
 		pageSize: 10,
 	};
+
+	// 如果选中了具体状态，传给后端过滤
+	const status = curTab.value.value;
+	if (status) {
+		data.orderStatus = status;
+	}
 
 	request.post(`/pay/order/list`, data).then((res) => {
 		res = res.orders.map(item => {
