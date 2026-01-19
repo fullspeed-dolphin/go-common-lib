@@ -2,7 +2,7 @@
 	<view class="AlbumInfo">
 		<u-navbar :title="detail.name" placeholder></u-navbar>
 		<section class="section-banner">
-			<up-lazy-load class="img" :image="detail.image_url + '?x-oss-process=image/resize,w_600'" mode="aspectFill" />
+			<up-lazy-load class="img" :image="(detail.image_url || detail.background_image_url) + '?x-oss-process=image/resize,w_600'" mode="aspectFill" />
 			<view v-if="album_total" class="summary">
 				<view class="item u-flex-y-center">
 					<!-- displayType === 'photo' ? '照片' : '视频' -->
