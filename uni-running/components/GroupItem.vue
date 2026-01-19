@@ -49,9 +49,9 @@
 	<view v-else class="group-item group-item-simple flex-start" @click="viewDetail(item)">
 		<!-- <image class="poster" :src="" mode="aspectFill"></image> -->
 		<view class="poster">
-			<up-lazy-load height="150" borderRadius="16" :image="
+			<up-lazy-load height="160" borderRadius="12" :image="
         (item.avatar_url ||
-        'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_150,h_150,m_fill'
+        'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_160,h_160,m_fill'
       " mode="aspectFill" />
 		</view>
 		<view class="group-item-content col">
@@ -60,12 +60,15 @@
 				<view class="gray total">{{ item.total_members }}人</view>
 			</view>
 			<view class="row justify-start">
-				<u-icon name="map" size="24rpx" color="#FF8C00" class="gray"></u-icon>
-				<view class="location ellipsis" style="width: 320rpx">
+				<u-icon name="map" size="28rpx" color="#FF8C00"></u-icon>
+				<view class="location ellipsis">
 					{{ item.establish_location }}
 				</view>
 			</view>
-			<view class="desc gray ellipsis">{{ item.introduction }}</view>
+			<view class="row justify-start">
+				<u-icon name="chat" size="28rpx" color="#FF8C00"></u-icon>
+				<view class="desc ellipsis">{{ item.introduction }}</view>
+			</view>
 		</view>
 	</view>
 </template>
@@ -209,14 +212,16 @@
 		display: flex;
 		align-items: stretch;
 		background: #fff;
-		padding: 10rpx 34rpx;
+		padding: 24rpx;
+		border-radius: 16rpx;
+		box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
 
 		.poster {
-			width: 144rpx;
-			height: 144rpx;
+			width: 160rpx;
+			height: 160rpx;
 			background: #f5f5f5;
-			margin-right: 22rpx;
-			border-radius: 16rpx 16rpx 16rpx 16rpx;
+			margin-right: 24rpx;
+			border-radius: 12rpx;
 			flex-shrink: 0;
 			flex-grow: 0;
 		}
@@ -256,18 +261,17 @@
 		}
 
 		.location {
-			font-size: 24rpx;
+			font-size: 28rpx;
 			color: #979797;
-			line-height: 34rpx;
-			height: 34rpx;
+			line-height: 40rpx;
 			margin-left: 10rpx;
 		}
 
 		.desc {
-			font-weight: bold;
-			font-size: 20rpx;
-			line-height: 28rpx;
-			height: 28rpx;
+			font-size: 26rpx;
+			color: #979797;
+			line-height: 36rpx;
+			margin-left: 10rpx;
 		}
 
 		.gray {

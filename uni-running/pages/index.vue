@@ -134,7 +134,7 @@
 				</view>
 			</section> -->
 			
-			<view style="padding: 0 34rpx;">
+			<view style="margin-top: 150rpx; padding: 0 34rpx;">
 				<u-divider text="已经到底了~"></u-divider>
 			</view>
 		</view>
@@ -562,6 +562,8 @@
 	}
 	
 	.index-page {
+		background: #f5f5f5;
+
 		.content {
 			background: #f5f5f5;
 		}
@@ -662,6 +664,7 @@
 		flex-direction: column;
 		gap: 20rpx;
 		min-height: 900rpx;
+		padding: 0 34rpx;
 	}
 
 	.empty-state {
@@ -747,7 +750,7 @@
 			position: relative;
 			gap: 20rpx;
 			padding: 6rpx;
-			background: #f5f5f5;
+			background: #fff;
 			border-radius: 999rpx;
 		}
 
