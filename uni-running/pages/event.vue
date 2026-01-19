@@ -1,17 +1,9 @@
 <template>
 	<view class="page-wrapper">
 		<view class="event-page">
-			<!-- 顶部导航 -->
-			<view class="header">
-				<view class="placeholder" :style="{ height: statusBarHeight + 'px' }"></view>
-				<view class="nav-bar">
-					<text class="nav-title">全速俱乐部活动</text>
-				</view>
-			</view>
-
-			<!-- 分类标签 -->
-			<view class="tab-bar-wrapper" :style="{ top: (statusBarHeight + 44) + 'px' }">
-				<view class="tab-bar">
+				<!-- 分类标签 -->
+			<view class="section-filter">
+				<view class="category-tags">
 					<view class="tags-inner">
 						<!-- 滑块 -->
 						<view class="tag-slider" :style="sliderStyle" :class="sliderAnimClass"></view>
@@ -23,7 +15,7 @@
 			</view>
 
 			<!-- 内容区域 -->
-			<view class="content" :style="{ paddingTop: (statusBarHeight + 44 + 52) + 'px' }"
+			<view class="content" :style="{ paddingTop: '52px' }"
 				@touchstart="onTouchStart"
 				@touchend="onTouchEnd">
 				<mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="loadData" :up="upOption" :top="0" :bottom="200" :safearea="true">
@@ -82,9 +74,6 @@ const upOption = {
 		icon: 'https://www.mescroll.com/img/mescroll-empty.png'
 	}
 };
-
-// 状态栏高度
-const statusBarHeight = ref(0);
 
 // 分类筛选，默认跑步
 const selectedType = ref('running');
@@ -255,12 +244,6 @@ const getFscInfo = async (fscId) => {
 	}
 };
 
-// 获取状态栏高度
-const getStatusBarHeight = () => {
-	const systemInfo = uni.getSystemInfoSync();
-	statusBarHeight.value = systemInfo.statusBarHeight || 20;
-};
-
 // 加载数据
 const loadData = async (mescroll) => {
 	loading.value = true;
@@ -326,7 +309,6 @@ const goDetail = (item) => {
 };
 
 onLoad(() => {
-	getStatusBarHeight();
 	getTabWidths();
 });
 
@@ -350,43 +332,15 @@ onShow(() => {
 	background: #f5f5f5;
 }
 
-// 顶部导航
-.header {
+// 分类标签
+.section-filter {
 	position: fixed;
 	top: 0;
 	left: 0;
 	right: 0;
-	z-index: 100;
-	background: #fff;
-}
-
-.nav-bar {
-	height: 88rpx;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.nav-title {
-	font-size: 34rpx;
-	font-weight: 500;
-	color: #000;
-}
-
-// 分类标签
-.tab-bar-wrapper {
-	position: fixed;
-	left: 0;
-	right: 0;
 	z-index: 99;
-	background: #fff;
-	border-bottom: 1rpx solid #eee;
-}
-
-.tab-bar {
-	display: flex;
-	align-items: center;
-	padding: 20rpx 32rpx;
+	background: #f5f5f5;
+	padding: 16rpx 24rpx;
 }
 
 .tags-inner {
@@ -394,7 +348,7 @@ onShow(() => {
 	position: relative;
 	gap: 20rpx;
 	padding: 6rpx;
-	background: #f5f5f5;
+	background: #fff;
 	border-radius: 999rpx;
 }
 

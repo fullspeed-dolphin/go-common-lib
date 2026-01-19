@@ -1,9 +1,7 @@
 <template>
 	<view class="page">
-		<u-navbar title="活动列表" placeholder></u-navbar>
-
 		<!-- 分类标签 -->
-		<view class="section-filter" :style="{ top: navbarHeight + 'px' }">
+		<view class="section-filter">
 			<view class="category-tags">
 				<view class="tags-inner">
 					<view class="tag-slider" :style="getSliderStyle()" :class="sliderAnimClass"></view>
@@ -67,9 +65,6 @@ import request from "@/utils/request.js"
 // 使用store
 const store = useStore();
 const refUserLogin = ref(null);
-
-// 导航栏高度
-const navbarHeight = ref(0);
 
 // Tab 相关
 const tabList = ref([
@@ -140,25 +135,6 @@ const getTabWidths = () => {
 			}
 		});
 	});
-};
-
-// 计算 navbar 高度
-const computeNavbarHeight = () => {
-	const statusBarHeight = uni.getWindowInfo().statusBarHeight || 0;
-
-	// #ifdef MP-WEIXIN
-	const menuBtn = uni.getMenuButtonBoundingClientRect();
-	if (menuBtn) {
-		const navHeight = menuBtn.bottom + (menuBtn.top - statusBarHeight);
-		navbarHeight.value = navHeight;
-	} else {
-		navbarHeight.value = statusBarHeight + 44;
-	}
-	// #endif
-
-	// #ifndef MP-WEIXIN
-	navbarHeight.value = statusBarHeight + 44;
-	// #endif
 };
 
 // Tab 切换
@@ -261,7 +237,6 @@ const getList = (mescroll) => {
 
 // 页面加载
 onLoad(() => {
-	computeNavbarHeight();
 	getTabWidths();
 });
 
@@ -295,6 +270,7 @@ onShareTimeline(() => {
 
 .section-filter {
 	position: fixed;
+	top: 0;
 	width: 100%;
 	z-index: 10;
 	background: #f5f5f5;

@@ -12,7 +12,7 @@
     },
     {
       "path": "pages/event",
-      "style": { "navigationStyle": "custom", "navigationBarTitleText": "活动" }
+      "style": { "navigationBarTitleText": "全速俱乐部活动" }
     },
     {
       "path": "pages/sport",
@@ -94,7 +94,7 @@
         {
           "path": "orderList",
           "style": {
-            "navigationBarTitleText": "我的活动"
+            "navigationBarTitleText": "我的订单"
           }
         },
         {"path": "runningTeam/teamList","style": { "navigationStyle": "custom","navigationBarTitleText": "跑团列表"}},

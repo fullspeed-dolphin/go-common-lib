@@ -563,13 +563,13 @@
 	
 	.index-page {
 		.content {
-			background: #fafafa;
+			background: #f5f5f5;
 		}
 
 		.event-swiper {
 			padding: 0 34rpx;
 			height: 444rpx;
-			background: #fafafa;
+			background: #f5f5f5;
 
 			.event-swiper-item {
 				padding-right: 20rpx;
