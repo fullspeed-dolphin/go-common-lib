@@ -49,7 +49,7 @@
 	<view v-else class="group-item group-item-simple flex-start" @click="viewDetail(item)">
 		<!-- <image class="poster" :src="" mode="aspectFill"></image> -->
 		<view class="poster">
-			<up-lazy-load height="160" borderRadius="12" :image="
+			<up-lazy-load height="160" borderRadius="12" :is-effect="false" :image="
         (item.avatar_url ||
         'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_160,h_160,m_fill'
       " mode="aspectFill" />

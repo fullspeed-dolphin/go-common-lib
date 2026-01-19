@@ -334,17 +334,20 @@
 			clubSliderPosition.value = index;
 		}
 
-		// 动画结束后切换数据
+		// slide-out 动画结束后切换数据
 		setTimeout(() => {
 			clubCategoryIndex.value = index;
-			// 列表滑入动画
-			listAnimationClass.value = slideDirection.value === 'right' ? 'slide-in-right' : 'slide-in-left';
-			getGroupList();
-			// 动画完成后解锁
-			setTimeout(() => {
-				isClubTabSwitching.value = false;
-				listAnimationClass.value = '';
-			}, 350);
+			// 动画结束后清空旧数据，避免新数据加载前显示旧数据
+			GroupList.value = [];
+			// 数据加载完成后再触发滑入动画
+			getGroupList(() => {
+				listAnimationClass.value = slideDirection.value === 'right' ? 'slide-in-right' : 'slide-in-left';
+				// 动画完成后解锁
+				setTimeout(() => {
+					isClubTabSwitching.value = false;
+					listAnimationClass.value = '';
+				}, 350);
+			});
 		}, 250);
 	};
 
@@ -527,7 +530,7 @@
 		});
 	};
 
-	const getGroupList = () => {
+	const getGroupList = (onComplete = null) => {
 		const clubType = clubCategoryList.value[clubCategoryIndex.value].value;
 		const data = {
 			pageIndex: 0,
@@ -540,6 +543,7 @@
 		}
 		request.get(`/running-group/api/v1/groups/list`, data).then(res => {
 			GroupList.value = res.data;
+			if (onComplete) onComplete();
 		});
 	};
 </script>

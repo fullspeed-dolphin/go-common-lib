@@ -108,6 +108,7 @@
 	const sliderPosition = ref(0); // 当前滑块显示的 index
 	const sliderOffset = ref(0); // 额外偏移量（用于循环动画）
 	const isTabSwitching = ref(false); // 防止动画重叠
+	const pendingSlideIn = ref(false); // 等待数据加载完成后触发滑入动画
 
 	// 存储每个 tab 的位置信息
 	const tabRects = ref([]);
@@ -262,18 +263,15 @@
 			sliderPosition.value = index;
 		}
 
-		// 动画结束后切换数据
+		// slide-out 动画结束后切换数据
 		setTimeout(() => {
 			tabActive.value = index;
 			curTab.value = item;
-			// 列表滑入动画
-			listAnimationClass.value = slideDirection.value === 'right' ? 'slide-in-right' : 'slide-in-left';
+			// 动画结束后清空旧数据，避免新数据加载前显示旧数据
+			dataList.value = [];
+			// 标记等待数据加载完成后触发滑入动画
+			pendingSlideIn.value = true;
 			refreshList();
-			// 动画完成后解锁
-			setTimeout(() => {
-				isTabSwitching.value = false;
-				listAnimationClass.value = '';
-			}, 350);
 		}, 250);
 	};
 
@@ -346,6 +344,16 @@
 				}
 
 				dataList.value = dataList.value.concat(res.data); //追加新数据
+
+				// 如果是 tab 切换触发的加载，数据加载完成后触发滑入动画
+				if (pendingSlideIn.value) {
+					pendingSlideIn.value = false;
+					listAnimationClass.value = slideDirection.value === 'right' ? 'slide-in-right' : 'slide-in-left';
+					setTimeout(() => {
+						isTabSwitching.value = false;
+						listAnimationClass.value = '';
+					}, 350);
+				}
 			})
 			.catch((error) => {
 				uni.hideLoading();
@@ -359,6 +367,7 @@
 		height: 100vh;
 		display: flex;
 		flex-direction: column;
+		background: #f5f5f5;
 	}
 
 	.mescroll-wrapper {

@@ -188,13 +188,14 @@ const onTabChange = (type, index, direction = null, isLoop = false) => {
 	// 切换数据
 	setTimeout(() => {
 		selectedType.value = type;
-		// 滑入动画
-		listAnimationClass.value = slideDirection.value === 'right' ? 'slide-in-right' : 'slide-in-left';
-
-		setTimeout(() => {
-			isTabSwitching.value = false;
-			listAnimationClass.value = '';
-		}, 350);
+		// 等待 DOM 更新后再触发滑入动画
+		nextTick(() => {
+			listAnimationClass.value = slideDirection.value === 'right' ? 'slide-in-right' : 'slide-in-left';
+			setTimeout(() => {
+				isTabSwitching.value = false;
+				listAnimationClass.value = '';
+			}, 350);
+		});
 	}, 250);
 };
 
@@ -411,6 +412,7 @@ onShow(() => {
 .page-wrapper {
 	min-height: 100vh;
 	position: relative;
+	background: #f5f5f5;
 }
 
 .event-page {
