@@ -30,6 +30,7 @@
             :confirmColor="confirmColor"
             :toolbarRightSlot="toolbarRightSlot"
 			:pageInline="pageInline"
+						round="14px"
             @close="close"
             @cancel="cancel"
             @confirm="confirm"

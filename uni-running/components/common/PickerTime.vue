@@ -122,14 +122,13 @@ defineExpose({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .pickerTime {
   width: 100%;
   max-width: 100%;
-  ::v-deep {
     .u-cell {
       width: 100% !important;
     }
-  }
+    
 }
 </style>
