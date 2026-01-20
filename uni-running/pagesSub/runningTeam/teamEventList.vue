@@ -2,7 +2,6 @@
   <view class="page-container">
     <u-navbar :title="clubTypeName + '活动列表'" autoBack placeholder></u-navbar>
     <mescroll-body @init="mescrollInit" @down="downCallback" @up="getList" :top="0">
-    <view class="event-list">
       <view class="event-card" v-for="(item, index) in eventList" :key="index">
         <image class="event-poster" :src="item.background_image_url" mode="aspectFill"></image>
         <view class="event-info">
@@ -17,16 +16,19 @@
               <u-icon name="clock" size="24rpx" color="#999"></u-icon>
               <text class="meta-text">{{ item.event_time }}</text>
             </view>
-            <view class="meta-item">
+            <view class="meta-item u-mb-10">
               <u-icon name="map" size="24rpx" color="#999"></u-icon>
               <text class="meta-text">{{ item.event_location }}</text>
+            </view>
+            <view v-if="item.status === 'REJ'" style="background: #fa3534;color:#fff;font-size:24rpx;padding:8rpx 8rpx;border-radius:8rpx;" >
+              审核批注：{{ item.status_message || '--' }}
             </view>
           </view>
           <view class="event-actions u-mt-10">
             <u-button v-if="!['EXP', 'ACT'].includes(item.status)" type="primary" size="small" shape="circle" color="#2979ff"
               customStyle="width: 120rpx;margin:0;"
               @click="editEvent(item)">更新</u-button>
-            <u-button v-if="!['EXP', 'ACT'].includes(item.status)"  type="error" size="small" shape="circle" color="#fa3534"
+            <u-button v-if="!['EXP', 'ACT'].includes(item.status)"  type="error" size="small" shape="circle" color="#f56c6c"
               customStyle="width: 120rpx;margin:0;"
               @click="removeItem(item)">删除</u-button>
             <u-button type="primary" size="small" plain shape="circle" color="#FF8C00"
@@ -35,12 +37,6 @@
           </view>
         </view>
       </view>
-
-      <!-- 空状态 -->
-      <!-- <view class="empty-state" v-if="!loading && eventList.length === 0">
-        <u-empty mode="data" text="暂无活动"></u-empty>
-      </view> -->
-    </view>
 	</mescroll-body>
 
     <!-- 底部按钮 -->
@@ -175,7 +171,7 @@ const createEvent = () => {
 
 // 编辑活动
 const editEvent = (item) => {
-  uni.$u.route(`pagesSub/runningTeam/teamEventForm?id=${item.id}&group_id=${group_id.value}&status=${item.status}&status_message=${encodeURIComponent(item.status_message || '')}`);
+  uni.$u.route(`pagesSub/runningTeam/teamEventForm?id=${item.id}&group_id=${group_id.value}`);
 };
 
 // 查看活动详情
@@ -210,19 +206,13 @@ onShow(() => {
   padding-bottom: 140rpx;
 }
 
-.event-list {
-  display: flex;
-  flex-direction: column;
-  gap: 24rpx;
-}
-
 .event-card {
   background: #FFFFFF;
   border-radius: 16rpx;
   padding: 20rpx;
   display: flex;
   gap: 20rpx;
-
+  margin: 24rpx auto;
   .event-poster {
     width: 120rpx;
     height: 120rpx;
