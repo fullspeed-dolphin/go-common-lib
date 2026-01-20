@@ -230,7 +230,7 @@
 						left: -9px;
 						color: $u-error;
 						line-height: 20px;
-						font-size: 20px;
+						font-size: 20rpx;
 						top: 3px;
 					}
 
