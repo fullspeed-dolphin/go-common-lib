@@ -16,6 +16,7 @@
 					<view class="title ellipsis2">
 						{{item.description}}
 					</view>
+<<<<<<< HEAD
 					<view class="info-row">
 						<u-icon name="clock" size="14" />
 						<view class="info-text">
@@ -26,6 +27,21 @@
 						<u-icon name="map" size="14" />
 						<view class="info-text ellipsis2">
 							{{item.event_location}}
+=======
+					<view class="">
+						<view class="u-flex-y-center" style="width:180rpx;">
+							<u-icon name="clock" size="12" />
+							<view class="u-ml-10">
+								{{item.event_time}}
+							</view>
+						</view>
+						
+						<view class="u-flex u-mt-10">
+							<u-icon name="map" size="12" />
+							<view class="u-ml-10 ellipsis2" style="line-height:1.2">
+								{{item.event_location}}
+							</view>
+>>>>>>> 376faa01f3afd6b41b838cf8868a7a6a230042df
 						</view>
 					</view>
 				</view>
