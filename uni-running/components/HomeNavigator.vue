@@ -18,7 +18,7 @@
 	} from "@dcloudio/uni-app";
 	import request from "@/utils/request.js"
 
-	// 只在正式版中显示，开发版和体验版中隐藏（用于规避审核）
+	// 只在正式版和开发版中显示，体验版中隐藏（用于规避审核）
 	// 直接在组件中获取环境版本，确保准确
 	let shouldShow = false;
 	// #ifdef MP-WEIXIN

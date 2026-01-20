@@ -10,28 +10,22 @@
 		</section>
 		<mescroll-body @init="mescrollInit" @down="downCallback" @up="getList" top="0">
 			<view class="card-item bgf u-flex" v-for="item in dataList" :key="item.event_id" @click="viewDetail(item)">
-				<up-lazy-load class="img" borderRadius="16" :image="item.image_url + '?x-oss-process=image/resize,w_100,h_100,m_fill'" mode="aspectFill" />
-				
-				<view class="" style="width:510rpx;margin-left:12rpx;">
-					<view class="u-flex">
-						<view class="title ellipsis2 u-mb-15" style="width:420rpx;line-height: 1.2;">
-							{{item.description}}
-						</view>
-						<!-- <view class="u-ml-5">2345张</view> -->
+				<up-lazy-load class="img" borderRadius="16" :image="item.image_url + '?x-oss-process=image/resize,w_150,h_150,m_fill'" mode="aspectFill" />
+
+				<view class="card-content">
+					<view class="title ellipsis2">
+						{{item.description}}
 					</view>
-					<view class="">
-						<view class="u-flex-y-center" style="width:180rpx;">
-							<u-icon name="clock" labelPos="top" size="12" />
-							<view class="u-ml-10">
-								{{item.event_time}}
-							</view>
+					<view class="info-row">
+						<u-icon name="clock" size="14" />
+						<view class="info-text">
+							{{item.event_time}}
 						</view>
-						
-						<view class="u-flex  u-ml-10">
-							<u-icon name="map" size="12" />
-							<view class="u-ml-10 ellipsis2" style="line-height:1.2">
-								{{item.event_location}}
-							</view>
+					</view>
+					<view class="info-row">
+						<u-icon name="map" size="14" />
+						<view class="info-text ellipsis2">
+							{{item.event_location}}
 						</view>
 					</view>
 				</view>
@@ -116,23 +110,54 @@
 		padding: 20rpx 34rpx;
 		background: #fafafa;
 	}
-	
+
 	.card-item{
 		width: 682rpx;
-		min-height: 150rpx;
+		min-height: 200rpx;
 		border-radius: 16rpx;
-		padding: 20rpx 16rpx;
+		padding: 28rpx 24rpx;
 		margin: 0rpx auto 30rpx;
-		color:#979797;font-size:24rpx;
+		align-items: flex-start;
+
 		.img{
-			width: 120rpx;
-			height: 120rpx;
+			width: 160rpx;
+			height: 160rpx;
+			flex-shrink: 0;
 		}
+
+		.card-content{
+			flex: 1;
+			margin-left: 24rpx;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			justify-content: flex-start;
+		}
+
 		.title{
 			font-weight: bold;
-			font-size: 28rpx;
-			color:#000;
+			font-size: 32rpx;
+			color: #000;
+			line-height: 1.4;
+			margin-bottom: 16rpx;
+			text-align: left;
 		}
+
+		.info-row{
+			display: flex;
+			align-items: flex-start;
+			margin-top: 12rpx;
+			color: #979797;
+			font-size: 26rpx;
+			line-height: 1.4;
+			text-align: left;
+		}
+
+		.info-text{
+			margin-left: 12rpx;
+			text-align: left;
+		}
+
 		::v-deep{
 			.u-icon--right{
 				align-items: flex-start;
