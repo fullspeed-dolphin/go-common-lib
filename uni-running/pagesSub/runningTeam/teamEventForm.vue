@@ -10,7 +10,7 @@
 		<view v-if="pageIndex === 0 " class="u-mb-30 u-mt-30">
 			设置基础信息
 		</view>
-		<view v-if="pageIndex === 0" class="panel-section">
+		<view v-show="pageIndex === 0" class="panel-section">
 			<up-form :model="form" ref="uForm" :rules="rules" labelWidth="auto">
 				<!-- 两个上传框并排 -->
 				<view class="flex-between-center">
@@ -204,8 +204,6 @@
 
 	const maxDate = dayjs().add(4, 'M').valueOf();
 
-	const isAgree = ref(false);
-	
 	function validateField(propName) {
 		uForm.value.validateField(propName, () => {}, "change");
 	}
@@ -285,16 +283,6 @@
 		routerParams.value = options
 		form.value.phone = store.state.userInfo.phone;
 
-		// 如果状态是 REJ，弹窗显示拒绝原因
-		if (options.status === 'REJ' && options.status_message) {
-			uni.showModal({
-				title: '审核未通过',
-				content: decodeURIComponent(options.status_message),
-				showCancel: false,
-				confirmText: '我知道了'
-			});
-		}
-
 		getDetail();
 	});
 
@@ -318,8 +306,6 @@
 					// 	dayjs(JSON.parse(res.registration_time)[1]).valueOf()
 					// ]
 				});
-
-				isAgree.value = true;
 			});
 	};
 
@@ -331,13 +317,32 @@
 	// 	}
 	// });
 
+	const packageResult = ref({});
 	const submitForm = async () => {
 		// 第二步：提交套餐
 		if (pageIndex.value === 1) {
-			const packageResult = await refTeamEventFormPackage.value.submitForm();
-			if (!packageResult?.success) return;
+			packageResult.value = await refTeamEventFormPackage.value.submitForm();
+			if (!packageResult.value?.success) return;
 
 			isSubmitting.value = true;
+
+			const isEdit = !!routerParams.value.id;
+			if (isEdit) {
+				try{
+					await createPackage(routerParams.value.id);
+					await createEvent(true);
+				} catch(e) {
+					console.error('编辑活动失败', e);
+				}
+
+				isSubmitting.value = false;
+
+				uni.$u.toast(isEdit ? "更新成功" : "创建成功");
+				uni.$emit("updateList", { isChange: true });
+				setTimeout(() => uni.navigateBack(), 500);
+
+				return;
+			}
 
 			// 先创建/更新活动基础信息，获取 event_id
 			const eventId = await createEvent(true); // skipNavigation = true
@@ -345,32 +350,11 @@
 				isSubmitting.value = false;
 				return;
 			}
-
-			// 调用 ticket_type API 创建/更新套餐价格
-			const isEdit = !!routerParams.value.id;
-			const ticketUrl = isEdit
-				? '/event-api/ticket_type/update'
-				: '/event-api/ticket_type';
-
-			try {
-				await request.post(ticketUrl, {
-					event_id: eventId,
-					ticket_type: 'ga',
-					price: JSON.stringify(packageResult.data),
-					currency: 'CNY'
-				});
-
-				uni.hideLoading();
-				uni.$u.toast(isEdit ? "更新成功" : "创建成功");
-				uni.$emit("updateList", { isChange: true });
-				setTimeout(() => uni.navigateBack(), 500);
-			} catch (e) {
-				uni.hideLoading();
-				console.error('保存套餐价格失败', e);
-				uni.$u.toast('保存套餐价格失败');
-			} finally {
-				isSubmitting.value = false;
-			}
+			await createPackage(eventId);
+			
+			uni.$u.toast(isEdit ? "更新成功" : "创建成功");
+			uni.$emit("updateList", { isChange: true });
+			setTimeout(() => uni.navigateBack(), 500);
 			return;
 		}
 
@@ -396,6 +380,32 @@
 			}
 		});
 	};
+
+	async function createPackage(eventId) {
+		// 调用 ticket_type API 创建/更新套餐价格
+			const isEdit = !!routerParams.value.id;
+			const ticketUrl = isEdit
+				? '/event-api/ticket_type/update'
+				: '/event-api/ticket_type';
+
+			try {
+				await request.post(ticketUrl, {
+					event_id: eventId,
+					ticket_type: 'ga',
+					price: JSON.stringify(packageResult.value.data),
+					currency: 'CNY'
+				});
+
+				uni.hideLoading();
+				
+			} catch (e) {
+				uni.hideLoading();
+				console.error('保存套餐价格失败', e);
+				uni.$u.toast('保存套餐价格失败');
+			} finally {
+				isSubmitting.value = false;
+			}
+	}
 
 	// 创建/更新活动基础信息，返回 event_id
 	async function createEvent (skipNavigation = false) {
@@ -487,7 +497,7 @@
 			text-align: right;
 			background: #fff;
 			border-radius: 16rpx;
-			padding: 60rpx 40rpx;
+			padding: 60rpx 30rpx;
 		}
 
 		.u-form-item__body{
