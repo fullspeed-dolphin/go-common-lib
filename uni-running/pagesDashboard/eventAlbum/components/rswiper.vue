@@ -1,43 +1,50 @@
 <template>
   <view class="SwiperSection" style="width:750rpx;" @touchstart="touchStart" @touchend="touchEnd">
-    <swiper class="swiper" circular @change="swiperChange" swiperDuration="30" :current="currentIndex" :disable-touch="disableTouch">
+    
+		<swiper class="swiper" circular @change="swiperChange" swiperDuration="30" :current="currentIndex" :disable-touch="disableTouch">
       <swiper-item class="flex-center" v-for="(item, index) in displaySwiperList" :key="index">
         <image class="poster" :style="'height:' + item.height" 
-				v-if="item.url" :src="item.url + '?x-oss-process=image/resize,w_750/quality,q_80/format,webp'" mode="widthFix" />
+				v-if="item.url" :src="item.url750" mode="widthFix" @load="e => isLoadedHDimage = true"/>
       </swiper-item>
     </swiper>
 		
-    <view class="section-slider">
-      <!-- 预览图 -->
-      <!-- <scrollimageview :dataList="originList" :originIndex="originIndex" @dirHandle="dirHandle" :isShow="isShowAmount"
-        :min="0" :total="Number(totalNumber || 0)" style="margin-bottom:20rpx;">
-      </scrollimageview> -->
-      <!-- :style="{opacity: !isShow ? 0 : 1}" -->
-
-      <!-- // <slider :value="originIndex" @change="sliderChange" :step="1" :max="originList.length -1" /> -->
-      <!-- 拖动滑块 -->
-      <xzsliderrange v-model="originIndexArr" solo :decoration="false" @move="sliderChange" :size="30" height="2px"
-        activeBgc="rgb(0, 122, 255)" :max="Number(originList.length || 0)" :min="0" :total="Number(totalNumber || 0)"
-        hintColor="#fff" @showNum="e => isShowAmount = e" />
-      <view class="title" :style="{ opacity: !isShow ? 0 : 1 }">{{ originIndex + 1 }}/{{ originList.length }}(总
-        {{ totalNumber }})
-      </view>
-    </view>
-    <!-- loading -->
-    <view class="loading">
-      <up-loading-page bg-color="#e8e8e8" :loading="isloading" loading-text="加载中..." style="background-color:rgba(0,0,0,.3)" />
-    </view>
-		
-		<section class="section-btns flex-center" style="position: fixed;right:34rpx;bottom: 90rpx;">
-			<up-button @click="openShare()" type="primary" icon="share"
-				customStyle="width:70rpx;height:130rpx;">
-				分享
-			</up-button>
-			<up-button @click="downloadPicture" type="primary" icon="download"
-				customStyle="width:70rpx;height:130rpx;">
-				下载
-			</up-button>
+    <section class="bottom-info">
+			<div class="flex-center">
+				<up-button @click="loadHDimage()" shape="circle" type="primary"
+					customStyle="width:188rpx;height:64rpx;margin:0;font-size:24rpx;color: #babab6;border-color:rgba(255, 255, 255, 0.27);background:rgba(34, 34, 34, 0.8);">
+					{{isSomeHDimage ? '已加载高清图' : '加载高清图'}}
+				</up-button>
+			</div>
+			
+			<view class="section-slider">
+			  <xzsliderrange v-model="originIndexArr" solo :decoration="false" @move="sliderChange" :size="30" height="2px"
+			    activeBgc="rgb(0, 122, 255)" :max="Number(originList.length || 0)" :min="0" :total="Number(album_total || 0)"
+			    hintColor="#fff" @showNum="e => isShowAmount = e" />
+			  <view class="title" :style="{ opacity: !isShowAmount ? 0 : 1 }">
+					{{ originIndex + 1 }}
+					<text class="c9">/{{ originList.length }}(总{{ album_total }})</text>
+			  </view>
+			</view>
+			
+			<section class="section-btns flex-between-center u-pr-30">
+				<view class=""></view>
+				<view class="flex-row">
+					<up-button @click="openShare()" type="primary" icon="share"
+						customStyle="width:70rpx;height:120rpx;margin:0;background-color:transparent;">
+						分享
+					</up-button>
+					<up-button @click="downloadPicture()" type="primary" icon="download"
+						customStyle="width:70rpx;height:120rpx;margin:0;background-color:transparent;">
+						下载
+					</up-button>
+				</view>
+			</section>
 		</section>
+		
+		<!-- loading -->
+		<view v-if="isloading" class="loading">
+		  <up-loading-page bg-color="#e8e8e8" :loading="isloading" loading-text="加载中..." style="background-color:rgba(0,0,0,.3)" />
+		</view>
 		
 		<SharePoster ref="refSharePoster" />
   </view>
@@ -61,16 +68,15 @@ const store = useStore();
 const album_total = computed(() => store.state.album_total);
 const album_data = computed(() => store.state.album_data);
 
+// 如果存在原图，按钮变更为已加载
+const isSomeHDimage = computed(() => displaySwiperList.value.some(i => !i.url750.includes('?x-oss-process')))
+
 const props = defineProps({
   originList: {
     type: Array,
     default: []
   },
   originIndex: {
-    type: [Number, String],
-    default: 0
-  },
-  totalNumber: {
     type: [Number, String],
     default: 0
   }
@@ -80,6 +86,12 @@ const refSharePoster = ref(null)
 function openShare() {
 	const imageUrl = displaySwiperList.value?.[currentIndex.value].url
 	refSharePoster.value.open(imageUrl)
+}
+
+// 加载高清图
+const isLoadedHDimage = ref(false)
+function loadHDimage() {
+	displaySwiperList.value[currentIndex.value].url750 = displaySwiperList.value?.[currentIndex.value].url
 }
 
 const emits = defineEmits(['loadingMore'])
@@ -133,6 +145,7 @@ function initSwiperData(originIndex) {
 		
 	displaySwiperList.value = displayList.map(item => ({
 		url: item,
+		url750: item + '?x-oss-process=image/resize,w_750/quality,q_80/format,webp',
 		height: getPhotoHeight(item)
 	}));
 
@@ -253,18 +266,6 @@ const touchEnd = (event) => {
   // console.log(endDir.value)
 }
 
-// 图片滚动回调设置slider
-const dirHandle = (start, end) => {
-  console.log('start===', start)
-  originIndex.value = start
-  if (originIndex.value + 6 > originList.value.length && !isloading.value) {
-    emits('loadingMore', originIndex.value)
-    isloading.value = true
-    return;
-  }
-  initSwiperData(start);
-};
-
 function downloadPicture() {
 	const imageUrl = displaySwiperList.value?.[currentIndex.value].url;
 	
@@ -333,22 +334,20 @@ defineExpose({
 		}
 	}
 .title {
-  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 60rpx;
-  color: #fff
+  color: #fff;
 }
 
 .swiper {
   height: calc(100vh - 120rpx);
 }
 
-.section-slider {
+.bottom-info {
   position: fixed;
   width: 100%;
-  bottom: 150rpx;
+  bottom: 10rpx;
   left: 0;
 }
 </style>
