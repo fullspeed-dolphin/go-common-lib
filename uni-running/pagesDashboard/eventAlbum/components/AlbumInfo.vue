@@ -73,11 +73,18 @@ function getDetail (){
 		res.event_id = res.id
 		res.event_time = res.event_time?.slice(0, 10)
 		detail.value = res
+
+		store.commit('set', {
+			type: 'album_info',
+			data: res
+		})
 	});
 	
 	request.post(`/image-service/albums/view/count?event_id=${routeParams.value.event_id}`).then((res) => {
 		visitAmount.value = res.view_count
 	});
+
+	
 }
 
 function addVistAmount() {
