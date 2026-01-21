@@ -33,7 +33,7 @@
 				<view class="panel-item">
 					<view class="label">
 						<image class="icon" :src="staticBaseUrl + '/images/icon-event-date@2x.png'" mode="aspectFill"></image>
-						<text>活动开始时间：</text>
+						<text>{{ isCourseEvent ? '课程开始时间：' : '活动开始时间：' }}</text>
 					</view>
 					<view class="value">{{
             dayjs(detail.event_time).format("YYYY-MM-DD HH:mm")
@@ -89,7 +89,7 @@
 					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;" @click="routeTo()">
 						<block v-if="Number(detail.is_free) === 1">进入活动</block>
 						<block v-else-if="detail.status === 'ACT'">{{
-              isSignUp ? "取消报名" : "活动报名"
+              isSignUp ? "取消报名" : (isCourseEvent ? "立即报班" : "活动报名")
             }}</block>
 						<block v-else-if="detail.status === 'PND'">活动暂未开始</block>
 						<block v-else-if="detail.status === 'EXP'">查看报名详情</block>
@@ -142,6 +142,10 @@
 
 	// 计算属性
 	const userInfo = computed(() => store.state.userInfo);
+
+	// 特定活动ID硬编码：课程类活动
+	const COURSE_EVENT_ID = '01KFDCDMWB682FDW00A2W7C0AK';
+	const isCourseEvent = computed(() => routerParams.value.id === COURSE_EVENT_ID);
 
 	// 定时器
 	let timer = null;
