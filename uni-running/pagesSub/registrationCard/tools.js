@@ -48,6 +48,10 @@ export const bloodTypeOptions = [{
 	},
 ];
 export const tshirtSizeOptions = [{
+		label: "无参赛服",
+		value: "无参赛服"
+	},
+	{
 		label: "120",
 		value: "120"
 	},

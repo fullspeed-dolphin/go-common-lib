@@ -122,7 +122,7 @@
 					<PickerCell v-model="form.bloodType" :border="false" :columns="bloodTypeOptions" />
 				</up-form-item>
 
-				<up-form-item label="参赛服尺寸" prop="clothesSize" tips="参赛服尺码仅为参赛者个人信息，活动是否包含参赛服以具体活动宣发为准，详询活动组织方，如活动不提供参赛服则任意选择一个参赛服尺码。" required>
+				<up-form-item label="参赛服尺寸" prop="clothesSize" tips="参赛服尺码仅为参赛者个人信息，活动是否包含参赛服以具体活动宣发为准，详询活动组织方，如活动或课程不提供参赛服则选择'无参赛服'。" required>
 					<view @click="showOnceTip">
 						<PickerCell v-model="form.clothesSize" :disabled="isReadOnlyClothSize" :border="false" :columns="tshirtSizeOptions" />
 					</view>
@@ -140,7 +140,7 @@
 				<view style="font-size: 32rpx;margin-bottom: 20rpx;color:rgb(255, 140, 0);">提示：</view>
 				<view style="color:#777;font-size:24rpx;line-height: 1.3;">
 					<div class="u-flex-row"><div style="width:30rpx;">1、</div><div>请如实填写姓名和身份证信息，以便我们为您购买赛事保险。</div></div>
-					<div class="u-flex-row"><div style="width:30rpx;">2、</div><div>参赛服尺码仅为参赛者个人信息，活动是否包含参赛服以具体活动宣发为准，详询活动组织方，如活动不提供参赛服则任意选择一个参赛服尺码。</div></div>
+					<div class="u-flex-row"><div style="width:30rpx;">2、</div><div>参赛服尺码仅为参赛者个人信息，活动是否包含参赛服以具体活动宣发为准，详询活动组织方，如活动或课程不提供参赛服则选择'无参赛服'。</div></div>
 				</view>
 			</view>
 
@@ -265,7 +265,7 @@
 	function showOnceTip() {
 		if (isOnceShow.value) return;
 		isOnceShow.value = true;
-		uni.$u.toast('参赛服尺码仅为参赛者个人信息，活动是否包含参赛服以具体活动宣发为准，详询活动组织方，如活动不提供参赛服则任意选择一个尺码。')
+		uni.$u.toast('参赛服尺码仅为参赛者个人信息，活动是否包含参赛服以具体活动宣发为准，详询活动组织方，如活动或课程不提供参赛服则选择\'无参赛服\'。')
 	}
 
 	watch(
