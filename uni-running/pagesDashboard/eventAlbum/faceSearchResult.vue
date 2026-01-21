@@ -44,7 +44,7 @@ onLoad(() => {
 });
 
 const previewImage = (index) => {
-	const ossPar750  = '?x-oss-process=image/resize,w_750/quality,q_80/format,webp'
+	const ossPar750  = '?x-oss-process=image/resize,w_1050/quality,q_90/format,webp'
 	uni.previewImage({
 		urls: imageList.value.map(i => i + ossPar750),
 		current: index
