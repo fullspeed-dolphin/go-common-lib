@@ -1,178 +1,157 @@
+
 <template>
-	<up-popup :show="show" @close="close" closeable custom-style="background:transparent;">
-		<!-- 海报预览区域 -->
-		<view class="poster-preview" v-if="posterImageUrl">
-			<image :src="posterImageUrl" class="poster-image" mode="aspectFill"></image>
+  <!-- 显示图像的元素 -->
+  <up-popup :show="show" @close="close" closeable custom-style="background:rgba(0,0,0,.8);top:0;">
+    <view class="flex-col-center" style="height:100vh;">
+			<image :src="pictureImage" v-if="pictureImage" show-menu-by-longpress mode="widthFix" style="width: 600rpx"></image>
+			<u-button v-if="pictureImage" type="primary" block shape="circle" @click="$u.toast('长按图片保存到相册')" custom-style="width:500rpx;margin: 40rpx auto 0">
+				长按图片保存到相册
+			</u-button>
+			<l-painter ref="posterRef" @success="painterSsuccess" isCanvasToTempFilePath performance path-type="url" 
+			custom-style="position: fixed; left: 200%" />
 		</view>
-
-		<l-painter class="painter" isRenderImage ref="painter" :board="posterConfig" @success="sharePaintSuccess"
-			@done="sharePaintSuccess" />
-
-		<!-- 海报组件 -->
-		<!-- <up-poster ref="poster" :json="posterConfig"></up-poster> -->
-	</up-popup>
+  </up-popup>
 </template>
 <script setup>
-	import lPainter from './lime-painter/components/l-painter/l-painter'
-	import {
-		ref,
-		nextTick
-	} from 'vue';
+import lPainter from "./lime-painter/components/l-painter/l-painter.vue"
+import { ref, nextTick, computed } from "vue";
+import { onLoad } from "@dcloudio/uni-app";
 
-	const poster = ref(null);
-	const posterImageUrl = ref('');
-	const posterConfig = ref({});
+import { useStore } from "vuex";
+const store = useStore();
 
-	function createPoster(posterUrl) {
-		posterConfig.value = {
-			css: {
-				width: '750rpx',
-				height: '1000rpx',
-				background: 'green'
-			},
-			views: [{
-					type: 'text',
-					text: "this.userInfo.truename",
-					css: {
-						left: '30rpx',
-						top: '24rpx',
-						width: '608rpx',
-						height: '32rpx',
-						textAlign: 'left',
-						fontSize: '24rpx',
-						color: "#222",
-						maxLines: 1,
-						padding: "0 30rpx 0 0"
-					}
-				},
-				{
-					type: 'text',
-					text: "为你挑选了一个好物",
-					css: {
-						left: '30rpx',
-						top: '60rpx',
-						width: '608rpx',
-						height: '32rpx',
-						textAlign: 'left',
-						fontSize: '24rpx',
-						color: "#333",
-						maxLines: 1,
-						padding: "0 30rpx 0 0"
-					}
-				},
-				{
-					type: 'view',
-					css: {
-						left: '30rpx',
-						top: '110rpx',
-						width: '560rpx',
-						height: '710rpx',
-						background: '#fff',
-						borderRadius: "20rpx"
-					}
-				},
-				{
-					type: 'image',
-					src: posterUrl,
-					css: {
-						left: '56rpx',
-						top: '100rpx',
-						width: '510rpx',
-						height: '470rpx',
-						mode: 'aspectFill',
-					}
-				},
-				{
-					type: 'text',
-					text: "喜迎十五运·你跑了没--增城1978电影小镇欢乐跑",
-					css: {
-						left: '56rpx',
-						top: '632rpx',
-						width: '170rpx',
-						fontSize: '28rpx',
-						color: "#222",
-						textAlign: 'left',
-					}
-				},
-				{
-					type: 'text',
-					text: "2025-11-09",
-					css: {
-						left: '56rpx',
-						top: '690rpx',
-						width: '390rpx',
-						height: '150rpx',
-						textAlign: 'left',
-						fontSize: '28rpx',
-						lineHeight: '50rpx',
-						maxLines: 2,
-						color: "#545253"
-					}
-				},
-				{
-					type: 'image',
-					src: `.../../assets/qrcode.min.jpeg`,
-					css: {
-						left: '453rpx',
-						top: '680rpx',
-						background: '#fff',
-						width: '110rpx',
-						height: '110rpx'
-					}
-				},
-			]
-		}
-	}
+const album_info = computed(() => store.state.album_info);
 
-	function sharePaintSuccess(res) {
-		uni.hideLoading()
-		posterImageUrl.value = res
-	}
+console.log("album_info", album_info);
 
-	const generatePoster = async () => {
-		try {
-			uni.showLoading({
-				title: '海报生成中...'
-			});
-			await nextTick()
+// 海报元素的引用，用于后续操作DOM
+const posterRef = ref(null);
 
-			const result = await poster.value.exportImage();
-			posterImageUrl.value = result.path;
+// 控制海报是否显示
+const posterIsShow = ref(false);
 
-			uni.hideLoading();
-			uni.showToast({
-				title: '海报生成成功',
-				icon: 'success'
-			});
-		} catch (error) {
-			uni.hideLoading();
-			uni.showToast({
-				title: '海报生成失败',
-				icon: 'none'
-			});
-		}
-	};
+// 存储最终生成的海报图片URL
+const pictureImage = ref("");
 
-	const show = ref(false);
+// 海报的JSON配置，包含CSS样式和视图层次结构
+const posterJson = ref({});
 
-	function open(imageUrl) {
-		createPoster(imageUrl)
-		// generatePoster()
-		show.value = true;
-	}
+const painterSsuccess = (e) => {
+  console.log("painterSsuccess");
+  posterIsShow.value = true;
+  pictureImage.value = e;
+  uni.hideLoading();
+};
 
-	function close() {
-		show.value = false;
-	}
+const renderPoster = (imageUrl) => {
+  posterJson.value = {
+    css: {
+      width: "750rpx",
+      paddingBottom: "40rpx",
+      background: "linear-gradient(,#000 0%, #ff8c00 100%)",
+    },
+    views: [
+      {
+        css: {
+          marginLeft: "40rpx",
+          marginTop: "30rpx",
+          padding: "32rpx",
+          boxSizing: "border-box",
+          background: "#fff",
+          borderRadius: "16rpx",
+          width: "670rpx",
+          boxShadow: "0 20rpx 58rpx rgba(0,0,0,.5)",
+        },
+        views: [
+          {
+            src: imageUrl,
+            type: "image",
+            css: {
+              objectFit: "cover",
+              objectPosition: "50% 50%",
+              width: "606rpx",
+              height: "606rpx",
+            },
+          },
+          {
+            css: {
+              marginTop: "32rpx",
+              color: "#333333",
+              fontSize: "30rpx",
+            },
+            views: [
+              {
+                text: album_info.value.name || "活动相册",
+                type: "text",
+                css: {
+                  lineHeight: "48rpx",
+                  width: "478rpx",
+                },
+              },
+            ],
+            type: "view",
+          },
+          {
+            css: {
+              marginTop: "10rpx",
+            },
+            views: [
+              {
+                text: album_info.value.event_time.slice(0, 10) || "",
+                type: "text",
+                css: {
+                  paddingRight: "32rpx",
+                  boxSizing: "border-box",
+                  lineClamp: 2,
+                  color: "#666666",
+                  fontSize: "28rpx",
+                  width: "478rpx",
+                },
+              },
+              {
+								src: "/static/images/qrcode.min.jpeg",
+								type: "image",
+                css: {
+									marginTop: "-10rpx",
+                  width: "128rpx",
+                  height: "128rpx",
+                },
+              },
+            ],
+            type: "view",
+          },
+        ],
+        type: "view",
+      },
+    ],
+  };
 
-	defineExpose({
-		open
-	})
+  posterRef.value.render(posterJson.value);
+};
+
+const show = ref(false);
+
+function open(imageUrl) {
+  uni.showLoading({
+    title: "正在生成海报",
+    icon: "loading",
+  });
+
+  show.value = true;
+
+  nextTick(() => {
+    renderPoster(imageUrl);
+  });
+}
+
+function close() {
+  show.value = false;
+}
+
+defineExpose({
+  open,
+});
 </script>
 
-<style lang="less">
-	.poster-image {
-		width: 750rpx;
-		height: 1000rpx;
-	}
+<style >
 </style>

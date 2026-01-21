@@ -29,21 +29,24 @@
     </view>
 		
 		<section class="section-btns flex-center" style="position: fixed;right:34rpx;bottom: 90rpx;">
-			<!-- <up-button @click="downloadPicture" type="primary" icon="share"
+			<up-button @click="openShare()" type="primary" icon="share"
 				customStyle="width:70rpx;height:130rpx;">
 				分享
-			</up-button> -->
+			</up-button>
 			<up-button @click="downloadPicture" type="primary" icon="download"
 				customStyle="width:70rpx;height:130rpx;">
 				下载
 			</up-button>
 		</section>
+		
+		<SharePoster ref="refSharePoster" />
   </view>
 </template>
 
 <script setup>
 import xzsliderrange from "./xz-slider-range/xz-slider-range.vue"
 import scrollimageview from "./scrollimageview.vue"
+import SharePoster from "./SharePoster.vue"
 import {
   onMounted,
   ref,
@@ -72,6 +75,13 @@ const props = defineProps({
     default: 0
   }
 })
+
+const refSharePoster = ref(null)
+function openShare() {
+	const imageUrl = displaySwiperList.value?.[currentIndex.value].url
+	refSharePoster.value.open(imageUrl)
+}
+
 const emits = defineEmits(['loadingMore'])
 
 const originList = ref([]) // 源数据

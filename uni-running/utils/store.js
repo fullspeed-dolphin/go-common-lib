@@ -1,6 +1,5 @@
 import { createStore } from 'vuex'
 import request from "@/utils/request.js"
-import { clearUserInfo } from "@/utils/util.js"
 
 export default createStore({
 	state() {
@@ -12,6 +11,7 @@ export default createStore({
 			album_pageSize: 60,
 			album_data: [],
 			album_total: 0,
+			album_info: {}
 		}
 	},
 	mutations: {
