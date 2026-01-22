@@ -1,5 +1,5 @@
 <template>
-	<u-navbar :title="null" bgColor="transparent"></u-navbar>
+	<u-navbar :title="detail.name || '活动详情'" bgColor="#fff" placeholder></u-navbar>
 	
 	<view class="u-pb-30" style="background: #f5f5f5" :class="{
       isFixedNavbar: isFixedNavbar,
@@ -81,8 +81,8 @@
 
 			<view class="section-bottom1">
 				<view class="u-border-top1" :class="{ isSignUp: isSignUp }">
-					<u-button type="primary" :color="['REJ','EXP'][detail.status] ? '#999;' : '#FF8C00'" shape="circle" customStyle="height: 80rpx;" @click="routeTo()">
-						<block v-if="detail.status === 'ACT'">报名中</block>
+					<u-button type="primary" :color="['REJ','EXP'].includes(detail.status) ? '#999' : '#FF8C00'" shape="circle" customStyle="height: 80rpx;" @click="routeTo()">
+						<block v-if="detail.status === 'ACT'">{{ detail.event_detail_url ? '立即报名' : '报名中' }}</block>
 						<block v-if="detail.status === 'PND'">审核中</block>
 						<block v-if="detail.status === 'EXP'">已过期</block>
 						<block v-if="detail.status === 'REJ'">修改活动信息并重新提交</block>
@@ -243,6 +243,17 @@
 			return refPhoneLogin.value.open();
 		}
 
+		// ACT 状态且有 event_detail_url 时，跳转到配置的 URL 并携带 token
+		if (detail.value.status === 'ACT' && detail.value.event_detail_url) {
+			const token = uni.getStorageSync("token");
+			const separator = detail.value.event_detail_url.includes('?') ? '&' : '?';
+			const url = `${detail.value.event_detail_url}${separator}token=${token}`;
+			uni.$u.route(
+				`pagesSub/settings/webView?link=${encodeURIComponent(url)}`
+			);
+			return;
+		}
+
 		if (detail.value.status === "EXP" && !!detail.value.event_detail_url) {
 			uni.$u.route(
 				`pagesSub/settings/webView?link=${detail.value.event_detail_url}`
@@ -254,11 +265,6 @@
 			uni.$u.route("pagesSub/runningTeam/teamEventForm?event_id=" + routerParams.value.id);
 			return;
 		}
-
-		// if (detail.value.status === 'ACT') {
-		// 	uni.$u.route("pagesSub/orderIn?event_id=" + routerParams.value.id);
-		// 	return;
-		// }
 	};
 
 	const cancelSignUp = () => {

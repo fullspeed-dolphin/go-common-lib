@@ -188,6 +188,15 @@ const onTabChange = (type, index, direction = null, isLoop = false) => {
 	// 切换数据
 	setTimeout(() => {
 		selectedType.value = type;
+
+		// 切换后自动刷新数据
+		if (type === 'mine') {
+			loadMyEvents();
+		} else {
+			// 跑步/骑行 tab 刷新列表
+			getMescroll()?.resetUpScroll();
+		}
+
 		// 等待 DOM 更新后再触发滑入动画
 		nextTick(() => {
 			listAnimationClass.value = slideDirection.value === 'right' ? 'slide-in-right' : 'slide-in-left';

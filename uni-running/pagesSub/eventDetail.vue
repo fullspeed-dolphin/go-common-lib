@@ -1,8 +1,7 @@
 <template>
-	<u-navbar :title="null" bgColor="transparent"></u-navbar>
+	<u-navbar :title="detail.name || '活动详情'" bgColor="#fff" placeholder></u-navbar>
 	
 	<view class="u-pb-30" style="background: #f5f5f5" :class="{
-      isFixedNavbar: isFixedNavbar,
       isLoadedPage: isLoadedPage,
     }">
 		<view class="event-status flex-center" v-if="detail.status === 'ACT'">
@@ -136,7 +135,6 @@
 	const isScroll = ref(false);
 	const isSignUp = ref(false);
 	const detail = ref({});
-	const isFixedNavbar = ref(true);
 	const isLoadedPage = ref(false);
 	const routerParams = ref({});
 
@@ -170,22 +168,13 @@
 		uni.removeStorageSync("eventDetail");
 	});
 	
-	const navBarBg = ref('transparent');
 	onPageScroll((e) => {
-		isFixedNavbar.value = parseInt(e.scrollTop) < 30;
-
 		isScroll.value = true;
 
 		clearTimeout(timer);
 		timer = setTimeout(() => {
 			isScroll.value = false;
 		}, 100);
-		
-		if (e.scrollTop  >= 5) {
-		  navBarBg.value = "#ffffff";
-		} else {
-		  navBarBg.value = 'transparent';
-		}
 	});
 
 	// 分享给好友
@@ -469,16 +458,6 @@
 				color: #ff8c00;
 				background: #f2f2f2;
 				border-color: #f2f2f2;
-			}
-		}
-
-		.isFixedNavbar {
-			.up-navbar--fixed {
-				background: none !important;
-
-				.navbar-badge {
-					background: #fff;
-				}
 			}
 		}
 	}

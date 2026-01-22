@@ -2,8 +2,8 @@
 		<u-navbar title="活动报名" placeholder bgColor="#f8f8f8"/>
 
 		<section class="section-assign">
-			<view class="cell flex-between-center">
-				<view class="">跑团</view>
+			<view v-if="showField('group')" class="cell flex-between-center">
+				<view class="">{{ getLabel('group') }}</view>
 				<view class="flex-start" @click="openGroupPop()">
 					<view class="txt" :class="{ c70: !myGroup.name }">
 						{{ myGroup.name || "加入跑团" }}
@@ -12,27 +12,27 @@
 				</view>
 			</view>
 
-			<view class="cell flex-between-center">
-				<view class="">全速码</view>
+			<view v-if="showField('code')" class="cell flex-between-center">
+				<view class="">{{ getLabel('code') }}</view>
 				<view class="verify-code-input-wrapper">
-					<u-input placeholder="请输入全速码" maxlength="5" border="none" v-model="verifyCode" inputAlign="right"
+					<u-input :placeholder="`请输入${getLabel('code')}`" maxlength="5" border="none" v-model="verifyCode" inputAlign="right"
 						color="#000000" fontSize="30rpx" :placeholderStyle="'font-size: 26rpx; color: #999999;font-weight: 700;'">
 					</u-input>
 				</view>
 				<u-tag v-if="!!verifyCode.length" :text="computedCode.text" plain size="mini"
 					:type="computedCode.isOk ? 'success' : 'error'"></u-tag>
 			</view>
-			<view class="cell flex-between-center">
-				<view class="cell-label">参赛包领取地址<u-icon name="star-fill" color="#E53935" size="8"></u-icon></view>
+			<view v-if="showField('address')" class="cell flex-between-center">
+				<view class="cell-label">{{ getLabel('address') }}<u-icon name="star-fill" color="#E53935" size="8"></u-icon></view>
 				<view class="" style="width:540rpx;margin:0 -20rpx;">
-					<PickerCell v-model="selectedAddress" :disabled="!addressPickerColumns.length" placeholder="请选择地址" :border="false" :columns="addressPickerColumns" />
+					<PickerCell v-model="selectedAddress" :disabled="!addressPickerColumns.length" :placeholder="`请选择${getLabel('address')}`" :border="false" :columns="addressPickerColumns" />
 				</view>
 			</view>
 		</section>
 
-		<view class="section" style="margin-top:30rpx;">
+		<view v-if="showField('package')" class="section" style="margin-top:30rpx;">
 			<view class="section-title">
-				<text>选择套餐</text>
+				<text>{{ getLabel('package') }}</text>
 				<text v-if="eventCapacity.mode === 'event'" class="remaining-quota">（剩余名额：{{ (eventCapacity.capacity || 0) - (eventCapacity.capacity_used || 0) }}）</text>
 			</view>
 			<view class="section-content">
@@ -186,6 +186,29 @@
 	const selectedAddress = ref("");
 	const addressPickerColumns = ref([]);
 	const multiPackageCount = ref(1); // 存储 multi_package 字段值
+
+	// 表单标签配置
+	const formLabels = ref(null)
+
+	// 默认标签
+	const DEFAULT_LABELS = {
+		group: '跑团',
+		code: '全速码',
+		address: '参赛包领取地址',
+		package: '选择套餐'
+	}
+
+	// 判断字段是否显示（null 或空字符串都隐藏）
+	const showField = (key) => {
+		if (!formLabels.value || !(key in formLabels.value)) return true
+		const value = formLabels.value[key]
+		return value !== null && value !== ''
+	}
+
+	// 获取字段标签
+	const getLabel = (key) => {
+		return formLabels.value?.[key] || DEFAULT_LABELS[key]
+	}
 
 	const userInfo = computed(() => store.state.userInfo);
 
@@ -377,12 +400,12 @@
 			if (res.spxcode_status === "ACT") {
 				computedCode.value = {
 					isOk: true,
-					text: "全速码有效",
+					text: `${getLabel('code')}有效`,
 				};
 			} else {
 				computedCode.value = {
 					isOk: false,
-					text: "全速码无效",
+					text: `${getLabel('code')}无效`,
 				};
 			}
 
@@ -467,12 +490,14 @@
 
 		if (!isAgree.value) return uni.$u.toast("请勾选同意协议");
 
-		if (!selectedAddress.value) return uni.$u.toast("请选择参赛包领取地址");
+		if (showField('address') && !selectedAddress.value) {
+			return uni.$u.toast(`请选择${getLabel('address')}`);
+		}
 
 		// 获取所有选中的套餐（count > 0）
 		const selectedPackages = packageList.value.filter(item => item.count > 0);
-		if (!selectedPackages.length) {
-			return uni.$u.toast("请选择套餐");
+		if (showField('package') && !selectedPackages.length) {
+			return uni.$u.toast(`请选择${getLabel('package')}`);
 		}
 
 		// 检查所有空位是否已填充
@@ -640,6 +665,9 @@
 
 		try {
 			const res = await request.get(`/event-api/api/v1/events/${event_id.value}`);
+
+			// 读取表单标签配置
+			formLabels.value = res?.form_labels || null
 
 			// 获取 multi_package 字段，判断是否多选
 			if (res && res.multi_package !== undefined && res.multi_package !== null) {
