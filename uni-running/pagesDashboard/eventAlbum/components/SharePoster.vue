@@ -1,7 +1,6 @@
 
 <template>
-  <!-- 显示图像的元素 -->
-  <up-popup :show="show" @close="close" closeable custom-style="background:rgba(0,0,0,.8);top:0;">
+  <up-popup v-if="show" :show="show" @close="close" closeable custom-style="background:rgba(0,0,0,.8);top:0;">
     <view class="flex-col-center" style="height:100vh;">
 			<image :src="pictureImage" v-if="pictureImage" show-menu-by-longpress mode="widthFix" style="width: 600rpx"></image>
 			<u-button v-if="pictureImage" type="primary" block shape="circle" @click="$u.toast('长按图片保存到相册')" custom-style="width:500rpx;margin: 40rpx auto 0">
@@ -22,23 +21,14 @@ const store = useStore();
 
 const album_info = computed(() => store.state.album_info);
 
-console.log("album_info", album_info);
-
-// 海报元素的引用，用于后续操作DOM
 const posterRef = ref(null);
-
-// 控制海报是否显示
-const posterIsShow = ref(false);
 
 // 存储最终生成的海报图片URL
 const pictureImage = ref("");
 
-// 海报的JSON配置，包含CSS样式和视图层次结构
 const posterJson = ref({});
 
 const painterSsuccess = (e) => {
-  console.log("painterSsuccess");
-  posterIsShow.value = true;
   pictureImage.value = e;
   uni.hideLoading();
 };

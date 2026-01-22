@@ -614,7 +614,6 @@ onShow(() => {
 	font-size: 28rpx;
 	font-weight: 600;
 	color: #333;
-	line-height: 40rpx;
 	margin-bottom: 8rpx;
 	overflow: hidden;
 	text-overflow: ellipsis;
