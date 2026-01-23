@@ -7,7 +7,7 @@
 				<view class="u-ml-5">请输入名称或团号或地址</view>
 			</view>
 		</view>
-		<view class="content">
+		<scroll-view class="content" scroll-y :show-scrollbar="false" enhanced>
 			<view class="container">
 				<view class="section-banner">
 					<swiper class="swiper" circular indicator-dots indicator-active-color="#FF8C00" :autoplay="true"
@@ -134,10 +134,10 @@
 				</view>
 			</section> -->
 			
-			<view style="margin-top: 150rpx; padding: 0 34rpx;">
+			<view style="margin-top: 150rpx; padding: 0 34rpx; padding-bottom: calc(224rpx + env(safe-area-inset-bottom));">
 				<u-divider text="已经到底了~"></u-divider>
 			</view>
-		</view>
+		</scroll-view>
 
 		<tabbar type="index" />
 		
@@ -190,6 +190,7 @@
 	const eventCategoryIndex = ref(0);
 
 	const clubCategoryList = ref([
+		{ name: '我的', value: 'mine' },
 		{ name: '全部', value: 'all' },
 		{ name: '跑步', value: 'running' },
 		{ name: '骑行', value: 'cycling' }
@@ -278,7 +279,7 @@
 
 			// 获取全速俱乐部分类 tag 位置
 			const clubQuery = uni.createSelectorQuery();
-			clubQuery.selectAll('#club-tag-0, #club-tag-1, #club-tag-2').boundingClientRect();
+			clubQuery.selectAll('#club-tag-0, #club-tag-1, #club-tag-2, #club-tag-3').boundingClientRect();
 			clubQuery.exec((res) => {
 				if (res[0]) {
 					clubTagRects.value = res[0].map(item => ({ width: item.width, left: item.left }));
@@ -532,6 +533,22 @@
 
 	const getGroupList = (onComplete = null) => {
 		const clubType = clubCategoryList.value[clubCategoryIndex.value].value;
+
+		// "我的"tab：获取用户所属的俱乐部
+		if (clubType === 'mine') {
+			const groupId = userInfo.value.running_group;
+			if (!groupId) {
+				GroupList.value = [];
+				if (onComplete) onComplete();
+				return;
+			}
+			request.get(`/running-group/api/v1/groups/info?group_id=${groupId}`).then(res => {
+				GroupList.value = res ? [res] : [];
+				if (onComplete) onComplete();
+			});
+			return;
+		}
+
 		const data = {
 			pageIndex: 0,
 			pageSize: 5,
@@ -567,9 +584,12 @@
 	
 	.index-page {
 		background: #f5f5f5;
+		height: 100vh;
+		overflow: hidden;
 
 		.content {
 			background: #f5f5f5;
+			height: 100vh;
 		}
 
 		.event-swiper {

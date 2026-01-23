@@ -80,6 +80,10 @@
 	const searchTxt = ref("");
 	const tabActive = ref(0);
 	const tabList = ref([{
+			label: "我的",
+			value: "mine"
+		},
+		{
 			label: "全部",
 			value: "all"
 		},
@@ -93,8 +97,8 @@
 		},
 	]);
 	const curTab = ref({
-		label: "全部",
-		value: "all"
+		label: "我的",
+		value: "mine"
 	});
 	const dataList = ref([]);
 	const navbarHeight = ref(0);
@@ -141,7 +145,7 @@
 
 			// 获取所有 tab 位置
 			const query = uni.createSelectorQuery();
-			query.selectAll('#tab-0, #tab-1, #tab-2').boundingClientRect();
+			query.selectAll('#tab-0, #tab-1, #tab-2, #tab-3').boundingClientRect();
 			query.exec((res) => {
 				if (res[0]) {
 					tabRects.value = res[0].map(item => ({ width: item.width, left: item.left }));
@@ -321,6 +325,51 @@
 		uni.showLoading({
 			mask: true
 		});
+
+		// "我的"tab：获取用户所属的俱乐部
+		if (curTab.value.value === 'mine') {
+			const groupId = userInfo.value.running_group;
+			if (!groupId) {
+				uni.hideLoading();
+				mescroll.endSuccess(0);
+				if (mescroll.num == 1) {
+					dataList.value = [];
+				}
+				if (pendingSlideIn.value) {
+					pendingSlideIn.value = false;
+					listAnimationClass.value = slideDirection.value === 'right' ? 'slide-in-right' : 'slide-in-left';
+					setTimeout(() => {
+						isTabSwitching.value = false;
+						listAnimationClass.value = '';
+					}, 350);
+				}
+				return;
+			}
+			request.get(`/running-group/api/v1/groups/info?group_id=${groupId}`)
+				.then((res) => {
+					uni.hideLoading();
+					mescroll.endSuccess(res ? 1 : 0);
+					if (mescroll.num == 1) {
+						dataList.value = [];
+					}
+					if (res) {
+						dataList.value = [res];
+					}
+					if (pendingSlideIn.value) {
+						pendingSlideIn.value = false;
+						listAnimationClass.value = slideDirection.value === 'right' ? 'slide-in-right' : 'slide-in-left';
+						setTimeout(() => {
+							isTabSwitching.value = false;
+							listAnimationClass.value = '';
+						}, 350);
+					}
+				})
+				.catch((error) => {
+					uni.hideLoading();
+					mescroll.endSuccess(0);
+				});
+			return;
+		}
 
 		const data = {
 			pageIndex: mescroll.num - 1,

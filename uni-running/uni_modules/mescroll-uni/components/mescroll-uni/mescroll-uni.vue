@@ -1,6 +1,6 @@
 <template>
 	<view class="mescroll-uni-warp">
-		<scroll-view :id="viewId" class="mescroll-uni" :class="{'mescroll-uni-fixed':isFixed}" :style="{'height':scrollHeight,'padding-top':padTop,'padding-bottom':padBottom,'top':fixedTop,'bottom':fixedBottom}" :scroll-top="scrollTop" :scroll-with-animation="scrollAnim" @scroll="scroll" :scroll-y='scrollable' :enable-back-to-top="true" :throttle="false">
+		<scroll-view :id="viewId" class="mescroll-uni" :class="{'mescroll-uni-fixed':isFixed}" :style="{'height':scrollHeight,'padding-top':padTop,'padding-bottom':padBottom,'top':fixedTop,'bottom':fixedBottom}" :scroll-top="scrollTop" :scroll-with-animation="scrollAnim" @scroll="scroll" :scroll-y='scrollable' :enable-back-to-top="true" :throttle="false" :show-scrollbar="false" enhanced>
 			<view class="mescroll-uni-content mescroll-render-touch"
 			@touchstart="wxsBiz.touchstartEvent" 
 			@touchmove="wxsBiz.touchmoveEvent" 
