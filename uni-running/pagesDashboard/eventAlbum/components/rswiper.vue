@@ -2,9 +2,14 @@
   <view class="SwiperSection" style="width:750rpx;" @touchstart="touchStart" @touchend="touchEnd">
     
 		<swiper class="swiper" circular @change="swiperChange" swiperDuration="30" :current="currentIndex" :disable-touch="disableTouch">
-      <swiper-item class="flex-center" v-for="(item, index) in displaySwiperList" :key="index">
-        <image class="poster" :style="'height:' + item.height" 
-				v-if="item.url" :src="item.url750" mode="widthFix" @load="e => isLoadedHDimage = true"/>
+	  <swiper-item class="flex-center" v-for="(item, index) in displaySwiperList" :key="item.url750 || index">
+				<movable-area class="movable-area" scale-area>
+					<movable-view :key="item.url750 || index" class="movable-view flex-center" direction="all" :inertia="true" damping="100" scale="true" scale-min="1" scale-max="4" :scale-value="scaleValue">
+						<!-- <view class="scroll-view"><image :key="index" class="image" :src="item" mode="widthFix" @longpress="onLongpress(item)" /></view> -->
+						<image class="poster" :style="'height:' + item.height"
+							 :src="item.url750" mode="widthFix" @load="e => isLoadedHDimage = true"/>
+					</movable-view>
+				</movable-area>
       </swiper-item>
     </swiper>
 		
@@ -108,6 +113,8 @@ const isloading = ref(false) // 加载动画内容
 const isShow = ref(false) // 图片数量的显示隐藏
 const isAlbumComplete = ref(false) // 是否已浏览完全部图片
 
+const isZooming = ref(false)
+
 watch(
   () => album_data.value,
   (val) => {
@@ -169,7 +176,9 @@ function initSwiperData(originIndex) {
 /**
  * swiper滑动时候
  */
+const scaleValue = ref(1)
 const swiperChange = (event) => {
+	scaleValue.value = 1
   const {
     current
   } = event.detail;
@@ -319,15 +328,19 @@ const endDir = ref('')
 const touchStart = (event) => {
   startTime.value = Date.now()
   startPosition.value = event.changedTouches[0].clientX
+	
+	isZooming.value = true
 }
 // 终点,计算移动距离
 const touchEnd = (event) => {
+	isZooming.value = false
+	
   const endTime = Date.now()
   if (endTime - startTime.value > 2000) {
     return;
   }
   endPosition.value = event.changedTouches[0].clientX
-
+	
 
   //当移动距离超过10时判断左滑右滑。
   if (Math.abs(endPosition.value - startPosition.value) > 10) {
@@ -427,7 +440,31 @@ defineExpose({
 .swiper {
   height: calc(100vh - 120rpx);
 }
-
+.swiper {
+	width: 100%;
+	height: 100vh;
+		.movable-area {
+			height: 100%;
+			width: 100%;
+			.movable-view {
+				width: 100%;
+				min-height: 100%;
+				.uni-scroll-view{
+					height: 100vh;
+				}
+				.scroll-view {
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					min-height: 100vh;
+					.image {
+						width: 100%;
+						height: auto;
+					}
+				}
+			}
+		}
+}
 .bottom-info {
   position: fixed;
   width: 100%;
