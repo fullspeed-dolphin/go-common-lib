@@ -184,6 +184,7 @@
 <style lang="less" scoped>
 	.page {
 		background: #f5f5f5;
+		min-height: 100vh;
 	}
 
 	.content {

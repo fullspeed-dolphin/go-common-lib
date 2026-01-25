@@ -1,6 +1,23 @@
 <template>
   <view class="flex1">
-    <template v-if="maxCountNum === 1">
+    <!-- 自定义模式 -->
+    <template v-if="isCustom">
+      <template v-if="!fileList.length">
+        <view @click="chooseCustomImage">
+          <slot name="trigger"></slot>
+        </view>
+      </template>
+      <template v-else>
+        <view class="custom-preview" :style="customPreviewStyle">
+          <image :src="fileList[0].url" class="custom-preview-image" @click="chooseAndReplace" mode="aspectFill" />
+          <view class="custom-preview-actions">
+            <u-icon name="close" size="14" color="#fff" @click.stop="deleteFile({ tempFilePath: fileList[0] })" />
+          </view>
+        </view>
+      </template>
+    </template>
+    <!-- 默认模式 -->
+    <template v-else-if="maxCountNum === 1">
       <template v-if="!fileList.length">
         <u-upload
           :fileList="fileList"
@@ -51,7 +68,7 @@
   </view>
 </template>
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import { asyncAlls } from "@/utils/util.js";
 import { baseLink } from "@/utils/config.js";
 import { uploadToken } from "../../utils/config";
@@ -118,6 +135,49 @@ const props = defineProps({
 const emit = defineEmits(["input", "update:modelValue", 'change']);
 
 const maxCountNum = Number(props.maxCount) || 1;
+
+// 自定义预览样式
+const customPreviewStyle = computed(() => {
+  const w = typeof props.width === 'number' ? `${props.width}rpx` : props.width;
+  const h = typeof props.height === 'number' ? `${props.height}rpx` : props.height;
+  return `width:${w};height:${h};`;
+});
+
+// 自定义模式下选择图片
+const chooseCustomImage = async () => {
+  if (props.readonly) return;
+  try {
+    const res = await new Promise((resolve, reject) => {
+      uni.chooseImage({
+        count: 1,
+        sourceType: props.capture,
+        success: (r) => resolve(r.tempFilePaths[0]),
+        fail: (e) => reject(e),
+      });
+    });
+
+    if (!res) return;
+
+    uni.showLoading({ mask: true, title: '上传图片中' });
+    const uploadedUrl = await uploadFile({ url: res });
+    if (uploadedUrl) {
+      const newItem = {
+        name: uploadedUrl,
+        url: uploadedUrl,
+        extname: 'png',
+        uid: new Date().getTime(),
+      };
+      fileList.value = [newItem];
+      const value = listToString(fileList.value);
+      emit('update:modelValue', value);
+      emit('change', value);
+    }
+  } catch (e) {
+    console.error(e);
+  } finally {
+    uni.hideLoading();
+  }
+};
 
 // 响应式数据
 const fileList = ref([]);
@@ -340,5 +400,24 @@ const uploadFile = async (file) => {
   padding: 10rpx;
   background: rgba(0,0,0,.3);
   border-radius: 99px;
+}
+
+.custom-preview {
+  position: relative;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+.custom-preview-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 16rpx;
+}
+.custom-preview-actions {
+  position: absolute;
+  top: 12rpx;
+  right: 12rpx;
+  padding: 12rpx;
+  background: rgba(0,0,0,.5);
+  border-radius: 50%;
 }
 </style>

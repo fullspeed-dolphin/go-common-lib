@@ -1,15 +1,15 @@
 <template>
-	<view>
+	<view class="page">
 		<section class="section-form u-flex-row">
 			<view class="upload-wrapper">
-				<FileUpload v-model="ruleForm.picture" isCustom @change="onImageUploaded">
+				<FileUpload v-model="ruleForm.picture" isCustom :width="448" :height="790" @change="onImageUploaded">
 					<template #trigger>
 						<view class="section-upload flex-col-center">
 							<view class="icon">
-								<up-icon name="plus" color="#FF8C00" size="86rpx"></up-icon>
+								<up-icon name="plus" color="#CCCCCC" size="86rpx"></up-icon>
 							</view>
 							<view>上传打卡</view>
-							<view>(上传软件截图或照片)</view>
+							<view>(上传软件截图照片)</view>
 						</view>
 					</template>
 				</FileUpload>
@@ -27,10 +27,7 @@
 					<view class="label">配速</view>
 					<view class="value u-flex-xy-center">{{exerciseInfo.pace || '--'}}</view>
 				</view>
-				<view @click="$u.route('pagesSport/captureRule?type=rule')" style="color: #FF8C00;line-height: 40rpx;">
-					截图打卡规则
 				</view>
-			</view>
 		</section>
 
 		<u-button v-if="isCheckInSuccess" type="primary" @click="goBack()" customStyle="width:640rpx; margin: 60rpx auto 30rpx" color="#FF8C00"
@@ -38,7 +35,12 @@
 			返回运动页
 		</u-button>
 
-		<view class="powered-by">Powered By Payeco AI</view>
+		<view class="bottom-info">
+			<view @click="$u.route('pagesSport/captureRule?type=rule')" class="rule-link">
+				截图打卡规则
+			</view>
+			<view class="powered-by">由易联支付AI平台强势驱动</view>
+		</view>
 	</view>
 </template>
 <script setup>
@@ -91,19 +93,19 @@
 					mask: true
 				});
 			} else {
-				uni.showToast({
+				uni.showModal({
 					title: '识别失败',
-					icon: 'error',
-					mask: true
+					content: res?.msg || '无法识别截图中的运动数据，请确保上传的是有效的运动截图',
+					showCancel: false
 				});
 			}
 		} catch (error) {
 			uni.hideLoading();
 			console.error('OCR识别失败:', error);
-			uni.showToast({
+			uni.showModal({
 				title: '识别失败',
-				icon: 'error',
-				mask: true
+				content: error?.msg || error?.message || '识别服务异常，请稍后重试',
+				showCancel: false
 			});
 		}
 	};
@@ -123,6 +125,11 @@
 </script>
 
 <style lang="less" scoped>
+	.page {
+		background: #f5f5f5;
+		min-height: 100vh;
+	}
+
 	.section-form {
 		padding: 30rpx 34rpx 30rpx;
 	}
@@ -175,32 +182,43 @@
 		.section-upload {
 			width: 448rpx;
 			height: 790rpx;
-			background: #FFF8F0;
+			background: #FAFAFA;
 			border-radius: 16rpx 16rpx 16rpx 16rpx;
-			border: 2rpx dashed #FF8C00;
+			border: 2rpx dashed #CCCCCC;
 			line-height: 40rpx;
-			color: #FF8C00;
+			color: #999999;
 
 			.icon {
 				margin-bottom: 42rpx;
 			}
 
 			.u-icon__icon {
-				color: #FF8C00;
+				color: #CCCCCC;
 			}
 		}
 	}
 
-	.powered-by {
+	.bottom-info {
 		position: fixed;
 		bottom: 0;
 		left: 0;
 		right: 0;
 		text-align: center;
-		color: #FF8C00;
-		font-size: 24rpx;
-		padding: 30rpx 0;
-		padding-bottom: calc(30rpx + env(safe-area-inset-bottom));
-		background: transparent;
+		padding-bottom: env(safe-area-inset-bottom);
+		background: #f5f5f5;
+
+		.rule-link {
+			color: #FF8C00;
+			font-size: 28rpx;
+			line-height: 40rpx;
+			text-decoration: underline;
+			padding: 20rpx 0;
+		}
+
+		.powered-by {
+			color: #FF8C00;
+			font-size: 24rpx;
+			padding: 20rpx 0;
+		}
 	}
 </style>
