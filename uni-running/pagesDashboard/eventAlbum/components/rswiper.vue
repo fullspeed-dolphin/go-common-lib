@@ -106,6 +106,7 @@ const disableTouch = ref(false) // 是否阻止触摸
 const isShowAmount = ref(false) // 是否阻止触摸
 const isloading = ref(false) // 加载动画内容
 const isShow = ref(false) // 图片数量的显示隐藏
+const isAlbumComplete = ref(false) // 是否已浏览完全部图片
 
 watch(
   () => album_data.value,
@@ -131,18 +132,28 @@ function initSwiperData(originIndex) {
 		disableTouch.value = false;
 	}
 	const originListLength = originList.value.length; // 源数据长度
-	
+	const totalCount = Number(album_total.value) || 0
+	const isAllLoaded = totalCount === 0 || originListLength >= totalCount
+
 	let displayList = [];
+	// 当前图片
 	displayList[displayIndex.value] = originList.value[originIndex];
+	// 前一张图片（仍然允许循环）
 	displayList[displayIndex.value - 1 == -1 ? 2 : displayIndex.value - 1] =
 		originList.value[
 			originIndex - 1 == -1 ? originListLength - 1 : originIndex - 1
 		];
+	// 后一张图片（如果已是最后一张且全部加载完，用当前图片填充）
+	let nextImageIndex;
+	if (originIndex + 1 >= originListLength) {
+		// 超出范围，用当前图片填充（防止 undefined）
+		nextImageIndex = isAllLoaded ? originIndex : (originIndex + 1 < originListLength ? originIndex + 1 : originIndex);
+	} else {
+		nextImageIndex = originIndex + 1;
+	}
 	displayList[displayIndex.value + 1 == 3 ? 0 : displayIndex.value + 1] =
-		originList.value[
-			originIndex + 1 == originListLength ? 0 : originIndex + 1
-		];
-		
+		originList.value[nextImageIndex];
+
 	displaySwiperList.value = displayList.map(item => ({
 		url: item,
 		url750: item + '?x-oss-process=image/resize,w_750/quality,q_80/format,webp',
@@ -165,16 +176,72 @@ const swiperChange = (event) => {
   currentIndex.value = current
   // console.log(current, 'current=====',event.detail)
   const originListLength = originList.value.length; // 源数据长度
-  if (originIndex.value + 6 > originListLength) {
-    emits('loadingMore', originIndex.value + 1)
-    isloading.value = true
-    return;
-  }
+
   // =============向后==========
   if (displayIndex.value - current == 2 || displayIndex.value - current == -1) {
     // console.log('向后滑动', displayIndex.value, current)
-    originIndex.value =
-      originIndex.value + 1 == originListLength ? 0 : originIndex.value + 1;
+
+    // 如果已经标记完成，阻止继续滑动
+    if (isAlbumComplete.value) {
+      nextTick(() => {
+        currentIndex.value = displayIndex.value
+      })
+      return
+    }
+
+    // 检查下一张是否超出范围
+    const nextIndex = originIndex.value + 1
+    const totalCount = Number(album_total.value) || 0
+    // 判断是否全部加载完成：
+    // 1. totalCount > 0 且 originListLength >= totalCount：有明确的总数，且已全部加载
+    // 2. totalCount == 0：没有总数信息，认为当前已加载的就是全部
+    const isAllLoaded = totalCount === 0 || originListLength >= totalCount
+
+    console.log('向后滑动检查:', {
+      originIndex: originIndex.value,
+      nextIndex,
+      originListLength,
+      album_total: album_total.value,
+      totalCount,
+      isAllLoaded
+    })
+
+    if (nextIndex >= originListLength) {
+      // 下一张超出已加载范围
+      if (isAllLoaded) {
+        // 数据已全部加载，禁止继续滑动，弹出提示
+        isAlbumComplete.value = true
+        nextTick(() => {
+          currentIndex.value = displayIndex.value
+        })
+        uni.showModal({
+          title: '提示',
+          content: '当前相册已经全部浏览完成',
+          showCancel: false,
+          confirmText: '知道了'
+        })
+        return
+      } else {
+        // 还有更多数据，显示 loading 等待加载
+        if (!isloading.value) {
+          emits('loadingMore', originIndex.value + 1)
+          isloading.value = true
+        }
+        nextTick(() => {
+          currentIndex.value = displayIndex.value
+        })
+        return
+      }
+    }
+
+    // 预加载：当接近末尾时提前加载更多
+    if (originIndex.value + 6 > originListLength && !isAllLoaded && !isloading.value) {
+      emits('loadingMore', originIndex.value + 1)
+      isloading.value = true
+    }
+
+    // 正常切换到下一张（不循环回第一张）
+    originIndex.value = nextIndex;
     displayIndex.value = displayIndex.value + 1 == 3 ? 0 : displayIndex.value + 1;
     initSwiperData(originIndex.value);
   }
@@ -194,7 +261,24 @@ const sliderChange = (e) => {
   if (originIndex.value == e[0]) return;
   originIndex.value = e[0];
 
-  if (originIndex.value + 6 > originList.value.length && !isloading.value) {
+  const totalCount = Number(album_total.value) || 0
+  const isAllLoaded = totalCount === 0 || originList.value.length >= totalCount
+
+  // 检查是否到达最后一张
+  if (originIndex.value >= originList.value.length - 1 && isAllLoaded) {
+    isAlbumComplete.value = true
+    uni.showModal({
+      title: '提示',
+      content: '当前相册已经全部浏览完成',
+      showCancel: false,
+      confirmText: '知道了'
+    })
+    initSwiperData(originIndex.value);
+    return;
+  }
+
+  // 预加载：只在还有更多数据时触发
+  if (originIndex.value + 6 > originList.value.length && !isAllLoaded && !isloading.value) {
     emits("loadingMore", originIndex.value);
     isloading.value = true;
     return;

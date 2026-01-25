@@ -27,8 +27,8 @@
 		// release: 正式版（显示）
 		// develop: 开发者工具（不显示）
 		// trial: 体验版（不显示）
-		shouldShow = envVersion === 'release';
-		// shouldShow = envVersion === 'release' || envVersion === 'develop' || envVersion === 'trial';
+		//shouldShow = envVersion === 'release';
+		 shouldShow = envVersion === 'release' || envVersion === 'develop' || envVersion === 'trial';
 		console.log('[HomeNavigator] envVersion:', envVersion, 'shouldShow:', shouldShow);
 	} catch (e) {
 		console.error('[HomeNavigator] 获取环境版本失败:', e);
