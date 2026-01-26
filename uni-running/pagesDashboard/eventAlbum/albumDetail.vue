@@ -202,14 +202,14 @@
 	
 	onShareAppMessage(() => {
 		return {
-			title: '跑了没 - ' + (currentEvent.value.description || '活动相册'),
+			title: currentEvent.value.description ? `跑了没 - ${currentEvent.value.description} - 活动相册` : '跑了没 - 活动相册',
 			path: `/pagesDashboard/eventAlbum/albumDetail?event_id=${currentEvent.value.event_id}&description=${encodeURIComponent(currentEvent.value.description || '')}`,
 			imageUrl: currentEvent.value.image_url
 		};
 	})
 	onShareTimeline(() => {
 		return {
-			title: '跑了没 - ' + (currentEvent.value.description || '活动相册'),
+			title: currentEvent.value.description ? `跑了没 - ${currentEvent.value.description} - 活动相册` : '跑了没 - 活动相册',
 			query: `event_id=${currentEvent.value.event_id}&description=${encodeURIComponent(currentEvent.value.description || '')}`,
 			imageUrl: currentEvent.value.image_url
 		};
