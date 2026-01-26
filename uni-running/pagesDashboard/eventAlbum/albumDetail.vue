@@ -202,15 +202,16 @@
 	
 	onShareAppMessage(() => {
 		return {
-			title: '跑了没 - ' + (currentEvent.value.name || ''),
-			imageUrl: currentEvent.value.background_image_url
+			title: '跑了没 - ' + (currentEvent.value.description || '活动相册'),
+			path: `/pagesDashboard/eventAlbum/albumDetail?event_id=${currentEvent.value.event_id}&description=${encodeURIComponent(currentEvent.value.description || '')}`,
+			imageUrl: currentEvent.value.image_url
 		};
 	})
 	onShareTimeline(() => {
 		return {
-			title: '跑了没 - ' + (currentEvent.value.name || ''),
-			query: '', // 可以携带参数
-			imageUrl: currentEvent.value.background_image_url
+			title: '跑了没 - ' + (currentEvent.value.description || '活动相册'),
+			query: `event_id=${currentEvent.value.event_id}&description=${encodeURIComponent(currentEvent.value.description || '')}`,
+			imageUrl: currentEvent.value.image_url
 		};
 	})
 	

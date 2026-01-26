@@ -11,12 +11,13 @@
       <view
         class="slides-track"
         :style="{
+          width: (screenWidth * 3) + 'px',
           transform: `translate3d(${translateX}px, 0, 0)`,
           transition: isAnimating ? 'transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)' : 'none'
         }"
       >
         <!-- 上一张 -->
-        <view class="slide">
+        <view class="slide" :style="{ width: screenWidth + 'px' }">
           <image
             v-if="prevImage.url750"
             class="slide-image"
@@ -26,8 +27,8 @@
         </view>
 
         <!-- 当前（支持缩放） -->
-        <view class="slide">
-          <movable-area class="movable-area" scale-area>
+        <view class="slide" :style="{ width: screenWidth + 'px' }">
+          <movable-area :key="'ma-' + originIndex + '-' + movableKey" class="movable-area" scale-area>
             <movable-view
               class="movable-view"
               direction="all"
@@ -52,7 +53,7 @@
         </view>
 
         <!-- 下一张 -->
-        <view class="slide">
+        <view class="slide" :style="{ width: screenWidth + 'px' }">
           <image
             v-if="nextImage.url750"
             class="slide-image"
@@ -144,12 +145,15 @@ const hdImageIndexes = ref(new Set())
 
 // ==================== 屏幕宽度 ====================
 const screenWidth = ref(375)
-try {
-  const sysInfo = uni.getSystemInfoSync()
-  screenWidth.value = sysInfo.windowWidth || 375
-} catch (e) {
-  screenWidth.value = 375
+function updateScreenWidth() {
+  try {
+    const sysInfo = uni.getSystemInfoSync()
+    screenWidth.value = sysInfo.screenWidth || sysInfo.windowWidth || 375
+  } catch (e) {
+    screenWidth.value = 375
+  }
 }
+updateScreenWidth()
 
 // ==================== 缩放状态 ====================
 const scaleValue = ref(1)
@@ -157,6 +161,7 @@ const currentScaleValue = ref(1)
 const moveX = ref(0)
 const moveY = ref(0)
 const isZoomed = computed(() => currentScaleValue.value > 1.05)
+const movableKey = ref(0) // 用于强制重建 movable-area
 
 // ==================== 滑动状态 ====================
 const translateX = ref(-screenWidth.value) // 初始位置：显示中间那张
@@ -209,6 +214,34 @@ watch(
     translateX.value = -screenWidth.value
   },
   { immediate: true }
+);
+
+// ==================== 缩放状态自动重置 ====================
+// 当 originIndex 变化时，自动重置缩放状态
+// 问题：原生组件状态与 Vue 响应式系统不同步
+// 解决：1. 强制触发位置更新（先设非零值再设回0）
+//       2. 使用独立 key 强制重建 movable-area
+watch(
+  () => originIndex.value,
+  () => {
+    // 第一步：重置缩放
+    scaleValue.value = 1
+    currentScaleValue.value = 1
+
+    // 第二步：强制触发位置更新（先设置非零值，再设为0）
+    // Vue 会优化掉"相同值"的更新，原生组件不会收到信号
+    moveX.value = 0.001
+    moveY.value = 0.001
+
+    // 第三步：延迟后设回 0，确保原生组件有时间处理
+    setTimeout(() => {
+      moveX.value = 0
+      moveY.value = 0
+    }, 16)
+
+    // 第四步：强制重建 movable-area（双保险）
+    movableKey.value++
+  }
 );
 
 // ==================== 手势处理 ====================
@@ -332,17 +365,15 @@ function goToPrev() {
     return
   }
 
-  resetZoom()
-
-  // 动画滑动到上一张位置
+  // 播放滑动动画
   isAnimating.value = true
   translateX.value = 0
 
   setTimeout(() => {
     isAnimating.value = false
+    // 更新 index，watch 会自动重置缩放状态，movable-area 会因为 key 变化而重建
     originIndex.value--
     originIndexArr.value[0] = originIndex.value
-    // 重置位置（瞬间）
     translateX.value = -screenWidth.value
   }, 300)
 }
@@ -380,17 +411,15 @@ function goToNext() {
     isloading.value = true
   }
 
-  resetZoom()
-
-  // 动画滑动到下一张位置
+  // 播放滑动动画
   isAnimating.value = true
   translateX.value = -screenWidth.value * 2
 
   setTimeout(() => {
     isAnimating.value = false
+    // 更新 index，watch 会自动重置缩放状态，movable-area 会因为 key 变化而重建
     originIndex.value++
     originIndexArr.value[0] = originIndex.value
-    // 重置位置（瞬间）
     translateX.value = -screenWidth.value
   }, 300)
 }
@@ -403,18 +432,11 @@ function snapBack() {
   }, 300)
 }
 
-function resetZoom() {
-  scaleValue.value = 1
-  currentScaleValue.value = 1
-  moveX.value = 0
-  moveY.value = 0
-}
-
 // ==================== 滑块控制 ====================
 const sliderChange = (e) => {
   if (originIndex.value === e[0]) return;
 
-  resetZoom()
+  // 更新 index，watch 会自动重置缩放状态
   originIndex.value = e[0];
   translateX.value = -screenWidth.value
 
@@ -534,14 +556,12 @@ defineExpose({
 
 .slides-track {
   display: flex;
-  width: 300%;
   height: 100%;
   will-change: transform;
 }
 
 .slide {
-  flex: 0 0 33.333%;
-  width: 33.333%;
+  flex: none;
   height: 100%;
   display: flex;
   align-items: center;
