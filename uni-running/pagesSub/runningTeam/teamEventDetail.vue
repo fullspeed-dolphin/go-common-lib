@@ -59,6 +59,22 @@
 					</view>
 				</view>
 
+				<view class="cell flex-row1 u-pl-20">
+					<view class="label">
+						<image class="icon" :src="staticBaseUrl + '/images/icon-event-item@2x.png'" mode="aspectFill"></image>
+						<text>活动性质：</text>
+					</view>
+					<view class="flex-row flex-wrap">
+						<view class="event-item flex-center tag-fsc">跑团活动</view>
+						<view class="event-item flex-center tag-visibility" v-if="detail.visibility">
+							{{ visibilityMap[detail.visibility] || detail.visibility }}
+						</view>
+						<view class="event-item flex-center" :class="Number(detail.is_free) === 1 ? 'tag-free' : 'tag-paid'">
+							{{ Number(detail.is_free) === 1 ? '免费' : '付费' }}
+						</view>
+					</view>
+				</view>
+
 				<view class="cell flex-start u-pl-20 customer-phone">
 					<view class="label">联系电话：</view>
 					<view class="value flex-start">
@@ -135,6 +151,13 @@
 
 	// 计算属性
 	const userInfo = computed(() => store.state.userInfo);
+
+	// visibility 映射
+	const visibilityMap = {
+		private: '全速俱乐部',
+		rg_member_only: '跑团内部可见',
+		public: '全平台可见'
+	};
 
 	// 定时器
 	let timer = null;
@@ -218,7 +241,11 @@
 		});
 		request.get(`/event-api/fsc_events/${routerParams.value.id}`)
 			.then((res) => {
-				res.text = `<img src="${res.long_image_url}?x-oss-process=image/resize,w_500" style="max-width:100%;" />`;
+				if (res.long_image_url) {
+					res.text = `<img src="${res.long_image_url}?x-oss-process=image/resize,w_500" style="max-width:100%;" />`;
+				} else {
+					res.text = `<div style="text-align:center;padding:40px 30px;"><img src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/logo.png" style="max-width:80%;" /><p style="color:#FF8C00;font-weight:bold;margin-top:20px;padding-bottom:120px;">全速体育提供技术支持</p></div>`;
+				}
 				res.eventItems = res.event_projects.split(",");
 
 				// res.status = "ACT";
@@ -323,11 +350,28 @@
 
 	.event-item {
 		color: #fff;
-		background: #f66761;
+		background: #FF8C00;
 		padding: 18rpx 26rpx;
 		margin: 20rpx 20rpx 0rpx 0;
 		border-radius: 16rpx;
 		font-size: 32rpx;
+
+		// 活动性质 tag 颜色
+		&.tag-fsc {
+			background: #22c55e; // 跑团活动 - 绿色
+		}
+
+		&.tag-visibility {
+			background: #f59e0b; // visibility - 橙色
+		}
+
+		&.tag-free {
+			background: #10b981; // 免费 - 翠绿色
+		}
+
+		&.tag-paid {
+			background: #ef4444; // 付费 - 红色
+		}
 	}
 
 	.panel-item {

@@ -4,7 +4,7 @@
 			:image="(item.image_url) + '?x-oss-process=image/resize,w_600,h_320,m_fill'"
 			mode="aspectFill" />
 		
-		<view class="event-tag">{{item.fsc_id ? '跑团活动' : '自营活动'}}</view>
+		<view class="event-tag" :class="item.fsc_id ? 'tag-fsc' : 'tag-self'">{{item.fsc_id ? '跑团活动' : '自营活动'}}</view>
 		
 		<view class="u-p-20">
 			<view class="event-item-title ellipsis2">{{ item.description }}</view>
@@ -87,10 +87,17 @@
 			right: 0;
 			top:0;
 			color: #fff;
-			background: #8bc63d;
 			border-radius: 0 16rpx 0 16rpx;
 			font-size: 24rpx;
 			padding: 10rpx 20rpx;
+
+			&.tag-self {
+				background: #3b82f6; // 自营活动 - 蓝色
+			}
+
+			&.tag-fsc {
+				background: #22c55e; // 跑团活动 - 绿色
+			}
 		}
 	}
 

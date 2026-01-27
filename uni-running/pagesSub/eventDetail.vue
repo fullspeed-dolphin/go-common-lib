@@ -48,7 +48,7 @@
           }}</view>
 				</view>
 
-				<view class="cell flex-row1 u-pl-20">
+				<view class="panel-item">
 					<view class="label">
 						<image class="icon" :src="staticBaseUrl + '/images/icon-event-item@2x.png'" mode="aspectFill"></image>
 						<text>活动项目：</text>
@@ -57,6 +57,30 @@
 						<view class="event-item flex-center" v-for="(item, index) in detail.eventItems" :key="index">
 							{{ item }}
 						</view>
+					</view>
+				</view>
+
+				<view class="panel-item">
+					<view class="label">
+						<image class="icon" :src="staticBaseUrl + '/images/icon-event-item@2x.png'" mode="aspectFill"></image>
+						<text>活动性质：</text>
+					</view>
+					<view class="flex-row flex-wrap">
+						<template v-if="!isFscEvent">
+							<view class="event-item flex-center tag-self">自营活动</view>
+							<view class="event-item flex-center" :class="isPaidEvent ? 'tag-paid' : 'tag-free'">
+								{{ isPaidEvent ? '付费' : '免费' }}
+							</view>
+						</template>
+						<template v-else>
+							<view class="event-item flex-center tag-fsc">跑团活动</view>
+							<view class="event-item flex-center tag-visibility" v-if="detail.visibility">
+								{{ visibilityMap[detail.visibility] || detail.visibility }}
+							</view>
+							<view class="event-item flex-center" :class="Number(detail.is_free) === 1 ? 'tag-free' : 'tag-paid'">
+								{{ Number(detail.is_free) === 1 ? '免费' : '付费' }}
+							</view>
+						</template>
 					</view>
 				</view>
 
@@ -137,6 +161,7 @@
 	const detail = ref({});
 	const isLoadedPage = ref(false);
 	const routerParams = ref({});
+	const isPaidEvent = ref(false); // 普通活动是否为付费活动
 
 	// 计算属性
 	const userInfo = computed(() => store.state.userInfo);
@@ -144,6 +169,16 @@
 	// 特定活动ID硬编码：课程类活动
 	const COURSE_EVENT_ID = '01KFDCDMWB682FDW00A2W7C0AK';
 	const isCourseEvent = computed(() => routerParams.value.id === COURSE_EVENT_ID);
+
+	// 判断是否为跑团活动（fsc_event）
+	const isFscEvent = computed(() => !!routerParams.value.fsc_id);
+
+	// visibility 映射
+	const visibilityMap = {
+		private: '全速俱乐部',
+		rg_member_only: '跑团内部可见',
+		public: '全平台可见'
+	};
 
 	// 定时器
 	let timer = null;
@@ -210,7 +245,7 @@
 			.then((res) => {
 				res.text = `<img src="${res.long_image_url}?x-oss-process=image/resize,w_500" style="max-width:100%;" />`;
 				res.eventItems = res.event_projects.split("、");
-				
+
 				try {
 					const list = JSON.parse(res.registration_time)
 					res.registration_time = `${dayjs(list[0]).format('YYYY-MM-DD HH:mm')} 至 ${dayjs(list[1]).format('YYYY-MM-DD HH:mm').slice(5)}`
@@ -224,6 +259,26 @@
 				detail.value = res;
 
 				isLoadedPage.value = true;
+
+				// 普通活动：通过 /user/price 接口判断是否付费
+				if (!routerParams.value.fsc_id) {
+					checkEventPrice();
+				}
+			});
+	};
+
+	// 检查普通活动是否付费
+	const checkEventPrice = () => {
+		request.post('/booking-api/user/price', {
+			event_id: routerParams.value.id
+		})
+			.then(() => {
+				// 接口返回成功（状态码200），认为是付费活动
+				isPaidEvent.value = true;
+			})
+			.catch(() => {
+				// 接口返回失败，认为是免费活动
+				isPaidEvent.value = false;
 			});
 	};
 
@@ -321,11 +376,32 @@
 
 	.event-item {
 		color: #fff;
-		background: #f66761;
+		background: #FF8C00;
 		padding: 18rpx 26rpx;
 		margin: 20rpx 20rpx 0rpx 0;
 		border-radius: 16rpx;
 		font-size: 32rpx;
+
+		// 活动性质 tag 颜色
+		&.tag-self {
+			background: #3b82f6; // 自营活动 - 蓝色
+		}
+
+		&.tag-fsc {
+			background: #22c55e; // 跑团活动 - 绿色
+		}
+
+		&.tag-visibility {
+			background: #f59e0b; // visibility - 橙色
+		}
+
+		&.tag-free {
+			background: #10b981; // 免费 - 翠绿色
+		}
+
+		&.tag-paid {
+			background: #ef4444; // 付费 - 红色
+		}
 	}
 
 	.panel-item {

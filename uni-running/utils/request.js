@@ -41,7 +41,7 @@ function fetch(options) {
 				
 				// 登录过期
 				if (response?.code != 200) {
-					if (response?.code !== 400) {
+					if (response?.code !== 400 && options.showError !== false) {
 						uni.showToast({
 							icon: 'error',
 							title: response.msg || '请求失败'
@@ -97,11 +97,12 @@ export default {
 			url
 		})
 	},
-	post(url, data) {
+	post(url, data, options = {}) {
 		return fetch({
 			method: "post",
 			data,
-			url
+			url,
+			...options
 		})
 	},
 }

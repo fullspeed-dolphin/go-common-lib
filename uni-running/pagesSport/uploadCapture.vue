@@ -6,7 +6,7 @@
 					<template #trigger>
 						<view class="section-upload flex-col-center">
 							<view class="icon">
-								<up-icon name="plus" color="#CCCCCC" size="86rpx"></up-icon>
+								<up-icon name="plus" color="#FF8C00" size="86rpx"></up-icon>
 							</view>
 							<view>上传打卡</view>
 							<view>(上传软件截图照片)</view>
@@ -14,20 +14,29 @@
 					</template>
 				</FileUpload>
 			</view>
-			<view class="u-ml-30">
+			<view class="form-fields">
 				<view class="cell-item">
-					<view class="label">距离(KM)</view>
-					<view class="value u-flex-xy-center">{{exerciseInfo.distance || '--'}}</view>
+					<view class="label">
+						<up-icon name="map" size="28rpx" color="#FF8C00"></up-icon>
+						<text class="label-text">距离(KM)</text>
+					</view>
+					<view class="value u-flex-xy-center">{{exerciseInfo.distance || 0}}</view>
 				</view>
 				<view class="cell-item">
-					<view class="label">时长</view>
-					<view class="value u-flex-xy-center">{{exerciseInfo.duration || '--'}}</view>
+					<view class="label">
+						<up-icon name="clock" size="28rpx" color="#FF8C00"></up-icon>
+						<text class="label-text">时长</text>
+					</view>
+					<view class="value u-flex-xy-center">{{exerciseInfo.duration || 0}}</view>
 				</view>
 				<view class="cell-item">
-					<view class="label">配速</view>
-					<view class="value u-flex-xy-center">{{exerciseInfo.pace || '--'}}</view>
+					<view class="label">
+						<up-icon name="calendar-fill" size="28rpx" color="#FF8C00"></up-icon>
+						<text class="label-text">配速</text>
+					</view>
+					<view class="value u-flex-xy-center">{{exerciseInfo.pace || 0}}</view>
 				</view>
-				</view>
+			</view>
 		</section>
 
 		<u-button v-if="isCheckInSuccess" type="primary" @click="goBack()" customStyle="width:640rpx; margin: 60rpx auto 30rpx" color="#FF8C00"
@@ -70,7 +79,7 @@
 
 			const res = await request.post('/ocr-api/recognize', {
 				image_url: imageUrl
-			});
+			}, { showError: false });
 
 			uni.hideLoading();
 
@@ -140,18 +149,36 @@
 		flex-shrink: 0;
 	}
 
+	.form-fields {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		height: 790rpx;
+		margin-left: 30rpx;
+	}
+
 	.cell-item {
 		font-weight: bold;
 		color: #000000;
 		line-height: 40rpx;
-		margin-bottom: 40rpx;
+
+		.label {
+			display: flex;
+			align-items: center;
+
+			.label-text {
+				margin-left: 8rpx;
+			}
+		}
 
 		.value {
 			width: 206rpx;
 			height: 88rpx;
 			margin-top: 20rpx;
-			color: #6C6C6C;
-			background: #F2F2F2;
+			color: #FF8C00;
+			background: #FFF;
+			border: 2rpx solid #FF8C00;
+			border-radius: 8rpx;
 		}
 	}
 
@@ -176,24 +203,27 @@
 				width: 448rpx !important;
 				height: 790rpx !important;
 				border-radius: 16rpx;
+				border: 2rpx solid #FF8C00;
+				box-shadow: 0 4rpx 20rpx rgba(255, 140, 0, 0.15);
 			}
 		}
 
 		.section-upload {
 			width: 448rpx;
 			height: 790rpx;
-			background: #FAFAFA;
-			border-radius: 16rpx 16rpx 16rpx 16rpx;
-			border: 2rpx dashed #CCCCCC;
+			background: #FFF;
+			border-radius: 16rpx;
+			border: 2rpx dashed #FF8C00;
 			line-height: 40rpx;
-			color: #999999;
+			color: #FF8C00;
+			box-shadow: 0 4rpx 20rpx rgba(255, 140, 0, 0.15);
 
 			.icon {
 				margin-bottom: 42rpx;
 			}
 
 			.u-icon__icon {
-				color: #CCCCCC;
+				color: #FF8C00;
 			}
 		}
 	}
