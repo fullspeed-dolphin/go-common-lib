@@ -25,10 +25,10 @@
 								<!-- <view class="name" style="color: #666; margin-top: 20rpx">
 								{{ userInfo.phone || ""}}
 								</view> -->
-								<view class="u-flex-y-center" style="color: #666; margin-top: 16rpx">
-									<image style="width:28rpx;height:30rpx;" src="/static/images/跑币@2x.png" mode="aspectFill"></image>
+								<view @click="$u.route('/pagesSub/runCoin/myCoin')" class="u-flex-y-center" style="color: #666; margin-top: 16rpx">
+									<image style="width:28rpx;height:30rpx;" src="/static/images/coin.png" mode="aspectFill"></image>
 									<text class="u-ml-10 b c0">跑币余额:</text>
-									<text class="u-ml-10 u-mr-10 b c0">0</text>
+									<text class="u-ml-10 u-mr-10 b c0">{{coinInfo.fscoin}}</text>
 									<u-icon name="arrow-right" size="10"></u-icon>
 								</view>
 							</block>
@@ -148,7 +148,8 @@
 	import tabbar from "@/components/tabBar.vue";
 	import UserLogin from "@/components/UserLogin.vue";
 	import AccessUser from "@/components/common/AccessUser.vue";
-
+	import request from "@/utils/request.js"
+	
 	const store = useStore();
 
 	// 模板引用
@@ -161,8 +162,18 @@
 	// 页面显示
 	onShow(() => {
 		store.dispatch("getUserInfo");
+		
+		getInfo()
 	});
-
+	
+	const coinInfo = ref({})
+	function getInfo () {
+		if (!userInfo.value.id) return;
+		request.get(`/wallet-api/wallet/balance`).then(res => {
+			coinInfo.value = res
+		})
+	}
+	
 	// 方法定义
 	const showLoading = () => {
 		uni.showLoading({

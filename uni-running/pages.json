@@ -53,13 +53,9 @@
     {
       "root": "pagesSub",
       "pages": [
-        {
-          "path": "login",
-          "style": {
-            "navigationStyle": "custom",
-            "navigationBarTitleText": "登录"
-          }
-        },
+        { "path": "login", "style": { "navigationStyle": "custom", "navigationBarTitleText": "登录" } },
+        { "path": "runCoin/myCoin", "style": { "navigationStyle": "custom", "navigationBarTitleText": "我的跑币" } },
+        { "path": "runCoin/coinRanks", "style": { "navigationStyle": "custom", "navigationBarTitleText": "跑币排行榜" } },
         {
           "path": "signerForm",
           "style": {
