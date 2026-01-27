@@ -1,6 +1,6 @@
 <template>
 	<!-- 只在正式版和开发版中显示，体验版中隐藏（用于规避审核） -->
-	<view class="menu" v-if="shouldShow">
+	<view class="menu" vif="shouldShow">
 		<view class="menu-item" v-for="(item, index) in navList" :key="index" @click="routeTo(item)">
 			<view class="menu-item-bg">
 				<image class="menu-item-icon" :src="item.icon_url + '?x-oss-process=image/resize,w_90,h_90,m_fill'" mode="aspectFill"></image>

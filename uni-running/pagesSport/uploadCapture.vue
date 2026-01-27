@@ -44,6 +44,31 @@
 			返回运动页
 		</u-button>
 
+		<view class="panel bgf">
+			<view style="font-size: 30rpx;margin-bottom: 20rpx;color:rgb(255, 140, 0);">全速运动打卡规则</view>
+			<view class="u-mt-10" style="color:#777;font-size:24rpx;line-height: 1.3;">
+				<div class="u-mb-5">✅ 核心要求：</div>
+				<div class="u-flex-row"><div style="width:30rpx;">1. </div>每日1次有效打卡，多传仅记最新上传记录。</div>
+				<div class="u-flex-row"><div style="width:30rpx;">2. </div>支持Keep/咕咚等主流运动APP，截图需清晰显时间+类型+数据（跑步/健走≥1km）。</div>
+				<div class="u-flex-row"><div style="width:30rpx;">3. </div>当日运动当日23:59前通过小程序上传，逾期无效。</div>
+			</view>
+			<view class="u-mt-10" style="color:#777;font-size:24rpx;line-height: 1.3;">
+				<div class="u-mb-5">⚠️ 安全提示：</div>
+				<div class="u-flex-row"><div style="width:30rpx;">1. </div>身体健康者参与，不适即停，风险自担。</div>
+				<div class="u-flex-row"><div style="width:30rpx;">2. </div>选安全场地，避恶劣天气</div>
+			</view>
+			<view class="u-mt-10" style="color:#777;font-size:24rpx;line-height: 1.3;">
+				<div class="u-mb-5">❌ 违规处理：</div>
+				<div class="u-flex-row"><div style="width:30rpx;">1. </div>盗用/篡改截图=取消权益+记录违规。</div>
+			</view>
+			<view class="u-mt-10" style="color:#777;font-size:24rpx;line-height: 1.3;">
+				<div class="u-mb-5">💁‍♀️联系客服：</div>
+				<div class="u-flex-row"><div style="width:30rpx;">1. </div>客服在线时间:工作日 9:00-18:00。</div>
+			</view>
+		</view>
+
+		<div style="height: 200rpx;"></div>
+
 		<view class="bottom-info">
 			<view @click="$u.route('pagesSport/captureRule?type=rule')" class="rule-link">
 				截图打卡规则
