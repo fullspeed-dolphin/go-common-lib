@@ -5,7 +5,7 @@
 			<view class="panel1">
 				<image src="./assets/Frame 1000005626@2x.min.png" style="width:100%;height: 134rpx; " mode="aspectFill"></image>
 				<view style="position: absolute;top:0;left:0;right:0;">
-					<view class="flex-between-center" style="padding: 44rpx 30rpx 0 56rpx;margin-bottom:80rpx;">
+					<view class="flex-between-center" style="padding: 44rpx 30rpx 0 56rpx;margin-bottom:50rpx;">
 						<view class="u-flex-y-center">
 							<image style="width:48rpx;height:48rpx;" src="/static/images/coin.png" mode="aspectFill"></image>
 							<view style="font-weight: bold;
