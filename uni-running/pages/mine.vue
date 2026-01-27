@@ -25,7 +25,7 @@
 								<!-- <view class="name" style="color: #666; margin-top: 20rpx">
 								{{ userInfo.phone || ""}}
 								</view> -->
-								<view @click="$u.route('/pagesSub/runCoin/myCoin')" class="u-flex-y-center" style="color: #666; margin-top: 16rpx">
+								<view @click="routeTo('/pagesSub/runCoin/myCoin')" class="u-flex-y-center" style="color: #666; margin-top: 16rpx">
 									<image style="width:28rpx;height:30rpx;" src="/static/images/coin.png" mode="aspectFill"></image>
 									<text class="u-ml-10 b c0">跑币余额:</text>
 									<text class="u-ml-10 u-mr-10 b c0">{{coinInfo.fscoin}}</text>
@@ -46,6 +46,12 @@
 					<template #icon>
 						<image class="nav-icon" style="width: 32rpx; height: 40rpx"
 							src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-mine-event@2x.png"></image>
+					</template>
+				</u-cell>
+				<u-cell title="我的跑币" class="nav-cell" @click="routeTo('/pagesSub/runCoin/myCoin')" :border="false" isLink>
+					<template #icon>
+						<image class="nav-icon" style="width: 40rpx; height: 40rpx"
+							src="/static/images/coin.png"></image>
 					</template>
 				</u-cell>
 				<u-cell title="全速俱乐部" class="nav-cell" @click="
