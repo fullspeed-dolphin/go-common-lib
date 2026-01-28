@@ -2,7 +2,7 @@
 	<view class="page">
 		<section class="section-form u-flex-row">
 			<view class="upload-wrapper">
-				<FileUpload v-model="ruleForm.picture" isCustom :width="448" :height="790" @change="onImageUploaded">
+				<FileUpload v-model="ruleForm.picture" isCustom :width="448" :height="600" @change="onImageUploaded">
 					<template #trigger>
 						<view class="section-upload flex-col-center">
 							<view class="icon">
@@ -65,13 +65,18 @@
 				<div class="u-mb-5">💁‍♀️联系客服：</div>
 				<div class="u-flex-row"><div style="width:30rpx;">1. </div>客服在线时间:工作日 9:00-18:00。</div>
 			</view>
+			<!-- 客服按钮 -->
+			<button class="contact-btn" open-type="contact">
+				<u-icon name="chat-fill" size="80rpx" color="#FF8C00"></u-icon>
+				<text class="contact-text">联系客服</text>
+			</button>
 		</view>
 
-		<div style="height: 200rpx;"></div>
+		<div style="height: 380rpx;"></div>
 
 		<view class="bottom-info">
 			<view @click="$u.route('pagesSport/captureRule?type=rule')" class="rule-link">
-				截图打卡规则
+				点此查看完整截图打卡规则
 			</view>
 			<view class="powered-by">由易联支付AI平台强势驱动</view>
 		</view>
@@ -164,13 +169,40 @@
 		min-height: 100vh;
 	}
 
+	.panel {
+		position: relative;
+	}
+
+	.contact-btn {
+		position: absolute;
+		left: 50%;
+		transform: translateX(-50%);
+		bottom: -100rpx;
+		display: flex;
+		align-items: center;
+		padding: 0;
+		background: transparent;
+		border: none;
+		margin: 0;
+
+		&::after {
+			border: none;
+		}
+
+		.contact-text {
+			margin-left: 10rpx;
+			font-size: 28rpx;
+			color: #FF8C00;
+		}
+	}
+
 	.section-form {
 		padding: 30rpx 34rpx 30rpx;
 	}
 
 	.upload-wrapper {
 		width: 448rpx;
-		height: 790rpx;
+		height: 600rpx;
 		flex-shrink: 0;
 	}
 
@@ -178,7 +210,7 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
-		height: 790rpx;
+		height: 600rpx;
 		margin-left: 30rpx;
 	}
 
@@ -211,22 +243,22 @@
 		.upload-wrapper {
 			.u-upload {
 				width: 448rpx !important;
-				height: 790rpx !important;
+				height: 600rpx !important;
 			}
 
 			.u-upload__wrap {
 				width: 448rpx !important;
-				height: 790rpx !important;
+				height: 600rpx !important;
 			}
 
 			.u-upload__wrap__preview {
 				width: 448rpx !important;
-				height: 790rpx !important;
+				height: 600rpx !important;
 			}
 
 			.u-upload__wrap__preview__image {
 				width: 448rpx !important;
-				height: 790rpx !important;
+				height: 600rpx !important;
 				border-radius: 16rpx;
 				border: 2rpx solid #FF8C00;
 				box-shadow: 0 4rpx 20rpx rgba(255, 140, 0, 0.15);
@@ -235,7 +267,7 @@
 
 		.section-upload {
 			width: 448rpx;
-			height: 790rpx;
+			height: 600rpx;
 			background: #FFF;
 			border-radius: 16rpx;
 			border: 2rpx dashed #FF8C00;
@@ -267,13 +299,13 @@
 			font-size: 28rpx;
 			line-height: 40rpx;
 			text-decoration: underline;
-			padding: 20rpx 0;
+			padding: 10rpx 0;
 		}
 
 		.powered-by {
 			color: #FF8C00;
 			font-size: 24rpx;
-			padding: 20rpx 0;
+			padding: 10rpx 0;
 		}
 	}
 </style>

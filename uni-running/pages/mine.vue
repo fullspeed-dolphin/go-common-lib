@@ -25,11 +25,11 @@
 								<!-- <view class="name" style="color: #666; margin-top: 20rpx">
 								{{ userInfo.phone || ""}}
 								</view> -->
-								<view @click="routeTo('/pagesSub/runCoin/myCoin')" class="u-flex-y-center" style="color: #666; margin-top: 16rpx">
-									<image style="width:28rpx;height:30rpx;" src="/static/images/coin.png" mode="aspectFill"></image>
-									<text class="u-ml-10 b c0">跑币余额:</text>
-									<text class="u-ml-10 u-mr-10 b c0">{{coinInfo.fscoin}}</text>
-									<u-icon name="arrow-right" size="10"></u-icon>
+								<view @click="routeTo('/pagesSub/runCoin/myCoin')" class="coin-pill">
+									<image class="coin-icon" src="/static/images/coin.png" mode="aspectFill"></image>
+									<text class="coin-label">跑币余额:</text>
+									<text class="coin-value">{{coinInfo.fscoin}}</text>
+									<u-icon name="arrow-right" size="12"></u-icon>
 								</view>
 							</block>
 							<view class="name" v-else @click="handleUserClick">登录/注册</view>
@@ -48,12 +48,12 @@
 							src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-mine-event@2x.png"></image>
 					</template>
 				</u-cell>
-				<u-cell title="我的跑币" class="nav-cell" @click="routeTo('/pagesSub/runCoin/myCoin')" :border="false" isLink>
+				<!-- <u-cell title="我的跑币" class="nav-cell" @click="routeTo('/pagesSub/runCoin/myCoin')" :border="false" isLink>
 					<template #icon>
 						<image class="nav-icon" style="width: 40rpx; height: 40rpx"
 							src="/static/images/coin.png"></image>
 					</template>
-				</u-cell>
+				</u-cell> -->
 				<u-cell title="全速俱乐部" class="nav-cell" @click="
             routeTo(
               `pagesSub/runningTeam/teamDetail?from=mine&group_id=${userInfo.running_group}`
@@ -363,26 +363,56 @@
 	}
 
 	.user-box {
-		height: 210rpx;
+		height: 260rpx;
 		padding: 56rpx 0 0rpx 48rpx;
 		overflow: hidden;
 
 		.avatar {
 			display: block;
-			width: 108rpx;
-			height: 108rpx;
-			margin-right: 30rpx;
+			width: 140rpx;
+			height: 140rpx;
+			margin-right: 36rpx;
 			background: #f5f5f5;
-			border-radius: 108rpx;
+			border-radius: 140rpx;
 			text-align: center;
 			font-size: 60rpx;
 			color: #ccc;
-			border: 1rpx solid rgba(0, 0, 0, 0.06);
+			border: 2rpx solid rgba(0, 0, 0, 0.06);
 		}
 
 		.name {
-			font-weight: 500;
-			font-size: 30rpx;
+			font-weight: 600;
+			font-size: 36rpx;
+		}
+
+		.coin-pill {
+			display: inline-flex;
+			align-items: center;
+			margin-top: 20rpx;
+			padding: 10rpx 24rpx;
+			background: linear-gradient(135deg, #FFF8E1 0%, #FFE0B2 100%);
+			border-radius: 100rpx;
+			border: 2rpx solid #FFB74D;
+
+			.coin-icon {
+				width: 32rpx;
+				height: 34rpx;
+			}
+
+			.coin-label {
+				margin-left: 10rpx;
+				font-size: 26rpx;
+				color: #E65100;
+				font-weight: 500;
+			}
+
+			.coin-value {
+				margin-left: 8rpx;
+				margin-right: 8rpx;
+				font-size: 28rpx;
+				color: #E65100;
+				font-weight: 600;
+			}
 		}
 	}
 
