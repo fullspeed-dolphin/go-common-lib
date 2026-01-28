@@ -157,8 +157,16 @@ import {
 	import {
 		useStore
 	} from "vuex";
+import { useShare } from "@/composables/useShare.js";
+
 // 使用store
 const store = useStore();
+
+// 分享配置
+useShare({
+	title: '活动签到',
+	path: '/pagesMine/PunchEvent'
+});
 const refUserLogin = ref(null);
 
 // 待执行的操作（登录成功后继续执行）

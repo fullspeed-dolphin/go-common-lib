@@ -1,7 +1,7 @@
 <template>
 	<view class="bg">
 		<u-navbar autoBack placeholder title="跑币排行榜" bgColor="transparent"></u-navbar>
-		<mescroll-body @init="mescrollInit" @down="downCallback" @up="getList" top="0">
+		<mescroll-body @init="mescrollInit" @down="downCallback" @up="getList" top="0" :up="{ auto: false }">
 			<view class="card-item bgf u-flex" v-for="(item, index) in dataList" :key="index">
 				<up-lazy-load class="img" borderRadius="16" :image="item.avatar_url + '?x-oss-process=image/resize,w_150,h_150,m_fill'" mode="aspectFill" />
 
@@ -43,6 +43,13 @@
 	const { mescrollInit, downCallback } = useMescroll(onPageScroll, onReachBottom)
 
 	import request from "@/utils/request.js"
+	import { useShare } from "@/composables/useShare.js";
+
+	// 分享配置
+	useShare({
+		title: '跑币排行榜',
+		path: '/pagesSub/runCoin/coinRanks'
+	});
 
 	const searchTxt = ref("")
 
@@ -65,10 +72,9 @@
 	};
 
 	const dataList = ref([])
+
 	const getList = (mescroll) => {
-		uni.showLoading({
-			mask: true
-		});
+		uni.showLoading({ mask: true });
 
 		const params = {
 			page: mescroll.num - 1,
@@ -76,15 +82,14 @@
 		};
 
 		request.get(`/wallet-api/wallet/list`, params).then((res) => {
-				//如果是第一页需手动制空列表
+				// 第一页清空列表
 				if (mescroll.num == 1) dataList.value = []
 
-				res = res.list
+				const list = res.list || []
+				dataList.value = dataList.value.concat(list)
 
-				dataList.value = dataList.value.concat(res)
-
-				//隐藏下拉刷新和上拉加载的状态;
-				mescroll.endSuccess(res.length);
+				uni.hideLoading();
+				mescroll.endSuccess(list.length);
 			})
 			.catch((error) => {
 				console.log(error)

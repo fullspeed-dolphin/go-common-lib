@@ -80,9 +80,16 @@ import { ref, computed, nextTick } from "vue";
 import { useStore } from "vuex";
 import GroupItem from "@/components/GroupItem.vue";
 import request from "@/utils/request.js";
+import { useShare } from "@/composables/useShare.js";
 
 // 使用store
 const store = useStore();
+
+// 分享配置
+useShare({
+	title: '运动排行榜',
+	path: '/pagesSub/sport/top'
+});
 
 // 模板引用
 const mescrollRef = ref(null);

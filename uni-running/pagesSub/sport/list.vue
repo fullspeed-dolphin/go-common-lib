@@ -73,6 +73,13 @@
 <script setup>
 import SportItem from "@/components/SportItem.vue";
 import { ref, onMounted } from "vue";
+import { useShare } from "@/composables/useShare.js";
+
+// 分享配置
+useShare({
+  title: '运动记录',
+  path: '/pagesSub/sport/list'
+});
 
 const sports = ref([]);
 const expandedIndex = ref(0);

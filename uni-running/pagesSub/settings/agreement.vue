@@ -14,13 +14,24 @@ import baoxian from "../utils/baoxian.js"
 import notices_ShuiLianHu from "../utils/notices_ShuiLianHu.js"
 import rule_ShuiLianHu from "../utils/rule_ShuiLianHu.js"
 import disclaimer_ShuiLianHu from "../utils/disclaimer_ShuiLianHu.js"
+import { useShare, buildPath } from "@/composables/useShare.js"
+
+// 路由参数
+const routeType = ref('');
 
 const detail = ref({
 	Content: ""
 })
 
+// 分享配置
+useShare(() => ({
+	title: '用户协议',
+	path: buildPath('/pagesSub/settings/agreement', { type: routeType.value })
+}));
+
 // 页面加载
 onLoad((options) => {
+	routeType.value = options.type || '';
 	if (options.type === 'signUp') {
 		detail.value.Content = agree_signUp
 	}

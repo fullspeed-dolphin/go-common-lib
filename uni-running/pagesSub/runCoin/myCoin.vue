@@ -52,23 +52,16 @@
 </template>
 <script setup>
 import { ref } from "vue";
-import { onLoad, onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
+import { onLoad } from "@dcloudio/uni-app";
 import { onPageScroll, onReachBottom } from '@dcloudio/uni-app';
+import { useShare } from "@/composables/useShare.js";
 
-// 分享给朋友
-onShareAppMessage(() => {
-	return {
-		title: '我的跑币',
-		path: '/pagesSub/runCoin/myCoin'
-	};
+// 分享配置
+useShare({
+	title: '我的跑币',
+	path: '/pagesSub/runCoin/myCoin'
 });
 
-// 分享到朋友圈
-onShareTimeline(() => {
-	return {
-		title: '我的跑币'
-	};
-});
 	import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 	const { mescrollInit, downCallback } = useMescroll(onPageScroll, onReachBottom)
 import request from "@/utils/request.js"

@@ -122,9 +122,16 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useStore } from "vuex";
+import { useShare } from "@/composables/useShare.js";
 
 // 使用store
 const store = useStore();
+
+// 分享配置
+useShare({
+	title: '我的跑币',
+	path: '/pagesSub/runCoin'
+});
 
 // 计算属性
 const userInfo = computed(() => store.state.userInfo);

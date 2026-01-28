@@ -42,7 +42,14 @@
 	import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 	const { mescrollInit, downCallback } = useMescroll(onPageScroll, onReachBottom)
 
-	import request from "@/utils/request.js"
+	import request from "@/utils/request.js";
+	import { useShare } from "@/composables/useShare.js";
+
+	// 分享配置
+	useShare({
+		title: '活动相册',
+		path: '/pagesDashboard/eventAlbum/albumList'
+	});
 
 	const searchTxt = ref("")
 

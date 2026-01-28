@@ -67,10 +67,16 @@
 
 	import GroupItem from "@/components/GroupItem.vue";
 	import UserLogin from "@/components/UserLogin.vue";
-
+	import { useShare } from "@/composables/useShare.js";
 
 	// 使用store
 	const store = useStore();
+
+	// 分享配置
+	useShare({
+		title: '寻找你的跑团',
+		path: '/pagesSub/runningTeam/teamList'
+	});
 
 	// 模板引用
 	const refUserLogin = ref(null);

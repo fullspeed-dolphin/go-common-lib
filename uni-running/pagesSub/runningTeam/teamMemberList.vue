@@ -29,10 +29,17 @@ import { onPageScroll, onReachBottom } from "@dcloudio/uni-app";
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 const { mescrollInit, downCallback } = useMescroll(onPageScroll, onReachBottom);
 import MemberDetail from "./memberDetail.vue";
+import { useShare, buildPath } from "@/composables/useShare.js";
 
 // 响应式数据
 const dataList = ref([]);
 const group_id = ref("");
+
+// 分享配置
+useShare(() => ({
+  title: '跑团成员列表',
+  path: buildPath('/pagesSub/runningTeam/teamMemberList', { group_id: group_id.value })
+}));
 
 // 页面加载
 onLoad((options) => {

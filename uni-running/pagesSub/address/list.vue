@@ -42,6 +42,13 @@
 import { ref, onMounted } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
+import { useShare } from "@/composables/useShare.js";
+
+// 分享配置
+useShare({
+  title: '我的地址',
+  path: '/pagesSub/address/list'
+});
 
 const addressList = ref([
   {

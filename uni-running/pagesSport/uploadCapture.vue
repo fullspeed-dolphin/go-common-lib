@@ -78,25 +78,17 @@
 </template>
 <script setup>
 	import { ref } from "vue";
-	import { onLoad, onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
+	import { onLoad } from "@dcloudio/uni-app";
 	import FileUpload from "@/components/common/FileUpload.vue";
 	import request from "../utils/request";
+	import { useShare } from "@/composables/useShare.js";
 
-	// 分享给朋友
-	onShareAppMessage(() => {
-		return {
-			title: '运动截图打卡',
-			path: '/pagesSport/uploadCapture'
-		};
+	// 分享配置
+	useShare({
+		title: '运动截图打卡',
+		path: '/pagesSport/uploadCapture'
 	});
 
-	// 分享到朋友圈
-	onShareTimeline(() => {
-		return {
-			title: '运动截图打卡'
-		};
-	});
-	
 	const exerciseInfo = ref({
 		distance: '',
 		duration: '',

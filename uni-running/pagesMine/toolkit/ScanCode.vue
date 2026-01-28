@@ -38,6 +38,13 @@ import {
 } from "@dcloudio/uni-app";
 import { asyncAlls } from "@/utils/util.js"
 import request from "@/utils/request.js"
+import { useShare } from "@/composables/useShare.js";
+
+// 分享配置
+useShare({
+	title: '活动扫码签到',
+	path: '/pagesMine/toolkit/ScanCode'
+});
 
 function get_isInCheckTime() {
 	const now = dayjs()

@@ -66,8 +66,9 @@
 		useStore
 	} from "vuex";
 	import {
-		onLoad, onShareAppMessage, onShareTimeline
+		onLoad
 	} from "@dcloudio/uni-app";
+	import { useShare, buildPath } from "@/composables/useShare.js";
 	const store = useStore();
 
 	const album_total = computed(() => store.state.album_total);
@@ -97,6 +98,18 @@
 	const currentImageIndex = ref(0)
 	const currentEvent = ref({})
 	const isShowBackTop = ref(false)
+
+	// 分享配置
+	useShare(() => ({
+		title: currentEvent.value.description
+			? `跑了没 - ${currentEvent.value.description} - 活动相册`
+			: '跑了没 - 活动相册',
+		path: buildPath('/pagesDashboard/eventAlbum/albumDetail', {
+			event_id: currentEvent.value.event_id,
+			description: currentEvent.value.description || ''
+		}),
+		imageUrl: currentEvent.value.image_url || ''
+	}));
 	const isLoadingMore = ref(false)
 	const isScrolling = ref(false)
 	const paging = ref(null)
@@ -193,26 +206,6 @@
 
 	onLoad((options) => {
 		currentEvent.value = options
-
-		wx?.showShareMenu?.({
-			withShareTicket: true,
-			menus: ['shareAppMessage', 'shareTimeline']
-		});
-	})
-	
-	onShareAppMessage(() => {
-		return {
-			title: currentEvent.value.description ? `跑了没 - ${currentEvent.value.description} - 活动相册` : '跑了没 - 活动相册',
-			path: `/pagesDashboard/eventAlbum/albumDetail?event_id=${currentEvent.value.event_id}&description=${encodeURIComponent(currentEvent.value.description || '')}`,
-			imageUrl: currentEvent.value.image_url
-		};
-	})
-	onShareTimeline(() => {
-		return {
-			title: currentEvent.value.description ? `跑了没 - ${currentEvent.value.description} - 活动相册` : '跑了没 - 活动相册',
-			query: `event_id=${currentEvent.value.event_id}&description=${encodeURIComponent(currentEvent.value.description || '')}`,
-			imageUrl: currentEvent.value.image_url
-		};
 	})
 	
 </script>

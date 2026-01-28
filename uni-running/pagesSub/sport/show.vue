@@ -178,6 +178,16 @@ import { ref, computed, onMounted } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import store from "@/utils/store.js";
+import { useShare, buildPath } from "@/composables/useShare.js";
+
+// 路由参数
+const routeId = ref('');
+
+// 分享配置
+useShare(() => ({
+  title: `${activityData.value.userName || '用户'}的运动详情`,
+  path: buildPath('/pagesSub/sport/show', { id: routeId.value })
+}));
 
 const mapCenter = ref({
   latitude: 39.908823,
@@ -494,6 +504,7 @@ const getPaceBarWidth = (pace) => {
 onLoad((options) => {
   // 从路由参数获取活动ID
   const id = options.id;
+  routeId.value = id || '';
   if (id) {
     loadSportData(id);
   } else {

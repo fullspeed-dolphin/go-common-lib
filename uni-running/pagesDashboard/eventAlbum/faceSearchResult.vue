@@ -24,7 +24,14 @@
 <script setup>
 import { ref, nextTick } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
+import { useShare } from "@/composables/useShare.js";
 // import qPreviewImage from "./q-previewImage/components/q-previewImage.vue"
+
+// 分享配置
+useShare({
+  title: '人脸搜索结果',
+  path: '/pagesDashboard/eventAlbum/faceSearchResult'
+});
 
 const ossPar250  = '?x-oss-process=image/resize,w_250/quality,q_80/format,webp'
 const refPreviewImage = ref(null);

@@ -97,8 +97,15 @@
 	} from "vuex";
 	import tabbar from "@/components/tabBar.vue";
 	import UserLogin from "@/components/UserLogin.vue";
+	import { useShare } from "@/composables/useShare.js";
 
 	const store = useStore();
+
+	// 分享配置
+	useShare({
+		title: '运动打卡',
+		path: '/pages/sport'
+	});
 
 	const refUserLogin = ref(null);
 

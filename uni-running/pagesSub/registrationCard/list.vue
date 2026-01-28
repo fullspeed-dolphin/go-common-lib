@@ -61,6 +61,13 @@
 	import {
 		showRequestError
 	} from "./utils.js";
+	import { useShare } from "@/composables/useShare.js";
+
+	// 分享配置
+	useShare({
+		title: '我的报名卡',
+		path: '/pagesSub/registrationCard/list'
+	});
 
 	// 响应式数据
 	const registrationCardList = ref([]);

@@ -158,6 +158,13 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import request from "@/utils/request.js";
+import { useShare } from "@/composables/useShare.js";
+
+// 分享配置
+useShare({
+  title: '跑步轨迹',
+  path: '/pagesSub/runMap'
+});
 
 // 地图相关
 const mapCenter = ref({

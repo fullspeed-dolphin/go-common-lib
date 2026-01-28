@@ -76,8 +76,16 @@ color: #979797;">
 	import { useStore } from "vuex";
 	import PickerCell from "@/components/common/PickerCell.vue";
 	import request from "@/utils/request";
+	import { useShare } from "@/composables/useShare.js";
+
 	// 使用store
 	const store = useStore();
+
+	// 分享配置
+	useShare({
+		title: '摄影师招募',
+		path: '/pagesDashboard/eventAlbum/contractForm'
+	});
 	
 	const selected = ref('wechat') // 默认微信支付
 	const isAgree = ref(false)

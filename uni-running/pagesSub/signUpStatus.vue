@@ -45,11 +45,18 @@
 import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import request from "@/utils/request.js"
+import { useShare, buildPath } from "@/composables/useShare.js";
 
 // 响应式数据
 const isSuccess = ref(false)
 const orderDetail = ref({})
 const order_no = ref('')
+
+// 分享配置
+useShare(() => ({
+	title: isSuccess.value ? '支付成功' : '支付状态',
+	path: buildPath('/pagesSub/signUpStatus', { order_no: order_no.value })
+}));
 
 // 页面加载
 onLoad((options) => {

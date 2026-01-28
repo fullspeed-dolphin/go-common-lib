@@ -31,6 +31,7 @@ import request from "@/utils/request.js"
 import { onPageScroll, onReachBottom } from "@dcloudio/uni-app";
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 const { mescrollInit, downCallback } = useMescroll(onPageScroll, onReachBottom);
+import { useShare, buildPath } from "@/composables/useShare.js";
 
 
 // 模板引用
@@ -39,6 +40,12 @@ const mescrollRef = ref(null);
 // 响应式数据
 const dataList = ref([]);
 const group_id = ref("");
+
+// 分享配置
+useShare(() => ({
+  title: '跑团地图',
+  path: buildPath('/pagesSub/runningTeam/teamMaps', { group_id: group_id.value })
+}));
 
 // 页面加载
 onLoad((options) => {

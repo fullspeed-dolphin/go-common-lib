@@ -48,8 +48,6 @@ import {
 import {
 	onLoad,
 	onShow,
-	onShareAppMessage,
-	onShareTimeline
 } from "@dcloudio/uni-app";
 import { onPageScroll, onReachBottom } from "@dcloudio/uni-app";
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
@@ -61,9 +59,16 @@ import {
 import UserLogin from "@/components/UserLogin.vue";
 import EventItem from "@/components/EventItem.vue";
 import request from "@/utils/request.js"
+import { useShare } from "@/composables/useShare.js";
 
 // 使用store
 const store = useStore();
+
+// 分享配置
+useShare({
+	title: '跑了没 - 活动列表',
+	path: '/pagesSub/eventList'
+});
 const refUserLogin = ref(null);
 
 // Tab 相关
@@ -244,22 +249,6 @@ onShow(() => {
 	getTabWidths();
 });
 
-// #ifdef MP-WEIXIN
-onShareAppMessage(() => {
-	return {
-		title: '跑了没 - 活动列表',
-		imageUrl: '',
-	};
-});
-
-onShareTimeline(() => {
-	return {
-		title: '跑了没 - 活动列表',
-		query: '',
-		imageUrl: '',
-	};
-});
-// #endif
 </script>
 
 <style lang="scss" scoped>

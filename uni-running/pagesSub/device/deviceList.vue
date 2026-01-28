@@ -45,6 +45,13 @@
 <script setup>
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
+import { useShare } from "@/composables/useShare.js";
+
+// 分享配置
+useShare({
+  title: '我的智能设备',
+  path: '/pagesSub/device/deviceList'
+});
 
 // 响应式数据
 const deviceList = ref([

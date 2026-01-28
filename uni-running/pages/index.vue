@@ -154,10 +154,9 @@
 	import {
 		onLoad,
 		onShow,
-		onPageScroll,
-		onShareAppMessage,
-		onShareTimeline
+		onPageScroll
 	} from "@dcloudio/uni-app";
+	import { useShare } from "@/composables/useShare.js";
 	import {
 		useStore
 	} from "vuex";
@@ -174,6 +173,12 @@
 	// 使用store
 	const store = useStore();
 	const refUserLogin = ref(null);
+
+	// 分享配置
+	useShare({
+		title: '跑了没 - 跑，一切活力的泉源',
+		path: '/pages/index'
+	});
 
 	// 待执行的操作（登录成功后继续执行）
 	const pendingAction = ref(null);
@@ -428,14 +433,7 @@
 	};
 
 	// 页面加载
-	onLoad((options) => {		
-		// #ifdef MP-WEIXIN
-		wx.showShareMenu({
-			withShareTicket: true,
-			menus: ['shareAppMessage', 'shareTimeline'] // 开启分享给朋友和分享到朋友圈
-		});
-		// #endif
-
+	onLoad((options) => {
 		openUserLogin()
 	});
 
@@ -449,24 +447,6 @@
 		}
 		// #endif
 	}
-
-	// 分享给朋友
-	onShareAppMessage(() => {
-		return {
-			title: '跑了没 - 跑，一切活力的泉源',
-			path: '/pages/index',
-			imageUrl: '', // 可以设置自定义分享图片，留空则使用当前页面截图
-		};
-	});
-
-	// 分享到朋友圈
-	onShareTimeline(() => {
-		return {
-			title: '跑了没 - 跑，一切活力的泉源',
-			query: '', // 可以携带参数
-			imageUrl: '', // 可以设置自定义分享图片
-		};
-	});
 
 	// 页面显示
 	onShow(() => {

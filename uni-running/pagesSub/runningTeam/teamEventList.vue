@@ -66,9 +66,16 @@ const {
 	onPageScroll,
 	onReachBottom
 );
+import { useShare, buildPath } from "@/composables/useShare.js";
 
 
 const group_id = ref("");
+
+// 分享配置
+useShare(() => ({
+  title: '跑团活动列表',
+  path: buildPath('/pagesSub/runningTeam/teamEventList', { group_id: group_id.value })
+}));
 const eventList = ref([]);
 const loading = ref(false);
 const detail = ref({});

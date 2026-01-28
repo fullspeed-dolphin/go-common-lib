@@ -126,9 +126,8 @@
 		onLoad,
 		onUnload,
 		onPageScroll,
-		onShareAppMessage,
-		onShareTimeline,
 	} from "@dcloudio/uni-app";
+	import { useShare, buildPath } from "@/composables/useShare.js";
 	import {
 		useStore
 	} from "vuex";
@@ -162,16 +161,15 @@
 	// 定时器
 	let timer = null;
 
+	// 分享配置
+	useShare(() => ({
+		title: detail.value.name || '跑团活动详情',
+		path: buildPath('/pagesSub/runningTeam/teamEventDetail', { id: routerParams.value.id }),
+		imageUrl: detail.value.background_image_url || ''
+	}));
+
 	// 页面加载
 	onLoad((options) => {
-		// #ifdef MP-WEIXIN
-		// 启用分享给好友和分享到朋友圈
-		// 实现了 onShareTimeline 后，微信会自动在右上角菜单显示"分享到朋友圈"选项
-		// wx.showShareMenu({
-		// 	withShareTicket: true,
-		// });
-		// #endif
-
 		routerParams.value = options;
 
 		// 如果状态是 REJ，弹窗显示拒绝原因
@@ -210,24 +208,6 @@
 		  navBarBg.value = 'transparent';
 		}
 	});
-
-	// // 分享给好友
-	// onShareAppMessage(() => {
-	// 	return {
-	// 		title: detail.value.name || "活动详情", // 分享标题
-	// 		path: `/pagesSub/eventDetail?id=${routerParams.value.id}`, // 分享路径
-	// 		imageUrl: detail.value.background_image_url || "", // 分享时显示的封面图
-	// 	};
-	// });
-
-	// // 分享到朋友圈
-	// onShareTimeline(() => {
-	// 	return {
-	// 		title: detail.value.name || "活动详情", // 分享标题
-	// 		query: `id=${routerParams.value.id}`, // 分享参数
-	// 		imageUrl: detail.value.background_image_url || "", // 分享时显示的封面图
-	// 	};
-	// });
 
 	// 方法定义
 	const getDetail = () => {

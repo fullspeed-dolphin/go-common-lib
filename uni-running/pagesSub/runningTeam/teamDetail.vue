@@ -174,8 +174,6 @@
 		onUnload,
 		onShow,
 		onPageScroll,
-		onShareAppMessage,
-		onShareTimeline
 	} from "@dcloudio/uni-app";
 
 	import {
@@ -185,9 +183,17 @@
 	import EventItem from "@/components/EventItem.vue";
 	import MemberDetail from "./memberDetail.vue";
 	import request from "@/utils/request.js"
-			
+	import { useShare, buildPath } from "@/composables/useShare.js";
+
 	// 使用store
 	const store = useStore();
+
+	// 分享配置
+	useShare(() => ({
+		title: '跑了没 - ' + (detail.value.name || ''),
+		path: buildPath('/pagesSub/runningTeam/teamDetail', { group_id: routeParams.value.group_id }),
+		imageUrl: detail.value.avatar_url || ''
+	}));
 
 	const refUserLogin = ref(null);
 
@@ -392,24 +398,6 @@
 		});
 	};
 
-	// #ifdef MP-WEIXIN
-	// 分享给朋友
-	onShareAppMessage(() => {
-		return {
-			title: '跑了没 - ' + (detail.value.name || ''),
-			imageUrl: detail.value.avatar_url, // 可以设置自定义分享图片，留空则使用当前页面截图
-		};
-	});
-	// 分享到朋友圈
-	onShareTimeline(() => {
-		return {
-			title: '跑了没 - ' + (detail.value.name || ''),
-			query: '', // 可以携带参数
-			imageUrl: detail.value.avatar_url, // 可以设置自定义分享图片
-		};
-	});
-	// #endif
-	
 	const navBarBg = ref('transparent');
 	onPageScroll((e) => {
 		const scrollTop = e.scrollTop || 0;

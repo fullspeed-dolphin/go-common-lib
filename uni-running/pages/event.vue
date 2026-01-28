@@ -82,9 +82,16 @@ import request from "@/utils/request.js";
 import dayjs from "dayjs";
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 import tabbar from "@/components/tabBar.vue";
+import { useShare } from "@/composables/useShare.js";
 
 // Vuex store
 const store = useStore();
+
+// 分享配置
+useShare({
+	title: '全速俱乐部活动',
+	path: '/pages/event'
+});
 const userInfo = computed(() => store.state.userInfo);
 
 const { mescrollInit, downCallback, getMescroll } = useMescroll(onPageScroll, onReachBottom);

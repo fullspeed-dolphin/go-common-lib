@@ -144,11 +144,18 @@
 <script setup>
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
+import { useShare, buildPath } from "@/composables/useShare.js";
 
 const detail = ref({
   event_info: {},
   sign_info: {},
 });
+
+// 分享配置
+useShare(() => ({
+  title: detail.value.event_info?.name ? `${detail.value.event_info.name} - 订单详情` : '订单详情',
+  path: '/pagesSub/orderDetail'
+}));
 
 onLoad(() => {
   detail.value = uni.getStorageSync("orderDetail");

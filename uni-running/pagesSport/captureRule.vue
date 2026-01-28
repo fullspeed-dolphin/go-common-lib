@@ -7,12 +7,23 @@
 import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { pouchInRule, failUpload, coinRule } from "./assets/rules.js"
+import { useShare, buildPath } from "@/composables/useShare.js"
+
+// 路由参数
+const routeType = ref('');
+
+// 分享配置
+useShare(() => ({
+  title: routeType.value === 'coinRule' ? '跑币规则' : '打卡规则',
+  path: buildPath('/pagesSport/captureRule', { type: routeType.value })
+}));
 
 // 响应式数据
 const ruleText = ref('')
 
 // 页面加载
 onLoad((options) => {
+	routeType.value = options.type || '';
 	if (options.type === 'rule') {
 		ruleText.value = pouchInRule
 	}

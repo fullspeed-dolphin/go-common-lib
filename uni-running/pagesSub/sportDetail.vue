@@ -90,9 +90,19 @@
 import { ref, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { useStore } from "vuex";
+import { useShare, buildPath } from "@/composables/useShare.js";
 
 // 使用store
 const store = useStore();
+
+// 路由参数
+const routeOptions = ref({});
+
+// 分享配置
+useShare(() => ({
+	title: `${userInfo.value.nickname || '用户'}的运动详情`,
+	path: buildPath('/pagesSub/sportDetail', { id: routeOptions.value.id })
+}));
 
 // 生成轨迹数据的函数
 function generateTrackData(
@@ -180,16 +190,9 @@ const pageHeight = computed(() => {
 // 页面加载
 onLoad((optionsParam) => {
   options.value = optionsParam;
+  routeOptions.value = optionsParam;
 
   polyline.value[0].points = testTrackData; // 假设trackPoints已在其他地方定义
-
-  // #ifdef MP-WEIXIN
-  wx.showShareMenu({
-    // withShareTicket: true,
-    success: function () {},
-    fail: function () {},
-  });
-  // #endif
 });
 
 // 方法定义

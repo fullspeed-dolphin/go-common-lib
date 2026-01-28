@@ -94,6 +94,7 @@ import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import CommonDialog from "@/components/common/CommonDialog.vue";
 import { gaoChi, huaWei, jiaMing } from "./deviceUtils.js";
+import { useShare, buildPath } from "@/composables/useShare.js";
 
 const refCommonDialog = ref(null);
 
@@ -102,6 +103,12 @@ const textContent = ref("");
 const options = ref({
   value: "",
 });
+
+// 分享配置
+useShare(() => ({
+  title: options.value.value ? `${options.value.value} - 设备详情` : '设备详情',
+  path: buildPath('/pagesSub/device/deviceDetail', { value: options.value.value })
+}));
 
 // 页面加载
 onLoad((optionsParam) => {

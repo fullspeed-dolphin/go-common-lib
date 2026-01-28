@@ -5,11 +5,21 @@
 </template>
 <script setup>
 import { ref } from 'vue'
-import { onLoad, onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app'
+import { onLoad } from '@dcloudio/uni-app'
+import { useShare, buildPath } from "@/composables/useShare.js"
 import request from "@/utils/request.js"
 
 const link = ref("")
 const title = ref("跑了没")
+
+// 分享配置
+useShare(() => ({
+	title: title.value,
+	path: buildPath('/pagesSub/settings/webView', {
+		link: link.value,
+		title: title.value
+	})
+}));
 
 // 页面加载
 onLoad((options) => {
@@ -18,30 +28,6 @@ onLoad((options) => {
 	if (options.title) {
 		title.value = decodeURIComponent(options.title)
 	}
-
-	// #ifdef MP-WEIXIN
-	// 开启分享菜单，包含分享给朋友和分享到朋友圈
-	wx.showShareMenu({
-		withShareTicket: true,
-		menus: ['shareAppMessage', 'shareTimeline']
-	});
-	// #endif
-})
-
-// 分享给朋友
-onShareAppMessage(() => {
-	return {
-		title: title.value,
-		path: `/pagesSub/settings/webView?link=${encodeURIComponent(link.value)}&title=${encodeURIComponent(title.value)}`,
-	};
-});
-
-// 分享到朋友圈
-onShareTimeline(() => {
-	return {
-		title: title.value,
-		query: `link=${encodeURIComponent(link.value)}&title=${encodeURIComponent(title.value)}`,
-	};
 })
 
 // 方法定义

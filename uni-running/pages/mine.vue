@@ -154,9 +154,16 @@
 	import tabbar from "@/components/tabBar.vue";
 	import UserLogin from "@/components/UserLogin.vue";
 	import AccessUser from "@/components/common/AccessUser.vue";
-	import request from "@/utils/request.js"
-	
+	import request from "@/utils/request.js";
+	import { useShare } from "@/composables/useShare.js";
+
 	const store = useStore();
+
+	// 分享配置
+	useShare({
+		title: '我的个人中心',
+		path: '/pages/mine'
+	});
 
 	// 模板引用
 	const refUserLogin = ref(null);
