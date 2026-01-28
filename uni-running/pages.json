@@ -27,7 +27,7 @@
 		{
 		  "root": "pagesSport",
 		  "pages": [
-				{ "path": "uploadCapture","style": { "navigationBarTitleText": "运动截图打卡"} },
+				{ "path": "uploadCapture","style": { "navigationStyle": "custom", "navigationBarTitleText": "运动截图打卡"} },
 		    { "path": "captureRule", "style": {  "navigationBarTitleText": "" } }
 			]
 		},

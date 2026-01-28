@@ -1,79 +1,84 @@
 <template>
-	<view class="page">
-		<section class="section-form u-flex-row">
+	<view class="">
+		<u-navbar @leftClick="leftClick" :autoBack="false" bgColor="transparent" placeholder title="运动截图打卡"></u-navbar>
+		
+		<block v-if="pageIndex === 0 || !ruleForm.picture">
+			<section class="u-pl-30 u-pt-40" style="margin-bottom: 140rpx;">
+				<view class="u-flex-y-center" style="font-weight: 800;font-size: 48rpx;">
+					<view class="iconfont icon-pulse-fill" style="color:#FF8C00;font-size: 48rpx;margin-right: 18rpx;"></view>
+					全速运动
+				</view>
+				<view class="u-mt-20" style="color: #6A7282;">记录每一次汗水，赢取跑币奖励</view>
+			</section>
+		</block>
+		
+		<section class="flex-center" style="margin-top: 80rpx;">
 			<view class="upload-wrapper">
 				<FileUpload v-model="ruleForm.picture" isCustom :width="448" :height="600" @change="onImageUploaded">
 					<template #trigger>
-						<view class="section-upload flex-col-center">
-							<view class="icon">
-								<up-icon name="plus" color="#FF8C00" size="86rpx"></up-icon>
-							</view>
-							<view>上传打卡</view>
-							<view>(上传软件截图照片)</view>
+						<view class="section-upload flex-col-center" style="color: #99A1AF;line-height: 1.3;">
+							<view class="iconfont flex-center icon-shangchuan"></view>
+							<view style="font-size: 34rpx;font-weight: 500; color:#000;margin-bottom:20rpx;">上传运动截图</view>
+							<view>支持主流运动</view>
+							<view>APP截图自动</view>
+							<view>识别数据</view>
 						</view>
 					</template>
 				</FileUpload>
 			</view>
-			<view class="form-fields">
-				<view class="cell-item">
-					<view class="label">
-						<up-icon name="map" size="28rpx" color="#FF8C00"></up-icon>
-						<text class="label-text">距离(KM)</text>
+		</section>
+		
+		<section v-if="pageIndex === 1 && ruleForm.picture" class="form-fields">
+			<view style="font-weight: 800;font-size: 32rpx;">
+				<up-icon name="checkmark-circle" size="40rpx" color="#00C950" />
+				识别结果
+			</view>
+			<view class="u-flex-row">
+				<view class="cell-item flex-col-center">
+					<view class="label flex-center" style="background: #EFF6FF;">
+						<up-icon name="map" size="40rpx" color="#2B7FFF" />
 					</view>
-					<view class="value u-flex-xy-center">{{exerciseInfo.distance || 0}}</view>
+					<view class="value">{{exerciseInfo.distance || 0}}</view>
+					<text class="label-text">距离(KM)</text>
 				</view>
-				<view class="cell-item">
-					<view class="label">
-						<up-icon name="clock" size="28rpx" color="#FF8C00"></up-icon>
-						<text class="label-text">时长</text>
+				<view class="cell-item flex-col-center">
+					<view class="label flex-center" style="background: #FFF7ED;">
+						<!-- <up-icon name="clock" size="40rpx" color="#FF8C00" /> -->
+						<view class="iconfont icon-jishiqi" style="color:#FF8C00"></view>
 					</view>
-					<view class="value u-flex-xy-center">{{exerciseInfo.duration || 0}}</view>
+					<view class="value">{{exerciseInfo.duration || 0}}</view>
+					<text class="label-text">时长</text>
 				</view>
-				<view class="cell-item">
-					<view class="label">
-						<up-icon name="calendar-fill" size="28rpx" color="#FF8C00"></up-icon>
-						<text class="label-text">配速</text>
+				<view class="cell-item flex-col-center">
+					<view class="label flex-center" style="background: #FAF5FF;;">
+						<!-- <up-icon name="calendar-fill" size="40rpx" color="#AF4BFF" /> -->
+						<view class="iconfont icon-shandianshandianfahuotuikuan" style="color:#AF4BFF"></view>
 					</view>
-					<view class="value u-flex-xy-center">{{exerciseInfo.pace || 0}}</view>
+					<view class="value">{{exerciseInfo.pace || 0}}</view>
+					<text class="label-text">配速</text>
 				</view>
 			</view>
 		</section>
-
-		<view class="panel bgf">
-			<view style="font-size: 30rpx;margin-bottom: 10rpx;color:rgb(255, 140, 0);">全速运动打卡规则</view>
-			<view style="color:#777;font-size:24rpx;line-height: 1.4;">
-				<div class="u-mb-5">一、核心要求：</div>
-				<div class="u-flex-row"><div style="width:30rpx;">1. </div>每日1次有效打卡，多传仅记最新上传记录。</div>
-				<div class="u-flex-row"><div style="width:30rpx;">2. </div>支持Keep/咕咚等主流运动APP，截图需清晰显时间+类型+数据（跑步/健走≥1km）。</div>
-				<div class="u-flex-row"><div style="width:30rpx;">3. </div>当日运动当日23:59前通过小程序上传，逾期无效。</div>
-			</view>
-			<view class="u-mt-5" style="color:#777;font-size:24rpx;line-height: 1.4;">
-				<div class="u-mb-5">二、安全提示：</div>
-				<div class="u-flex-row"><div style="width:30rpx;">1. </div>身体健康者参与，不适即停，风险自担。</div>
-				<div class="u-flex-row"><div style="width:30rpx;">2. </div>选安全场地，避恶劣天气。</div>
-			</view>
-			<view class="u-mt-5" style="color:#777;font-size:24rpx;line-height: 1.4;">
-				<div class="u-mb-5">三、违规处理：</div>
-				<div>盗用/篡改截图将取消权益并记录违规。</div>
-			</view>
-			<view class="u-mt-5" style="color:#777;font-size:24rpx;line-height: 1.4;">
-				<div class="u-mb-5">四、联系客服：</div>
-				<div>客服在线时间:工作日 9:00-18:00。</div>
-			</view>
-			<!-- 客服按钮 -->
-			<button class="contact-btn" open-type="contact">
-				<u-icon name="chat-fill" size="80rpx" color="#FF8C00"></u-icon>
-				<text class="contact-text">联系客服</text>
-			</button>
-		</view>
-
+		
 		<!-- 底部信息区 -->
-		<view class="bottom-info-content">
-			<view @click="$u.route('pagesSport/captureRule?type=rule')" class="rule-link">
-				点此查看完整截图打卡规则
+		<view v-if="pageIndex === 0 || !ruleForm.picture" class="bottom-info-content">
+			<view @click="$u.route('pagesSport/captureRule?type=rule')" class="rule-link flex-center">
+				截图打卡规则
+				<u-icon name="arrow-right" color="rgba(255, 140, 0, .75)"></u-icon>
 			</view>
 			<view class="powered-by">由易联支付AI平台强势驱动</view>
 		</view>
+		
+		<section v-if="isSubmiting" class="section-loading flex-center">
+			<view class="panel1 bgf flex-col-center">
+				<view style="margin-bottom: 40rpx; ">
+					<up-loading-icon mode="circle" color="#FF8C00" textSize="40"></up-loading-icon>
+				</view>
+				<view style="font-weight: 600;font-size: 34rpx;margin-bottom: 30rpx;">系统正在识别</view>
+				<view style="color: #6C7484;">智能提取数据中，请不要离开页面...</view>
+			</view>
+		</section>
+		
 	</view>
 </template>
 <script setup>
@@ -88,28 +93,27 @@
 		title: '运动截图打卡',
 		path: '/pagesSport/uploadCapture'
 	});
+	
+	const pageIndex = ref(0)
 
 	const exerciseInfo = ref({
 		distance: '',
 		duration: '',
 		pace: ''
 	})
+	
+	const isSubmiting = ref(false)
 
 	// 图片上传成功后调用OCR识别
 	const onImageUploaded = async (imageUrl) => {
 		if (!imageUrl) return;
 
 		try {
-			uni.showLoading({
-				title: '识别中...',
-				mask: true
-			});
+			isSubmiting.value = true
 
 			const res = await request.post('/ocr-api/recognize', {
 				image_url: imageUrl
 			}, { showError: false, includeResponse: true });
-
-			uni.hideLoading();
 
 			// 校验返回数据是否有效（不为空、不为0）
 			const isValidData = res?.data &&
@@ -149,7 +153,20 @@
 				showCancel: false
 			});
 		}
+		
+		isSubmiting.value = false
+		pageIndex.value = 1
 	};
+	
+	function leftClick () {
+		console.log(';leftClick====>', pageIndex.value)
+		if (pageIndex.value === 1) {
+			pageIndex.value = 0
+			return;
+		}
+		
+		uni.navigateBack()
+	}
 
 	const ruleForm = ref({
 		picture: "",
@@ -161,83 +178,72 @@
 </script>
 
 <style lang="less" scoped>
-	.page {
-		background: #f5f5f5;
-		min-height: 100vh;
-	}
-
-	.panel {
-		position: relative;
-	}
-
-	.contact-btn {
-		position: absolute;
-		left: 50%;
-		transform: translateX(-50%);
-		bottom: -100rpx;
-		display: flex;
-		align-items: center;
-		padding: 0;
-		background: transparent;
-		border: none;
-		margin: 0;
-
-		&::after {
-			border: none;
+	.section-loading{
+		position: fixed;
+		width: 100%;
+		height: 100%;
+		top:0;
+		left:0;
+		background: rgba(0,0,0,.7);
+		z-index: 1000;
+		.panel1{
+			width: 606rpx;
+			height: 404rpx;
+			background: #FFFFFF;
+			border-radius: 32rpx 32rpx 32rpx 32rpx;
 		}
-
-		.contact-text {
-			margin-left: 10rpx;
-			font-size: 28rpx;
-			color: #FF8C00;
-		}
-	}
-
-	.section-form {
-		padding: 30rpx 34rpx 30rpx;
-	}
-
-	.upload-wrapper {
-		width: 448rpx;
-		height: 600rpx;
-		flex-shrink: 0;
 	}
 
 	.form-fields {
-		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
-		height: 600rpx;
-		margin-left: 30rpx;
+		width: 686rpx;
+		height: 412rpx;
+		padding: 50rpx;
+		margin-top: 48rpx;
+		margin: 48rpx auto 0;
+		border-radius: 32rpx 32rpx 32rpx 32rpx;
+		border: 2rpx solid #F3F4F6;
 	}
 
 	.cell-item {
 		font-weight: bold;
-		color: #000000;
-		line-height: 40rpx;
-
+		margin-top: 40rpx;
+		padding-top: 10rpx;
 		.label {
-			display: flex;
-			align-items: center;
-
-			.label-text {
-				margin-left: 8rpx;
-			}
+			width: 80rpx;
+			height: 80rpx;
+			font-size: 40rpx;
+			border-radius: 32rpx 32rpx 32rpx 32rpx;
+		}
+		.label-text {
+			font-size: 24rpx;
+			color: #6A7282;
 		}
 
 		.value {
 			width: 206rpx;
-			height: 88rpx;
-			margin-top: 20rpx;
-			color: #FF8C00;
-			background: #FFF;
-			border: 2rpx solid #FF8C00;
-			border-radius: 8rpx;
+			height: 44rpx;
+			margin-top: 30rpx;
+			margin-bottom: 20rpx;
+			font-weight: 800;
+			font-size: 44rpx;
+			text-align: center;
 		}
 	}
 
 	::v-deep {
 		.upload-wrapper {
+			.uicon-checkmark-circle {
+				font-weight: 800;
+			}
+			.iconfont{
+				width: 160rpx;
+				height: 160rpx;
+				color: #FF8C00;
+				font-size: 52rpx;
+				background: #F8EEE0;
+				margin-bottom: 40rpx;
+				border-radius: 64rpx 64rpx 64rpx 64rpx;
+			}
 			.u-upload {
 				width: 448rpx !important;
 				height: 600rpx !important;
@@ -248,9 +254,9 @@
 				height: 600rpx !important;
 			}
 
-			.u-upload__wrap__preview {
-				width: 448rpx !important;
-				height: 600rpx !important;
+			.custom-preview {
+				width: 690rpx !important;
+				height: 500rpx !important;
 			}
 
 			.u-upload__wrap__preview__image {
@@ -258,7 +264,6 @@
 				height: 600rpx !important;
 				border-radius: 16rpx;
 				border: 2rpx solid #FF8C00;
-				box-shadow: 0 4rpx 20rpx rgba(255, 140, 0, 0.15);
 			}
 		}
 
@@ -266,11 +271,9 @@
 			width: 448rpx;
 			height: 600rpx;
 			background: #FFF;
-			border-radius: 16rpx;
-			border: 2rpx dashed #FF8C00;
+			border-radius: 36rpx;
+			border: 10rpx dashed #D1D5DC;
 			line-height: 40rpx;
-			color: #FF8C00;
-			box-shadow: 0 4rpx 20rpx rgba(255, 140, 0, 0.15);
 
 			.icon {
 				margin-bottom: 42rpx;
@@ -283,21 +286,23 @@
 	}
 
 	.bottom-info-content {
+		position: fixed;
+		bottom: 0;
+		width: 100%;
 		text-align: center;
 		padding: 130rpx 0 30rpx;
 
 		.rule-link {
-			color: #FF8C00;
+			color: rgba(255, 140, 0, .75);
 			font-size: 28rpx;
 			line-height: 40rpx;
-			text-decoration: underline;
 			padding: 10rpx 0;
 		}
 
 		.powered-by {
-			color: #FF8C00;
+			color: rgba(255, 140, 0, .75);
 			font-size: 24rpx;
-			padding: 10rpx 0;
+			margin-top: 50rpx;
 		}
 	}
 
