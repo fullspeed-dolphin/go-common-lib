@@ -45,25 +45,25 @@
 		</u-button>
 
 		<view class="panel bgf">
-			<view style="font-size: 30rpx;margin-bottom: 20rpx;color:rgb(255, 140, 0);">全速运动打卡规则</view>
-			<view class="u-mt-10" style="color:#777;font-size:24rpx;line-height: 1.3;">
-				<div class="u-mb-5">✅ 核心要求：</div>
+			<view style="font-size: 30rpx;margin-bottom: 10rpx;color:rgb(255, 140, 0);">全速运动打卡规则</view>
+			<view style="color:#777;font-size:24rpx;line-height: 1.4;">
+				<div class="u-mb-5">一、核心要求：</div>
 				<div class="u-flex-row"><div style="width:30rpx;">1. </div>每日1次有效打卡，多传仅记最新上传记录。</div>
 				<div class="u-flex-row"><div style="width:30rpx;">2. </div>支持Keep/咕咚等主流运动APP，截图需清晰显时间+类型+数据（跑步/健走≥1km）。</div>
 				<div class="u-flex-row"><div style="width:30rpx;">3. </div>当日运动当日23:59前通过小程序上传，逾期无效。</div>
 			</view>
-			<view class="u-mt-10" style="color:#777;font-size:24rpx;line-height: 1.3;">
-				<div class="u-mb-5">⚠️ 安全提示：</div>
+			<view class="u-mt-5" style="color:#777;font-size:24rpx;line-height: 1.4;">
+				<div class="u-mb-5">二、安全提示：</div>
 				<div class="u-flex-row"><div style="width:30rpx;">1. </div>身体健康者参与，不适即停，风险自担。</div>
-				<div class="u-flex-row"><div style="width:30rpx;">2. </div>选安全场地，避恶劣天气</div>
+				<div class="u-flex-row"><div style="width:30rpx;">2. </div>选安全场地，避恶劣天气。</div>
 			</view>
-			<view class="u-mt-10" style="color:#777;font-size:24rpx;line-height: 1.3;">
-				<div class="u-mb-5">❌ 违规处理：</div>
-				<div class="u-flex-row"><div style="width:30rpx;">1. </div>盗用/篡改截图=取消权益+记录违规。</div>
+			<view class="u-mt-5" style="color:#777;font-size:24rpx;line-height: 1.4;">
+				<div class="u-mb-5">三、违规处理：</div>
+				<div>盗用/篡改截图将取消权益并记录违规。</div>
 			</view>
-			<view class="u-mt-10" style="color:#777;font-size:24rpx;line-height: 1.3;">
-				<div class="u-mb-5">💁‍♀️联系客服：</div>
-				<div class="u-flex-row"><div style="width:30rpx;">1. </div>客服在线时间:工作日 9:00-18:00。</div>
+			<view class="u-mt-5" style="color:#777;font-size:24rpx;line-height: 1.4;">
+				<div class="u-mb-5">四、联系客服：</div>
+				<div>客服在线时间:工作日 9:00-18:00。</div>
 			</view>
 			<!-- 客服按钮 -->
 			<button class="contact-btn" open-type="contact">
@@ -126,10 +126,10 @@
 				exerciseInfo.value.pace = res.speed;
 
 				isCheckInSuccess.value = true;
-				uni.showToast({
+				uni.showModal({
 					title: '打卡成功',
-					icon: 'success',
-					mask: true
+					content: res?.msg || '打卡成功',
+					showCancel: false
 				});
 			} else {
 				uni.showModal({
