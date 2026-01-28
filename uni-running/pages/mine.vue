@@ -27,7 +27,7 @@
 								</view> -->
 								<view @click="routeTo('/pagesSub/runCoin/myCoin')" class="coin-pill">
 									<image class="coin-icon" src="/static/images/coin.png" mode="aspectFill"></image>
-									<text class="coin-label">跑币余额:</text>
+									<text class="coin-label">我的跑币:</text>
 									<text class="coin-value">{{coinInfo.fscoin}}</text>
 									<u-icon name="arrow-right" size="12"></u-icon>
 								</view>
@@ -133,7 +133,7 @@
 		</view>
 		<tabbar type="mine" />
 
-		<UserLogin ref="refUserLogin" />
+		<UserLogin ref="refUserLogin" @success="onLoginSuccess" />
 		<AccessUser ref="refAccessUser" />
 	</view>
 </template>
@@ -161,6 +161,17 @@
 	// 模板引用
 	const refUserLogin = ref(null);
 	const refAccessUser = ref(null);
+
+	// 待执行的操作（登录成功后继续执行）
+	const pendingAction = ref(null);
+
+	// 登录成功回调
+	const onLoginSuccess = () => {
+		if (pendingAction.value) {
+			pendingAction.value();
+			pendingAction.value = null;
+		}
+	};
 
 	// 计算属性
 	const userInfo = computed(() => store.state.userInfo);
@@ -193,6 +204,7 @@
 
 	const routeTo = (link) => {
 		if (!userInfo.value.id) {
+			pendingAction.value = () => uni.$u.route(link);
 			return refUserLogin.value.open();
 		}
 
@@ -201,6 +213,7 @@
 
 	const handleUserClick = () => {
 		if (!userInfo.value.id) {
+			pendingAction.value = () => refAccessUser.value.open();
 			return refUserLogin.value.open();
 		}
 

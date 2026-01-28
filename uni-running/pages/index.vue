@@ -141,7 +141,7 @@
 
 		<tabbar type="index" />
 		
-		<UserLogin ref="refUserLogin" />
+		<UserLogin ref="refUserLogin" @success="onLoginSuccess" />
 	</view>
 </template>
 <script setup>
@@ -174,6 +174,17 @@
 	// 使用store
 	const store = useStore();
 	const refUserLogin = ref(null);
+
+	// 待执行的操作（登录成功后继续执行）
+	const pendingAction = ref(null);
+
+	// 登录成功回调
+	const onLoginSuccess = () => {
+		if (pendingAction.value) {
+			pendingAction.value();
+			pendingAction.value = null;
+		}
+	};
 
 	const eventList = ref([]);
 	const bannerEventList = ref([]);
@@ -401,13 +412,17 @@
 	
 	const userInfo = computed(() => store.state.userInfo);
 
-	const ensureLogin = () => {
+	const ensureLogin = (action = null) => {
 		const token = uni.getStorageSync("token");
 		const hasLogin = !!(
 			token || userInfo.value.id
 		);
 		if (hasLogin) return true;
 
+		// 保存待执行的操作
+		if (action) {
+			pendingAction.value = action;
+		}
 		openUserLogin();
 		return false;
 	};
@@ -464,7 +479,7 @@
 
 	// 方法定义
 	const clickSwiper = (item) => {
-		if (!ensureLogin()) return;
+		if (!ensureLogin(() => clickSwiper(item))) return;
 
 		if (item.id === '01KA8MPFAF0VBY1G35CVCNC1CW' || item.banner_id === '01KA8MPFAF0VBY1G35CVCNC1CW') {
 			// 跳转到其他小程序

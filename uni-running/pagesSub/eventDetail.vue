@@ -125,7 +125,7 @@
 			<u-icon name="share" color="#fff" size="18"></u-icon>
 		</button>
 
-		<UserLogin ref="refUserLogin" />
+		<UserLogin ref="refUserLogin" @success="onLoginSuccess" />
 	</view>
 </template>
 <script setup>
@@ -154,6 +154,17 @@
 
 	// 模板引用
 	const refUserLogin = ref(null);
+
+	// 待执行的操作（登录成功后继续执行）
+	const pendingAction = ref(null);
+
+	// 登录成功回调
+	const onLoginSuccess = () => {
+		if (pendingAction.value) {
+			pendingAction.value();
+			pendingAction.value = null;
+		}
+	};
 
 	// 响应式数据
 	const isScroll = ref(false);
@@ -284,6 +295,7 @@
 
 	const routeTo = () => {
 		if (!userInfo.value.id) {
+			pendingAction.value = () => routeTo();
 			return refUserLogin.value.open();
 		}
 

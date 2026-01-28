@@ -64,7 +64,16 @@ function fetch(options) {
 				}
 				
 				if (response?.code == 200) {
-					resolve(response.data)
+					// 向后兼容：默认只返回 data
+					// 如需完整响应（含 msg），调用时传入 includeResponse: true
+					if (options.includeResponse) {
+						resolve({
+							data: response.data,
+							msg: response.msg
+						})
+					} else {
+						resolve(response.data)
+					}
 				}
 			},
 			fail(err) {

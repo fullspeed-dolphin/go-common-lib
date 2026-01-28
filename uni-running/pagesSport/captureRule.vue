@@ -6,8 +6,7 @@
 <script setup>
 import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
-import { pouchInRule } from "./assets/rules.js"
-import { failUpload } from "./assets/rules.js"
+import { pouchInRule, failUpload, coinRule } from "./assets/rules.js"
 
 // 响应式数据
 const ruleText = ref('')
@@ -19,6 +18,9 @@ onLoad((options) => {
 	}
 	if (options.type === 'failUpload') {
 		ruleText.value = failUpload
+	}
+	if (options.type === 'coinRule') {
+		ruleText.value = coinRule
 	}
 })
 </script>

@@ -137,7 +137,7 @@
 			@cancel="isShowEventModal = false"
 		/>
 		
-		<UserLogin ref="refUserLogin" @success="getEvents()"/>
+		<UserLogin ref="refUserLogin" @success="onLoginSuccess"/>
   </view>
 </template>
 
@@ -160,7 +160,19 @@ import {
 // 使用store
 const store = useStore();
 const refUserLogin = ref(null);
-	
+
+// 待执行的操作（登录成功后继续执行）
+const pendingAction = ref(null);
+
+// 登录成功回调
+const onLoginSuccess = () => {
+	getEvents();
+	if (pendingAction.value) {
+		pendingAction.value();
+		pendingAction.value = null;
+	}
+};
+
 const punchInStatus = ref('pending')
 const isShowEventModal = ref(false)
 const selectedEvent = ref({})
@@ -263,6 +275,7 @@ function changeEvent(e) {
 const participants = ref([])
 const getCurrentEventSigners = () => {
 	if (!store.state.userInfo.id) {
+		pendingAction.value = () => getCurrentEventSigners();
 		return refUserLogin.value.open();
 	}
 	uni.showLoading({
@@ -280,6 +293,7 @@ const getCurrentEventSigners = () => {
 // 点击签到按钮
 const handleSign = async () => {
 	if (!store.state.userInfo.id) {
+		pendingAction.value = () => handleSign();
 		return refUserLogin.value.open();
 	}
 

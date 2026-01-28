@@ -39,11 +39,6 @@
 			</view>
 		</section>
 
-		<u-button v-if="isCheckInSuccess" type="primary" @click="goBack()" customStyle="width:640rpx; margin: 60rpx auto 30rpx" color="#FF8C00"
-			shape="circle">
-			返回运动页
-		</u-button>
-
 		<view class="panel bgf">
 			<view style="font-size: 30rpx;margin-bottom: 10rpx;color:rgb(255, 140, 0);">全速运动打卡规则</view>
 			<view style="color:#777;font-size:24rpx;line-height: 1.4;">
@@ -72,9 +67,8 @@
 			</button>
 		</view>
 
-		<div style="height: 380rpx;"></div>
-
-		<view class="bottom-info">
+		<!-- 底部信息区 -->
+		<view class="bottom-info-content">
 			<view @click="$u.route('pagesSport/captureRule?type=rule')" class="rule-link">
 				点此查看完整截图打卡规则
 			</view>
@@ -84,18 +78,30 @@
 </template>
 <script setup>
 	import { ref } from "vue";
-	import { onLoad } from "@dcloudio/uni-app";
+	import { onLoad, onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
 	import FileUpload from "@/components/common/FileUpload.vue";
 	import request from "../utils/request";
+
+	// 分享给朋友
+	onShareAppMessage(() => {
+		return {
+			title: '运动截图打卡',
+			path: '/pagesSport/uploadCapture'
+		};
+	});
+
+	// 分享到朋友圈
+	onShareTimeline(() => {
+		return {
+			title: '运动截图打卡'
+		};
+	});
 	
 	const exerciseInfo = ref({
 		distance: '',
 		duration: '',
 		pace: ''
 	})
-
-	// 打卡是否成功
-	const isCheckInSuccess = ref(false);
 
 	// 图片上传成功后调用OCR识别
 	const onImageUploaded = async (imageUrl) => {
@@ -109,27 +115,31 @@
 
 			const res = await request.post('/ocr-api/recognize', {
 				image_url: imageUrl
-			}, { showError: false });
+			}, { showError: false, includeResponse: true });
 
 			uni.hideLoading();
 
 			// 校验返回数据是否有效（不为空、不为0）
-			const isValidData = res &&
-				res.km && res.km !== '0' && res.km !== '0.00' &&
-				res.time && res.time !== '00:00' && res.time !== '00:00:00' &&
-				res.speed;
+			const isValidData = res?.data &&
+				res.data.km && res.data.km !== '0' && res.data.km !== '0.00' &&
+				res.data.time && res.data.time !== '00:00' && res.data.time !== '00:00:00' &&
+				res.data.speed;
 
 			if (isValidData) {
 				// 将识别结果填入
-				exerciseInfo.value.distance = res.km;
-				exerciseInfo.value.duration = res.time;
-				exerciseInfo.value.pace = res.speed;
+				exerciseInfo.value.distance = res.data.km;
+				exerciseInfo.value.duration = res.data.time;
+				exerciseInfo.value.pace = res.data.speed;
 
-				isCheckInSuccess.value = true;
 				uni.showModal({
 					title: '打卡成功',
 					content: res?.msg || '打卡成功',
-					showCancel: false
+					showCancel: false,
+					success: () => {
+						uni.redirectTo({
+							url: '/pagesSub/runCoin/myCoin'
+						});
+					}
 				});
 			} else {
 				uni.showModal({
@@ -156,11 +166,6 @@
 		id_card: "",
 		phone: "",
 	});
-
-	// 返回运动页
-	const goBack = () => {
-		uni.navigateBack();
-	};
 </script>
 
 <style lang="less" scoped>
@@ -285,14 +290,9 @@
 		}
 	}
 
-	.bottom-info {
-		position: fixed;
-		bottom: 0;
-		left: 0;
-		right: 0;
+	.bottom-info-content {
 		text-align: center;
-		padding-bottom: env(safe-area-inset-bottom);
-		background: #f5f5f5;
+		padding: 130rpx 0 30rpx;
 
 		.rule-link {
 			color: #FF8C00;
@@ -308,4 +308,5 @@
 			padding: 10rpx 0;
 		}
 	}
+
 </style>

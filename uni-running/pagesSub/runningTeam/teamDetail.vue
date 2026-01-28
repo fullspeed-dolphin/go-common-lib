@@ -160,7 +160,7 @@
 		
 		<MemberDetail ref="refMemberDetail" />
 
-		<UserLogin ref="refUserLogin" @success="getMemberList()"/>
+		<UserLogin ref="refUserLogin" @success="onLoginSuccess"/>
 	</view>
 </template>
 <script setup>
@@ -190,6 +190,18 @@
 	const store = useStore();
 
 	const refUserLogin = ref(null);
+
+	// 待执行的操作（登录成功后继续执行）
+	const pendingAction = ref(null);
+
+	// 登录成功回调
+	const onLoginSuccess = () => {
+		getMemberList();
+		if (pendingAction.value) {
+			pendingAction.value();
+			pendingAction.value = null;
+		}
+	};
 
 	// 响应式数据
 	const isEmpty = ref(false);
@@ -322,6 +334,7 @@
 
 	const joinGroup = () => {
 		if (!store.state.userInfo.id) {
+			pendingAction.value = () => joinGroup();
 			return refUserLogin.value.open();
 		}
 		uni.showModal({

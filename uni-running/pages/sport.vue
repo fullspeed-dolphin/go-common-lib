@@ -82,7 +82,7 @@
 
 		<tabbar type="sport" />
 
-		<UserLogin ref="refUserLogin" />
+		<UserLogin ref="refUserLogin" @success="onLoginSuccess" />
 	</view>
 </template>
 <script setup>
@@ -101,6 +101,17 @@
 	const store = useStore();
 
 	const refUserLogin = ref(null);
+
+	// 待执行的操作（登录成功后继续执行）
+	const pendingAction = ref(null);
+
+	// 登录成功回调
+	const onLoginSuccess = () => {
+		if (pendingAction.value) {
+			pendingAction.value();
+			pendingAction.value = null;
+		}
+	};
 
 	// 地图中心点坐标
 	const latitude = ref(39.908823); // 默认北京坐标
@@ -130,6 +141,7 @@
 	// 跳转到跑步轨迹页面
 	const goToRunMap = () => {
 		if (!userInfo.value.id) {
+			pendingAction.value = () => uni.navigateTo({ url: "/pagesSub/runMap" });
 			return refUserLogin.value?.open();
 		}
 
@@ -140,6 +152,7 @@
 	
 	const userRouteTo = (link) => {
 		if (!userInfo.value.id) {
+			pendingAction.value = () => uni.$u.route(link);
 			return refUserLogin.value?.open();
 		}
 
@@ -149,6 +162,7 @@
 	// 跳转到排行榜页面
 	const goToRanking = () => {
 		if (!userInfo.value.id) {
+			pendingAction.value = () => uni.navigateTo({ url: "/pagesSub/sport/top" });
 			return refUserLogin.value?.open();
 		}
 
@@ -160,6 +174,7 @@
 	// 跳转到运动记录页面
 	const goToRunRecord = () => {
 		if (!userInfo.value.id) {
+			pendingAction.value = () => uni.navigateTo({ url: "/pagesSub/sport/list" });
 			return refUserLogin.value?.open();
 		}
 
@@ -171,6 +186,7 @@
 	// 跳转到运动打卡页面
 	const goToRunCheckIn = () => {
 		if (!userInfo.value.id) {
+			pendingAction.value = () => uni.navigateTo({ url: "/pagesSub/sport/checkIn" });
 			return refUserLogin.value?.open();
 		}
 

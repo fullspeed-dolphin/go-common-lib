@@ -42,7 +42,7 @@
 				</u-button>
 		</section>
 
-		<UserLogin ref="refUserLogin" />
+		<UserLogin ref="refUserLogin" @success="onLoginSuccess" />
 	</view>
 </template>
 
@@ -75,6 +75,17 @@
 	// 模板引用
 	const refUserLogin = ref(null);
 	const mescrollRef = ref(null);
+
+	// 待执行的操作（登录成功后继续执行）
+	const pendingAction = ref(null);
+
+	// 登录成功回调
+	const onLoginSuccess = () => {
+		if (pendingAction.value) {
+			pendingAction.value();
+			pendingAction.value = null;
+		}
+	};
 
 	// 响应式数据
 	const searchTxt = ref("");
@@ -209,6 +220,7 @@
 
 	const openForm = () => {
 		if (!store.state.userInfo.id) {
+			pendingAction.value = () => openForm();
 			return refUserLogin.value.open();
 		}
 
