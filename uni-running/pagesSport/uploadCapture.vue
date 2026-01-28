@@ -1,6 +1,6 @@
 <template>
 	<view class="">
-		<u-navbar @leftClick="leftClick" :autoBack="false" bgColor="transparent" placeholder title="运动截图打卡"></u-navbar>
+		<u-navbar autoBack bgColor="transparent" placeholder title="运动截图打卡"></u-navbar>
 		
 		<block v-if="pageIndex === 0 || !ruleForm.picture">
 			<section class="u-pl-30 u-pt-40" style="margin-bottom: 140rpx;">
@@ -28,7 +28,7 @@
 			</view>
 		</section>
 		
-		<section v-if="pageIndex === 1 && ruleForm.picture" class="form-fields">
+		<section v-if="pageIndex === 1 && ruleForm.picture && exerciseInfo.distance" class="form-fields">
 			<view style="font-weight: 800;font-size: 32rpx;">
 				<up-icon name="checkmark-circle" size="40rpx" color="#00C950" />
 				识别结果
@@ -61,7 +61,7 @@
 		</section>
 		
 		<!-- 底部信息区 -->
-		<view v-if="pageIndex === 0 || !ruleForm.picture" class="bottom-info-content">
+		<view v-if="pageIndex === 0 || !ruleForm.picture || !isSuccess" class="bottom-info-content">
 			<view @click="$u.route('pagesSport/captureRule?type=rule')" class="rule-link flex-center">
 				截图打卡规则
 				<u-icon name="arrow-right" color="rgba(255, 140, 0, .75)"></u-icon>
@@ -78,6 +78,10 @@
 				<view style="color: #6C7484;">智能提取数据中，请不要离开页面...</view>
 			</view>
 		</section>
+		
+		<view v-if="pageIndex === 1 && ruleForm.picture && submitText" class="" style="padding: 56rpx 20rpx 80rpx">
+			<u-button type="primary" color="#ff8c00" shape="circle" @click="routeTo()">{{submitText}}</u-button>
+		</view>
 		
 	</view>
 </template>
@@ -103,6 +107,8 @@
 	})
 	
 	const isSubmiting = ref(false)
+	const isSuccess = ref(false)
+	const submitText = ref('')
 
 	// 图片上传成功后调用OCR识别
 	const onImageUploaded = async (imageUrl) => {
@@ -126,18 +132,22 @@
 				exerciseInfo.value.distance = res.data.km;
 				exerciseInfo.value.duration = res.data.time;
 				exerciseInfo.value.pace = res.data.speed;
-
-				uni.showModal({
-					title: '打卡成功',
-					content: res?.msg || '打卡成功',
-					showCancel: false,
-					success: () => {
-						uni.redirectTo({
-							url: '/pagesSub/runCoin/myCoin'
-						});
-					}
-				});
+				
+				submitText.value = res?.msg || '打卡成功';
+				isSuccess.value = true
+				// uni.showModal({
+				// 	title: '打卡成功',
+				// 	content: res?.msg || '打卡成功',
+				// 	showCancel: false,
+				// 	success: () => {
+				// 		uni.redirectTo({
+				// 			url: '/pagesSub/runCoin/myCoin'
+				// 		});
+				// 	}
+				// });
 			} else {
+				isSuccess.value = false
+				submitText.value = ''
 				uni.showModal({
 					title: '识别失败',
 					content: res?.msg || '无法识别截图中的运动数据，请确保上传的是有效的运动截图',
@@ -145,6 +155,8 @@
 				});
 			}
 		} catch (error) {
+			isSuccess.value = false
+			submitText.value = ''
 			uni.hideLoading();
 			console.error('OCR识别失败:', error);
 			uni.showModal({
@@ -158,23 +170,16 @@
 		pageIndex.value = 1
 	};
 	
-	function leftClick () {
-		console.log(';leftClick====>', pageIndex.value)
-		if (pageIndex.value === 1) {
-			pageIndex.value = 0
-			return;
-		}
-		
-		uni.navigateBack()
-	}
 
 	const ruleForm = ref({
 		picture: "",
-		activity: "",
-		fullName: "",
-		id_card: "",
-		phone: "",
 	});
+	
+	function routeTo() {
+		uni.redirectTo({
+			url: '/pagesSub/runCoin/myCoin'
+		});
+	}
 </script>
 
 <style lang="less" scoped>
@@ -208,6 +213,11 @@
 		font-weight: bold;
 		margin-top: 40rpx;
 		padding-top: 10rpx;
+		padding-bottom: 10rpx;
+		border-right: 2rpx solid #F3F4F6;
+		&:last-child{
+			border:0;
+		}
 		.label {
 			width: 80rpx;
 			height: 80rpx;
