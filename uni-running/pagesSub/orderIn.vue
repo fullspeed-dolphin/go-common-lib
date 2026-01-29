@@ -60,9 +60,9 @@
 									<u-icon name="minus" size="14" :color="item.count <= 0 ? '#ccc' : '#333'"></u-icon>
 								</view>
 								<view class="qty-value">{{ item.count || 0 }}</view>
-								<view class="qty-btn plus" :class="{ disabled: isMaxCount(item) }"
+								<view class="qty-btn plus" :class="{ disabled: isPlusDisabled(item) }"
 									@click.stop="increaseCount(item)">
-									<u-icon name="plus" size="14" :color="isMaxCount(item) ? '#ccc' : '#333'"></u-icon>
+									<u-icon name="plus" size="14" :color="isPlusDisabled(item) ? '#ccc' : '#333'"></u-icon>
 								</view>
 							</view>
 						</view>
@@ -71,26 +71,24 @@
 					<!-- 报名卡空位区域：count > 0 时显示 -->
 					<view v-if="item.count > 0" class="price-item-slots">
 						<view v-for="(group, groupIndex) in item.groups" :key="groupIndex"
-							class="slot-group" :class="{ 'multi-group': item.groupSize > 1 }">
+							class="slot-group">
+							<!-- 已添加的报名卡 -->
 							<view v-for="(slot, slotIndex) in group" :key="slotIndex"
-								class="slot-item" @click="handleSlotClick(item, groupIndex, slotIndex)">
-								<!-- 已填充 -->
-								<template v-if="slot">
-									<view class="slot-filled">
-										<image class="slot-avatar" src="/static/images/user.png" mode="aspectFill"></image>
-										<view class="slot-remove" @click.stop="removeSlot(item, groupIndex, slotIndex)">
-											<u-icon name="close-circle" color="#999" size="20"></u-icon>
-										</view>
+								class="slot-item">
+								<view class="slot-filled">
+									<image class="slot-avatar" src="/static/images/user.png" mode="aspectFill"></image>
+									<view class="slot-remove" @click.stop="removeSlot(item, groupIndex, slotIndex)">
+										<u-icon name="close-circle" color="#999" size="20"></u-icon>
 									</view>
-									<view class="slot-name">{{ slot.full_name }}</view>
-								</template>
-								<!-- 空位 -->
-								<template v-else>
-									<view class="slot-empty">
-										<u-icon name="plus" color="#999" size="20"></u-icon>
-									</view>
-									<view class="slot-name">请选择</view>
-								</template>
+								</view>
+								<view class="slot-name">{{ slot.full_name }}</view>
+							</view>
+							<!-- 添加按钮：始终显示，达到上限时点击会提示 -->
+							<view class="slot-item" @click="handleAddSigner(item, groupIndex)">
+								<view class="slot-empty" :class="{ 'slot-disabled': group.length >= (item.groupSize || 1) }">
+									<u-icon name="plus" :color="group.length >= (item.groupSize || 1) ? '#ccc' : '#999'" size="20"></u-icon>
+								</view>
+								<view class="slot-name">添加</view>
 							</view>
 						</view>
 					</view>
@@ -231,18 +229,31 @@
 		return (item.count || 0) >= getMaxCount(item);
 	}
 
+	// 是否禁用 + 按钮（综合检查套餐容量和 multi_package 限制）
+	function isPlusDisabled(item) {
+		// 检查套餐自身容量限制
+		if (isMaxCount(item)) return true;
+		// 检查 multi_package 限制
+		if (isReachedMultiPackageLimit()) return true;
+		return false;
+	}
+
 	// 增加数量
 	function increaseCount(item) {
 		if (isMaxCount(item)) return;
 
+		// 检查是否已达到 multi_package 限制
+		if (isReachedMultiPackageLimit()) {
+			uni.$u.toast(`最多只能选择 ${multiPackageCount.value} 个套餐`);
+			return;
+		}
+
 		if (!item.count) item.count = 0;
 		item.count++;
 
-		// 新增一组空位
-		const groupSize = item.groupSize || 1;
-		const newGroup = new Array(groupSize).fill(null);
+		// 新增一组空数组（不预设空位，由用户逐个添加）
 		if (!item.groups) item.groups = [];
-		item.groups.push(newGroup);
+		item.groups.push([]);
 	}
 
 	// 点击套餐卡片
@@ -253,8 +264,32 @@
 			// 已选中：弹窗确认是否取消
 			confirmClearPackage(item);
 		} else {
-			// 未选中：自动 +1
-			increaseCount(item);
+			// 未选中：检查是否需要清除其他套餐（单选模式）
+			if (!isMultiSelect.value && totalSelectedCount.value > 0) {
+				// 单选模式下，切换到新套餐前需要确认清除其他套餐
+				uni.showModal({
+					title: '提示',
+					content: '切换套餐会清空已选择的报名卡信息，是否继续？',
+					confirmText: '是',
+					cancelText: '否',
+					success: (res) => {
+						if (res.confirm) {
+							// 清空所有其他套餐
+							packageList.value.forEach(pkg => {
+								if (pkg !== item) {
+									pkg.count = 0;
+									pkg.groups = [];
+								}
+							});
+							// 然后增加当前套餐
+							increaseCount(item);
+						}
+					}
+				});
+			} else {
+				// 多选模式或没有已选套餐，直接增加
+				increaseCount(item);
+			}
 		}
 	}
 
@@ -292,26 +327,46 @@
 		}
 	}
 
-	// 点击空位
-	function handleSlotClick(item, groupIndex, slotIndex) {
-		// 如果已有报名卡，不处理（用户需要先删除）
-		if (item.groups[groupIndex][slotIndex]) return;
+	// 点击添加报名卡按钮
+	function handleAddSigner(item, groupIndex) {
+		const group = item.groups[groupIndex];
+		const maxSigners = item.groupSize || 1;
 
-		// 记录当前要填充的位置
-		currentSlotInfo.value = { item, groupIndex, slotIndex };
+		// 检查是否已达到该组的报名卡数量上限
+		if (group.length >= maxSigners) {
+			uni.$u.toast('已到达最高报名卡数量上限');
+			return;
+		}
+
+		// 记录当前要填充的位置（groupIndex，slotIndex 为当前数组长度，即新增位置）
+		currentSlotInfo.value = { item, groupIndex, slotIndex: group.length };
 		refSignerList.value.open(item);
 	}
 
-	// 移除空位中的报名卡
+	// 移除报名卡
 	function removeSlot(item, groupIndex, slotIndex) {
 		if (item.groups && item.groups[groupIndex]) {
-			item.groups[groupIndex][slotIndex] = null;
+			item.groups[groupIndex].splice(slotIndex, 1);
 		}
 	}
 
 	const isMultiSelect = computed(() => {
 		return multiPackageCount.value > 1;
 	});
+
+	// 计算当前已选择的套餐总数（所有套餐的 count 之和）
+	const totalSelectedCount = computed(() => {
+		return packageList.value.reduce((sum, item) => sum + (item.count || 0), 0);
+	});
+
+	// 检查是否已达到 multi_package 限制
+	function isReachedMultiPackageLimit(excludeItem = null) {
+		const currentTotal = packageList.value.reduce((sum, item) => {
+			if (excludeItem && item === excludeItem) return sum;
+			return sum + (item.count || 0);
+		}, 0);
+		return currentTotal >= multiPackageCount.value;
+	}
 	
 	const totalPrice = ref(0)
 	watch(
@@ -446,7 +501,7 @@
 		}
 
 		// 检查是否重复添加（同一套餐内）
-		const isExists = item.groups.flat().some(s => s && s.id === signerInfo.id);
+		const isExists = item.groups.flat().some(s => s.id === signerInfo.id);
 		if (isExists) {
 			return uni.$u.toast(`「${signerInfo.full_name}」已在本套餐中`);
 		}
@@ -477,8 +532,8 @@
 			}
 		}
 
-		// 填充到指定位置
-		item.groups[groupIndex][slotIndex] = signerInfo;
+		// 添加到组中
+		item.groups[groupIndex].push(signerInfo);
 	};
 	
 
@@ -500,11 +555,13 @@
 			return uni.$u.toast(`请选择${getLabel('package')}`);
 		}
 
-		// 检查所有空位是否已填充
+		// 检查所有组是否已填满报名卡
 		for (const pkg of selectedPackages) {
-			const emptySlots = pkg.groups.flat().filter(slot => slot === null);
-			if (emptySlots.length > 0) {
-				return uni.$u.toast(`请完成「${pkg.label}」的报名卡选择`);
+			const requiredSigners = pkg.groupSize || 1;
+			for (const group of pkg.groups) {
+				if (group.length < requiredSigners) {
+					return uni.$u.toast(`请完成「${pkg.label}」的报名卡选择（需要${requiredSigners}人）`);
+				}
 			}
 		}
 
@@ -512,7 +569,7 @@
 		for (const pkg of selectedPackages) {
 			if (pkg.label.includes('亲子')) {
 				for (const group of pkg.groups) {
-					const hasChild = group.some(s => s && isUnder14(s.cert_number));
+					const hasChild = group.some(s => isUnder14(s.cert_number));
 					if (!hasChild) {
 						return uni.$u.toast('亲子套餐每组至少需要一个儿童');
 					}
@@ -545,13 +602,11 @@
 			let allSignerList = []
 			packageList.value.filter(i => i.count > 0).forEach(item => {
 				if (item.groups) {
-					item.groups.flat()?.forEach(user => {
-						if (user) {
-							allSignerList.push({
-								...user,
-								eventInfo: item
-							})
-						}
+					item.groups.flat().forEach(user => {
+						allSignerList.push({
+							...user,
+							eventInfo: item
+						})
 					})
 				}
 			})
@@ -987,13 +1042,8 @@
 
 			.slot-group {
 				display: flex;
+				flex-wrap: wrap;
 				gap: 16rpx;
-
-				&.multi-group {
-					border: 1rpx dashed #E53935;
-					padding: 16rpx;
-					border-radius: 12rpx;
-				}
 			}
 
 			.slot-item {
@@ -1016,6 +1066,12 @@
 			.slot-empty {
 				background: #f5f5f5;
 				border: 2rpx dashed #ccc;
+
+				&.slot-disabled {
+					background: #e8e8e8;
+					border-color: #ddd;
+					opacity: 0.6;
+				}
 			}
 
 			.slot-filled {

@@ -281,31 +281,29 @@
 	// gender: "male",
 	// birthday: "",
 	// 0、如果证件类型选择的是身份证，要做实时校验
-	// 1、在报名卡中如果检测到是大于18岁的男性，T-shirt尺码只给选择L
-	// 2、如果是大于18岁的女性，T-shirt尺码只给选择M
-	// 3、2016年之后出生的身份证只给130的T-shirt尺码
+	// 根据年龄和性别自动填充默认尺寸（用户可自行修改）
+	// 1、在报名卡中如果检测到是大于18岁的男性，T-shirt尺码默认L
+	// 2、如果是大于18岁的女性，T-shirt尺码默认M
+	// 3、10岁以下默认130的T-shirt尺码
 	const isReadOnlyClothSize = ref(false)
 	watch(
 		() => [form.gender, form.birthday],
 		(newVal) => {
 			console.log('newVal====>', newVal)
-			
-			if (form?.birthday) {
-				isReadOnlyClothSize.value = false
+
+			// 只有当尺寸未设置时才自动填充默认值
+			if (form?.birthday && !form.clothesSize) {
 				const userAge = new Date().getFullYear() - form.birthday.slice(0, 4);
-				
+
 				if (userAge > 18) {
 					if (form.gender === "male") {
-						isReadOnlyClothSize.value = true;
 						form.clothesSize = 'L'
 					} else {
-						isReadOnlyClothSize.value = true;
 						form.clothesSize = 'M'
 					}
 				}
-				
+
 				if (userAge < 10) {
-					isReadOnlyClothSize.value = true;
 					form.clothesSize = '130'
 				}
 			}

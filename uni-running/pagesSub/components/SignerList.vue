@@ -11,25 +11,31 @@
 					<view v-else class="radio-circle"></view>
 				</view>
 				<view class="card-item-content">
+					<!-- 第一行：姓名 + 本人标签 -->
 					<view class="name">
 						<view class="name-text">{{ item.full_name }}</view>
 						<view class="name-owner" v-if="item.is_self">本人</view>
 					</view>
-					<view class="id-card-number">
-						<view class="id-card-number-text">{{
-				      formatIdCard(item.cert_number || "")
-				    }}</view>
-						<view class="id-card-number-separator">|</view>
-						<view class="id-card-number-type"> {{item.ageScope}} ({{item.genderString}}) </view>
+					<!-- 第二行：身份证号 -->
+					<view class="id-card-row">
+						<view class="id-card-number-text">{{ formatIdCard(item.cert_number || "") }}</view>
+					</view>
+					<!-- 第三行：年龄段(性别) | 参赛服尺码 | 血型 -->
+					<view class="info-row">
+						<view class="info-item">{{ item.ageScope }}({{ item.genderString }})</view>
+						<view class="info-separator">|</view>
+						<view class="info-item">尺码: {{ item.tshirt_size || '-' }}</view>
+						<view class="info-separator">|</view>
+						<view class="info-item">血型: {{ item.blood_type || '-' }}</view>
 					</view>
 				</view>
 				<view class="edit-btn" @click.stop="editCard(item.id)">
-					<u-icon name="edit-pen" color="#999" size="20"></u-icon>
+					<u-icon name="edit-pen" color="#FF8C00" size="25"></u-icon>
 				</view>
 			</view>
 		</view>
-		<u-button v-if="dataList.length" type="primary" @click="confirmSelect" shape="circle" :disabled="!selectedId" customStyle="margin: 40rpx auto;width: 500rpx;">确认</u-button>
-		<u-button :type="dataList.length ? 'info' : 'primary'" @click="$u.route('pagesSub/registrationCard/list')" shape="circle" :plain="dataList.length > 0" customStyle="margin: 40rpx auto;width: 500rpx;">创建报名卡</u-button>
+		<u-button v-if="dataList.length" color="#FF8C00" @click="confirmSelect" shape="circle" :plain="!selectedId" customStyle="margin: 40rpx auto;width: 500rpx;">确认</u-button>
+		<u-button color="#FF8C00" @click="$u.route('pagesSub/registrationCard/list')" shape="circle" plain customStyle="margin: 40rpx auto;width: 500rpx;">创建报名卡</u-button>
 	</up-popup>
 </template>
 
@@ -165,16 +171,17 @@
 <style lang="scss" scoped>
 	.card-item {
 		margin: 20rpx;
-		padding: 24rpx 20rpx;
+		padding: 32rpx 20rpx;
 		background: #ffffff;
 		border-radius: 16rpx 16rpx 16rpx 16rpx;
 
 		.card-item-wrapper {
 			display: flex;
-			align-items: center;
+			align-items: flex-start;
 
 			.radio-btn {
 				margin-right: 20rpx;
+				margin-top: 6rpx;
 				flex-shrink: 0;
 
 				.radio-circle {
@@ -192,6 +199,7 @@
 
 			.edit-btn {
 				margin-left: 20rpx;
+				margin-top: 6rpx;
 				padding: 10rpx;
 				flex-shrink: 0;
 				display: flex;
@@ -204,23 +212,50 @@
 			display: flex;
 			align-items: center;
 			font-size: 28rpx;
+			margin-bottom: 16rpx;
 
 			.name-text {
 				font-weight: bold;
-				font-size: 30rpx;
+				font-size: 32rpx;
 				color: #000000;
 			}
 
 			.name-owner {
 				display: flex;
 				align-items: center;
-				margin-left: 26rpx;
+				margin-left: 20rpx;
 				background: #f1ffde;
 				border-radius: 8rpx 8rpx 8rpx 8rpx;
 				font-weight: bold;
 				font-size: 24rpx;
 				color: #8cc63e;
 				padding: 8rpx 16rpx;
+			}
+		}
+
+		.id-card-row {
+			margin-bottom: 16rpx;
+
+			.id-card-number-text {
+				font-size: 28rpx;
+				color: #666666;
+				letter-spacing: 2rpx;
+			}
+		}
+
+		.info-row {
+			display: flex;
+			align-items: center;
+
+			.info-item {
+				font-size: 26rpx;
+				color: #666666;
+			}
+
+			.info-separator {
+				margin: 0 16rpx;
+				font-weight: 100;
+				color: #bfbfbf;
 			}
 		}
 
