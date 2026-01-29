@@ -190,7 +190,7 @@
 
 	// 分享配置
 	useShare(() => ({
-		title: '跑了没 - ' + (detail.value.name || ''),
+		title: '全速运动 - ' + (detail.value.name || ''),
 		path: buildPath('/pagesSub/runningTeam/teamDetail', { group_id: routeParams.value.group_id }),
 		imageUrl: detail.value.avatar_url || ''
 	}));

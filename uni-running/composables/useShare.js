@@ -1,9 +1,12 @@
-import { onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app';
+import { getCurrentInstance } from 'vue';
 
 /**
  * 分享功能 Composable
  *
  * 统一封装微信小程序分享逻辑，支持分享给好友和分享到朋友圈
+ *
+ * 注意：由于 uni-app Vue3 Composition API 的限制，onShareAppMessage 在 Composable 中不生效
+ * 因此改用全局 mixin 方案，通过设置 $shareConfig 来传递分享配置
  *
  * @param {Object|Function} config - 分享配置对象或返回配置的函数
  * @param {string} config.title - 分享标题
@@ -34,42 +37,11 @@ export function useShare(config) {
 	});
 	// #endif
 
-	/**
-	 * 获取分享配置（支持静态配置和动态函数）
-	 */
-	const getConfig = () => {
-		return typeof config === 'function' ? config() : config;
-	};
-
-	/**
-	 * 从 path 中提取 query 字符串（用于朋友圈分享）
-	 * /pagesSub/xxx?id=123&name=test => id=123&name=test
-	 */
-	const extractQuery = (path) => {
-		if (!path) return '';
-		const queryIndex = path.indexOf('?');
-		return queryIndex > -1 ? path.substring(queryIndex + 1) : '';
-	};
-
-	// 分享给好友
-	onShareAppMessage(() => {
-		const { title, path, imageUrl } = getConfig();
-		return {
-			title: title || '全速俱乐部',
-			path: path || '/pages/index',
-			imageUrl: imageUrl || ''
-		};
-	});
-
-	// 分享到朋友圈
-	onShareTimeline(() => {
-		const { title, path, imageUrl } = getConfig();
-		return {
-			title: title || '全速俱乐部',
-			query: extractQuery(path),
-			imageUrl: imageUrl || ''
-		};
-	});
+	// 获取当前组件实例，设置 $shareConfig 供全局 mixin 读取
+	const instance = getCurrentInstance();
+	if (instance && instance.proxy) {
+		instance.proxy.$shareConfig = config;
+	}
 }
 
 /**

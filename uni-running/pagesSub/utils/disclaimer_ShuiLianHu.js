@@ -4,7 +4,7 @@ const text = `
 </h2>
 
 <p style="text-align: center;font-family: Calibri;font-size: 14px">
-  <span style="font-family:宋体">（活动报名时在“跑了没”线上勾选即视为签署） </span>
+  <span style="font-family:宋体">（活动报名时在“全速运动”线上勾选即视为签署） </span>
 </p>
 
 <p style="text-align: justify;font-family: Calibri;font-size: 14px">

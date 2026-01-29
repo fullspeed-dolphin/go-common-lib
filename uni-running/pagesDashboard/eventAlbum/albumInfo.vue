@@ -302,13 +302,13 @@
 		},
 		onShareAppMessage() {
 			return {
-				title: '跑了没 - ' + (this.currentEvent.name || ''),
+				title: '全速运动 - ' + (this.currentEvent.name || ''),
 				imageUrl: this.currentEvent.background_image_url
 			};
 		},
 		onShareTimeline() {
 			return {
-				title: '跑了没 - ' + (this.currentEvent.name || ''),
+				title: '全速运动 - ' + (this.currentEvent.name || ''),
 				query: '', // 可以携带参数
 				imageUrl: this.currentEvent.background_image_url
 			};

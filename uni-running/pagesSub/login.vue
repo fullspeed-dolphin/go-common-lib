@@ -7,7 +7,7 @@
         src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png"
         mode="aspectFill"
       ></image>
-      <view class="title flex-center">欢迎使用跑了没</view>
+      <view class="title flex-center">欢迎使用全速运动</view>
     </view>
     <view style="padding: 100rpx 104rpx 0">
       <PhoneLogin @success="successLogin" />

@@ -176,7 +176,7 @@
 
 	// 分享配置
 	useShare({
-		title: '跑了没 - 跑，一切活力的泉源',
+		title: '全速运动 - 跑，一切活力的泉源',
 		path: '/pages/index'
 	});
 
@@ -488,7 +488,7 @@
 			return;
 		}
 		if (item.redirect_url) {
-			uni.$u.route(`pagesSub/settings/webView?link=${encodeURIComponent(item.redirect_url)}&title=${encodeURIComponent(item.description || '跑了没')}`);
+			uni.$u.route(`pagesSub/settings/webView?link=${encodeURIComponent(item.redirect_url)}&title=${encodeURIComponent(item.description || '全速运动')}`);
 			return;
 		}
 	};

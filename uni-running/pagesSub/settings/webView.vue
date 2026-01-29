@@ -10,7 +10,7 @@ import { useShare, buildPath } from "@/composables/useShare.js"
 import request from "@/utils/request.js"
 
 const link = ref("")
-const title = ref("跑了没")
+const title = ref("全速运动")
 
 // 分享配置
 useShare(() => ({

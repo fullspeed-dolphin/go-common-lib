@@ -158,10 +158,10 @@
 						<span>阅读并同意以下内容</span>
 						<up-checkbox v-model:checked="form.agreed" :usedAlone="true" shape="circle" activeColor="#8CC63E" />
 					</view>
-					<view class="agree-content">您已知晓您在跑了没录入的参赛人身份信息，并将用于报名
+					<view class="agree-content">您已知晓您在全速运动录入的参赛人身份信息，并将用于报名
 						活动赛事等所有需要实名制的赛事产品，并在您保存时进行
 						验证，请确保此信息真实有效。
-						跑了没将通过加密等方式保护此信息。</view>
+						全速运动将通过加密等方式保护此信息。</view>
 				</view>
 			</view>
 

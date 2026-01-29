@@ -90,6 +90,7 @@
 				res = res.events?.filter?.(item => item.id).map(item => {
 					return {
 						event_id: item.id,
+						name: item.name,
 						description: item.description,
 						image_url: item.image_url,
 						event_time: item.event_time?.slice(0, 10),

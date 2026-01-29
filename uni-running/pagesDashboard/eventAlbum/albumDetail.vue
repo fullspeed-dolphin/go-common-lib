@@ -5,7 +5,7 @@
 			:inner-list-style="{'display':'flex','flex-wrap':'wrap'}" fixed-cell-height="180rpx" :default-page-size="60"
 			:force-close-inner-list="true" @virtualListChange="e => virtualList = e" @query="queryList" @scroll="onListScroll">
 
-			<AlbumInfo />
+			<AlbumInfo :event-id="currentEvent.event_id" />
 
 			<view style="height: 44px;">
 				<section class="section-tabs flex-between-center" :class="{isFixed: isShowBackTop}"
@@ -72,6 +72,7 @@
 	const store = useStore();
 
 	const album_total = computed(() => store.state.album_total);
+	const album_info = computed(() => store.state.album_info);
 
 	import zPaging from "./components/z-paging/components/z-paging/z-paging.vue"
 	import request from "@/utils/request.js"
@@ -99,16 +100,16 @@
 	const currentEvent = ref({})
 	const isShowBackTop = ref(false)
 
-	// 分享配置
+	// 分享配置 - 使用 Vuex 中 AlbumInfo 获取的完整数据
 	useShare(() => ({
-		title: currentEvent.value.description
-			? `跑了没 - ${currentEvent.value.description} - 活动相册`
-			: '跑了没 - 活动相册',
+		title: album_info.value?.name
+			? `全速运动 - ${album_info.value.name} - 活动相册`
+			: '全速运动 - 活动相册',
 		path: buildPath('/pagesDashboard/eventAlbum/albumDetail', {
 			event_id: currentEvent.value.event_id,
-			description: currentEvent.value.description || ''
+			name: album_info.value?.name || ''
 		}),
-		imageUrl: currentEvent.value.image_url || ''
+		imageUrl: album_info.value?.image_url || album_info.value?.background_image_url || ''
 	}));
 	const isLoadingMore = ref(false)
 	const isScrolling = ref(false)

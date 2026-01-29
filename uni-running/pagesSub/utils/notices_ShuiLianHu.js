@@ -48,11 +48,11 @@ const text = `
 </p>
 
 <p style="text-align: justify;font-family: Calibri;font-size: 14px">
-  <span style="font-family:宋体">（1）报名后 24 小时内：可在“跑了没”小程序一键退款，1-3 个工作日原路退回。</span>
+  <span style="font-family:宋体">（1）报名后 24 小时内：可在“全速运动”小程序一键退款，1-3 个工作日原路退回。</span>
 </p>
 
 <p style="text-align: justify;font-family: Calibri;font-size: 14px">
-  <span style="font-family:宋体">（2）报名后超 24 小时：常规不接受退款，如因不可抗力因素或伤病需提供二甲及以上医院证明至"跑了没"小程序客服申请。</span>
+  <span style="font-family:宋体">（2）报名后超 24 小时：常规不接受退款，如因不可抗力因素或伤病需提供二甲及以上医院证明至"全速运动"小程序客服申请。</span>
 </p>
 `;
 

@@ -45,24 +45,38 @@
 	</view>
 </template>
 <script setup>
-import { ref, computed} from "vue";
-	import {
-		useStore
-	} from "vuex";
-import { onLoad } from "@dcloudio/uni-app";
+import { ref, computed, onMounted, watch } from "vue";
+import { useStore } from "vuex";
 import request from "@/utils/request.js"
 import FindPhoto from "./FindPhoto.vue"
+
 const store = useStore();
+
+const props = defineProps({
+	eventId: String
+});
 
 const album_total = computed(() => store.state.album_total);
 
 const refFindPhoto = ref(null);
 const routeParams = ref({});
 
-onLoad((options) => {
-  routeParams.value = options;
-	getDetail()
-	addVistAmount()
+// 使用 onMounted + watch 替代 onLoad
+onMounted(() => {
+	if (props.eventId) {
+		routeParams.value = { event_id: props.eventId };
+		getDetail();
+		addVistAmount();
+	}
+});
+
+// 监听 eventId 变化（处理父组件异步传值的情况）
+watch(() => props.eventId, (newVal) => {
+	if (newVal && !routeParams.value.event_id) {
+		routeParams.value = { event_id: newVal };
+		getDetail();
+		addVistAmount();
+	}
 });
 
 const detail = ref({})

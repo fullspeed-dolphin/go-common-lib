@@ -61,7 +61,7 @@
 			margin-top: 25rpx;
 font-size: 24rpx;
 color: #979797;">
-				成为跑了没注册摄影师，更多官方活动等你来参加！
+				成为全速运动注册摄影师，更多官方活动等你来参加！
 			</view>
 		</block>
 	</view>

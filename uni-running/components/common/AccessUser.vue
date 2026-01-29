@@ -12,7 +12,7 @@
         <view class="section-box u-ml-10 flex-box">
           <!-- <image class="logo u-mr-10" src="../../static/img/basicprofile.jpeg"
 						style="width: 40rpx;height:40rpx;border-radius: 999rpx;" mode="aspectFill"></image> -->
-          <view class="title flex-center">跑了没小程序申请</view>
+          <view class="title flex-center">全速运动小程序申请</view>
         </view>
         <view class="">
           <view class="u-mt-20 u-mb-10"> 获取你的昵称、头像 </view>

@@ -66,7 +66,7 @@ const store = useStore();
 
 // 分享配置
 useShare({
-	title: '跑了没 - 活动列表',
+	title: '全速运动 - 活动列表',
 	path: '/pagesSub/eventList'
 });
 const refUserLogin = ref(null);

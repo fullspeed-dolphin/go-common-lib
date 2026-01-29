@@ -9,7 +9,7 @@
   >
     <view class="u-p-20 section-dialog">
       <view class="section-box">
-        <view class="title flex-center">欢迎登录 跑了没</view>
+        <view class="title flex-center">欢迎登录 全速运动</view>
       </view>
       <view class="flex-col-center">
         <view class="" style="font-size: 24rpx">
