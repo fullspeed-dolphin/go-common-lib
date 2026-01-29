@@ -288,8 +288,10 @@ const messages = [
 
 function renderSplitText(text) {
 	const parts = text.split(/[，]+/).filter(p => p.trim());
-	console.log(parts)
-	return parts;
+	// 给除了最后一个部分之外的每个部分加上逗号
+	return parts.map((part, index) => {
+		return index < parts.length - 1 ? part + '，' : part;
+	});
 }
 
 export function getRandomMotivation() {

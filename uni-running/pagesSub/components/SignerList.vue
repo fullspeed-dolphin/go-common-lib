@@ -24,7 +24,7 @@
 					<view class="info-row">
 						<view class="info-item">{{ item.ageScope }}({{ item.genderString }})</view>
 						<view class="info-separator">|</view>
-						<view class="info-item">尺码: {{ item.tshirt_size || '-' }}</view>
+						<view class="info-item">衣服尺码: {{ item.tshirt_size || '-' }}</view>
 						<view class="info-separator">|</view>
 						<view class="info-item">血型: {{ item.blood_type || '-' }}</view>
 					</view>

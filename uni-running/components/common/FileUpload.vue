@@ -9,7 +9,7 @@
       </template>
       <template v-else>
         <view class="custom-preview" :style="customPreviewStyle">
-          <image :src="fileList[0].url" class="custom-preview-image" @click="chooseAndReplace" mode="aspectFill" />
+          <image :src="fileList[0].url" class="custom-preview-image" @click="chooseAndReplace" mode="aspectFit" />
           <view class="custom-preview-actions">
             <u-icon name="close" size="14" color="#fff" @click.stop="deleteFile({ tempFilePath: fileList[0] })" />
           </view>

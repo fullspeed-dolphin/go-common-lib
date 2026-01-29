@@ -12,9 +12,9 @@
 			</section>
 		</block>
 		
-		<section class="flex-center" style="margin-top: 80rpx;">
-			<view class="upload-wrapper">
-				<FileUpload v-model="ruleForm.picture" additional="ocr-checkin" isCustom :width="448" :height="600" @change="onImageUploaded">
+		<section class="flex-center" :style="isSuccess ? 'margin-top: 30rpx;' : 'margin-top: 80rpx;'">
+			<view :class="isSuccess ? 'upload-wrapper-confirm' : 'upload-wrapper'">
+				<FileUpload v-model="ruleForm.picture" additional="ocr-checkin" isCustom :width="isSuccess ? 500 : 448" :height="isSuccess ? 750 : 600" @change="onImageUploaded">
 					<template #trigger>
 						<view class="section-upload flex-col-center" style="color: #99A1AF;line-height: 1.3;">
 							<view class="iconfont flex-center icon-shangchuan"></view>
@@ -43,8 +43,10 @@
 			<view class="tac" style="font-size: 16rpx;color: #99A1AF;margin-top: 40rpx;">
 				<text style="color: #E53935;">安全提示：</text> 身体健康者参与，不适即停，风险自担； 选安全场地，避恶劣天气。
 			</view>
-			<view class="powered-by">由易联支付AI平台强势驱动</view>
 		</view>
+
+		<!-- 底部固定文字 -->
+		<view v-if="pageIndex === 0 || !ruleForm.picture || !isSuccess" class="powered-by-fixed">由全速科技AI平台强势驱动</view>
 		
 		<section v-if="isSubmiting" class="section-loading flex-center">
 			<view class="panel1 bgf flex-col-center">
@@ -57,7 +59,7 @@
 		</section>
 		
 		<block v-if="pageIndex === 1 && ruleForm.picture && exerciseInfo.distance">
-			<section  class="form-fields">
+			<section class="form-fields-confirm">
 				<view style="font-weight: 800;font-size: 32rpx;">
 					<up-icon name="checkmark-circle" size="40rpx" color="#00C950" />
 					识别结果
@@ -72,15 +74,13 @@
 					</view>
 					<view class="cell-item flex-col-center">
 						<view class="label flex-center" style="background: #FFF7ED;">
-							<!-- <up-icon name="clock" size="40rpx" color="#FF8C00" /> -->
 							<view class="iconfont icon-jishiqi" style="color:#FF8C00"></view>
 						</view>
 						<view class="value">{{exerciseInfo.duration || 0}}</view>
 						<text class="label-text">时长</text>
 					</view>
 					<view class="cell-item flex-col-center">
-						<view class="label flex-center" style="background: #FAF5FF;;">
-							<!-- <up-icon name="calendar-fill" size="40rpx" color="#AF4BFF" /> -->
+						<view class="label flex-center" style="background: #FAF5FF;">
 							<view class="iconfont icon-shandianshandianfahuotuikuan" style="color:#AF4BFF"></view>
 						</view>
 						<view class="value">{{exerciseInfo.pace || 0}}</view>
@@ -88,11 +88,11 @@
 					</view>
 				</view>
 			</section>
-			<view class="flex-center" style="color:#99A1AF;margin-top:50rpx;font-size: 24rpx;">
+			<view class="flex-center" style="color:#99A1AF;margin-top:30rpx;font-size: 24rpx;">
 				请核对上方数据是否与截图一致
 			</view>
-			<view class="flex-center" style="margin-top: 142rpx;">
-				<u-button type="primary" custom-style="width:642rpx;" color="#ff8c00" shape="circle" @click="confirmToCheck()">确认数据无误</u-button>
+			<view class="flex-center" style="position: fixed; bottom: 30rpx; width: 100%; padding: 0 30rpx;">
+				<u-button type="primary" custom-style="width:642rpx;" color="#ff8c00" shape="circle" @click="confirmToCheck()">提交数据</u-button>
 			</view>
 		</block>
 		
@@ -136,6 +136,10 @@
 	const onImageUploaded = async (imageUrl) => {
 		if (!imageUrl) return;
 
+		// 重置状态，确保加载时背景显示上传界面
+		isSuccess.value = false
+		pageIndex.value = 0
+
 		try {
 			isSubmiting.value = true
 
@@ -154,18 +158,13 @@
 
 			if (isValidData) {
 				verifyToken = dataInfo.token;
-				
+
 				// 将识别结果填入
 				exerciseInfo.value.distance = dataInfo.km;
 				exerciseInfo.value.duration = dataInfo.time;
 				exerciseInfo.value.pace = dataInfo.speed;
-				
+
 				isSuccess.value = true
-				isSuccessCheck.value = true
-				
-				setTimeout(() => {
-					isSuccessCheck.value = false
-				}, 2000)
 				// uni.showModal({
 				// 	title: '打卡成功',
 				// 	content: res?.msg || '打卡成功',
@@ -215,7 +214,13 @@
 		request.post('/ocr-api/checkin', {
 			token: verifyToken
 		}, { showError: false, includeResponse: true }).then(res => {
-			uni.$u.route('pagesSport/recognizeSuccess', res)
+			// 显示"后台核验成功"弹窗
+			isSuccessCheck.value = true
+			// 2秒后隐藏弹窗并跳转
+			setTimeout(() => {
+				isSuccessCheck.value = false
+				uni.$u.route('pagesSport/recognizeSuccess', res)
+			}, 2000)
 		})
 	}
 </script>
@@ -303,8 +308,9 @@
 			}
 
 			.custom-preview {
-				width: 690rpx !important;
-				height: 500rpx !important;
+				border: 2rpx solid #FF8C00;
+				border-radius: 16rpx;
+				background: #f5f5f5;
 			}
 
 			.u-upload__wrap__preview__image {
@@ -312,6 +318,14 @@
 				height: 600rpx !important;
 				border-radius: 16rpx;
 				border: 2rpx solid #FF8C00;
+			}
+		}
+
+		.upload-wrapper-confirm {
+			.custom-preview {
+				border: 2rpx solid #FF8C00;
+				border-radius: 16rpx;
+				background: #f5f5f5;
 			}
 		}
 
@@ -332,6 +346,22 @@
 		}
 	}
 
+	.form-fields-confirm {
+		width: 686rpx;
+		padding: 20rpx 50rpx;
+		margin: 20rpx auto 0;
+		border-radius: 32rpx;
+		border: 2rpx solid #F3F4F6;
+
+		.cell-item {
+			margin-top: 20rpx;
+			.value {
+				margin-top: 15rpx;
+				margin-bottom: 10rpx;
+			}
+		}
+	}
+
 	.bottom-info-content {
 		text-align: center;
 		padding: 40rpx 0 30rpx;
@@ -342,12 +372,16 @@
 			line-height: 40rpx;
 			padding: 10rpx 0;
 		}
+	}
 
-		.powered-by {
-			color: rgba(255, 140, 0, .75);
-			font-size: 24rpx;
-			margin-top: 50rpx;
-		}
+	.powered-by-fixed {
+		position: fixed;
+		bottom: 60rpx;
+		left: 0;
+		width: 100%;
+		text-align: center;
+		color: rgba(255, 140, 0, .75);
+		font-size: 28rpx;
 	}
 
 </style>

@@ -1,6 +1,6 @@
 <template>
   <view class="">
-		<u-navbar autoBack bgColor="#ff9501" placeholder title="截图上传成功"></u-navbar>
+		<u-navbar autoBack bgColor="#ff9501" placeholder title="打卡成功"></u-navbar>
 		<view style="position: relative;width:100%;height: 700rpx;overflow: hidden;">
 			<view class="bg"></view>
 		</view>
@@ -21,8 +21,7 @@
 				<view class="u-flex-y-center">
 					<view class="color iconfont icon-liwu" style="font-size: 46rpx;"></view>
 					<view class="tal" style="max-width:414rpx;margin-left:15rpx;line-height: 1.5;">
-						<div>{{getRandomMotivation()[0]}} </div>
-						<div>{{getRandomMotivation()[1]}}</div>
+						<div v-for="(line, index) in motivationText" :key="index">{{line}}</div>
 					</view>
 				</view>
 			</view>
@@ -39,6 +38,7 @@ import { onLoad } from '@dcloudio/uni-app'
 import { getRandomMotivation } from "./assets/rules.js"
 
 const routerParems = ref('')
+const motivationText = ref(getRandomMotivation())
 
 function extractNumbers(str) {
   const matches = str.match(/\d+/g);
