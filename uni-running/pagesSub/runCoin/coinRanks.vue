@@ -3,7 +3,7 @@
 		<u-navbar autoBack placeholder title="跑币排行榜" bgColor="transparent"></u-navbar>
 		<mescroll-body @init="mescrollInit" @down="downCallback" @up="getList" top="0" :up="{ auto: false }">
 			<view class="card-item bgf u-flex" v-for="(item, index) in dataList" :key="index">
-				<up-lazy-load class="img" borderRadius="16" :image="item.avatar_url + '?x-oss-process=image/resize,w_150,h_150,m_fill'" mode="aspectFill" />
+				<up-lazy-load class="img" borderRadius="16" :image="getAvatarUrl(item)" error-img="/static/images/user.png" mode="aspectFill" />
 
 				<view class="card-content">
 					<view class="title u-flex-y-center">
@@ -52,6 +52,21 @@
 	});
 
 	const searchTxt = ref("")
+
+	const DEFAULT_AVATAR = '/static/images/user.png'
+
+	// 获取有效的头像URL，过滤掉微信默认头像
+	const getAvatarUrl = (item) => {
+		const { avatar_url, nickname } = item
+		// 如果没有头像URL，使用默认头像
+		if (!avatar_url) return DEFAULT_AVATAR
+		// 如果昵称是wxid_或user_开头，说明用户未授权，头像也是默认的
+		if (nickname?.startsWith('wxid_') || nickname?.startsWith('user_')) {
+			return DEFAULT_AVATAR
+		}
+		// 正常头像，加上OSS处理参数
+		return avatar_url + '?x-oss-process=image/resize,w_150,h_150,m_fill'
+	}
 
 	// 方法定义
 	const viewDetail = (item) => {
