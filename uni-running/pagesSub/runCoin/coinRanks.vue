@@ -77,7 +77,7 @@
 		uni.showLoading({ mask: true });
 
 		const params = {
-			page: mescroll.num - 1,
+			page: mescroll.num,
 			page_size: 10,
 		};
 
