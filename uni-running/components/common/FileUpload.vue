@@ -75,6 +75,10 @@ import { uploadToken } from "../../utils/config";
 
 // Props定义
 const props = defineProps({
+	additional: {
+		type: String,
+		default: "",
+	},
 	isCustom: {
 		type: Boolean,
 		default: false,
@@ -338,11 +342,16 @@ const compressImage = (src) => {
 const uploadFile = async (file) => {
   const filePath = await compressImage(file.url);
   console.log("filePath===========>", filePath);
+	const additional = props.additional
   return new Promise((resolve, reject) => {
     uni.uploadFile({
       url: baseLink + `/basic-service/image/upload`,
       filePath: filePath,
       name: "image",
+			// formData: {
+			// 	// path: additional || null
+			// 	path: 'ocr-checkin',
+			// },
       header: {
         Authorization: uploadToken,
         "content-type": "application/json",

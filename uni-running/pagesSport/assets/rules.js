@@ -269,3 +269,30 @@ export const failUpload = `
 <div>
 	
 `
+
+const messages = [
+  "每一步都在靠近更好的自己！",
+  "今天的汗水，是明天的勋章！",
+  "每一次迈步，都是向更好的自己靠近",
+  "今日的汗水，会浇灌出明日的光芒！",
+  "打卡不是终点，是持续热爱的起点呀!",
+  "自律的每一刻，都在塑造更棒的你！",
+  "运动的意义，在于遇见活力满满的自己!",
+  "一步一脚印，时光不会辜负坚持的你!",
+  "保持热爱，奔赴每一场属于自己的山海!",
+  "今日的坚持，是未来从容的底气!",
+  "突破舒适区，你比想象中更强大！",
+  "运动不止，热爱不息，未来可期！",
+  "运动签收成功，继续解锁运动快乐！"
+];
+
+function renderSplitText(text) {
+	const parts = text.split(/[，]+/).filter(p => p.trim());
+	console.log(parts)
+	return parts;
+}
+
+export function getRandomMotivation() {
+	const text = messages[Math.floor(Math.random() * messages.length)]
+  return renderSplitText(text);
+}

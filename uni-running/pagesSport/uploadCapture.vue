@@ -14,7 +14,7 @@
 		
 		<section class="flex-center" style="margin-top: 80rpx;">
 			<view class="upload-wrapper">
-				<FileUpload v-model="ruleForm.picture" isCustom :width="448" :height="600" @change="onImageUploaded">
+				<FileUpload v-model="ruleForm.picture" additional="ocr-checkin" isCustom :width="448" :height="600" @change="onImageUploaded">
 					<template #trigger>
 						<view class="section-upload flex-col-center" style="color: #99A1AF;line-height: 1.3;">
 							<view class="iconfont flex-center icon-shangchuan"></view>
@@ -28,43 +28,20 @@
 			</view>
 		</section>
 		
-		<section v-if="pageIndex === 1 && ruleForm.picture && exerciseInfo.distance" class="form-fields">
-			<view style="font-weight: 800;font-size: 32rpx;">
-				<up-icon name="checkmark-circle" size="40rpx" color="#00C950" />
-				识别结果
-			</view>
-			<view class="u-flex-row">
-				<view class="cell-item flex-col-center">
-					<view class="label flex-center" style="background: #EFF6FF;">
-						<up-icon name="map" size="40rpx" color="#2B7FFF" />
-					</view>
-					<view class="value">{{exerciseInfo.distance || 0}}</view>
-					<text class="label-text">距离(KM)</text>
-				</view>
-				<view class="cell-item flex-col-center">
-					<view class="label flex-center" style="background: #FFF7ED;">
-						<!-- <up-icon name="clock" size="40rpx" color="#FF8C00" /> -->
-						<view class="iconfont icon-jishiqi" style="color:#FF8C00"></view>
-					</view>
-					<view class="value">{{exerciseInfo.duration || 0}}</view>
-					<text class="label-text">时长</text>
-				</view>
-				<view class="cell-item flex-col-center">
-					<view class="label flex-center" style="background: #FAF5FF;;">
-						<!-- <up-icon name="calendar-fill" size="40rpx" color="#AF4BFF" /> -->
-						<view class="iconfont icon-shandianshandianfahuotuikuan" style="color:#AF4BFF"></view>
-					</view>
-					<view class="value">{{exerciseInfo.pace || 0}}</view>
-					<text class="label-text">配速</text>
-				</view>
-			</view>
-		</section>
-		
 		<!-- 底部信息区 -->
 		<view v-if="pageIndex === 0 || !ruleForm.picture || !isSuccess" class="bottom-info-content">
-			<view @click="$u.route('pagesSport/captureRule?type=rule')" class="rule-link flex-center">
+			<view @click="$u.route('pagesSport/captureRule?type=rule')" style="color:rgba(255, 140, 0, .75)" class="rule-link flex-center">
 				截图打卡规则
 				<u-icon name="arrow-right" color="rgba(255, 140, 0, .75)"></u-icon>
+			</view>
+			<view class="" style="font-size: 24rpx;color: #C9CCD1;margin-top: 90rpx;padding-left:34rpx; line-height: 34rpx;text-align: left;">
+				<view>1. 每日打卡即可获跑币，每日上限 100 个跑币(1km=10 跑币)。</view> 
+				<view>2. 截图需清晰显示时间+类型+数据(跑步/健走≥1km)。 </view>
+				<view>3. 当日运动当日23:59前通过小程序上传，逾期无效。 </view>
+				<view>4. 盗用/篡改截图将取消权益并记录违规。</view>
+			</view>
+			<view class="tac" style="font-size: 16rpx;color: #99A1AF;margin-top: 40rpx;">
+				<text style="color: #E53935;">安全提示：</text> 身体健康者参与，不适即停，风险自担； 选安全场地，避恶劣天气。
 			</view>
 			<view class="powered-by">由易联支付AI平台强势驱动</view>
 		</view>
@@ -79,8 +56,52 @@
 			</view>
 		</section>
 		
-		<view v-if="pageIndex === 1 && ruleForm.picture && submitText" class="" style="padding: 56rpx 20rpx 80rpx">
-			<u-button type="primary" color="#ff8c00" shape="circle" @click="routeTo()">{{submitText}}</u-button>
+		<block v-if="pageIndex === 1 && ruleForm.picture && exerciseInfo.distance">
+			<section  class="form-fields">
+				<view style="font-weight: 800;font-size: 32rpx;">
+					<up-icon name="checkmark-circle" size="40rpx" color="#00C950" />
+					识别结果
+				</view>
+				<view class="u-flex-row">
+					<view class="cell-item flex-col-center">
+						<view class="label flex-center" style="background: #EFF6FF;">
+							<up-icon name="map" size="40rpx" color="#2B7FFF" />
+						</view>
+						<view class="value">{{exerciseInfo.distance || 0}}</view>
+						<text class="label-text">距离(KM)</text>
+					</view>
+					<view class="cell-item flex-col-center">
+						<view class="label flex-center" style="background: #FFF7ED;">
+							<!-- <up-icon name="clock" size="40rpx" color="#FF8C00" /> -->
+							<view class="iconfont icon-jishiqi" style="color:#FF8C00"></view>
+						</view>
+						<view class="value">{{exerciseInfo.duration || 0}}</view>
+						<text class="label-text">时长</text>
+					</view>
+					<view class="cell-item flex-col-center">
+						<view class="label flex-center" style="background: #FAF5FF;;">
+							<!-- <up-icon name="calendar-fill" size="40rpx" color="#AF4BFF" /> -->
+							<view class="iconfont icon-shandianshandianfahuotuikuan" style="color:#AF4BFF"></view>
+						</view>
+						<view class="value">{{exerciseInfo.pace || 0}}</view>
+						<text class="label-text">配速</text>
+					</view>
+				</view>
+			</section>
+			<view class="flex-center" style="color:#99A1AF;margin-top:50rpx;font-size: 24rpx;">
+				请核对上方数据是否与截图一致
+			</view>
+			<view class="flex-center" style="margin-top: 142rpx;">
+				<u-button type="primary" custom-style="width:642rpx;" color="#ff8c00" shape="circle" @click="confirmToCheck()">确认数据无误</u-button>
+			</view>
+		</block>
+		
+		<view v-if="isSuccessCheck" class="check flex-center b" style="width: 344rpx;
+			height: 96rpx; position: fixed; left: 50%;top: 50%; transform: translate(-50%, -50%);
+			background: #404040; color: #fff;font-size: 32rpx;
+			border-radius: 46rpx 46rpx 46rpx 46rpx;">
+			<up-icon name="checkmark-circle" size="40rpx" color="#00C950" />
+			<view class="u-ml-10">后台核验成功</view>
 		</view>
 		
 	</view>
@@ -108,33 +129,43 @@
 	
 	const isSubmiting = ref(false)
 	const isSuccess = ref(false)
-	const submitText = ref('')
+	const isSuccessCheck = ref(false)
 
 	// 图片上传成功后调用OCR识别
+	let verifyToken = ''
 	const onImageUploaded = async (imageUrl) => {
 		if (!imageUrl) return;
 
 		try {
 			isSubmiting.value = true
 
-			const res = await request.post('/ocr-api/recognize', {
+			let res = await request.post('/ocr-api/recognize', {
 				image_url: imageUrl
 			}, { showError: false, includeResponse: true });
-
+			
+			// let res = {"code":200,"msg":"success","data":{"km":"16.03","time":"1:32:50","speed":"5'47\"","created_at":"2026-01-29T06:38:00","token":"eyJrbSI6IjE2LjAzIiwidGltZSI6IjE6MzI6NTAiLCJzcGVlZCI6IjUnNDdcIiIsIm9wZW5pZCI6ImNsaS10ZXN0IiwiZXhwaXJlX2F0IjoxNzY5Njc5MjE3fQ.24c7a1bafd1a003101ab2ec252383007376b85a11db6741e39439744c90df927"}}
+			
+			const dataInfo = res?.data
 			// 校验返回数据是否有效（不为空、不为0）
-			const isValidData = res?.data &&
-				res.data.km && res.data.km !== '0' && res.data.km !== '0.00' &&
-				res.data.time && res.data.time !== '00:00' && res.data.time !== '00:00:00' &&
-				res.data.speed;
+			const isValidData = dataInfo &&
+				dataInfo.km && dataInfo.km !== '0' && dataInfo.km !== '0.00' &&
+				dataInfo.time && dataInfo.time !== '00:00' && dataInfo.time !== '00:00:00' &&
+				dataInfo.speed;
 
 			if (isValidData) {
-				// 将识别结果填入
-				exerciseInfo.value.distance = res.data.km;
-				exerciseInfo.value.duration = res.data.time;
-				exerciseInfo.value.pace = res.data.speed;
+				verifyToken = dataInfo.token;
 				
-				submitText.value = res?.msg || '打卡成功';
+				// 将识别结果填入
+				exerciseInfo.value.distance = dataInfo.km;
+				exerciseInfo.value.duration = dataInfo.time;
+				exerciseInfo.value.pace = dataInfo.speed;
+				
 				isSuccess.value = true
+				isSuccessCheck.value = true
+				
+				setTimeout(() => {
+					isSuccessCheck.value = false
+				}, 2000)
 				// uni.showModal({
 				// 	title: '打卡成功',
 				// 	content: res?.msg || '打卡成功',
@@ -146,8 +177,8 @@
 				// 	}
 				// });
 			} else {
+				ruleForm.value.picture = ""
 				isSuccess.value = false
-				submitText.value = ''
 				uni.showModal({
 					title: '识别失败',
 					content: res?.msg || '无法识别截图中的运动数据，请确保上传的是有效的运动截图',
@@ -156,7 +187,8 @@
 			}
 		} catch (error) {
 			isSuccess.value = false
-			submitText.value = ''
+			ruleForm.value.picture = ""
+			
 			uni.hideLoading();
 			console.error('OCR识别失败:', error);
 			uni.showModal({
@@ -176,9 +208,15 @@
 	});
 	
 	function routeTo() {
-		uni.redirectTo({
-			url: '/pagesSub/runCoin/myCoin'
-		});
+		uni.$u.route('pagesSport/recognizeSuccess')
+	}
+	
+	function confirmToCheck() {
+		request.post('/ocr-api/checkin', {
+			token: verifyToken
+		}, { showError: false, includeResponse: true }).then(res => {
+			uni.$u.route('pagesSport/recognizeSuccess', res)
+		})
 	}
 </script>
 
@@ -280,7 +318,6 @@
 		.section-upload {
 			width: 448rpx;
 			height: 600rpx;
-			background: #FFF;
 			border-radius: 36rpx;
 			border: 10rpx dashed #D1D5DC;
 			line-height: 40rpx;
@@ -296,11 +333,8 @@
 	}
 
 	.bottom-info-content {
-		position: fixed;
-		bottom: 0;
-		width: 100%;
 		text-align: center;
-		padding: 130rpx 0 30rpx;
+		padding: 40rpx 0 30rpx;
 
 		.rule-link {
 			color: rgba(255, 140, 0, .75);
