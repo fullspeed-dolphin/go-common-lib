@@ -22,14 +22,10 @@
           }}人</text>
 			</view>
 			<view class="group-info-row">
-				<text class="label">上月总跑量</text>
-				<text class="value highlight">{{
-            formatDistance(
-              item.last_month_distance || item.total_distance || 0
-            )
-          }}km</text>
+				<text class="label">总跑量</text>
+				<text class="value highlight">{{formatDistance(item.total_km)}}km</text>
 			</view>
-			<view class="group-info-row">
+			<!-- <view class="group-info-row">
 				<text class="label">周人均跑</text>
 				<text class="value highlight">{{
             formatDistance(item.weekly_avg_distance || item.avg_distance || 0)
@@ -37,7 +33,7 @@
 			</view>
 			<view class="group-info-row">{{
         item.establish_location || item.address || item.location || "--"
-      }}</view>
+      }}</view> -->
 		</view>
 		<!-- 排名图标 -->
 		<view v-if="rankIcon" class="rank-icon">

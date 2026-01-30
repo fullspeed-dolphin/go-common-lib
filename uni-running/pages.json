@@ -212,14 +212,6 @@
           }
         },
         {
-          "path": "sport/list",
-          "style": {
-            "navigationStyle": "custom",
-            "navigationBarTitleText": "运动记录"
-          }
-        },
-        
-        {
           "path": "address/list",
           "style": {
             "navigationStyle": "custom",

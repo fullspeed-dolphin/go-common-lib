@@ -2,8 +2,10 @@
 	<view class="">
 		<u-navbar title="排行榜" placeholder />
 		<view class="tab-container flex-center" :style="{ top: getNavbarHeight() + 'px' }">
-			<u-tabs lineHeight="2" :duration="0" :inactiveStyle="{ color: '#000' }" :activeStyle="{ color: '#FF8C00' }"
-				:list="tab.items" @change="changeTab" :scrollable="false" keyName="label" lineColor="#FF8C00" />
+			<div style="width: 530rpx;">
+				<u-tabs lineHeight="2" :duration="0" :scrollable="false" :inactiveStyle="{ color: '#000' }" :activeStyle="{ color: '#FF8C00' }"
+				:list="tab.items" @change="changeTab" keyName="label" lineColor="#FF8C00" />
+			</div>
 		</view>
 		<mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" :top="100">
 			<!-- 个人跑量列表 -->
