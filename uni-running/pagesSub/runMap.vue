@@ -1244,7 +1244,7 @@ const submitRunningData = async () => {
       // 如果接口返回了id，使用返回的id；否则使用默认值
       const sportId = response?.id;
       uni.navigateTo({
-        url: `/pagesSub/sport/show?id=${sportId}`,
+        url: `/pagesSport/runDetail?id=${sportId}`,
       });
     }, 1000);
   } catch (error) {

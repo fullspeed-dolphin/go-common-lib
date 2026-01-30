@@ -25,7 +25,7 @@
 								mode="aspectFill"></image>
 						</view>
 					</view>
-					<view class="section u-flex-1 u-flex-between-center" @click="userRouteTo('pagesSport/uploadCapture')">
+					<view class="section u-flex-1 u-flex-between-center" @click="userRouteTo('pagesSport/punchInUpload')">
 							<view class="section-content-left">
 								<view class="section-content-title">运动截图打卡</view>
 							</view>
@@ -169,36 +169,36 @@
 	// 跳转到排行榜页面
 	const goToRanking = () => {
 		if (!userInfo.value.id) {
-			pendingAction.value = () => uni.navigateTo({ url: "/pagesSub/sport/top" });
+			pendingAction.value = () => uni.navigateTo({ url: "/pagesSport/runRankList" });
 			return refUserLogin.value?.open();
 		}
 
 		uni.navigateTo({
-			url: "/pagesSub/sport/top",
+			url: "/pagesSport/runRankList",
 		});
 	};
 
 	// 跳转到运动记录页面
 	const goToRunRecord = () => {
 		if (!userInfo.value.id) {
-			pendingAction.value = () => uni.navigateTo({ url: "/pagesSub/sport/list" });
+			pendingAction.value = () => uni.navigateTo({ url: "/pagesSport/runRecords" });
 			return refUserLogin.value?.open();
 		}
 
 		uni.navigateTo({
-			url: "/pagesSub/sport/list",
+			url: "/pagesSport/runRecords",
 		});
 	};
 
 	// 跳转到运动打卡页面
 	const goToRunCheckIn = () => {
 		if (!userInfo.value.id) {
-			pendingAction.value = () => uni.navigateTo({ url: "/pagesSub/sport/checkIn" });
+			pendingAction.value = () => uni.navigateTo({ url: "/pagesSport/punchInRecords" });
 			return refUserLogin.value?.open();
 		}
 
 		uni.navigateTo({
-			url: "/pagesSub/sport/checkIn",
+			url: "/pagesSport/punchInRecords",
 		});
 	};
 

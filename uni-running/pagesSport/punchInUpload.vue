@@ -30,7 +30,7 @@
 		
 		<!-- 底部信息区 -->
 		<view v-if="pageIndex === 0 || !ruleForm.picture || !isSuccess" class="bottom-info-content">
-			<view @click="$u.route('pagesSport/captureRule?type=rule')" style="color:rgba(255, 140, 0, .75)" class="rule-link flex-center">
+			<view @click="$u.route('pagesSport/punchInRule?type=rule')" style="color:rgba(255, 140, 0, .75)" class="rule-link flex-center">
 				截图打卡规则
 				<u-icon name="arrow-right" color="rgba(255, 140, 0, .75)"></u-icon>
 			</view>
@@ -116,7 +116,7 @@
 	// 分享配置
 	useShare({
 		title: '运动截图打卡',
-		path: '/pagesSport/uploadCapture'
+		path: '/pagesSport/punchInUpload'
 	});
 
 	const pageIndex = ref(0)

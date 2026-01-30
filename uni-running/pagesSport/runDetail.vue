@@ -186,7 +186,7 @@ const routeId = ref('');
 // 分享配置
 useShare(() => ({
   title: `${activityData.value.userName || '用户'}的运动详情`,
-  path: buildPath('/pagesSub/sport/show', { id: routeId.value })
+  path: buildPath('/pagesSport/runDetail', { id: routeId.value })
 }));
 
 const mapCenter = ref({

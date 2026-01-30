@@ -29,7 +29,7 @@
 							</view>
 						</view>
 						
-						<view class="flex-center" @click="$u.route('pagesSport/captureRule?type=coinRule')" style="color:rgba(255, 140, 0, .75);margin-top: 40rpx;">
+						<view class="flex-center" @click="$u.route('pagesSport/punchInRule?type=coinRule')" style="color:rgba(255, 140, 0, .75);margin-top: 40rpx;">
 							跑币规则 
 							<u-icon name="arrow-right" color="rgba(255, 140, 0, .75)"></u-icon>
 						</view>

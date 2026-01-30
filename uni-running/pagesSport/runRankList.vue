@@ -1,7 +1,7 @@
 <template>
-	<view class="page">
+	<view class="">
 		<u-navbar title="排行榜" placeholder />
-		<view class="tab-container flex-center bgf" :style="{ top: getNavbarHeight() + 'px' }">
+		<view class="tab-container flex-center" :style="{ top: getNavbarHeight() + 'px' }">
 			<u-tabs lineHeight="2" :duration="0" :inactiveStyle="{ color: '#000' }" :activeStyle="{ color: '#FF8C00' }"
 				:list="tab.items" @change="changeTab" :scrollable="false" keyName="label" lineColor="#FF8C00" />
 		</view>
@@ -176,15 +176,11 @@
 </script>
 
 <style lang="scss" scoped>
-	.page {
-		background: #fafafa;
-		padding-bottom: env(safe-area-inset-bottom);
-	}
-
 	.tab-container {
 		position: fixed;
 		width: 100%;
 		z-index: 10;
+		background: #fafafa;
 	}
 
 	// 个人跑量列表样式

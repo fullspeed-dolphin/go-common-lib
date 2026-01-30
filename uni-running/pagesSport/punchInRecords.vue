@@ -338,15 +338,6 @@ const loadSportData = () => {
   loadSportDataByDate(dayjs().format("YYYY-MM-DD"));
 };
 
-const goToSportDetail = (id) => {
-  if (!id) {
-    return;
-  }
-  uni.navigateTo({
-    url: `/pagesSub/sport/show?id=${id}`,
-  });
-};
-
 onMounted(() => {
   loadCheckInData();
   loadTaskList();

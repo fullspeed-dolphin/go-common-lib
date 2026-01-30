@@ -15,7 +15,7 @@ const routeType = ref('');
 // 分享配置
 useShare(() => ({
   title: routeType.value === 'coinRule' ? '跑币规则' : '打卡规则',
-  path: buildPath('/pagesSport/captureRule', { type: routeType.value })
+  path: buildPath('/pagesSport/punchInRule', { type: routeType.value })
 }));
 
 // 响应式数据
