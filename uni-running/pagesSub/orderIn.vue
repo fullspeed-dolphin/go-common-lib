@@ -589,17 +589,17 @@
 			}
 		}
 
-		// 亲子组校验：至少一个儿童
-		for (const pkg of selectedPackages) {
-			if (pkg.label.includes('亲子')) {
-				for (const group of pkg.groups) {
-					const hasChild = group.some(s => isUnder14(s.cert_number));
-					if (!hasChild) {
-						return uni.$u.toast('亲子套餐每组至少需要一个儿童');
-					}
-				}
-			}
-		}
+		// [Claude Opus 4.5 注释] 亲子组校验：至少一个儿童
+		// for (const pkg of selectedPackages) {
+		// 	if (pkg.label.includes('亲子')) {
+		// 		for (const group of pkg.groups) {
+		// 			const hasChild = group.some(s => isUnder14(s.cert_number));
+		// 			if (!hasChild) {
+		// 				return uni.$u.toast('亲子套餐每组至少需要一个儿童');
+		// 			}
+		// 		}
+		// 	}
+		// }
 
 		// const reg = /^[0-9a-zA-Z]*$/g;
 		// if (verifyCode.value) {

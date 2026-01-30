@@ -1,44 +1,66 @@
 <template>
 	<view class="">
-		<u-navbar title="排行榜" placeholder />
-		<view class="tab-container flex-center" :style="{ top: getNavbarHeight() + 'px' }">
-			<div style="width: 530rpx;">
-				<u-tabs lineHeight="2" :duration="0" :scrollable="false" :inactiveStyle="{ color: '#000' }" :activeStyle="{ color: '#FF8C00' }"
-				:list="tab.items" @change="changeTab" keyName="label" lineColor="#FF8C00" />
-			</div>
-		</view>
-		<mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" :top="100">
-			<!-- 个人跑量列表 -->
-			<view v-if="tab.active === 0" class="ranking-list">
-				<view class="ranking-item" v-for="(item, index) in dataList" :key="item.id || index">
-					<!-- 排名 -->
-					<view class="ranking-number">
-						<view v-if="index < 3" class="medal-wrapper">
-							<image :class="['medal-icon', `medal-${index + 1}`]" :src="getMedalIcon(index + 1)" mode="aspectFit">
-							</image>
-						</view>
-						<text v-if="index >= 3" class="rank-text">{{ index + 1 }}</text>
+		<u-navbar title="跑量排行榜" placeholder />
+		<!-- Tab 切换 -->
+		<view class="tab-container" :style="{ top: getNavbarHeight() + 'px' }">
+			<view class="category-tags">
+				<view class="tags-inner">
+					<view class="tag-slider" :style="sliderStyle" :class="sliderAnimClass"></view>
+					<view
+						v-for="(item, index) in tabList"
+						:key="item.value"
+						:id="'tab-' + index"
+						class="tag-item"
+						:class="{ active: currentIndex === index }"
+						@click="handleTabChange(index)"
+					>
+						{{ item.label }}
 					</view>
-					<!-- 头像和奖牌 -->
-					<view class="avatar-wrapper">
-						<up-lazy-load height="120" borderRadius="200" error-img="/static/images/user.png"
-							:image="item.avatar_url+ '?x-oss-process=image/resize,w_150,h_150,m_fill'" mode="aspectFill" />
-					</view>
-					<!-- 名称 -->
-					<view class="name">{{ item.nickname || "用户" }}</view>
-					<!-- 跑量 -->
-					<view class="distance">{{
-              formatDistance(item.total_km)
-            }}km</view>
 				</view>
 			</view>
+		</view>
+		<!-- 内容区域 -->
+		<view class="content-wrapper"
+			@touchstart="onTouchStart"
+			@touchend="handleTouchEnd">
+			<mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" :top="0" :up="{ auto: false }">
+				<!-- 个人跑量列表 -->
+				<view v-if="currentIndex === 0" class="ranking-list list-transition" :class="listAnimClass">
+					<view class="card-item" v-for="(item, index) in dataList" :key="item.id || index">
+						<!-- 头像 -->
+						<up-lazy-load class="avatar" borderRadius="16" error-img="/static/images/user.png"
+							:image="item.avatar_url + '?x-oss-process=image/resize,w_150,h_150,m_fill'" mode="aspectFill" />
+						<!-- 内容区域 -->
+						<view class="card-content">
+							<view class="title-row">
+								<view class="name ellipsis">{{ item.nickname || "用户" }}</view>
+								<view class="distance-tag">
+									<text class="distance-value">{{ formatDistance(item.total_km) }}</text>
+									<text class="distance-unit">km</text>
+								</view>
+							</view>
+							<view class="group-name">{{ item.running_group_name || '无跑团信息' }}</view>
+						</view>
+						<!-- 排名角标 -->
+						<view class="rank">
+							<image v-if="index === 0" class="icon" src="/pagesSub/runCoin/assets/Frame@2x (3).png" mode="aspectFill" />
+							<image v-if="index === 1" class="icon" src="/pagesSub/runCoin/assets/Frame@2x (4).png" mode="aspectFill" />
+							<image v-if="index === 2" class="icon" src="/pagesSub/runCoin/assets/Frame@2x (5).png" mode="aspectFill" />
+							<image v-if="index === 3" class="icon" src="/pagesSub/runCoin/assets/Frame@2x (6).png" mode="aspectFill" />
+							<image v-if="index === 4" class="icon" src="/pagesSub/runCoin/assets/Frame@2x (7).png" mode="aspectFill" />
+							<image v-if="index >= 5 && index <= 7" class="icon" src="/pagesSub/runCoin/assets/Frame@2x (8).png" mode="aspectFill" />
+							<view class="txt">{{ index + 1 }}</view>
+						</view>
+					</view>
+				</view>
 
-			<!-- 团队跑量列表 -->
-			<view v-if="tab.active === 1" class="team-list">
-				<GroupItem v-for="(item, index) in dataList" :key="item.id || item.group_id || index" :item="item"
-					variant="detail" :rankIcon="index < 3 ? getMedalIcon(index + 1, true) : ''" />
-			</view>
-		</mescroll-body>
+				<!-- 团队跑量列表 -->
+				<view v-if="currentIndex === 1" class="team-list list-transition" :class="listAnimClass">
+					<GroupItem v-for="(item, index) in dataList" :key="item.id || item.group_id || index" :item="item"
+						variant="detail" :rankIndex="index" />
+				</view>
+			</mescroll-body>
+		</view>
 	</view>
 </template>
 
@@ -46,7 +68,7 @@
 	import {
 		ref,
 		computed,
-		nextTick
+		watch
 	} from "vue";
 	import {
 		useStore
@@ -56,18 +78,17 @@
 	import {
 		useShare
 	} from "@/composables/useShare.js";
+	import { useTabAnimation } from "@/composables/useTabAnimation.js";
 	import { getNavbarHeight } from "@/utils/util.js"
 
 	import {
+		onLoad,
+		onShow,
 		onPageScroll,
 		onReachBottom
 	} from "@dcloudio/uni-app";
 	import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
-	const {
-		mescrollInit,
-		downCallback,
-		getMescroll
-	} = useMescroll(onPageScroll, onReachBottom);
+	const { mescrollInit, downCallback, getMescroll } = useMescroll(onPageScroll, onReachBottom);
 
 	// 使用store
 	const store = useStore();
@@ -81,18 +102,25 @@
 	// 模板引用
 	const mescrollRef = ref(null);
 
-	// 响应式数据
-	const tab = ref({
-		active: 0,
-		items: [{
-				label: "个人跑量",
-				value: "personal"
-			},
-			{
-				label: "团队跑量",
-				value: "team"
-			},
-		],
+	// Tab 配置
+	const tabList = ref([
+		{ label: "个人跑量", value: "personal" },
+		{ label: "团队跑量", value: "team" },
+	]);
+
+	// 使用 Tab 动画 composable
+	const {
+		currentIndex,
+		sliderStyle,
+		sliderAnimClass,
+		listAnimClass,
+		changeTab,
+		initTabRects,
+		onTouchStart,
+		onTouchEnd
+	} = useTabAnimation({
+		tabCount: tabList.value.length,
+		loop: false
 	});
 
 	const dataList = ref([]);
@@ -100,10 +128,23 @@
 	// 计算属性
 	const userInfo = computed(() => store.state.userInfo);
 
-	// tab切换
-	const changeTab = (detail) => {
-		tab.value.active = detail.index;
-		refreshList();
+	// Tab 切换处理
+	const handleTabChange = (index) => {
+		if (currentIndex.value === index) return;
+		changeTab(index);
+	};
+
+	// 监听 tab 切换，重新加载数据
+	watch(currentIndex, () => {
+		dataList.value = [];
+		setTimeout(() => {
+			refreshList();
+		}, 300);
+	});
+
+	// 手势切换处理
+	const handleTouchEnd = (e) => {
+		onTouchEnd(e, tabList.value);
 	};
 
 	// 格式化距离（米转公里，保留2位小数）
@@ -143,46 +184,105 @@
 	};
 
 	const getList = (mescroll) => {
-		uni.showLoading({
-			mask: true
-		});
-
 		const data = {
-			page: mescroll.num - 1,
+			page: mescroll.num,
 			page_size: 10,
 		};
 
 		// 根据当前tab选择不同的API
 		const apiUrl =
-			tab.value.active === 0 ?
+			currentIndex.value === 0 ?
 			`/sport-api/api/manual/user-ranking` // 个人跑量排行榜API
 			:
 			`/sport-api/api/manual/group-ranking`; // 团队跑量排行榜API
 
 		request.get(apiUrl, data).then((res) => {
-				res = res.list
-				mescroll.endSuccess(res.length);
-
-				//如果是第一页需手动制空列表
+				// 第一页清空列表
 				if (mescroll.num == 1) {
 					dataList.value = [];
 				}
 
-				dataList.value = dataList.value.concat(res); //追加新数据
+				const list = res.list || [];
+				dataList.value = dataList.value.concat(list); // 追加新数据
+
+				mescroll.endSuccess(list.length);
 			})
 			.catch((error) => {
-				uni.hideLoading();
+				mescroll.endErr();
 				console.error("获取排行榜数据失败:", error);
 			});
 	};
+
+	onLoad(() => {
+		initTabRects();
+	});
+
+	onShow(() => {
+		initTabRects();
+	});
 </script>
 
 <style lang="scss" scoped>
+	@import '@/styles/tab-animation.scss';
+
 	.tab-container {
 		position: fixed;
 		width: 100%;
 		z-index: 10;
 		background: #fafafa;
+		padding: 16rpx 24rpx;
+		display: flex;
+		justify-content: center;
+	}
+
+	.category-tags {
+		.tags-inner {
+			display: inline-flex;
+			position: relative;
+			gap: 12rpx;
+			padding: 6rpx;
+			background: #fff;
+			border-radius: 999rpx;
+		}
+
+		.tag-slider {
+			position: absolute;
+			top: 6rpx;
+			left: 6rpx;
+			height: calc(100% - 12rpx);
+			background: #FF8C00;
+			border-radius: 999rpx;
+			transition: transform 0.3s ease-out, width 0.3s ease-out;
+			z-index: 0;
+
+			&.no-transition {
+				transition: none !important;
+			}
+
+			&.slider-hidden {
+				opacity: 0;
+			}
+		}
+
+		.tag-item {
+			position: relative;
+			z-index: 1;
+			padding: 12rpx 40rpx;
+			font-size: 28rpx;
+			color: #666;
+			line-height: 40rpx;
+			white-space: nowrap;
+			transition: color 0.3s ease;
+
+			&.active {
+				color: #fff;
+				font-weight: bold;
+			}
+		}
+	}
+
+	.content-wrapper {
+		padding-top: 100rpx;
 	}
 
 	// 个人跑量列表样式
@@ -193,65 +293,97 @@
 		box-sizing: border-box;
 		padding: 0 34rpx;
 
-		.ranking-item {
+		.card-item {
 			position: relative;
 			display: flex;
-			align-items: center;
+			align-items: flex-start;
 			background: #ffffff;
 			border-radius: 16rpx;
-			border: 2rpx solid rgba(0, 0, 0, 0.06);
-			padding: 10rpx 26rpx;
-			margin-bottom: 20rpx;
+			padding: 28rpx 24rpx;
+			margin-bottom: 30rpx;
+			min-height: 180rpx;
 
-			.ranking-number {
-				width: 40rpx;
-				display: flex;
-				align-items: center;
-				justify-content: center;
+			.avatar {
+				width: 140rpx;
+				height: 140rpx;
 				flex-shrink: 0;
+			}
 
-				.rank-text {
-					font-weight: bold;
-					font-size: 30rpx;
-					color: #707070;
-				}
+			.card-content {
+				flex: 1;
+				margin-left: 24rpx;
+				display: flex;
+				flex-direction: column;
+				align-items: flex-start;
+				justify-content: flex-start;
 
-				.medal-wrapper {
-					position: absolute;
-					top: 0;
-					width: 50rpx;
-					height: 50rpx;
-					z-index: 2;
+				.title-row {
+					display: flex;
+					align-items: center;
+					margin-bottom: 16rpx;
 
-					.medal-icon {
-						width: 38rpx;
-						height: 51rpx;
+					.name {
+						font-weight: bold;
+						font-size: 30rpx;
+						color: #000;
+						line-height: 42rpx;
+						max-width: 280rpx;
+						margin-right: 16rpx;
+					}
+
+					.distance-tag {
+						display: flex;
+						align-items: center;
+
+						.distance-value {
+							font-size: 22rpx;
+							color: #FF8C00;
+						}
+
+						.distance-unit {
+							font-size: 22rpx;
+							color: #FF8C00;
+						}
 					}
 				}
+
+				.group-name {
+					display: inline-flex;
+					align-items: center;
+					justify-content: center;
+					min-width: 164rpx;
+					height: 40rpx;
+					padding: 0 16rpx;
+					color: #D3B4A8;
+					background: #F9F1F0;
+					font-size: 24rpx;
+					border-radius: 8rpx;
+				}
 			}
 
-			.avatar-wrapper {
-				position: relative;
-				margin-left: 20rpx;
-				margin-right: 24rpx;
-				flex-shrink: 0;
-				width: 100rpx;
-				height: 100rpx;
-			}
+			.rank {
+				position: absolute;
+				top: 0;
+				right: 22rpx;
 
-			.name {
-				flex: 1;
-				font-weight: bold;
-				font-size: 28rpx;
-				color: #000000;
-				margin-right: 20rpx;
-			}
+				.icon {
+					width: 56rpx;
+					height: 56rpx;
+				}
 
-			.distance {
-				font-weight: bold;
-				font-size: 24rpx;
-				color: #000000;
-				flex-shrink: 0;
+				.txt {
+					position: absolute;
+					top: 20rpx;
+					right: 22rpx;
+					color: #fff;
+					width: 16rpx;
+					height: 34rpx;
+					font-size: 24rpx;
+					font-weight: 800;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+				}
 			}
 		}
 	}

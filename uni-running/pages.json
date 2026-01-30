@@ -29,7 +29,7 @@
 		  "pages": [
 				{ "path": "punchInUpload","style": { "navigationStyle": "custom", "navigationBarTitleText": "运动截图打卡"} },
 				{ "path": "recognizeSuccess","style": { "navigationStyle": "custom", "navigationBarTitleText": "运动截图打卡"} },
-				{ "path": "runRankList","style": { "navigationStyle": "custom", "navigationBarTitleText": "排行榜"} },
+				{ "path": "runRankList","style": { "navigationStyle": "custom", "navigationBarTitleText": "跑量排行榜"} },
 				{ "path": "punchInRecords","style": { "navigationStyle": "custom", "navigationBarTitleText": "运动记录"} },
 				{ "path": "runRecords","style": { "navigationStyle": "custom", "navigationBarTitleText": "运动打卡记录"} },
 				{ "path": "runDetail","style": { "navigationStyle": "custom", "navigationBarTitleText": "运动详情"} },

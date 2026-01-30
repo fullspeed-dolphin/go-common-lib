@@ -35,9 +35,15 @@
         item.establish_location || item.address || item.location || "--"
       }}</view> -->
 		</view>
-		<!-- 排名图标 -->
-		<view v-if="rankIcon" class="rank-icon">
-			<image :src="rankIcon" mode="aspectFit" class="rank-icon-img"></image>
+		<!-- 排名角标 -->
+		<view v-if="rankIndex >= 0 && rankIndex <= 7" class="rank">
+			<image v-if="rankIndex === 0" class="icon" src="/pagesSub/runCoin/assets/Frame@2x (3).png" mode="aspectFill" />
+			<image v-if="rankIndex === 1" class="icon" src="/pagesSub/runCoin/assets/Frame@2x (4).png" mode="aspectFill" />
+			<image v-if="rankIndex === 2" class="icon" src="/pagesSub/runCoin/assets/Frame@2x (5).png" mode="aspectFill" />
+			<image v-if="rankIndex === 3" class="icon" src="/pagesSub/runCoin/assets/Frame@2x (6).png" mode="aspectFill" />
+			<image v-if="rankIndex === 4" class="icon" src="/pagesSub/runCoin/assets/Frame@2x (7).png" mode="aspectFill" />
+			<image v-if="rankIndex >= 5 && rankIndex <= 7" class="icon" src="/pagesSub/runCoin/assets/Frame@2x (8).png" mode="aspectFill" />
+			<view class="txt">{{ rankIndex + 1 }}</view>
 		</view>
 	</view>
 
@@ -86,6 +92,10 @@
 		rankIcon: {
 			type: String,
 			default: "", // 排名图标路径，用于显示名次（如前三名的奖牌图标）
+		},
+		rankIndex: {
+			type: Number,
+			default: -1, // 排名索引（0开始），用于显示排名角标
 		},
 	});
 
@@ -185,20 +195,28 @@
 			word-break: break-all;
 		}
 
-		.rank-icon {
+		.rank {
 			position: absolute;
-			top: 16rpx;
-			right: 16rpx;
-			width: 60rpx;
-			height: 60rpx;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			z-index: 2;
+			top: 0;
+			right: 22rpx;
 
-			.rank-icon-img {
-				width: 60rpx;
-				height: 60rpx;
+			.icon {
+				width: 56rpx;
+				height: 56rpx;
+			}
+
+			.txt {
+				position: absolute;
+				top: 20rpx;
+				right: 22rpx;
+				color: #fff;
+				width: 16rpx;
+				height: 34rpx;
+				font-size: 24rpx;
+				font-weight: 800;
+				display: flex;
+				align-items: center;
+				justify-content: center;
 			}
 		}
 	}
