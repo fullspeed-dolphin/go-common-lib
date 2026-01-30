@@ -108,7 +108,7 @@
 </template>
 <script setup>
 	import { ref } from "vue";
-	import { onLoad } from "@dcloudio/uni-app";
+	import { onLoad, onUnload } from "@dcloudio/uni-app";
 	import FileUpload from "@/components/common/FileUpload.vue";
 	import request from "../utils/request";
 	import { useShare } from "@/composables/useShare.js";
@@ -118,7 +118,7 @@
 		title: '运动截图打卡',
 		path: '/pagesSport/uploadCapture'
 	});
-	
+
 	const pageIndex = ref(0)
 
 	const exerciseInfo = ref({
@@ -126,10 +126,33 @@
 		duration: '',
 		pace: ''
 	})
-	
+
 	const isSubmiting = ref(false)
 	const isSuccess = ref(false)
 	const isSuccessCheck = ref(false)
+	const isSubmitted = ref(false) // 标记用户是否已提交数据
+
+	// 删除已上传的图片
+	const deleteUploadedImage = async (imageUrl) => {
+		if (!imageUrl) return;
+
+		try {
+			await request.post('/basic-service/file/delete', {
+				url: imageUrl
+			}, { showError: false });
+			console.log('已删除上传的图片:', imageUrl);
+		} catch (error) {
+			console.error('删除图片失败:', error);
+		}
+	};
+
+	// 页面卸载时检查是否需要删除图片
+	onUnload(() => {
+		// 如果有上传的图片且用户没有提交数据，则删除图片
+		if (ruleForm.value.picture && !isSubmitted.value) {
+			deleteUploadedImage(ruleForm.value.picture);
+		}
+	});
 
 	// 图片上传成功后调用OCR识别
 	let verifyToken = ''
@@ -176,6 +199,8 @@
 				// 	}
 				// });
 			} else {
+				// 识别失败，删除已上传的图片
+				deleteUploadedImage(imageUrl);
 				ruleForm.value.picture = ""
 				isSuccess.value = false
 				uni.showModal({
@@ -186,8 +211,10 @@
 			}
 		} catch (error) {
 			isSuccess.value = false
+			// 识别失败，删除已上传的图片
+			deleteUploadedImage(imageUrl);
 			ruleForm.value.picture = ""
-			
+
 			uni.hideLoading();
 			console.error('OCR识别失败:', error);
 			uni.showModal({
@@ -214,6 +241,8 @@
 		request.post('/ocr-api/checkin', {
 			token: verifyToken
 		}, { showError: false, includeResponse: true }).then(res => {
+			// 标记已提交，防止页面卸载时删除图片
+			isSubmitted.value = true
 			// 显示"后台核验成功"弹窗
 			isSuccessCheck.value = true
 			// 2秒后隐藏弹窗并跳转

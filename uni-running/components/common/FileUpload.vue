@@ -342,37 +342,36 @@ const compressImage = (src) => {
 const uploadFile = async (file) => {
   const filePath = await compressImage(file.url);
   console.log("filePath===========>", filePath);
-	const additional = props.additional
+  const additional = props.additional
   return new Promise((resolve, reject) => {
     uni.uploadFile({
       url: baseLink + `/basic-service/image/upload`,
       filePath: filePath,
       name: "image",
-			// formData: {
-			// 	// path: additional || null
-			// 	path: 'ocr-checkin',
-			// },
+      formData: additional ? { path: additional } : {},
       header: {
         Authorization: uploadToken,
         "content-type": "application/json",
       },
       success(res) {
         res = JSON.parse(res.data);
-        if (res.data.url) {
+        if (res.data?.url) {
           return resolve(res.data.url);
         } else {
-          uni.showToast({
-            icon: "none",
-            title: res.msg || "上传失败",
+          uni.showModal({
+            title: '提示',
+            content: res.msg || "上传失败",
+            showCancel: false
           });
+          reject(res);
         }
       },
       fail(e) {
-        uni.showToast({
-          icon: "none",
-          title: "上传失败",
+        uni.showModal({
+          title: '提示',
+          content: e?.msg || e?.errMsg || "上传失败",
+          showCancel: false
         });
-
         console.error(e);
         reject(e);
       },
