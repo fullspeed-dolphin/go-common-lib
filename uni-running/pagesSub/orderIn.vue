@@ -42,7 +42,7 @@
 					<!-- 套餐头部：左侧信息 + 右侧数量选择器 -->
 					<view class="price-item-header" @click="onPackageClick(item)">
 						<view class="price-item-left">
-							<view class="price-item-label">{{ item.label }}<text v-if="item.groupSize > 1" class="group-size-hint">（{{ item.groupSize }}人/组）</text></view>
+							<view class="price-item-label">{{ item.label }}</view>
 							<view class="price-item-meta">
 								<text class="price-item-price">￥{{ item.price }}</text>
 								<text v-if="item.isFull" class="price-item-status">已满</text>
@@ -96,22 +96,40 @@
 			</view>
 		</view>
 
-		<section class="section" style="margin-top:30rpx;">
-			<section v-if="packageList.length" class="section-content payment-content">
-				<view class="money flex-row u-mb-20" style="align-items: baseline">
-					￥{{ totalPrice }}
-					<view class="txt"> {{ !totalPrice ? '(请添加报名人员）' :'' }} </view>
+		<!-- 提示信息区域 -->
+		<section v-if="packageList.length" class="section-tips">
+			<view class="tips-title">温馨提示</view>
+			<view class="tips-list">
+				<view class="tips-item">1、最多可选择 <text class="tips-highlight">{{ multiPackageCount }}</text> 个套餐</view>
+				<view class="tips-item">2、每个套餐最多可添加 <text class="tips-highlight">{{ maxSignersPerPackage }}</text> 张报名卡</view>
+				<view class="tips-item">3、参赛服尺寸请详询活动组织方</view>
+			</view>
+		</section>
+
+		<!-- 支付区域 -->
+		<section v-if="packageList.length" class="section-payment">
+			<!-- 应付金额 -->
+			<view class="payment-amount">
+				<view class="amount-label">应付金额</view>
+				<view class="amount-value">
+					<text class="amount-symbol">¥</text>
+					<text class="amount-number">{{ totalPrice }}</text>
+					<text v-if="!totalPrice" class="amount-hint">（请添加报名人员）</text>
 				</view>
-				<view class="" style="margin-bottom: 20rpx; font-size: 24rpx">
-					选择支付方式
+			</view>
+			<!-- 支付方式 -->
+			<view class="payment-method">
+				<view class="method-label">支付方式</view>
+				<view class="payment-card active">
+					<view class="payment-card-left">
+						<image class="payment-icon" src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/微信支付@2x.png" mode="aspectFit"></image>
+						<text class="payment-name">微信支付</text>
+					</view>
+					<view class="payment-card-right">
+						<u-icon name="checkmark-circle-fill" color="#FF8C00" size="40rpx"></u-icon>
+					</view>
 				</view>
-				<view class="flex-between-center method-cell">
-					<image class="icon" src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/微信支付@2x.png"
-						mode="aspectFill"></image>
-					<image class="dot-icon" src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-dot@2x.png"
-						mode="aspectFill"></image>
-				</view>
-			</section>
+			</view>
 		</section>
 
 		<section class="section-bottom">
@@ -359,6 +377,12 @@
 		return packageList.value.reduce((sum, item) => sum + (item.count || 0), 0);
 	});
 
+	// 计算每个套餐最大报名卡数量（取所有套餐中的最大值）
+	const maxSignersPerPackage = computed(() => {
+		if (!packageList.value.length) return 1;
+		return Math.max(...packageList.value.map(item => item.groupSize || 1));
+	});
+
 	// 检查是否已达到 multi_package 限制
 	function isReachedMultiPackageLimit(excludeItem = null) {
 		const currentTotal = packageList.value.reduce((sum, item) => {
@@ -381,9 +405,9 @@
 						// 事件级容量：按组数计算
 						total += (item.price || 0) * item.count;
 					} else {
-						// 套餐级容量：按人数计算
-						const groupSize = item.groupSize || 1;
-						total += (item.price || 0) * item.count * groupSize;
+						// 套餐级容量：按实际添加的报名卡数量计算
+						const actualSigners = item.groups ? item.groups.flat().length : 0;
+						total += (item.price || 0) * actualSigners;
 					}
 				}
 			});
@@ -813,6 +837,34 @@
 		background: #fafafa;
 	}
 
+	.section-tips {
+		margin: 30rpx 34rpx;
+		padding: 24rpx;
+		background: #FFF7ED;
+		border-radius: 16rpx;
+		border: 1rpx solid #FFE4C4;
+
+		.tips-title {
+			font-size: 28rpx;
+			font-weight: bold;
+			color: #FF8C00;
+			margin-bottom: 16rpx;
+		}
+
+		.tips-list {
+			.tips-item {
+				font-size: 24rpx;
+				color: #666;
+				line-height: 1.8;
+			}
+
+			.tips-highlight {
+				color: #FF8C00;
+				font-weight: bold;
+			}
+		}
+	}
+
 	.section-bottom {
 		margin: 30rpx 34rpx;
 
@@ -1099,26 +1151,93 @@
 			}
 		}
 
-	.payment-content {
-		.money {
-			color: #e53935;
-			font-size: 44rpx;
-			.txt {
-				font-size: 34rpx;
-				color: #000;
-				margin-left: 20rpx;
+	// 支付区域（合并金额+支付方式）
+	.section-payment {
+		margin: 30rpx 34rpx 20rpx;
+		padding: 32rpx;
+		background: #ffffff;
+		border-radius: 16rpx;
+		border: 2rpx solid rgba(0, 0, 0, 0.06);
+
+		// 应付金额
+		.payment-amount {
+			.amount-label {
+				font-size: 26rpx;
+				color: #999;
+				margin-bottom: 12rpx;
+			}
+
+			.amount-value {
+				display: flex;
+				align-items: baseline;
+
+				.amount-symbol {
+					font-size: 36rpx;
+					font-weight: bold;
+					color: #E53935;
+				}
+
+				.amount-number {
+					font-size: 56rpx;
+					font-weight: bold;
+					color: #E53935;
+					margin-left: 4rpx;
+				}
+
+				.amount-hint {
+					font-size: 26rpx;
+					color: #999;
+					margin-left: 16rpx;
+				}
 			}
 		}
 
-		.method-cell {
-			.icon {
-				width: 58rpx;
-				height: 56rpx;
+		// 支付方式
+		.payment-method {
+			margin-top: 32rpx;
+
+			.method-label {
+				font-size: 26rpx;
+				color: #999;
+				margin-bottom: 16rpx;
+			}
+		}
+
+		.payment-card {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 24rpx;
+			background: #FAFAFA;
+			border-radius: 12rpx;
+			border: 2rpx solid #E8E8E8;
+			transition: all 0.2s ease;
+
+			&.active {
+				background: #FFF7ED;
+				border-color: #FF8C00;
 			}
 
-			.dot-icon {
-				width: 32rpx;
-				height: 32rpx;
+			.payment-card-left {
+				display: flex;
+				align-items: center;
+
+				.payment-icon {
+					width: 48rpx;
+					height: 48rpx;
+				}
+
+				.payment-name {
+					font-size: 28rpx;
+					font-weight: 500;
+					color: #333;
+					margin-left: 16rpx;
+				}
+			}
+
+			.payment-card-right {
+				display: flex;
+				align-items: center;
 			}
 		}
 	}
