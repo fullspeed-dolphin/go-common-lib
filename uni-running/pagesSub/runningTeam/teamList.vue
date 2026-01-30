@@ -1,7 +1,7 @@
 <template>
 	<view class="page">
 		<u-navbar title="全速俱乐部" placeholder></u-navbar>
-		<section class="section-filter" :style="{ top: navbarHeight + 'px' }">
+		<section class="section-filter" :style="{ top: getNavbarHeight() + 'px' }">
 			<view class="section-search">
 				<u-search v-model="searchTxt" @search="refreshList" placeholder="请输入名称或团号或地址" shape="round" bgColor="#fff"
 					borderColor="#FF8C00" :showAction="false"></u-search>
@@ -61,6 +61,7 @@
 	const { mescrollInit, downCallback, getMescroll } = useMescroll(onPageScroll, onReachBottom)
 
 	import request from "@/utils/request.js"
+	import { getNavbarHeight } from "@/utils/util.js"
 	import {
 		useStore
 	} from "vuex";
@@ -118,7 +119,6 @@
 		value: "mine"
 	});
 	const dataList = ref([]);
-	const navbarHeight = ref(0);
 
 	// 列表切换动画状态
 	const listAnimationClass = ref('');
@@ -178,29 +178,8 @@
 	// mescroll相关
 	let mescroll = null;
 
-	// 计算 navbar 高度
-	const computeNavbarHeight = () => {
-		const statusBarHeight = uni.getWindowInfo().statusBarHeight || 0;
-
-		// #ifdef MP-WEIXIN
-		const menuBtn = uni.getMenuButtonBoundingClientRect();
-		if (menuBtn) {
-			// 导航栏高度 = 胶囊底部 + (胶囊顶部 - 状态栏高度)
-			const navHeight = menuBtn.bottom + (menuBtn.top - statusBarHeight);
-			navbarHeight.value = navHeight;
-		} else {
-			navbarHeight.value = statusBarHeight + 44;
-		}
-		// #endif
-
-		// #ifndef MP-WEIXIN
-		navbarHeight.value = statusBarHeight + 44;
-		// #endif
-	};
-
 	// 页面挂载
 	onMounted(() => {
-		computeNavbarHeight();
 		getTabWidths();
 	});
 

@@ -24,3 +24,26 @@ export async function asyncAlls(jobs) {
 		throw new Error(error)
 	}
 }
+
+// 计算 navbar 高度
+export const getNavbarHeight = () => {
+	const statusBarHeight = uni.getWindowInfo().statusBarHeight || 0;
+	
+	let navbarHeight = 0
+	// #ifdef MP-WEIXIN
+	const menuBtn = uni.getMenuButtonBoundingClientRect();
+	if (menuBtn) {
+		// 导航栏高度 = 胶囊底部 + (胶囊顶部 - 状态栏高度)
+		const navHeight = menuBtn.bottom + (menuBtn.top - statusBarHeight);
+		navbarHeight = navHeight;
+	} else {
+		navbarHeight = statusBarHeight + 44;
+	}
+	// #endif
+
+	// #ifndef MP-WEIXIN
+	navbarHeight = statusBarHeight + 44;
+	// #endif
+	
+	return navbarHeight;
+};
