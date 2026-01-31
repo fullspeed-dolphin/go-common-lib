@@ -83,10 +83,10 @@
 								</view>
 								<view class="slot-name">{{ slot.full_name }}</view>
 							</view>
-							<!-- 添加按钮：始终显示，达到上限时点击会提示 -->
-							<view class="slot-item" @click="handleAddSigner(item, groupIndex)">
-								<view class="slot-empty" :class="{ 'slot-disabled': group.length >= (item.groupSize || 1) }">
-									<u-icon name="plus" :color="group.length >= (item.groupSize || 1) ? '#ccc' : '#999'" size="20"></u-icon>
+							<!-- 添加按钮：只有当组未满时才显示 -->
+							<view v-if="group.length < (item.groupSize || 1)" class="slot-item" @click="handleAddSigner(item, groupIndex)">
+								<view class="slot-empty">
+									<u-icon name="plus" color="#999" size="20"></u-icon>
 								</view>
 								<view class="slot-name">添加</view>
 							</view>
