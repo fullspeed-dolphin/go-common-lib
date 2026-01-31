@@ -43,9 +43,6 @@
 						:key="item.zp_index" @click="$refs.refPreviewVideo.openModal(item.item)">
 						<view class="iconfont icon-bofang"></view>
 						<image class="img" :src="item.item + '?x-oss-process=video/snapshot,t_5,f_jpg,w_720'" mode="aspectFill"></image>
-						<view class="ellipsis2 u-p-10">
-							{{item.item}}
-						</view>
 					</view>
 				</block>
 			</view>
@@ -157,14 +154,14 @@
 
 		// console.log('scrollTop====>',  distanceToBottom, scrollHeight , scrollTop , screenHeight)
 
-		const itemHeight = displayType.value === 'photo' ? 180 : 270; // 卡片高度
+		const itemHeight = displayType.value === 'photo' ? 180 : 200; // 卡片高度
 		const lanes = displayType.value === 'photo' ? 4 : 2; // 列数
 
 		if (distanceToBottom <= itemHeight * 5 && !isLoadingMore.value) {
 			loadMoreData()
 		}
-		
-		// 计算滚动到第几张图片位置, 图片高度 90px, 视频高度 135px
+
+		// 计算滚动到第几张图片位置, 图片高度 90px, 视频高度 100px
 		const photoIndex = Math.floor(scrollTop / (itemHeight / 2)) * lanes + (lanes * 2);
 		currentImageIndex.value = Math.min(photoIndex, album_total.value);
 	}, 120)
@@ -344,20 +341,28 @@
 		.card-video {
 			position: relative;
 			display: block;
-			width: 50%;
-			height: 270rpx;
+			/* #ifndef MP-WEIXIN */
+			width: 353rpx;
+			/* #endif */
+			/* #ifdef MP-WEIXIN */
+			width: 357rpx;
+			/* #endif */
+			height: 200rpx;
+			margin: 5rpx;
 			box-sizing: border-box;
 			overflow: hidden;
+			background: #f5f5f5;
+			border-radius: 10rpx;
 
 			.img {
 				width: 100%;
-				height: 192rpx;
-				border-radius: 10rpx 10rpx 0 0;
+				height: 100%;
+				border-radius: 10rpx;
 			}
 
 			.icon-bofang {
 				position: absolute;
-				top: 40%;
+				top: 50%;
 				left: 50%;
 				width: 30px;
 				height: 30px;

@@ -100,8 +100,8 @@
 		<section v-if="packageList.length" class="section-tips">
 			<view class="tips-title">温馨提示</view>
 			<view class="tips-list">
-				<view class="tips-item">1、最多可选择 <text class="tips-highlight">{{ multiPackageCount }}</text> 个套餐</view>
-				<view class="tips-item">2、每个套餐最多可添加 <text class="tips-highlight">{{ maxSignersPerPackage }}</text> 张报名卡</view>
+				<view class="tips-item">1、最多可选择 <text class="tips-highlight">{{ multiPackageCount }}</text> 种套餐</view>
+				<view class="tips-item">2、每份套餐最多选择 <text class="tips-highlight">{{ maxSignersPerPackage }}</text> 张报名卡，如需多人报名请增加套餐份数</view>
 				<view class="tips-item">3、参赛服尺寸请详询活动组织方</view>
 			</view>
 		</section>
@@ -251,8 +251,9 @@
 	function isPlusDisabled(item) {
 		// 检查套餐自身容量限制
 		if (isMaxCount(item)) return true;
-		// 检查 multi_package 限制
-		if (isReachedMultiPackageLimit()) return true;
+		// 检查 multi_package 限制：只有当该套餐尚未被选中（count === 0）时才检查
+		// 如果已经选中了，允许继续增加数量
+		if ((item.count || 0) === 0 && isReachedMultiPackageLimit()) return true;
 		return false;
 	}
 
@@ -260,9 +261,9 @@
 	function increaseCount(item) {
 		if (isMaxCount(item)) return;
 
-		// 检查是否已达到 multi_package 限制
-		if (isReachedMultiPackageLimit()) {
-			uni.$u.toast(`最多只能选择 ${multiPackageCount.value} 个套餐`);
+		// 检查是否已达到 multi_package 限制（当前套餐 count 为 0 时需要检查是否能新增一种套餐）
+		if ((item.count || 0) === 0 && isReachedMultiPackageLimit()) {
+			uni.$u.toast(`最多只能选择 ${multiPackageCount.value} 种套餐`);
 			return;
 		}
 
@@ -383,13 +384,13 @@
 		return Math.max(...packageList.value.map(item => item.groupSize || 1));
 	});
 
-	// 检查是否已达到 multi_package 限制
+	// 检查是否已达到 multi_package 限制（统计已选择的套餐种类数）
 	function isReachedMultiPackageLimit(excludeItem = null) {
-		const currentTotal = packageList.value.reduce((sum, item) => {
-			if (excludeItem && item === excludeItem) return sum;
-			return sum + (item.count || 0);
-		}, 0);
-		return currentTotal >= multiPackageCount.value;
+		const selectedTypeCount = packageList.value.filter(item => {
+			if (excludeItem && item === excludeItem) return false;
+			return (item.count || 0) > 0;
+		}).length;
+		return selectedTypeCount >= multiPackageCount.value;
 	}
 	
 	const totalPrice = ref(0)
