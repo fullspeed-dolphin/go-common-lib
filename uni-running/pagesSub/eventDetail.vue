@@ -258,6 +258,13 @@
 				if (!routerParams.value.fsc_id) {
 					checkEventPrice();
 				}
+			})
+			.catch((err) => {
+				// 未登录时弹出登录框，登录成功后重新获取数据
+				if (err?.code === 401) {
+					pendingAction.value = () => getDetail();
+					refUserLogin.value.open();
+				}
 			});
 	};
 

@@ -41,7 +41,8 @@ function fetch(options) {
 				
 				// 登录过期
 				if (response?.code != 200) {
-					if (response?.code !== 400 && options.showError !== false) {
+					// 401未认证错误不弹Toast，由页面逻辑处理登录
+					if (response?.code !== 400 && response?.code !== 401 && options.showError !== false) {
 						uni.showToast({
 							icon: 'error',
 							title: response.msg || '请求失败'
