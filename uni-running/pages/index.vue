@@ -30,7 +30,7 @@
 			</view>
 			<view class="category-tags">
 				<view class="tags-inner">
-					<view class="tag-slider" :style="getSliderStyle(eventCategoryIndex, 'event')"></view>
+					<view class="tag-slider" :style="getSliderStyle(eventCategoryIndex)"></view>
 					<view
 						v-for="(item, index) in eventCategoryList"
 						:key="item.value"
@@ -95,7 +95,7 @@
 						:key="item.value"
 						:id="'club-tag-' + index"
 						class="tag-item"
-						:class="{ active: clubSliderPosition === index }"
+						:class="{ active: clubCategoryIndex === index }"
 						@click="onClubCategoryChange(index)"
 					>
 						{{ item.name }}
@@ -149,7 +149,8 @@
 		ref,
 		onMounted,
 		computed,
-		nextTick
+		nextTick,
+		watch
 	} from "vue";
 	import {
 		onLoad,
@@ -157,6 +158,7 @@
 		onPageScroll
 	} from "@dcloudio/uni-app";
 	import { useShare } from "@/composables/useShare.js";
+	import { useTabAnimation } from "@/composables/useTabAnimation.js";
 	import {
 		useStore
 	} from "vuex";
@@ -211,50 +213,41 @@
 		{ name: '跑步', value: 'running' },
 		{ name: '骑行', value: 'cycling' }
 	]);
-	const clubCategoryIndex = ref(0);
 
-	// 列表切换动画状态
-	const listAnimationClass = ref('');
-	const slideDirection = ref('right'); // 'left' 或 'right'
-
-	// 滑块动画状态
-	const clubSliderAnimClass = ref('');
-	const clubSliderPosition = ref(0); // 当前滑块显示的 index
-	const clubSliderOffset = ref(0); // 额外偏移量（用于循环动画）
-	const isClubTabSwitching = ref(false); // 防止动画重叠
-
-	// 存储每个 tag 的位置信息 { width, left }
-	const eventTagRects = ref([]);
-	const clubTagRects = ref([]);
-	const eventContainerLeft = ref(0);
-	const clubContainerLeft = ref(0);
-
-	// 全速俱乐部滑块样式（支持循环动画）
-	const clubSliderStyle = computed(() => {
-		const rects = clubTagRects.value;
-		const containerLeft = clubContainerLeft.value;
-		const activeIndex = clubSliderPosition.value;
-		const offset = clubSliderOffset.value;
-		if (!rects.length || activeIndex >= rects.length) return {};
-
-		const rect = rects[activeIndex];
-		const left = rect.left - containerLeft + offset;
-
-		return {
-			width: rect.width + 'px',
-			transform: `translateX(${left}px)`
-		};
+	// 使用 Tab 动画 composable（全速俱乐部）
+	const {
+		currentIndex: clubCategoryIndex,
+		sliderStyle: clubSliderStyle,
+		sliderAnimClass: clubSliderAnimClass,
+		listAnimClass: listAnimationClass,
+		changeTab: changeClubTab,
+		initTabRects: initClubTabRects,
+		onTouchStart: onClubTouchStart,
+		onTouchEnd: clubTouchEnd
+	} = useTabAnimation({
+		tabCount: clubCategoryList.value.length,
+		loop: true
 	});
 
-	// 获取滑块样式
-	const getSliderStyle = (activeIndex, type) => {
-		const rects = type === 'event' ? eventTagRects.value : clubTagRects.value;
-		const containerLeft = type === 'event' ? eventContainerLeft.value : clubContainerLeft.value;
+	// 监听 tab 切换，重新加载数据
+	watch(clubCategoryIndex, () => {
+		GroupList.value = [];
+		setTimeout(() => {
+			getGroupList();
+		}, 300);
+	});
+
+	// 存储每个 tag 的位置信息 { width, left }（线下活动用）
+	const eventTagRects = ref([]);
+	const eventContainerLeft = ref(0);
+
+	// 获取滑块样式（线下活动用）
+	const getSliderStyle = (activeIndex) => {
+		const rects = eventTagRects.value;
+		const containerLeft = eventContainerLeft.value;
 		if (!rects.length || activeIndex >= rects.length) return {};
 
 		const rect = rects[activeIndex];
-		// 计算相对于容器的偏移（需要减去容器的 left 和 padding 6rpx）
-		const padding = 6 * (uni.getSystemInfoSync().windowWidth / 750); // rpx to px
 		const left = rect.left - containerLeft;
 
 		return {
@@ -284,23 +277,8 @@
 				}
 			});
 
-			// 获取全速俱乐部分类容器位置
-			const clubContainerQuery = uni.createSelectorQuery();
-			clubContainerQuery.select('#club-tag-0').boundingClientRect();
-			clubContainerQuery.exec((res) => {
-				if (res[0]) {
-					clubContainerLeft.value = res[0].left;
-				}
-			});
-
-			// 获取全速俱乐部分类 tag 位置
-			const clubQuery = uni.createSelectorQuery();
-			clubQuery.selectAll('#club-tag-0, #club-tag-1, #club-tag-2, #club-tag-3').boundingClientRect();
-			clubQuery.exec((res) => {
-				if (res[0]) {
-					clubTagRects.value = res[0].map(item => ({ width: item.width, left: item.left }));
-				}
-			});
+			// 初始化全速俱乐部 tab 位置（使用 composable）
+			initClubTabRects('#club-tag-');
 		});
 	};
 
@@ -309,98 +287,14 @@
 		eventCategoryIndex.value = index;
 	};
 
-	// direction: 'left' 表示内容从左边进入，'right' 表示内容从右边进入
-	// isLoop: 是否是循环切换（用于滑块动画）
-	const onClubCategoryChange = (index, direction = null, isLoop = false) => {
-		if (index === clubCategoryIndex.value || isClubTabSwitching.value) return;
-		isClubTabSwitching.value = true;
-
-		const maxIndex = clubCategoryList.value.length - 1;
-
-		// 如果没有指定方向，根据 index 位置自动判断
-		if (direction === null) {
-			direction = index > clubCategoryIndex.value ? 'right' : 'left';
-		}
-		slideDirection.value = direction;
-
-		// 触发列表滑出动画
-		listAnimationClass.value = slideDirection.value === 'right' ? 'slide-out-left' : 'slide-out-right';
-
-		// 处理滑块动画
-		if (isLoop) {
-			// 循环切换：滑块从目标位置的边缘滑入
-			// 计算偏移量（从左侧或右侧进入）
-			const slideOffset = direction === 'left' ? -60 : 60; // 左滑从左边进入，右滑从右边进入
-
-			// 1. 隐藏滑块，禁用过渡
-			clubSliderAnimClass.value = 'no-transition slider-hidden';
-			// 2. 设置起始偏移位置
-			clubSliderOffset.value = slideOffset;
-			// 3. 更新目标位置
-			clubSliderPosition.value = index;
-
-			// 4. 等待 DOM 更新后，开始滑入动画
-			setTimeout(() => {
-				clubSliderAnimClass.value = ''; // 恢复过渡
-				clubSliderOffset.value = 0; // 滑动到正确位置
-			}, 30);
-		} else {
-			// 普通切换：滑块直接过渡
-			clubSliderAnimClass.value = '';
-			clubSliderOffset.value = 0;
-			clubSliderPosition.value = index;
-		}
-
-		// slide-out 动画结束后切换数据
-		setTimeout(() => {
-			clubCategoryIndex.value = index;
-			// 动画结束后清空旧数据，避免新数据加载前显示旧数据
-			GroupList.value = [];
-			// 数据加载完成后再触发滑入动画
-			getGroupList(() => {
-				listAnimationClass.value = slideDirection.value === 'right' ? 'slide-in-right' : 'slide-in-left';
-				// 动画完成后解锁
-				setTimeout(() => {
-					isClubTabSwitching.value = false;
-					listAnimationClass.value = '';
-				}, 350);
-			});
-		}, 250);
+	// 全速俱乐部 Tab 切换
+	const onClubCategoryChange = (index) => {
+		changeClubTab(index);
 	};
 
-	// 全速俱乐部滑动切换相关
-	const clubTouchStartX = ref(0);
-	const clubTouchStartY = ref(0);
-
-	const onClubTouchStart = (e) => {
-		clubTouchStartX.value = e.touches[0].clientX;
-		clubTouchStartY.value = e.touches[0].clientY;
-	};
-
+	// 全速俱乐部手势结束处理
 	const onClubTouchEnd = (e) => {
-		const touchEndX = e.changedTouches[0].clientX;
-		const touchEndY = e.changedTouches[0].clientY;
-		const deltaX = touchEndX - clubTouchStartX.value;
-		const deltaY = touchEndY - clubTouchStartY.value;
-
-		// 确保是水平滑动（水平距离大于垂直距离）且滑动距离超过阈值
-		if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
-			const maxIndex = clubCategoryList.value.length - 1;
-			// 左滑（手指从右往左）：内容从左边进入
-			// 右滑（手指从左往右）：内容从右边进入
-			const swipeDirection = deltaX < 0 ? 'left' : 'right';
-			if (deltaX < 0) {
-				// 左滑，切换到下一个 tab（循环到第一个）
-				const nextIndex = clubCategoryIndex.value >= maxIndex ? 0 : clubCategoryIndex.value + 1;
-				const isLoop = clubCategoryIndex.value >= maxIndex; // 从最后一个循环到第一个
-				onClubCategoryChange(nextIndex, swipeDirection, isLoop);
-			} else if (deltaX > 0) {
-				// 右滑，切换到上一个 tab（循环到最后一个）
-				const prevIndex = clubCategoryIndex.value <= 0 ? maxIndex : clubCategoryIndex.value - 1;
-				const isLoop = clubCategoryIndex.value <= 0; // 从第一个循环到最后一个
-				onClubCategoryChange(prevIndex, swipeDirection, isLoop);
-			}
-		}
+		clubTouchEnd(e, clubCategoryList.value);
 	};
 
 	// 计算属性
