@@ -235,8 +235,6 @@
 			request.post(url, data).then(async (res) => {
 				console.log(res);
 
-				uni.$u.toast(group_id.value ? "更新成功" : "创建成功");
-
 				const res1 = await store.dispatch("getUserInfo");
 
 				// 跳转回上一级页面，返回上一页并传递参数
@@ -246,9 +244,24 @@
 					group_id: res1.running_group,
 				});
 
-				setTimeout(() => {
-					uni.navigateBack();
-				}, 500);
+				// 创建俱乐部时显示审批提示弹窗
+				if (!group_id.value) {
+					uni.showModal({
+						title: '提示',
+						content: '你的俱乐部正在审批中，审批完成之后将在此显示',
+						showCancel: false,
+						confirmText: '我知道了',
+						success: () => {
+							uni.navigateBack();
+						}
+					});
+				} else {
+					// 更新俱乐部时直接提示并返回
+					uni.$u.toast("更新成功");
+					setTimeout(() => {
+						uni.navigateBack();
+					}, 500);
+				}
 			}).catch(e => {
 				uni.hideLoading()
 				uni.showModal({
