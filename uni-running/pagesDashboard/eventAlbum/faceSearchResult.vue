@@ -13,11 +13,11 @@
 				class="result-img"
 				:src="url + ossPar250"
 				mode="aspectFill"
-				@click="previewImage(index)"
+				@click="previewImage(url, index)"
 			/>
 		</view>
 		
-		<!-- <qPreviewImage ref="refPreviewImage" :urls="image750List"></qPreviewImage> -->
+		<qPreviewImage ref="refPreviewImage" :urls="image750List"></qPreviewImage>
 	</view>
 </template>
 
@@ -25,7 +25,7 @@
 import { ref, nextTick } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { useShare } from "@/composables/useShare.js";
-// import qPreviewImage from "./q-previewImage/components/q-previewImage.vue"
+import qPreviewImage from "./components/q-previewImage/components/q-previewImage/q-previewImage.vue"
 
 // 分享配置
 useShare({
@@ -50,24 +50,14 @@ onLoad(() => {
 	}
 });
 
-const previewImage = (index) => {
-	const ossPar750  = '?x-oss-process=image/resize,w_1050/quality,q_90/format,webp'
-	uni.previewImage({
-		urls: imageList.value.map(i => i + ossPar750),
-		current: index
-	});
-};
-
-const preview = url => {
-    // #ifdef MP-WEIXIN
-    nextTick(()=>{
-         refPreviewImage.value.open(url); // 传入当前选中的图片地址(小程序必须添加$nextTick，解决组件首次加载无图)
-    })
-    // #endif
-
-    // #ifndef MP-WEIXIN
-    refPreviewImage.value.open(url); // 传入当前选中的图片地址
-    // #endif
+const previewImage = (url, index) => {
+	refPreviewImage.value.open(url);
+	
+	// const ossPar750  = '?x-oss-process=image/resize,w_750/quality,q_90/format,webp'
+	// uni.previewImage({
+	// 	urls: imageList.value.map(i => i + ossPar750),
+	// 	current: index
+	// });
 };
 </script>
 
