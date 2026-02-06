@@ -20,21 +20,19 @@
 
 	// 只在正式版和开发版中显示，体验版中隐藏（用于规避审核）
 	// 直接在组件中获取环境版本，确保准确
-	let shouldShow = false;
-	// #ifdef MP-WEIXIN
+	let shouldShow = ref(false);
 	try {
-		const envVersion = uni.getAccountInfoSync().miniProgram.envVersion;
+		const envVersion = uni?.getAccountInfoSync?.().miniProgram.envVersion || 'develop';
 		// release: 正式版（显示）
 		// develop: 开发者工具（不显示）
 		// trial: 体验版（不显示）
 		// shouldShow = envVersion === 'release';
-		 shouldShow = envVersion === 'release' || envVersion === 'develop' || envVersion === 'trial';
+		 shouldShow.value = envVersion === 'release' || envVersion === 'develop';
 		console.log('[HomeNavigator] envVersion:', envVersion, 'shouldShow:', shouldShow);
 	} catch (e) {
 		console.error('[HomeNavigator] 获取环境版本失败:', e);
-		shouldShow = false;
+		shouldShow.value = false;
 	}
-	// #endif
 
 	const navList = ref([])
 	// 页面显示
@@ -45,6 +43,11 @@
 
 	function getNavList() {
 		request.get(`/event-api/grid-menu/icons`).then((res) => {
+			// res.push({
+			// 	"icon_url": "https://ccrun.oss-cn-guangzhou.aliyuncs.com/images/2025/11/26/02ba556b-7558-40f6-bf18-4d101c07dfa1.png",
+			// 	"name": "PK520",
+			// 	"path": "pagesDashboard/pkEvent/pkEvent",
+			// })
 			navList.value = res
 		});
 	}
