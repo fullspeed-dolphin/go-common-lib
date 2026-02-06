@@ -68,7 +68,7 @@ export const xzSilderRangeProps = {
 };
 
 export const xzSilderRangeEmits = [
-  "update:modelValue", "change", "move", "showNum"
+  "update:modelValue", "change", "move", "showNum", 'touchStart', 'touchEnd'
 ];
 
 export type XzSilderRangeProps = ExtractPropTypes<typeof xzSilderRangeProps>;

@@ -7,7 +7,7 @@
         <view class="xz-slider-range__bar-bg" />
         <view :style="sliderRangeStyle.activeBarStyle" class="xz-slider-range__bar-active" />
       </view>
-      <view v-for="(item, index) in sliderBlockCtx.blocks" :key="index" :style="item.style" class="xz-slider-range__controls" @touchmove="blockEvent($event, index)" @touchstart="showHandle($event, 0)" @touchend="showHandle($event, 1)">
+      <view v-for="(item, index) in sliderBlockCtx.blocks" :key="index" :style="item.style" class="xz-slider-range__controls" @touchmove="blockEvent($event, index)" @touchstart="showHandle($event, 0)" @touchend="touchEnd(index)">
         <!-- 滑块值提示 -->
         <!-- <view v-if="item.showHint"
               :class="{
@@ -20,7 +20,7 @@
           <text>总{{ $props.total }}</text>
         </view> -->
         <!-- 显示的滑块数字 -->
-        <view :class="{'xz-slider-range__block--decoration': sliderBlockCtx.decoration}" class="xz-slider-range__block" :style="{opacity: isShow ? 0 : 1}">{{ item.hint+1 }}/{{$props.max}}</view>
+        <view :class="{'xz-slider-range__block--decoration': sliderBlockCtx.decoration}" class="xz-slider-range__block" :style="{opacity: isShow ? 0 : 1}">{{ item.hint+1 }}/{{$props.max + 1}}</view>
         <!-- 显示的圆心滑块 -->
         <view style="width:10rpx;height:10rpx;background:#fff;border-radius:50%;"></view>
       </view>
@@ -46,6 +46,10 @@ const showHandle = (e, num: number) => {
   $emits("showNum", isShow.value);
 };
 
+function touchEnd(index: number) {
+  $emits("touchEnd");
+  isShow.value = false;
+}
 const { sliderRangeStyle, sliderBlockCtx, blockEvent, reset } =
   useXzSliderRange($props, $emits);
 // console.log('sliderBlockCtx',sliderBlockCtx)
