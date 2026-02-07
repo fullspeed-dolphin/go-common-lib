@@ -48,8 +48,9 @@
 	</view>
 
 	<!-- 简单样式（首页使用，默认） -->
-	<view v-else class="group-item group-item-simple flex-start" @click="viewDetail(item)">
+	<view v-else class="group-item group-item-simple flex-start rel" @click="viewDetail(item)">
 		<!-- <image class="poster" :src="" mode="aspectFill"></image> -->
+		<view class="club-type" v-if="item.club_type">{{ getClubType(item) }}</view>
 		<view class="poster">
 			<up-lazy-load height="160" borderRadius="12" :is-effect="false" :image="
         (item.avatar_url ||
@@ -102,6 +103,16 @@
 	// Emits
 	const emit = defineEmits(["join"]);
 
+	function getClubType(item) {
+		if (item.club_type === "running") {
+			return "跑步";
+		} else if (item.club_type === "cycling") {
+			return "骑行";
+		} else {
+			return "";
+		}
+	}
+
 	// 方法定义
 	const viewDetail = (item) => {
 		// 搜索组件中不跳转详情，加入按钮控制交互
@@ -128,6 +139,17 @@
 </script>
 
 <style lang="scss" scoped>
+.club-type{
+	position: absolute;
+	top: 0rpx;
+	left: 0rpx;
+	background: rgba(0, 0, 0, 0.5);
+	color: #fff;
+	font-size: 22rpx;
+	padding: 8rpx 12rpx;
+	border-radius: 0 0rpx 16rpx 0;
+	z-index: 1;
+}
 	// 详细样式（groupList使用）
 	.group-item-detail {
 		position: relative;
@@ -136,7 +158,7 @@
 		background: #fff;
 		padding: 20rpx;
 		border-radius: 16rpx;
-
+		overflow: hidden;
 		.poster {
 			width: 134rpx;
 			height: 134rpx;
@@ -223,6 +245,7 @@
 
 	// 简单样式（首页使用，默认）
 	.group-item-simple {
+		overflow: hidden;
 		display: flex;
 		align-items: stretch;
 		background: #fff;

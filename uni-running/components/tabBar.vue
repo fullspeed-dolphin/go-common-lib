@@ -98,7 +98,6 @@ const onChange = (detail) => {
 
 <style lang="scss" scoped>
 .tabbar-box {
-  height: 224rpx;
   box-sizing: content-box;
   margin-bottom: env(safe-area-inset-bottom);
 }

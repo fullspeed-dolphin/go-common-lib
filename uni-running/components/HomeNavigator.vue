@@ -28,7 +28,7 @@
 		// trial: 体验版（不显示）
 		// shouldShow = envVersion === 'release';
 		 shouldShow.value = envVersion === 'release' || envVersion === 'develop';
-		console.log('[HomeNavigator] envVersion:', envVersion, 'shouldShow:', shouldShow);
+		console.log('[HomeNavigator] envVersion:', envVersion);
 	} catch (e) {
 		console.error('[HomeNavigator] 获取环境版本失败:', e);
 		shouldShow.value = false;
@@ -39,7 +39,6 @@
 	onShow(() => {
 		getNavList();
 	});
-
 
 	function getNavList() {
 		request.get(`/event-api/grid-menu/icons`).then((res) => {
