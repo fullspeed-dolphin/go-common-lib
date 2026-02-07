@@ -74,7 +74,8 @@
 
       <view class="section-slider">
         <xzsliderrange v-model="originIndexArr" solo :decoration="false" @move="sliderChange" :size="30" height="2px"
-          activeBgc="rgb(0, 122, 255)" :max="Number(originList.length || 0)" :min="0" :total="Number(album_total || 0)"
+					@touchEnd="changeSlideEnd"
+          activeBgc="rgb(0, 122, 255)" :max="Number(originList.length - 1 || 0)" :min="0" :total="Number(album_total || 0)"
           hintColor="#fff" @showNum="e => isShowAmount = e" />
         <view class="title" :style="{ opacity: !isShowAmount ? 0 : 1 }">
           {{ originIndex + 1 }}
@@ -432,6 +433,9 @@ function snapBack() {
   }, 300)
 }
 
+function changeSlideEnd() {
+	
+}
 // ==================== 滑块控制 ====================
 const sliderChange = (e) => {
   if (originIndex.value === e[0]) return;

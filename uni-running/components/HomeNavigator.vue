@@ -43,11 +43,11 @@
 
 	function getNavList() {
 		request.get(`/event-api/grid-menu/icons`).then((res) => {
-			// res.push({
-			// 	"icon_url": "https://ccrun.oss-cn-guangzhou.aliyuncs.com/images/2025/11/26/02ba556b-7558-40f6-bf18-4d101c07dfa1.png",
-			// 	"name": "PK520",
-			// 	"path": "pagesDashboard/pkEvent/pkEvent",
-			// })
+			res.push({
+				"icon_url": "https://ccrun.oss-cn-guangzhou.aliyuncs.com/images/2025/11/26/02ba556b-7558-40f6-bf18-4d101c07dfa1.png",
+				"name": "PK520",
+				"path": "pagesDashboard/pkEvent/pkEvent",
+			})
 			navList.value = res
 		});
 	}

@@ -20,32 +20,14 @@
 			</view>
 			
 			<HomeNavigator />
-
+			
 			<view class="section-title">
-				<view class="section-title-left">线下活动</view>
-				<view class="section-title-right" @click="$u.route('pagesSub/eventList')">
-					<view class="section-title-right-item">查看更多</view>
-					<u-icon name="arrow-right" size="24rpx" color="#ff8c00"></u-icon>
-				</view>
+				<u-cell title="线下活动" :border="false" isLink url="pagesSub/eventList" value="查看更多" />
 			</view>
-			<view class="category-tags">
-				<view class="tags-inner">
-					<view class="tag-slider" :style="getSliderStyle(eventCategoryIndex)"></view>
-					<view
-						v-for="(item, index) in eventCategoryList"
-						:key="item.value"
-						:id="'event-tag-' + index"
-						class="tag-item"
-						:class="{ active: eventCategoryIndex === index }"
-						@click="onEventCategoryChange(index)"
-					>
-						{{ item.name }}
-					</view>
-				</view>
-			</view>
+
 			<swiper class="event-swiper" circular indicator-active-color="#FF8C00" :autoplay="true" :interval="3000"
 				:display-multiple-items="1.2">
-				<swiper-item v-for="(item, index) in bannerEventList" :key="index">
+				<swiper-item v-for="(item, index) in offlineEventList" :key="index">
 					<view class="event-swiper-item">
 						<EventItem :item="item" :key="index" height="474rpx" />
 					</view>
@@ -53,11 +35,7 @@
 			</swiper>
 
 			<view class="section-title" v-if="onlineEventList && onlineEventList.length > 0">
-				<view class="section-title-left">线上赛事</view>
-				<view class="section-title-right">
-					<view class="section-title-right-item">查看更多</view>
-					<u-icon name="arrow-right" size="24rpx" color="#ff8c00"></u-icon>
-				</view>
+				<u-cell title="线上赛事" :border="false" isLink url="pagesSub/eventList" value="查看更多" />
 			</view>
 			<swiper class="event-swiper" circular indicator-active-color="#FF8C00" :autoplay="true" :interval="3000"
 				:next-margin="126" v-if="onlineEventList && onlineEventList.length > 0">
@@ -68,73 +46,15 @@
 				</swiper-item>
 			</swiper>
 
-			<!-- <view class="section-title">线上赛事</view>
-			<section class="section-offline"  @click="$u.route('pagesSub/eventDetail')">
-				<image class="poster" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
-				<view class="flex-start">
-					<view class="text">
-						<view class="name ellipsis">奔跑吧！广州·增城站奔跑吧！广州·增城站广州·增城站</view>
-						<view class="time">2025.10.26 8:00</view>
-					</view>
-					<u-button type="primary" size="small" shape="circle" disabled color="#f4f4f4" text="未开始"></u-button>
-				</view>
-			</section> -->
-
 			<view class="section-title">
-				<view class="section-title-left">全速俱乐部</view>
-				<view class="section-title-right" @click="$u.route('pagesSub/runningTeam/teamList')">
-					<view class="section-title-right-item">查看更多</view>
-					<u-icon name="arrow-right" size="24rpx" color="#ff8c00"></u-icon>
-				</view>
+				<u-cell title="全速俱乐部" :border="false" isLink url="pagesSub/runningTeam/teamList" value="查看更多" />
 			</view>
-			<view class="category-tags">
-				<view class="tags-inner">
-					<view class="tag-slider" :style="clubSliderStyle" :class="clubSliderAnimClass"></view>
-					<view
-						v-for="(item, index) in clubCategoryList"
-						:key="item.value"
-						:id="'club-tag-' + index"
-						class="tag-item"
-						:class="{ active: clubCategoryIndex === index }"
-						@click="onClubCategoryChange(index)"
-					>
-						{{ item.name }}
-					</view>
-				</view>
-			</view>
-			<section class="section-group" :class="['list-transition', listAnimationClass]"
-			@touchstart="onClubTouchStart"
-			@touchend="onClubTouchEnd">
-				<GroupItem :item="item" v-for="(item, index) in GroupList" :key="index" />
-				<view v-if="GroupList.length === 0 && !listAnimationClass" class="empty-state">
-					<text>暂无俱乐部</text>
-				</view>
-			</section>
 
-			<!-- <view class="section-title flex-between-center">
-				名人达人
-				<view class="flex-start">
-					<view class="txt">更多</view>
-					<u-icon name="arrow-right" size="34rpx" color="rgba(0,0,0,.9)"></u-icon>
-				</view>
-			</view>
 			<section class="section-group">
-				<view class="group-item flex-start" v-for="(item,index) in 3" :key="index">
-					<image class="poster radius999" src="https://cdn.uviewui.com/uview/album/1.jpg" mode="aspectFill"></image>
-					<view class="text">
-						<view class="flex-between-center" style="width: 520rpx;">
-							<view class="">
-								<view class="name ellipsis">昵称</view>
-								<view class="city ellipsis">广东广州</view>
-							</view>
-							<u-button type="primary" size="small" shape="circle" text="关注"></u-button>
-						</view>
-						<view class="desc ellipsis" style="color:#333;">全国跑友一家亲，SEA跑团来相聚。生命不息，跑···</view>
-					</view>
-				</view>
-			</section> -->
+				<GroupItem :item="item" v-for="(item, index) in GroupList" :key="index" />
+			</section>
 			
-			<view style="margin-top: 150rpx; padding: 0 34rpx; padding-bottom: calc(224rpx + env(safe-area-inset-bottom));">
+			<view style="margin-top: 50rpx; padding: 0 34rpx 100rpx;">
 				<u-divider text="已经到底了~"></u-divider>
 			</view>
 		</scroll-view>
@@ -194,48 +114,10 @@
 	};
 
 	const eventList = ref([]);
-	const bannerEventList = ref([]);
+	const offlineEventList = ref([]);
 	const bannerList = ref([]);
 	const GroupList = ref([]);
 	const onlineEventList = ref([]);
-
-	// 分类 tag 数据
-	const eventCategoryList = ref([
-		{ name: '全部', value: 'all' },
-		{ name: '跑步', value: 'running' },
-		{ name: '骑行', value: 'cycling' }
-	]);
-	const eventCategoryIndex = ref(0);
-
-	const clubCategoryList = ref([
-		{ name: '我的', value: 'mine' },
-		{ name: '全部', value: 'all' },
-		{ name: '跑步', value: 'running' },
-		{ name: '骑行', value: 'cycling' }
-	]);
-
-	// 使用 Tab 动画 composable（全速俱乐部）
-	const {
-		currentIndex: clubCategoryIndex,
-		sliderStyle: clubSliderStyle,
-		sliderAnimClass: clubSliderAnimClass,
-		listAnimClass: listAnimationClass,
-		changeTab: changeClubTab,
-		initTabRects: initClubTabRects,
-		onTouchStart: onClubTouchStart,
-		onTouchEnd: clubTouchEnd
-	} = useTabAnimation({
-		tabCount: clubCategoryList.value.length,
-		loop: true
-	});
-
-	// 监听 tab 切换，重新加载数据
-	watch(clubCategoryIndex, () => {
-		GroupList.value = [];
-		setTimeout(() => {
-			getGroupList();
-		}, 300);
-	});
 
 	// 存储每个 tag 的位置信息 { width, left }（线下活动用）
 	const eventTagRects = ref([]);
@@ -285,16 +167,6 @@
 	// 分类切换
 	const onEventCategoryChange = (index) => {
 		eventCategoryIndex.value = index;
-	};
-
-	// 全速俱乐部 Tab 切换
-	const onClubCategoryChange = (index) => {
-		changeClubTab(index);
-	};
-
-	// 全速俱乐部手势结束处理
-	const onClubTouchEnd = (e) => {
-		clubTouchEnd(e, clubCategoryList.value);
 	};
 
 	// 计算属性
@@ -348,7 +220,6 @@
 		getEvents();
 		getBannerList();
 		getOnlineEvents();
-		getTagWidths();
 	});
 
 	// 方法定义
@@ -387,18 +258,13 @@
 		}
 	};
 
-	const routeTo = (link) => {
-		console.log(link);
-		uni.$u.route(link);
-	};
-
 	const getEvents = () => {
 		Promise.all([request.get(`/event-api/fsc_swipers?status=ACT&visibility=public`), request.get(`/event-api/getOfflineEventSwiper`)]).then(res => {
 			const list = res.flat();
 			// dirty code: 将特定 swiper 标记为跑团活动
 			const targetItem = list.find(item => item.id === '01KEH51YPXSHF4QRT5C82HZFH1');
 			if (targetItem) targetItem.fsc_id = 'dirty';
-			bannerEventList.value = list;
+			offlineEventList.value = list;
 		});
 	};
 
@@ -420,36 +286,13 @@
 		});
 	};
 
-	const getGroupList = (onComplete = null) => {
-		const clubType = clubCategoryList.value[clubCategoryIndex.value].value;
-
-		// "我的"tab：获取用户所属的俱乐部
-		if (clubType === 'mine') {
-			const groupId = userInfo.value.running_group;
-			if (!groupId) {
-				GroupList.value = [];
-				if (onComplete) onComplete();
-				return;
-			}
-			request.get(`/running-group/api/v1/groups/info?group_id=${groupId}`).then(res => {
-				GroupList.value = res ? [res] : [];
-				if (onComplete) onComplete();
-			});
-			return;
-		}
-
-		const data = {
-			pageIndex: 0,
-			pageSize: 5,
-			keyword: "",
-		};
-		// 如果不是"全部"，则添加 club_type 过滤
-		if (clubType !== 'all') {
-			data.club_type = clubType;
-		}
-		request.get(`/running-group/api/v1/groups/list`, data).then(res => {
-			GroupList.value = res.data;
-			if (onComplete) onComplete();
+	const getGroupList = () => {
+		Promise.all([
+			request.get(`/running-group/api/v1/groups/list?pageIndex=0&pageSize=5&club_type=running`),
+			request.get(`/running-group/api/v1/groups/list?pageIndex=0&pageSize=5&club_type=cycling`),
+		]).then(res => {
+			console.log("GroupList res=====>", res);
+			GroupList.value = res.map(i => i.data).flat();
 		});
 	};
 </script>
@@ -540,32 +383,15 @@
 		}
 
 		.section-title {
-			margin: 40rpx 0 30rpx 0;
-			padding: 0 34rpx;
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			position: relative;
-			font-weight: 800;
-			font-size: 36rpx;
-			color: #000000;
-			line-height: 48rpx;
-
-			.txt {
-				font-size: 28rpx;
-				font-weight: 400;
-			}
-
-			.section-title-right {
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-				gap: 10rpx;
-
-				.section-title-right-item {
-					font-size: 28rpx;
+			::v-deep{
+				.u-cell__title-text{
+					font-weight: 800;
+					font-size: 36rpx;
+					color: #000000;
+				}
+				.uicon-arrow-right,
+				.u-cell__value{
 					color: #ff8c00;
-					font-weight: 400;
 				}
 			}
 		}
@@ -579,129 +405,4 @@
 		min-height: 900rpx;
 		padding: 0 34rpx;
 	}
-
-	.empty-state {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		height: 900rpx;
-		color: #999;
-		font-size: 28rpx;
-	}
-
-	// 列表切换动画
-	.list-transition {
-		will-change: transform, opacity;
-	}
-
-	.slide-out-left {
-		animation: slideOutLeft 0.25s ease-in forwards;
-	}
-
-	.slide-out-right {
-		animation: slideOutRight 0.25s ease-in forwards;
-	}
-
-	.slide-in-left {
-		animation: slideInLeft 0.3s ease-out forwards;
-	}
-
-	.slide-in-right {
-		animation: slideInRight 0.3s ease-out forwards;
-	}
-
-	@keyframes slideOutLeft {
-		from {
-			transform: translateX(0);
-			opacity: 1;
-		}
-		to {
-			transform: translateX(-60rpx);
-			opacity: 0;
-		}
-	}
-
-	@keyframes slideOutRight {
-		from {
-			transform: translateX(0);
-			opacity: 1;
-		}
-		to {
-			transform: translateX(60rpx);
-			opacity: 0;
-		}
-	}
-
-	@keyframes slideInLeft {
-		from {
-			transform: translateX(-60rpx);
-			opacity: 0;
-		}
-		to {
-			transform: translateX(0);
-			opacity: 1;
-		}
-	}
-
-	@keyframes slideInRight {
-		from {
-			transform: translateX(60rpx);
-			opacity: 0;
-		}
-		to {
-			transform: translateX(0);
-			opacity: 1;
-		}
-	}
-
-	.category-tags {
-		padding: 0 34rpx;
-		margin-bottom: 20rpx;
-
-		.tags-inner {
-			display: inline-flex;
-			position: relative;
-			gap: 20rpx;
-			padding: 6rpx;
-			background: #fff;
-			border-radius: 999rpx;
-		}
-
-		.tag-slider {
-			position: absolute;
-			top: 6rpx;
-			left: 6rpx;
-			height: calc(100% - 12rpx);
-			background: #FF8C00;
-			border-radius: 999rpx;
-			transition: transform 0.3s ease-out, width 0.3s ease-out;
-			z-index: 0;
-
-			// 滑块循环动画
-			&.no-transition {
-				transition: none !important;
-			}
-
-			&.slider-hidden {
-				opacity: 0;
-			}
-		}
-
-		.tag-item {
-			position: relative;
-			z-index: 1;
-			padding: 12rpx 28rpx;
-			font-size: 28rpx;
-			color: #666;
-			line-height: 40rpx;
-			white-space: nowrap;
-			transition: color 0.3s ease;
-
-			&.active {
-				color: #fff;
-				font-weight: bold;
-			}
-		}
-	}
-
 </style>
