@@ -18,9 +18,13 @@
 
 <script setup>
 	import {
-		ref
+		ref, computed
 	} from "vue";
+	import { useStore } from "vuex";
+	import request from "@/utils/request.js"
 
+	const store = useStore();
+	const album_info = computed(() => store.state.album_info);
 	const isShowModal = ref(false);
 	const isPlaying = ref(false);
 	const fileLink = ref('');
@@ -37,8 +41,11 @@
 
 	function openModal(link, index) {
 		fileLink.value = link
-
 		isShowModal.value = true;
+		const eventId = album_info.value?.event_id
+		if (eventId) {
+			request.post(`/image-service/albums/view/increment?event_id=${eventId}`)
+		}
 	}
 
 	function close() {
