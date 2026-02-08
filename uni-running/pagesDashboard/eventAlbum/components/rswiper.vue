@@ -68,7 +68,7 @@
       <div class="flex-center">
         <up-button @click="loadHDimage()" shape="circle" type="primary"
           customStyle="width:188rpx;height:64rpx;margin:0;font-size:24rpx;color: #babab6;border-color:rgba(255, 255, 255, 0.27);background:rgba(34, 34, 34, 0.8);">
-          {{isSomeHDimage ? '已加载高清图' : '加载高清图'}}
+          查看高清图
         </up-button>
       </div>
 
@@ -151,7 +151,6 @@ const originIndexArr = ref([0])
 const isloading = ref(false)
 const isShowAmount = ref(false)
 const isAlbumComplete = ref(false)
-const hdImageIndexes = ref(new Set())
 
 // ==================== 屏幕宽度 ====================
 const screenWidth = ref(375)
@@ -189,10 +188,9 @@ function getImageData(index) {
   const url = originList.value[index] || ''
   if (!url) return { url: '', url750: '', height: '500rpx' }
 
-  const isHD = hdImageIndexes.value.has(index)
   return {
     url: url,
-    url750: isHD ? url : url + '?x-oss-process=image/resize,w_750/quality,q_80/format,webp',
+    url750: url + '?x-oss-process=image/resize,w_750/quality,q_80/format,webp',
     height: getPhotoHeight(url)
   }
 }
@@ -209,7 +207,6 @@ const nextImage = computed(() => {
   return getImageData(originIndex.value + 1)
 })
 
-const isSomeHDimage = computed(() => hdImageIndexes.value.has(originIndex.value))
 
 // ==================== 数据初始化 ====================
 watch(
@@ -504,8 +501,10 @@ function openShare() {
 }
 
 function loadHDimage() {
-  hdImageIndexes.value.add(originIndex.value)
-  hdImageIndexes.value = new Set(hdImageIndexes.value)
+  uni.previewImage({
+    urls: originList.value,
+    current: originList.value[originIndex.value],
+  })
 }
 
 function downloadPicture() {

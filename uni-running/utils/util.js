@@ -3,7 +3,7 @@ export function clearUserInfo() {
 	uni.removeStorageSync('token')
 	uni.removeStorageSync('tokenExpire')
 	uni.removeStorageSync('userInfo')
-	
+
 	store.commit('set', {
 		type: 'userInfo',
 		data: {}
@@ -28,7 +28,7 @@ export async function asyncAlls(jobs) {
 // 计算 navbar 高度
 export const getNavbarHeight = () => {
 	const statusBarHeight = uni.getWindowInfo().statusBarHeight || 0;
-	
+
 	let navbarHeight = 0
 	// #ifdef MP-WEIXIN
 	const menuBtn = uni.getMenuButtonBoundingClientRect();
@@ -44,7 +44,7 @@ export const getNavbarHeight = () => {
 	// #ifndef MP-WEIXIN
 	navbarHeight = statusBarHeight + 44;
 	// #endif
-	
+
 	return navbarHeight;
 };
 
@@ -54,5 +54,5 @@ export function isReleaseVersion() {
 	// develop: 开发者工具（不显示）
 	// trial: 体验版（不显示）
 	// shouldShow = envVersion === 'release';
-	return envVersion === 'release' || envVersion === 'develop';
+	return envVersion === 'trial' || envVersion === 'release' || envVersion === 'develop';
 }

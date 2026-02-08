@@ -16,13 +16,13 @@
 				@click="previewImage(url, index)"
 			/>
 		</view>
-		
-		<qPreviewImage ref="refPreviewImage" :urls="image750List"></qPreviewImage>
+
+		<qPreviewImage ref="refPreviewImage" :urls="image750List" :originalUrls="imageList"></qPreviewImage>
 	</view>
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue';
+import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { useShare } from "@/composables/useShare.js";
 import qPreviewImage from "./components/q-previewImage/components/q-previewImage/q-previewImage.vue"
@@ -46,18 +46,12 @@ onLoad(() => {
 			return link.split('?Expires')[0]
 		});
 		imageList.value = list
-		image750List.value = list.map(i => i + '?x-oss-process=image/resize,w_750')
+		image750List.value = list.map(i => i + '?x-oss-process=image/resize,w_750/quality,q_80/format,webp')
 	}
 });
 
 const previewImage = (url, index) => {
 	refPreviewImage.value.open(url);
-	
-	// const ossPar750  = '?x-oss-process=image/resize,w_750/quality,q_90/format,webp'
-	// uni.previewImage({
-	// 	urls: imageList.value.map(i => i + ossPar750),
-	// 	current: index
-	// });
 };
 </script>
 
@@ -73,18 +67,5 @@ const previewImage = (url, index) => {
 	height: 180rpx;
 	padding: 5rpx;
 	box-sizing: border-box;
-}
-::v-deep{
-	.PreviewMedia{
-		.u-popup__content__close {
-			padding: 20rpx;
-			background: rgba(0,0,0, .5);
-			border-radius: 999px;
-			top: 300rpx!important;
-			.u-icon__icon{
-				color: #fff!important;
-			}
-		}
-	}
 }
 </style>

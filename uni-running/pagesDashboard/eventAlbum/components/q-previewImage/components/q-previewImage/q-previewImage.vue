@@ -15,75 +15,27 @@
 			</swiper-item>
 		</swiper>
 		
-		<view class="flex-center" style="position: fixed;left:0;bottom: 90rpx;width: 100%;">
-			<up-button @click="downloadPicture" type="primary" shape="circle" icon="download"
-				customStyle="width:186rpx;height:60rpx;">
-				下载原图
+		<view class="flex-center" style="position: fixed;left:0;bottom: 90rpx;width: 100%;" v-if="originalUrls.length">
+			<up-button @click="previewHD" shape="circle" type="primary"
+				customStyle="width:188rpx;height:64rpx;margin:0;font-size:24rpx;color: #babab6;border-color:rgba(255, 255, 255, 0.27);background:rgba(34, 34, 34, 0.8);">
+				查看高清图
 			</up-button>
 		</view>
 	</view>
 </template>
 
 <script>
-// 保存在线图片到相册
-async function saveOnlineImageToAlbum(imageUrl) {
-  // 1. 显示 loading（可选）
-  uni.showLoading({ title: '下载中...' });
-
-  try {
-    // 2. 下载图片到临时路径
-    const downloadRes = await new Promise((resolve, reject) => {
-      uni.downloadFile({
-        url: imageUrl, // 必须是 HTTPS（小程序要求）
-        success: resolve,
-        fail: reject
-      });
-    });
-
-    if (downloadRes.statusCode !== 200) {
-      throw new Error('图片下载失败');
-    }
-
-    const tempFilePath = downloadRes.tempFilePath;
-
-    // 3. 保存到相册
-    await new Promise((resolve, reject) => {
-      uni.saveImageToPhotosAlbum({
-        filePath: tempFilePath,
-        success: resolve,
-        fail: reject
-      });
-    });
-
-    uni.hideLoading();
-    uni.showToast({ title: '保存成功', icon: 'success' });
-
-  } catch (err) {
-    uni.hideLoading();
-    console.error('保存失败:', err);
-
-    // 常见错误处理
-    if (err.errMsg?.includes('auth deny')) {
-      uni.showToast({ title: '请允许访问相册', icon: 'none' });
-      // 引导用户去设置（可选）
-      uni.openSetting({
-        success: (res) => {
-          if (res.authSetting['scope.writePhotosAlbum']) {
-            // 用户已授权，可重试
-          }
-        }
-      });
-    } else {
-      uni.showToast({ title: '保存失败，请重试', icon: 'none' });
-    }
-  }
-}
-
 export default {
 	props: {
 		urls: {
 			type: Array,
 			required: true,
+			default: () => {
+				return [];
+			}
+		},
+		originalUrls: {
+			type: Array,
 			default: () => {
 				return [];
 			}
@@ -126,12 +78,11 @@ export default {
 		handleTouchEnd() {
 			this.isZooming = false;
 		},
-		downloadPicture() {
-			saveOnlineImageToAlbum(this.urls[this.current])
-			console.log('this.urls[this.current]=====>', this.urls[this.current])
-			// uni.saveImageToPhotosAlbum({
-			// 	filePath: this.urls[this.current],
-			// })
+		previewHD() {
+			uni.previewImage({
+				urls: this.originalUrls,
+				current: this.current,
+			})
 		}
 	}
 };
