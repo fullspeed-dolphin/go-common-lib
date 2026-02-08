@@ -2,16 +2,15 @@
 	<view v-if="isShowModal" class="PreviewMedia">
 		<up-popup :show="isShowModal" @close="close" overlayOpacity="0.9" bgColor="transparent" mode="center" closeable>
 			<view class="video-container" style="height: 100vh;width:100vw">
-				<video class="video" id="myVideo" 
+				<video class="video" id="myVideo"
 					:poster="fileLink + '?x-oss-process=video/snapshot,t_500,f_jpg,w_640,h_360,m_fast'"
 					:src="fileLink" @play="onPlay" @pause="onPause" @ended="onPause"
-					:controls="true"></video>
-			</view>
-			<view v-if="!isPlaying" class="flex-center" style="position: fixed;left:0;bottom: 90rpx;width: 100%;z-index:10;">
-				<up-button @click="downloadVideo" type="primary" plain shape="circle" icon="download"
-					customStyle="width:186rpx;height:60rpx;background: transparent;">
-					下载视频
-				</up-button>
+					:controls="true">
+					<!-- cover-view 才能浮在原生 video 组件之上 -->
+					<cover-view v-if="!isPlaying" class="download-cover" @click="downloadVideo">
+						<cover-view class="download-cover-btn">保存到相册</cover-view>
+					</cover-view>
+				</video>
 			</view>
 		</up-popup>
 	</view>
@@ -47,49 +46,61 @@
 	}
 
 	async function downloadVideo() {
-	  uni.showLoading({ title: '下载中...' })
-	
-	  try {
-	    // 下载视频文件
-	    const downloadRes = await new Promise((resolve, reject) => {
-	      uni.downloadFile({
-	        url: fileLink.value,
-	        success: resolve,
-	        fail: reject
-	      })
-	    })
-	
-	    if (downloadRes.statusCode !== 200) {
-	      throw new Error('下载失败')
-	    }
-	
-	    // 保存到相册（注意：仅 App 支持 saveVideoToPhotosAlbum）
-	    await new Promise((resolve, reject) => {
-	      uni.saveVideoToPhotosAlbum({
-	        filePath: downloadRes.tempFilePath,
-	        success: resolve,
-	        fail: reject
-	      })
-	    })
-	
-	    uni.showToast({ title: '保存成功', icon: 'success' })
-	  } catch (err) {
-	    console.error('保存失败:', err)
-	
-	    // 平台兼容处理：小程序/H5 不支持自动保存
-	    const systemInfo = uni.getSystemInfoSync()
-	    if (systemInfo.environment === 'miniProgram' || systemInfo.platform === 'devtools') {
-	      uni.showModal({
-	        title: '提示',
-	        content: '请长按视频，选择“保存视频”',
-	        showCancel: false
-	      })
-	    } else {
-	      uni.showToast({ title: '保存失败', icon: 'none' })
-	    }
-	  } finally {
-	    uni.hideLoading()
-	  }
+		uni.showLoading({ title: '下载中...' })
+		try {
+			// 先请求相册写入权限
+			// #ifdef MP-WEIXIN
+			await new Promise((resolve, reject) => {
+				uni.authorize({
+					scope: 'scope.writePhotosAlbum',
+					success: resolve,
+					fail: reject
+				})
+			})
+			// #endif
+
+			const downloadRes = await new Promise((resolve, reject) => {
+				uni.downloadFile({
+					url: fileLink.value,
+					success: resolve,
+					fail: reject
+				})
+			})
+
+			if (downloadRes.statusCode !== 200) {
+				throw new Error('下载失败')
+			}
+
+			await new Promise((resolve, reject) => {
+				uni.saveVideoToPhotosAlbum({
+					filePath: downloadRes.tempFilePath,
+					success: resolve,
+					fail: reject
+				})
+			})
+
+			uni.showToast({ title: '保存成功', icon: 'success' })
+		} catch (err) {
+			console.error('保存失败:', err)
+
+			// 权限被拒绝，引导用户去设置页开启
+			if (err.errMsg && (err.errMsg.includes('auth deny') || err.errMsg.includes('authorize'))) {
+				uni.showModal({
+					title: '提示',
+					content: '需要您授权"保存到相册"权限，请在设置中开启',
+					confirmText: '去设置',
+					success: (res) => {
+						if (res.confirm) {
+							uni.openSetting()
+						}
+					}
+				})
+			} else {
+				uni.showToast({ title: '保存失败，请重试', icon: 'none' })
+			}
+		} finally {
+			uni.hideLoading()
+		}
 	}
 	defineExpose({
 		openModal,
@@ -108,28 +119,24 @@
 		width: 100%;
 	}
 
-	.control-btn,
-	.download-btn {
+	.download-cover {
 		position: absolute;
-		bottom: 20rpx;
-		left: 50%;
-		transform: translateX(-50%);
-		width: 160rpx;
-		height: 60rpx;
-		line-height: 60rpx;
+		bottom: 120rpx;
+		left: 0;
+		width: 750rpx;
+		display: flex;
+		justify-content: center;
+	}
+
+	.download-cover-btn {
+		width: 188rpx;
+		height: 64rpx;
+		line-height: 64rpx;
+		background-color: rgba(34, 34, 34, 0.8);
+		color: #babab6;
 		font-size: 24rpx;
-		color: white;
-		border-radius: 8rpx;
-	}
-
-	.play-btn,
-	.pause-btn {
-		background: rgba(0, 0, 0, 0.6);
-		z-index: 10;
-	}
-
-	.download-btn {
-		background: #007aff;
-		margin-top: 80rpx;
+		border: 1px solid rgba(255, 255, 255, 0.27);
+		border-radius: 999rpx;
+		text-align: center;
 	}
 </style>
