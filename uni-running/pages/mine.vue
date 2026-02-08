@@ -113,7 +113,7 @@
 					</template>
 				</u-cell>
 
-				<u-cell title="关注全速体育" class="nav-cell" @click="openOfficialAccount" :border="false" isLink>
+				<u-cell v-if="isReleaseVersion()" title="关注全速体育" class="nav-cell" @click="openOfficialAccount" :border="false" isLink>
 					<template #icon>
 						<image class="nav-icon" style="width: 43rpx; height: 34rpx"
 							src="/static/images/Wei20260108212025_5184_21.png"></image>
@@ -156,6 +156,7 @@
 	import AccessUser from "@/components/common/AccessUser.vue";
 	import request from "@/utils/request.js";
 	import { useShare } from "@/composables/useShare.js";
+	import { isReleaseVersion } from "@/utils/util.js";
 
 	const store = useStore();
 
