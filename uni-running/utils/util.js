@@ -47,3 +47,12 @@ export const getNavbarHeight = () => {
 	
 	return navbarHeight;
 };
+
+export function isReleaseVersion() {
+	const envVersion = uni?.getAccountInfoSync?.().miniProgram.envVersion || 'develop';
+	// release: 正式版（显示）
+	// develop: 开发者工具（不显示）
+	// trial: 体验版（不显示）
+	// shouldShow = envVersion === 'release';
+	return envVersion === 'release' || envVersion === 'develop';
+}
