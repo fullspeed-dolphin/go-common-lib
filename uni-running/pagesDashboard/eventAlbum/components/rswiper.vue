@@ -110,6 +110,7 @@
 <script setup>
 import xzsliderrange from "./xz-slider-range/xz-slider-range.vue"
 import SharePoster from "./SharePoster.vue"
+import request from "@/utils/request.js"
 import {
   ref,
   watch,
@@ -121,6 +122,14 @@ const store = useStore();
 
 const album_total = computed(() => store.state.album_total);
 const album_data = computed(() => store.state.album_data);
+const album_info = computed(() => store.state.album_info);
+
+function addViewCount() {
+  const eventId = album_info.value?.event_id
+  if (eventId) {
+    request.post(`/image-service/albums/view/increment?event_id=${eventId}`)
+  }
+}
 
 const props = defineProps({
   originList: {
@@ -376,6 +385,7 @@ function goToPrev() {
     originIndex.value--
     originIndexArr.value[0] = originIndex.value
     translateX.value = -screenWidth.value
+    addViewCount()
   }, 300)
 }
 
@@ -422,6 +432,7 @@ function goToNext() {
     originIndex.value++
     originIndexArr.value[0] = originIndex.value
     translateX.value = -screenWidth.value
+    addViewCount()
   }, 300)
 }
 
@@ -443,6 +454,7 @@ const sliderChange = (e) => {
   // 更新 index，watch 会自动重置缩放状态
   originIndex.value = e[0];
   translateX.value = -screenWidth.value
+  addViewCount()
 
   const totalCount = Number(album_total.value) || 0
   const isAllLoaded = totalCount === 0 || originList.value.length >= totalCount

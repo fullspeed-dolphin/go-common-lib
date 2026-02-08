@@ -11,6 +11,7 @@
 <script setup>
 import SliderRange from "./xz-slider-range/xz-slider-range.vue";
 import SwiperSection from "./rswiper.vue"
+import request from "@/utils/request.js"
 	import {
 		ref, onMounted, computed
 	} from "vue";
@@ -18,9 +19,10 @@ import SwiperSection from "./rswiper.vue"
 		useStore
 	} from "vuex";
 	const store = useStore();
-	
+
 	const album_total = computed(() => store.state.album_total);
 	const album_data = computed(() => store.state.album_data);
+	const album_info = computed(() => store.state.album_info);
 	const sliderRange = ref(20);
 
 	const emits = defineEmits(["open",'loadingMore']);
@@ -34,8 +36,12 @@ import SwiperSection from "./rswiper.vue"
 		console.log('link====>', link, index)
 		if(link) {
 			isShowModal.value = true;
+			const eventId = album_info.value?.event_id
+			if (eventId) {
+				request.post(`/image-service/albums/view/increment?event_id=${eventId}`)
+			}
 		}
-		
+
 		originIndex.value = index
 	}
 	const loadingMore=(index)=> {
