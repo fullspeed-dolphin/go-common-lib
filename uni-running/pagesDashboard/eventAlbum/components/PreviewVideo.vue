@@ -3,15 +3,15 @@
 		<up-popup :show="isShowModal" @close="close" overlayOpacity="0.9" bgColor="transparent" mode="center" closeable>
 			<view class="video-container" style="height: 100vh;width:100vw">
 				<video class="video" id="myVideo" 
-					:poster1="fileLink + '?x-oss-process=video/snapshot,t_5,f_jpg,w_720'"
+					:poster="fileLink + '?x-oss-process=video/snapshot,t_500,f_jpg,w_640,h_360,m_fast'"
 					:src="fileLink" @play="onPlay" @pause="onPause" @ended="onPause"
 					:controls="true"></video>
 			</view>
 			<view v-if="!isPlaying" class="flex-center" style="position: fixed;left:0;bottom: 90rpx;width: 100%;z-index:10;">
-				<!-- <up-button @click="downloadVideo" type="primary" plain shape="circle" icon="download"
+				<up-button @click="downloadVideo" type="primary" plain shape="circle" icon="download"
 					customStyle="width:186rpx;height:60rpx;background: transparent;">
 					下载视频
-				</up-button> -->
+				</up-button>
 			</view>
 		</up-popup>
 	</view>
