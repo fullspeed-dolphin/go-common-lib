@@ -1,19 +1,19 @@
 <template>
   <view class="">
-    <section class="section-header header-bg">
+    <section class="section-header header-bg" :style="{background:'url('+detailInfo?.background_image_url+')'}">
       <view class="status-bar flex-start">
         <view class="flex-center bar">
 					<view class="status-dot"></view>
-					<text class="status-text">火热报名中·2月28日截止</text>
+					<text class="status-text">火热报名中·{{detailInfo?.registration_end_time}}截止</text>
 				</view>
       </view>
 
-      <view class="title">为爱奔跑520</view>
-      <view class="subtitle">全速体育悦月跑线上挑战赛</view>
+      <view class="title">{{ detailInfo?.event_name }}</view>
+      <view class="subtitle">{{ detailInfo?.event_subtitle }}</view>
 
       <view class="start-time flex-center">
         <view class="iconfont icon-riqi u-mr-10"></view>
-        <text class="time-text">3月1日 开跑</text>
+        <text class="time-text">{{detailInfo?.start_time}} 开跑</text>
       </view>
     </section>
 
@@ -35,22 +35,22 @@
     <section class="btn-container u-mb-30">
       <u-button class="join-btn" color="linear-gradient( 64deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%)" 
 			customStyle="width: 686rpx;height: 96rpx;border-radius: 32rpx;letter-spacing: 1px;font-size: 34rpx;" 
-			@click="$u.route('pagesDashboard/pkEvent/pkEventForm')">
+			@click="$u.route('pagesDashboard/pkEvent/pkEventForm',{id: activetyId})">
 				立即报名参赛
 			</u-button>
     </section>
 
     <!-- 功能按钮组 -->
     <section class="section-func-buttons flex-wrap">
-      <view class="func-item flex-col-center" @click="$u.route('pagesDashboard/pkEvent/teamForm')">
+      <view class="func-item flex-col-center" @click="$u.route('pagesDashboard/pkEvent/teamForm',{id: activetyId})">
         <view class="iconfont flex-center icon-zhandui1" style="color:#FCD515;background: #FEF9C2;"></view>
         <text class="func-text">创建战队</text>
       </view>
-      <view class="func-item flex-col-center" @click="$u.route('pagesDashboard/pkEvent/teamDetail?id=')">
+      <view class="func-item flex-col-center" @click="$u.route('pagesDashboard/pkEvent/teamDetail',{id: activetyId})">
         <view class="iconfont flex-center icon-zhandui1" style="color:#FCD515;background: #FEF9C2;"></view>
         <text class="func-text">进入战队</text>
       </view>
-      <view class="func-item flex-col-center" @click="$u.route('pagesDashboard/pkEvent/teamList')">
+      <view class="func-item flex-col-center" @click="$u.route('pagesDashboard/pkEvent/teamList',{id: activetyId})">
         <view class="iconfont flex-center icon-list-1-copy" style="color:#155DFC;background: #DBEAFE;"></view>
         <text class="func-text">战队列表</text>
       </view>
@@ -58,17 +58,17 @@
         <view class="iconfont flex-center icon-huodongguize" style="color:#FC9C15;background: #FEE8C2;"></view>
         <text class="func-text">活动规则</text>
       </view>
-      <view class="func-item flex-col-center" @click="$u.route('pagesDashboard/pkEvent/teamForm')">
+      <view class="func-item flex-col-center" @click="$u.route('pagesDashboard/pkEvent/teamForm',{id: activetyId})">
         <view class="iconfont flex-center icon-lijidaka" style="color:#8515FC;background: #EBDBFE;"></view>
         <text class="func-text">立即打卡</text>
       </view>
-			<view class="func-item flex-col-center" @click="$u.route('pagesDashboard/pkEvent/pkRankList')">
+			<view class="func-item flex-col-center" @click="$u.route('pagesDashboard/pkEvent/pkRankList',{id: activetyId})">
 			  <view class="iconfont flex-center icon-zhengshu" style="color:#EE2061;background: #FEDBE6;"></view>
 			  <text class="func-text">完赛证书</text>
 			</view>
     </section>
 	<section class="section-func-buttons flex-wrap" style="margin-bottom: 100rpx;">
-      <view class="func-item flex-col-center" @click="$u.route('pagesDashboard/pkEvent/pkRankList')">
+      <view class="func-item flex-col-center" @click="$u.route('pagesDashboard/pkEvent/pkRankList',{id: activetyId})">
         <view class="iconfont flex-center icon-paihangbang" style="color:#FC9C15;background: #FEE8C2;"></view>
         <text class="func-text">排行榜</text>
       </view>
@@ -78,6 +78,17 @@
 </template>
 
 <script setup>
+import { ref} from "vue";
+import { onLoad } from "@dcloudio/uni-app";
+import request from "@/utils/request.js"
+import dayjs from "dayjs";
+const activetyId = ref('01KH0WQX4H2C7Q4GJ217P8T922');
+const detailInfo = ref(null);
+onLoad((options) => {
+	console.log(options);
+	// activetyId.value = options.id;
+	init();
+});
 // uniapp 导航方法（无需 import）
 const handleJoin = () => {
   uni.navigateTo({ url: '/pages/join/join' });
@@ -98,6 +109,20 @@ const goToRanking = () => {
 const checkIn = () => {
   uni.navigateTo({ url: '/pages/check-in/check-in' });
 };
+const init=()=>{ 
+	// let url = !type ? '/ranking/personal?activity_id=' + id : '/ranking/team?activity_id='+ id
+  request.get('/event-api/online_events/01KH0WQX4H2C7Q4GJ217P8T922').then(res => {
+	//   console.log('res===',res)
+	  detailInfo.value = res || {}
+	//   console.log('detailInfo.value===',dayjs(detailInfo.value.registration_end_time).format('MM月DD日'))
+	  detailInfo.value.registration_end_time = dayjs(detailInfo.value.registration_end_time).format('M月D日')
+	  detailInfo.value.start_time = dayjs(detailInfo.value.start_time).format('M月D日')
+	//   console.log('detailInfo.value===',detailInfo.value)
+    // if (res.code === 200) {
+    // //   rankList.value = res.data
+    // }
+  })
+}
 </script>
 
 <style lang="scss" scoped>
