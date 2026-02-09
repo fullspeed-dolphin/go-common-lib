@@ -25,16 +25,12 @@ border: 2rpx solid #E2E8F0;">
 					</up-form-item>
 					<up-form-item label="选择组别" prop="categoryType" required>
 						<view class="flex-between-center u-pt-5">
-							<view class="category-item flex-col-center" :class="{active: form.categoryType === 1}" @click="form.categoryType = 1">
-								<view class="iconfont icon-xunhuan1-M" style="color:#2B7FFF;"></view>
-								<view class="target">3.14公里</view>
-								<view class="txt">圆周率无限挑战</view>
+							<view class="category-item flex-col-center" v-for="(item,index) in  groupInfo" :class="{active: form.categoryType === index+1}" @click="form.categoryType = (index+1)" >
+								<view class="iconfont icon-xunhuan1-M" v-if="index==0" style="color:#2B7FFF;"></view>
+								<view class="iconfont icon-aixin" v-else style="color:#F6339A;"></view>
+								<view class="target">{{item.target_km}}公里</view>
+								<view class="txt">{{ item.description }}</view>
 							</view>					
-							<view class="category-item flex-col-center " :class="{active: form.categoryType === 2}" @click="form.categoryType = 2">
-								<view class="iconfont icon-aixin" style="color:#F6339A;"></view>
-								<view class="target">5.20公里</view>
-								<view class="txt">让爱意随脚步延伸</view>
-							</view>
 						</view>
 					</up-form-item>
 					<view class="textarea-cell">
@@ -79,6 +75,8 @@ border: 2rpx solid #E2E8F0;">
 
 	const uForm = ref(null);
 	const from = ref("");
+	const activetyId = ref(""); // 活动ID
+	const groupInfo = ref({}); // 组别
 	
 	const group_id = ref("");
 	const form = ref({
@@ -115,9 +113,10 @@ border: 2rpx solid #E2E8F0;">
 	onLoad((options) => {
 		console.log("option", options);
 		group_id.value = options.group_id;
-
+		activetyId.value = options.id
 		from.value = options.from;
 		getDetail();
+		getClubType()
 	});
 
 	// 方法定义
@@ -195,6 +194,12 @@ border: 2rpx solid #E2E8F0;">
 				});
 			})
 		});
+	};
+	// 获取组别
+	const getClubType = () => {
+		request.get('/event-api/online_events/'+activetyId.value).then(res => {
+			groupInfo.value = res?.group_config?.groups || {}
+		})
 	};
 </script>
 

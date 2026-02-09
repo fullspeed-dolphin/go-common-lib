@@ -68,7 +68,8 @@
 import { ref, computed, watch } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { useTabAnimation } from "@/composables/useTabAnimation.js";
-
+import request from "@/utils/request.js"
+const activetyId = ref('')
 const rank1 = {
   name: "王嘉骐",
   distance: "320.50",
@@ -117,8 +118,10 @@ const {
   loop: true,
 });
 
-onLoad(() => {
+onLoad((options) => {
+  activetyId.value = options.id
   initTabRects();
+  getRankList(0,options.id)
 });
 
 // 当前选中的 tab
@@ -128,6 +131,7 @@ const curTab = computed(() => tabList.value[currentIndex.value]);
 const handleTabChange = (item, index) => {
   if (currentIndex.value === index) return;
   changeTab(index);
+  getRankList(index,activetyId.value)
 };
 
 const dataList = ref([]);
@@ -199,6 +203,15 @@ const handleEdit = () => {
     url: "/pages/edit-team/edit-team",
   });
 };
+// 排行榜type 0个人 1战队,id是activity_id
+const getRankList = (type,id) => {
+  let url = !type ? '/ranking/personal?activity_id=' + id : '/ranking/team?activity_id='+ id
+  request.get(url).then(res => {
+    if (res.code === 200) {
+      rankList.value = res.data
+    }
+  })
+}
 </script>
 
 <style lang="scss" scoped>

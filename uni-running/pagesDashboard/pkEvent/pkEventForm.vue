@@ -65,6 +65,7 @@ import PickerCell from "@/components/common/PickerCell.vue";
 import request from "@/utils/request.js";
 
 const uForm = ref(null);
+const activetyId = ref("");
 
 const group_id = ref("");
 const form = ref({
@@ -106,9 +107,11 @@ const rules = ref({
 onLoad((options) => {
   console.log("option", options);
   group_id.value = options.group_id;
-
+  activetyId.value = options.id;
   // form.value = options.from;
   getDetail();
+  // 套餐列表
+  getComboList();
 });
 
 // 方法定义
@@ -190,6 +193,15 @@ const submitForm = () => {
       });
   });
 };
+// 获取套餐列表
+const getComboList = (type,id) => {
+  // let url = !type ? '/ranking/personal?activity_id=' + id : '/ranking/team?activity_id='+ id
+  request.get(`/online_activity_package?activity_id=${activetyId.value}`).then(res => {
+    if (res.code === 200) {
+      rankList.value = res.data
+    }
+  })
+}
 </script>
 
 <style lang="less" scoped>

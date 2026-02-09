@@ -75,7 +75,7 @@ import {
 	onLoad,
 } from "@dcloudio/uni-app";
 import { useTabAnimation } from "@/composables/useTabAnimation.js";
-
+const activetyId = ref('')
 // Tab 配置
 const tabList = ref([
 	{ label: "3.14KM", value: "" },
@@ -97,7 +97,8 @@ const {
 	loop: true
 });
 
-onLoad(() => {
+onLoad((options) => {
+	activetyId.value = options.id
 	initTabRects();
 });
 

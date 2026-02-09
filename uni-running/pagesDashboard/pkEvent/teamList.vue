@@ -63,7 +63,8 @@ import {
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 import { useTabAnimation } from "@/composables/useTabAnimation.js";
 import request from "@/utils/request.js";
-
+const activetyId = ref('') // 活动ID
+const teamGoalKm = ref('3.14KM'); // 战队目标里程
 const {
 	mescrollInit,
 	downCallback,
@@ -99,6 +100,7 @@ const curTab = computed(() => tabList.value[currentIndex.value]);
 const handleTabChange = (item, index) => {
 	if (currentIndex.value === index) return;
 	changeTab(index);
+	teamGoalKm.value = index ? '5.20KM' : '3.14KM';
 };
 
 // 数据
@@ -133,6 +135,7 @@ const getList = (mescroll) => {
 	const data = {
 		pageIndex: mescroll.num - 1,
 		pageSize: 10,
+		team_goal_km: teamGoalKm.value,
 	};
 
 	// 如果选中了具体状态，传给后端过滤
@@ -141,7 +144,7 @@ const getList = (mescroll) => {
 		data.orderStatus = status;
 	}
 
-	request.post(`/pay/order/list`, data).then((res) => {
+	request.get(`/online_activity_team?activity_id=${activetyId.value}`, data).then((res) => {
 		res = res.orders.map(item => {
 			const sign_info_list = item.sign_info_list
 			return {
@@ -189,7 +192,8 @@ function getRefundInfo(orderTime, endHour) {
 	};
 }
 
-onLoad(() => {
+onLoad((options) => {
+	activetyId.value = options.id
 	initTabRects();
 });
 
