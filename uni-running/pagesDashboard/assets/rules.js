@@ -105,6 +105,224 @@ export const failUpload = `
 `
 
 export const activeRule = `
-<h4 style="font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-alternates: normal; font-size-adjust: none; font-language-override: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-variant-position: normal; font-variant-emoji: normal; font-weight: 600; font-stretch: normal; line-height: 28px; font-family: quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin-top: 16px; margin-bottom: 8px; color: rgb(15, 17, 21); text-wrap-mode: wrap; background-color: rgb(255, 255, 255);">第一部分：活动前</h4><ol start="1" style="margin-top: 8px; margin-bottom: 16px; padding-left: 18px; color: rgb(15, 17, 21); font-family: quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; text-wrap-mode: wrap; background-color: rgb(255, 255, 255);" class=" list-paddingleft-2"><li><p class="ds-markdown-paragraph" style="margin-bottom: 8px;">报名资格</p></li><ul style="margin-top: 4px; padding-left: 18px;" class=" list-paddingleft-2"><li><p class="ds-markdown-paragraph">年龄要求（如18岁以上，或未成年人需监护人同意并陪同）。</p></li><li><p class="ds-markdown-paragraph" data-tools-id="70690">健康要求：参与者需确认自身身体健康，适合参加跑步活动。建议有长期跑步习惯。患有心脏病、高血压等不适合剧烈运动疾病者禁止参赛。</p></li></ul><li><p class="ds-markdown-paragraph" style="margin-bottom: 8px;">报名与确认</p></li><ul style="margin-top: 4px; padding-left: 18px;" class=" list-paddingleft-2"><li><p class="ds-markdown-paragraph" data-tools-id="70840">在规定时间内完成报名并支付费用。</p></li><li><p class="ds-markdown-paragraph">报名信息需真实有效，不得冒名顶替。</p></li></ul><li><p class="ds-markdown-paragraph" style="margin-bottom: 8px;" data-tools-id="28686">装备领取</p></li><ul style="margin-top: 4px; padding-left: 18px;" class=" list-paddingleft-2"><li><p class="ds-markdown-paragraph">需本人凭有效身份证件领取参赛包（含号码布、计时芯片、T恤等）。</p></li><li><p class="ds-markdown-paragraph">不得代领（特殊情况需提供委托书）。</p></li></ul></ol><h4 style="font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-alternates: normal; font-size-adjust: none; font-language-override: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-variant-position: normal; font-variant-emoji: normal; font-weight: 600; font-stretch: normal; line-height: 28px; font-family: quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin-top: 16px; margin-bottom: 8px; color: rgb(15, 17, 21); text-wrap-mode: wrap; background-color: rgb(255, 255, 255);">第二部分：活动日</h4><ol start="1" style="margin-top: 8px; margin-bottom: 16px; padding-left: 18px; color: rgb(15, 17, 21); font-family: quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; text-wrap-mode: wrap; background-color: rgb(255, 255, 255);" class=" list-paddingleft-2"><li><p class="ds-markdown-paragraph" style="margin-bottom: 8px;">集合与检录</p></li><ul style="margin-top: 4px; padding-left: 18px;" class=" list-paddingleft-2"><li><p class="ds-markdown-paragraph">在规定时间内到达起点，按号码布分区进入指定集结区。</p></li><li><p class="ds-markdown-paragraph">将号码布佩戴在胸前显眼位置，不得折叠或遮挡。</p></li></ul><li><p class="ds-markdown-paragraph" style="margin-bottom: 8px;">起跑</p></li><ul style="margin-top: 4px; padding-left: 18px;" class=" list-paddingleft-2"><li><p class="ds-markdown-paragraph">听从发令，按顺序分区起跑，不得拥挤、推搡。</p></li><li><p class="ds-markdown-paragraph">遵守活动规定的出发时间，迟到者可能被禁止进入赛道。</p></li></ul><li><p class="ds-markdown-paragraph" style="margin-bottom: 8px;">赛道行为（核心规则）</p></li><ul style="margin-top: 4px; padding-left: 18px;" class=" list-paddingleft-2"><li><p class="ds-markdown-paragraph">超越时从右侧（或规定一侧）通过，并口头示意（如“请让一下，谢谢”）。</p></li><li><p class="ds-markdown-paragraph">不随意急停、变道，如需系鞋带或休息，请移步至赛道外侧。</p></li><li><p class="ds-markdown-paragraph">不随手乱扔垃圾，水杯、包装等请尽量丢弃在补给站附近的垃圾桶。</p></li></ul><ul style="margin-top: 4px; padding-left: 18px;" class=" list-paddingleft-2"><li><p class="ds-markdown-paragraph">安全第一：始终注意自身和他人安全。如感不适，应立即停止比赛并向工作人员或志愿者求助。</p></li><li><p class="ds-markdown-paragraph">遵守交通：在非封闭赛道必须遵守交通规则，按指示过马路。</p></li><li><p class="ds-markdown-paragraph">按指定路线：必须沿活动设定的路线跑完全程，禁止抄近道或用其他交通工具。</p></li><li><p class="ds-markdown-paragraph" style="margin-bottom: 8px;">文明礼仪：</p></li><li><p class="ds-markdown-paragraph">接受帮助：只能接受官方工作人员、志愿者提供的补给和帮助。</p></li><li><p class="ds-markdown-paragraph">宠物与工具：通常禁止携带宠物、婴儿车、滑轮鞋、自行车等进入跑步队伍（除非活动特别允许）。</p></li></ul><li><p class="ds-markdown-paragraph" style="margin-bottom: 8px;">补给站</p></li><ul style="margin-top: 4px; padding-left: 18px;" class=" list-paddingleft-2"><li><p class="ds-markdown-paragraph">在指定补给站取用水和食物。</p></li><li><p class="ds-markdown-paragraph">取水时注意后方跑者，避免急停或转身造成碰撞。</p></li></ul><li><p class="ds-markdown-paragraph" style="margin-bottom: 8px;">终点与完赛</p></li><ul style="margin-top: 4px; padding-left: 18px;" class=" list-paddingleft-2"><li><p class="ds-markdown-paragraph">有序通过终点，不要在终点线长时间停留。</p></li><li><p class="ds-markdown-paragraph">领取完赛奖牌和补给后，尽快随人流离开终点区域。</p></li></ul></ol><h4 style="font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-alternates: normal; font-size-adjust: none; font-language-override: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-variant-position: normal; font-variant-emoji: normal; font-weight: 600; font-stretch: normal; line-height: 28px; font-family: quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin-top: 16px; margin-bottom: 8px; color: rgb(15, 17, 21); text-wrap-mode: wrap; background-color: rgb(255, 255, 255);">第三部分：违规与处罚</h4><ol start="1" style="margin-top: 8px; margin-bottom: 16px; padding-left: 18px; color: rgb(15, 17, 21); font-family: quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; text-wrap-mode: wrap; background-color: rgb(255, 255, 255);" class=" list-paddingleft-2"><li><p class="ds-markdown-paragraph" style="margin-bottom: 8px;">常见违规行为</p></li><ul style="margin-top: 4px; padding-left: 18px;" class=" list-paddingleft-2"><li><p class="ds-markdown-paragraph">替跑、转让号码布。</p></li><li><p class="ds-markdown-paragraph">不按规定路线跑，抄近道。</p></li><li><p class="ds-markdown-paragraph">携带他人计时芯片。</p></li><li><p class="ds-markdown-paragraph">不文明行为（如打架斗殴、辱骂工作人员、破坏公物）。</p></li><li><p class="ds-markdown-paragraph">无视安全规则，对他人造成危险。</p></li></ul><li><p class="ds-markdown-paragraph" style="margin-bottom: 8px;">处罚措施</p></li><ul style="margin-top: 4px; padding-left: 18px;" class=" list-paddingleft-2"><li><p class="ds-markdown-paragraph">取消活动成绩和排名。</p></li><li><p class="ds-markdown-paragraph">禁止参加未来由本主办方举办的活动。</p></li><li><p class="ds-markdown-paragraph">严重违规者可能被移送公安机关处理。</p></li></ul></ol>
-	
+<p style="text-align: center; margin-bottom: 20px;font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    <span style="font-size: 18px;"><strong>活动形式及规则</strong></span>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    <strong>&nbsp;</strong>
+</p>
+<p style="margin: 0px 0px 0px 8px; text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 0px; line-height: 1.5em;">
+    （一）<strong>活动形式：月度</strong>自律健康跑线上打卡任务
+</p>
+<p style="margin: 0px 0px 0px 8px; text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 0px; line-height: 1.5em;">
+    （二）<strong>活动规则：</strong><strong></strong>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 32px; line-height: 1.5em;">
+    <span style="font-family:宋体">活动报名者在“全速运动”小程序月度达成10次运动打卡即视为达成月度任务，可获得抽奖、平分奖金池及荣誉奖励。</span>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 32px; line-height: 1.5em;">
+    活动适合跑步小白（刚开始跑步）、健康跑者、有健康认知的大众养成跑步运动习惯。活动报名者年龄限16-60周岁，无严重疾病史，能熟练使用智能手机。<strong></strong>
+</p>
+<p style="margin: 0px 0px 0px 8px; text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 0px; line-height: 1.5em;">
+    1.&nbsp;<strong>活动</strong><strong>报名</strong><strong>费</strong><strong>&nbsp;</strong>&nbsp;
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 28px; line-height: 1.5em;">
+    A<span style="font-family:宋体">、52</span>元约定金
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 28px; line-height: 1.5em;">
+    B<span style="font-family:宋体">、52</span>元<span style="font-family:宋体">约定金+99 飒跑礼包（含斯凯奇跑步速干短袖一件，价值169元</span>）
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 28px; line-height: 1.5em;">
+    C<span style="font-family:宋体">、52</span>元<span style="font-family:宋体">约定金+499爽跑礼包（含斯凯奇跑鞋一双，平安跑者险30天，价值899元）</span>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 28px; line-height: 1.5em;">
+    D<span style="font-family:宋体">、52</span>元<span style="font-family:宋体">约定金+1399智跑礼包（含华为系watch pt6 pro运动手表一只，平安跑者险30天，价值1899元）</span>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 28px; line-height: 1.5em;">
+    <strong><span style="font-family:宋体">为爱奔跑520·</span></strong><strong>悦月跑</strong><strong>月度</strong><strong>任务</strong><strong></strong>
+</p>
+<table cellspacing="0">
+    <tbody>
+        <tr class="firstRow">
+            <td width="82" valign="top" style="padding: 0px 7px; border-width: 1px; border-color: windowtext;">
+                <p style="text-align: center; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+                    月度任务
+                </p>
+            </td>
+            <td width="215" valign="top" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: windowtext; border-top-width: 1px; border-top-color: windowtext; border-bottom-width: 1px; border-bottom-color: windowtext;">
+                <p style="text-align: center; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+                    任务内容
+                </p>
+            </td>
+            <td width="271" valign="top" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: windowtext; border-top-width: 1px; border-top-color: windowtext; border-bottom-width: 1px; border-bottom-color: windowtext;">
+                <p style="text-align: center; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+                    完成标准
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td width="82" valign="top" style="padding: 0px 7px; border-left-width: 1px; border-left-color: windowtext; border-right-width: 1px; border-right-color: windowtext; border-top: none; border-bottom-width: 1px; border-bottom-color: windowtext;">
+                <p style="text-align: center; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+                    个人
+                </p>
+            </td>
+            <td width="215" valign="top" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: windowtext; border-top: none; border-bottom-width: 1px; border-bottom-color: windowtext;">
+                <p style="font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+                    月份完成10<span style="font-family:宋体">次</span>3.14/5.20<span style="font-family:宋体">公里</span>运动打卡
+                </p>
+            </td>
+            <td width="271" valign="top" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: windowtext; border-top: none; border-bottom-width: 1px; border-bottom-color: windowtext;">
+                <p style="font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+                    单次≥3.14/5.20km<span style="font-family:宋体">，</span>配速不低于<span style="font-family:Calibri">12分/公里</span>
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td width="82" valign="top" style="padding: 0px 7px; border-left-width: 1px; border-left-color: windowtext; border-right-width: 1px; border-right-color: windowtext; border-top: none; border-bottom-width: 1px; border-bottom-color: windowtext;">
+                <p style="text-align: center; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+                    团队
+                </p>
+            </td>
+            <td width="215" valign="top" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: windowtext; border-top: none; border-bottom-width: 1px; border-bottom-color: windowtext;">
+                <p style="font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+                    10<span style="font-family:宋体">人成团，团队</span>完成率≥<span style="font-family:Calibri">8</span>5% ，跑量超<span style="font-family:Calibri">1314公里</span>
+                </p>
+            </td>
+            <td width="271" valign="top" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: windowtext; border-top: none; border-bottom-width: 1px; border-bottom-color: windowtext;">
+                <p style="font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+                    成员每日限<span style="font-family:Calibri">1次</span>，单次≥3.14/5.20km，配速不低于<span style="font-family:Calibri">12分/公里</span>
+                </p>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 32px; line-height: 1.5em;">
+    <strong>打卡规则</strong>&nbsp;&nbsp;
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    - <span style="font-family:宋体">数据来源：&quot;</span>全速运动&quot;<span style="font-family:宋体">小程序轨迹截图打卡/</span>GPS<span style="font-family:宋体">手表（需</span>绑定<span style="font-family:宋体">同步数据） &nbsp;</span>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    - 打卡时间限定：每日5:00-23:00<span style="font-family:宋体">上传记录 &nbsp;</span>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    &nbsp;
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    &nbsp;
+</p>
+<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    2.&nbsp;<strong>活动</strong><strong>奖励</strong>&nbsp;
+</p>
+<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    (1)&nbsp;<strong>游戏约定金</strong><strong></strong>
+</p>
+<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    A.&nbsp;报名参加活动达成月度打卡任务即可退还约定金，未达成任务者不予退还。<strong></strong>
+</p>
+<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    B.&nbsp;<span style="font-family:宋体">未达成月度任务者所缴纳约定金，扣除10%平台费用后进入月度活动奖金池，达成月度打卡任务者平分约定奖金池。</span>&nbsp;
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    &nbsp;
+</p>
+<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    (2)&nbsp;<strong>个人</strong><strong><span style="font-family:宋体">奖励 &nbsp;</span></strong><strong></strong>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    <strong>- </strong><strong>月度任务</strong><strong>完赛</strong><strong>奖励</strong><strong>：</strong><strong></strong>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    <span style="font-family:宋体">平分约定奖金池奖金+</span>电子证书+<span style="font-family:宋体">斯凯奇周边产品抽奖（按报名人数10%设中奖奖品，不含前五名）</span>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    &nbsp;
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    <strong>- </strong><strong><span style="font-family:宋体">月度报名活动人数1000人以上，</span></strong><strong>个人</strong><strong>跑量</strong><strong>TOP</strong><strong>5</strong><strong><span style="font-family:宋体">： </span></strong>&nbsp;
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 16px; line-height: 1.5em;">
+    &nbsp;&nbsp;<span style="font-family:宋体">冠军：</span>斯凯奇新款高端跑鞋+<span style="font-family:宋体">广州全速定制纯钛保温杯</span>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 16px; line-height: 1.5em;">
+    &nbsp;&nbsp;<span style="font-family:宋体">亚军：</span>斯凯奇新款跑鞋+<span style="font-family:宋体">广州全速定制纯钛保温杯</span>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 16px; line-height: 1.5em;">
+    &nbsp;&nbsp;<span style="font-family:宋体">季军：</span>斯凯奇经典跑鞋+<span style="font-family:宋体">广州全速定制纯钛保温杯</span>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 32px; line-height: 1.5em;">
+    第四名：斯凯奇慢跑鞋+<span style="font-family:宋体">广州全速定制纯钛保温杯</span>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 32px; line-height: 1.5em;">
+    第五名：斯凯奇慢跑鞋+<span style="font-family:宋体">广州全速定制纯钛保温杯</span>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    <strong>- </strong><strong><span style="font-family:宋体">月度报名活动人数1000人以下，</span></strong><strong>个人</strong><strong>跑量</strong><strong>TOP</strong><strong>3<span style="font-family:宋体">：</span></strong><strong></strong>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 16px; line-height: 1.5em;">
+    &nbsp;&nbsp;<span style="font-family:宋体">冠军：</span>斯凯奇新款高端跑鞋+<span style="font-family:宋体">广州全速定制纯钛保温杯</span>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 16px; line-height: 1.5em;">
+    &nbsp;&nbsp;<span style="font-family:宋体">亚军：</span>斯凯奇新款跑鞋+<span style="font-family:宋体">广州全速定制纯钛保温杯</span>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 16px; line-height: 1.5em;">
+    &nbsp;&nbsp;<span style="font-family:宋体">季军：</span>斯凯奇经典跑鞋+<span style="font-family:宋体">广州全速定制纯钛保温杯</span><strong></strong>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;" class="" data-tools-id="94943">
+    &nbsp;
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    <strong>- <span style="font-family:宋体">荣誉激励 </span></strong>&nbsp;
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    <span style="font-family:宋体">为爱奔跑520·月度</span>之星：<span style="font-family:宋体">达成任务且月跑量150公里以上，</span>获得电子勋章
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;" class="" data-tools-id="82990">
+    &nbsp;
+</p>
+<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    (3)&nbsp;<strong>团队奖励</strong><strong></strong>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    <strong>创团邀约奖励：</strong><strong></strong>
+</p>
+<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    A.&nbsp;<span style="font-family:宋体">战队人数≥50人，奖励6双斯凯奇运动袜</span>
+</p>
+<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    B.&nbsp;<span style="font-family:宋体">战队人数≥100人，奖励6双斯凯奇运动袜+斯凯奇跑鞋1双（梁朝伟同款）</span>
+</p>
+<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    C.&nbsp;<span style="font-family:宋体">战队人数≥200人，奖励12双斯凯奇运动袜+斯凯奇跑鞋2双（梁朝伟同款）</span>
+</p>
+<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    D.&nbsp;<span style="font-family:宋体">战队人数≥300人，奖励24双斯凯奇运动袜+斯凯奇跑鞋3双（梁朝伟同款</span><strong></strong>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    <strong>&nbsp;</strong>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    <strong>团队任务完成奖励：</strong><strong></strong>
+</p>
+<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    A.&nbsp;<span style="font-family:宋体">达成任务且月跑量1314公里以上，</span>获得“<span style="font-family:宋体">为爱奔跑520·高能战队”奖牌</span>
+</p>
+<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    B.&nbsp;<span style="font-family:宋体">成员报名费（不含约定金）10%奖励团长</span>
+</p>
+<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    C.&nbsp;<span style="font-family:宋体">团队跑量TOP10团队长获得</span>斯凯奇新款跑鞋<span style="font-family:宋体">一双（战队成员100以上）</span>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    <strong>&nbsp;</strong>
+</p>
+<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    3.&nbsp;<strong>活动体验官奖励</strong><strong></strong>
+</p>
+<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
+    &nbsp;&nbsp;<span style="font-family:宋体">粉丝1w以上可报名参加活动体验官活动，视频号自媒体发布作品带话题：#为爱奔跑520</span>挑战赛，#<span style="font-family:宋体">全速体育</span>悦月跑，#<span style="font-family:宋体">广州全速体育，视频播放量前5名（播放5000以上）及“点赞+评价”排名前5者（互动100以上）获得斯凯奇跑鞋一双（不可兼得）。</span>
+</p>
+<p>
+    <br/>
+</p>
 `

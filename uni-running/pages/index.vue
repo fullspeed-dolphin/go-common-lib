@@ -11,9 +11,11 @@
     <view class="container">
       <view class="section-banner">
         <swiper class="swiper" circular indicator-dots indicator-active-color="#FF8C00" :autoplay="true" :interval="3000">
-          <swiper-item v-for="(item, index) in bannerList" :key="index">
-            <image class="img" :src="item.image_url + '?x-oss-process=image/resize,w_700,h_350,m_fill'" mode="aspectFill" @click="clickSwiper(item)"></image>
-          </swiper-item>
+          <view class="" v-for="(item, index) in bannerList" :key="index">
+          	<swiper-item >
+          	  <image class="img" :src="item.image_url + '?x-oss-process=image/resize,w_700,h_350,m_fill'" mode="aspectFill" @click="clickSwiper(item)"></image>
+          	</swiper-item>
+          </view>
         </swiper>
       </view>
     </view>
@@ -23,28 +25,34 @@
     <u-cell title="线下活动" customClass="section-title" :border="false" isLink url="pagesSub/eventList" value="查看更多" />
 
     <swiper class="event-swiper" circular indicator-active-color="#FF8C00" :autoplay="true" :interval="3000" :display-multiple-items="1.2">
-      <swiper-item v-for="(item, index) in offlineEventList" :key="index">
-        <view class="event-swiper-item">
-          <EventItem :item="item" :key="index" height="474rpx" />
-        </view>
-      </swiper-item>
+      <view class=""  v-for="(item, index) in offlineEventList" :key="index">
+      	<swiper-item>
+      	  <view class="event-swiper-item">
+      	    <EventItem :item="item" :key="index" height="474rpx" />
+      	  </view>
+      	</swiper-item>
+      </view>
     </swiper>
 
     <block v-if="onlineEventList && onlineEventList.length > 0">
       <u-cell title="线上赛事" customClass="section-title" :border="false" isLink url="pagesSub/eventList" value="查看更多" />
       <swiper class="event-swiper" circular indicator-active-color="#FF8C00" :autoplay="true" :interval="3000" :next-margin="126">
-        <swiper-item v-for="(item, index) in onlineEventList" :key="index">
-          <view class="event-swiper-item">
-            <EventItem :item="item" :key="index" height="474rpx" />
-          </view>
-        </swiper-item>
+        <view v-for="(item, index) in onlineEventList" :key="index">
+					<swiper-item >
+						<view class="event-swiper-item">
+							<EventItem :item="item" :key="index" height="474rpx" />
+						</view>
+					</swiper-item>
+				</view>
       </swiper>
     </block>
 
     <u-cell title="全速俱乐部" customClass="section-title" :border="false" isLink url="pagesSub/runningTeam/teamList" value="查看更多" />
 
     <section class="section-group">
-      <GroupItem :item="item" v-for="(item, index) in GroupList" :key="index" />
+			<view v-for="(item, index) in GroupList" :key="index">
+				<GroupItem :item="item"  />
+			</view>
     </section>
 
     <view style="margin-top: 50rpx; padding: 0 34rpx 0rpx;">
