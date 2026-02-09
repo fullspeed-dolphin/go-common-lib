@@ -54,9 +54,9 @@
         <view class="iconfont flex-center icon-list-1-copy" style="color:#155DFC;background: #DBEAFE;"></view>
         <text class="func-text">战队列表</text>
       </view>
-      <view class="func-item flex-col-center" @click="$u.route('pagesDashboard/pkEvent/pkRankList')">
-        <view class="iconfont flex-center icon-paihangbang" style="color:#FC9C15;background: #FEE8C2;"></view>
-        <text class="func-text">排行榜</text>
+      <view class="func-item flex-col-center" @click="$u.route('pagesDashboard/pkEvent/activeRule')">
+        <view class="iconfont flex-center icon-huodongguize" style="color:#FC9C15;background: #FEE8C2;"></view>
+        <text class="func-text">活动规则</text>
       </view>
       <view class="func-item flex-col-center" @click="$u.route('pagesDashboard/pkEvent/teamForm')">
         <view class="iconfont flex-center icon-lijidaka" style="color:#8515FC;background: #EBDBFE;"></view>
@@ -66,6 +66,12 @@
 			  <view class="iconfont flex-center icon-zhengshu" style="color:#EE2061;background: #FEDBE6;"></view>
 			  <text class="func-text">完赛证书</text>
 			</view>
+    </section>
+	<section class="section-func-buttons flex-wrap" style="margin-bottom: 100rpx;">
+      <view class="func-item flex-col-center" @click="$u.route('pagesDashboard/pkEvent/pkRankList')">
+        <view class="iconfont flex-center icon-paihangbang" style="color:#FC9C15;background: #FEE8C2;"></view>
+        <text class="func-text">排行榜</text>
+      </view>
     </section>
 
   </view>

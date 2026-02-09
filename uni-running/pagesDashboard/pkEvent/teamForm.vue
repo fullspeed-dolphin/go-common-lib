@@ -78,6 +78,7 @@ border: 2rpx solid #E2E8F0;">
 	import request from "@/utils/request.js"
 
 	const uForm = ref(null);
+	const from = ref("");
 	
 	const group_id = ref("");
 	const form = ref({

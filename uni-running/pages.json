@@ -58,6 +58,7 @@
 				{ "path": "pkEvent/pkRankList","style": { "navigationBarTitleText": "排行榜"} },
 				{ "path": "pkEvent/teamForm","style": { "navigationBarTitleText": "创建战队"} },
 				{ "path": "pkEvent/teamList","style": { "navigationBarTitleText": "战队列表"} },
+				{ "path": "pkEvent/activeRule","style": { "navigationBarTitleText": "活动规则"} },
 				{ "path": "pkEvent/teamDetail","style": { "navigationBarTitleText": "战队详情"} }
 			]
 		},
