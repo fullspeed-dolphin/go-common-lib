@@ -89,26 +89,7 @@ onLoad((options) => {
 	// activetyId.value = options.id;
 	init();
 });
-// uniapp 导航方法（无需 import）
-const handleJoin = () => {
-  uni.navigateTo({ url: '/pages/join/join' });
-};
 
-const createTeam = () => {
-  uni.navigateTo({ url: '/pages/create-team/create-team' });
-};
-
-const goToTeamList = () => {
-  uni.navigateTo({ url: '/pages/team-list/team-list' });
-};
-
-const goToRanking = () => {
-  uni.navigateTo({ url: '/pages/ranking/ranking' });
-};
-
-const checkIn = () => {
-  uni.navigateTo({ url: '/pages/check-in/check-in' });
-};
 const init=()=>{ 
 	// let url = !type ? '/ranking/personal?activity_id=' + id : '/ranking/team?activity_id='+ id
   request.get('/event-api/online_events/01KH0WQX4H2C7Q4GJ217P8T922').then(res => {
