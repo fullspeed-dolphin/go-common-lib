@@ -32,12 +32,11 @@
 			<mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" :top="100">
 				<view class="order-list" :class="['list-transition', listAnimClass]">
 					<view class="team-card" v-for="(item, index) in dataList" :key="index" @click="$u.route('pagesDashboard/pkEvent/teamDetail?id=' + item.id)">
-						<image :src="item.event_info && item.event_info.background_image_url" class="avatar" />
-				
+						<image :src="item.team_avatar_url" class="avatar" />
 						<view class="content">
-							<view class="title">跑者无界战队</view>
-							<view class="subtitle">3.14KM | 200人</view>
-							<view class="leader">队长：王东</view>
+							<view class="title">{{ item.team_name }}</view>
+							<view class="subtitle">{{ item.team_goal_km }} KM | {{item.current_members}}人</view>
+							<view class="leader">队长：{{ item.team_name }}</view>
 						</view>
 				
 						<view class="join-btn flex-center">加入战队</view>
@@ -65,6 +64,7 @@ import { useTabAnimation } from "@/composables/useTabAnimation.js";
 import request from "@/utils/request.js";
 const activetyId = ref('') // 活动ID
 const teamGoalKm = ref('3.14KM'); // 战队目标里程
+const searchTxt = ref('')
 const {
 	mescrollInit,
 	downCallback,
@@ -136,23 +136,25 @@ const getList = (mescroll) => {
 		pageIndex: mescroll.num - 1,
 		pageSize: 10,
 		team_goal_km: teamGoalKm.value,
+		team_name: searchTxt.value
 	};
 
 	// 如果选中了具体状态，传给后端过滤
 	const status = curTab.value.value;
-	if (status) {
-		data.orderStatus = status;
-	}
+	// if (status) {
+	// 	data.status = status;
+	// }
 
-	request.get(`/online_activity_team?activity_id=${activetyId.value}`, data).then((res) => {
-		res = res.orders.map(item => {
-			const sign_info_list = item.sign_info_list
-			return {
-				...item,
-				...(getRefundInfo(item.created_at, item.refund_valid_hour || 24)),
-				sign_list: sign_info_list?.map(i => i.full_name).join(',') || ''
-			}
-		})
+	request.get(`/event-api/online_events_team?activity_id=${activetyId.value}`, data).then((res) => {
+		console.log("res=====",res)
+		// res = res.orders.map(item => {
+		// 	const sign_info_list = item.sign_info_list
+		// 	return {
+		// 		...item,
+		// 		...(getRefundInfo(item.created_at, item.refund_valid_hour || 24)),
+		// 		sign_list: sign_info_list?.map(i => i.full_name).join(',') || ''
+		// 	}
+		// })
 
 		mescroll.endSuccess(res.length);
 

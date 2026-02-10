@@ -60,6 +60,14 @@
           <text class="progress-percent"><text style="font-size:36rpx;">{{ item.progress }}</text>km</text>
         </view>
       </view>
+      <view v-if="!rankList.length">
+        <u-empty
+        mode="data"
+        text="暂无数据"
+>
+</u-empty>
+      </view>
+      
     </view>
   </view>
 </template>
@@ -205,11 +213,13 @@ const handleEdit = () => {
 };
 // 排行榜type 0个人 1战队,id是activity_id
 const getRankList = (type,id) => {
-  let url = !type ? '/ranking/personal?activity_id=' + id : '/ranking/team?activity_id='+ id
+  let url = !type ? '/event-api//ranking/personal?event_id=' + id : '/event-api/ranking/team?event_id='+ id
   request.get(url).then(res => {
-    if (res.code === 200) {
-      rankList.value = res.data
-    }
+    rankList.value = res || []
+    // console.log("res====",res)
+    // if (res.code === 200) {
+    //   rankList.value = res.data
+    // }
   })
 }
 </script>
