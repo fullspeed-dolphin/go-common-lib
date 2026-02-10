@@ -52,7 +52,7 @@
           <view class="user-name">{{ item.name }}</view>
           <view class="user-detail u-flex-y-center">
             {{ item.total }}KM
-            <view class="flex-center group-tag">飞跑战队</view>
+            <view class="flex-center group-tag">{{ item.team_name }}</view>
           </view>
           <view class="user-time">10次</view>
         </view>
@@ -145,7 +145,6 @@ const handleTabChange = (item, index) => {
 const dataList = ref([]);
 
 watch(currentIndex, () => {
-  dataList.value = [];
   setTimeout(() => {
     refreshList();
   }, 300);
@@ -157,53 +156,7 @@ const handleTouchEnd = (e) => {
 };
 
 // 排行榜数据
-const rankList = ref([
-  {
-    id: 1,
-    name: "吴金根",
-    avatar: "/static/avatar1.png",
-    completed: 10,
-    total: 10,
-    time: "2026-2-3-03:59:58",
-    progress: "100",
-  },
-  {
-    id: 2,
-    name: "赵德霞",
-    avatar: "/static/avatar2.png",
-    completed: 10,
-    total: 10,
-    time: "2026-2-3-04:26:45",
-    progress: "100",
-  },
-  {
-    id: 3,
-    name: "王誉玲",
-    avatar: "/static/avatar3.png",
-    completed: 8,
-    total: 10,
-    time: "2026-2-3-03:59:58",
-    progress: "80",
-  },
-  {
-    id: 4,
-    name: "孙木",
-    avatar: "/static/avatar4.png",
-    completed: 8,
-    total: 10,
-    time: "2026-2-3-03:59:58",
-    progress: "80",
-  },
-  {
-    id: 5,
-    name: "李菁",
-    avatar: "/static/avatar5.png",
-    completed: 8,
-    total: 10,
-    time: "2026-2-3-03:59:58",
-    progress: "80",
-  },
-]);
+const rankList = ref([]);
 
 // 编辑按钮点击
 const handleEdit = () => {
@@ -213,13 +166,9 @@ const handleEdit = () => {
 };
 // 排行榜type 0个人 1战队,id是activity_id
 const getRankList = (type,id) => {
-  let url = !type ? '/event-api//ranking/personal?event_id=' + id : '/event-api/ranking/team?event_id='+ id
+  let url = !type ? '/event-api/ranking/personal?event_id=' + id : '/event-api/ranking/team?event_id='+ id
   request.get(url).then(res => {
     rankList.value = res || []
-    // console.log("res====",res)
-    // if (res.code === 200) {
-    //   rankList.value = res.data
-    // }
   })
 }
 </script>

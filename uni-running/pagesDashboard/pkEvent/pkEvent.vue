@@ -3,9 +3,9 @@
     <section class="section-header header-bg" :style="{background:'url('+detailInfo?.background_image_url+')'}">
       <view class="status-bar flex-start">
         <view class="flex-center bar">
-					<view class="status-dot"></view>
-					<text class="status-text">火热报名中·{{detailInfo?.registration_end_time}}截止</text>
-				</view>
+          <view class="status-dot"></view>
+          <text class="status-text">火热报名中·{{detailInfo?.registration_end_time}}截止</text>
+        </view>
       </view>
 
       <view class="title">{{ detailInfo?.event_name }}</view>
@@ -33,21 +33,19 @@
     </section>
 
     <section class="btn-container u-mb-30">
-      <u-button class="join-btn" color="linear-gradient( 64deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%)" 
-			customStyle="width: 686rpx;height: 96rpx;border-radius: 32rpx;letter-spacing: 1px;font-size: 34rpx;" 
-			:disabled="detailInfo?.status !== 'act'"
-			@click="onceJoin()">
-				立即报名参赛
-			</u-button>
+      <u-button class="join-btn" color="linear-gradient( 64deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%)"
+        customStyle="width: 686rpx;height: 96rpx;border-radius: 32rpx;letter-spacing: 1px;font-size: 34rpx;" :disabled="detailInfo?.status !== 'act'" @click="onceJoin()">
+        立即报名参赛
+      </u-button>
     </section>
 
     <!-- 功能按钮组 -->
     <section class="section-func-buttons flex-wrap">
-      <view class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/teamForm')">
+      <view v-if="!userStatusInfo.in_team" class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/teamForm')">
         <view class="iconfont flex-center icon-zhandui1" style="color:#FCD515;background: #FEF9C2;"></view>
         <text class="func-text">创建战队</text>
       </view>
-      <view class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/teamDetail')">
+      <view v-if="userStatusInfo.in_team" class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/teamDetail?id='+userStatusInfo.team_info?.team_id)">
         <view class="iconfont flex-center icon-zhandui1" style="color:#FCD515;background: #FEF9C2;"></view>
         <text class="func-text">进入战队</text>
       </view>
@@ -63,17 +61,17 @@
         <view class="iconfont flex-center icon-lijidaka" style="color:#8515FC;background: #EBDBFE;"></view>
         <text class="func-text">立即打卡</text>
       </view>
-			<!-- <view class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/pkRankList')">
+      <!-- <view class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/pkRankList')">
 			  <view class="iconfont flex-center icon-zhengshu" style="color:#EE2061;background: #FEDBE6;"></view>
 			  <text class="func-text">完赛证书</text>
 			</view> -->
-		<view class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/pkRankList')">
+      <view class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/pkRankList')">
         <view class="iconfont flex-center icon-paihangbang" style="color:#FC9C15;background: #FEE8C2;"></view>
         <text class="func-text">排行榜</text>
       </view>
     </section>
-	<!-- 排行榜 -->
-	 <view class="tab-container">
+    <!-- 排行榜 -->
+    <view class="tab-container">
       <view class="category-tags">
         <view class="tags-inner">
           <view class="tag-slider" :style="sliderStyle" :class="sliderAnimClass"></view>
@@ -94,7 +92,7 @@
           <view class="user-name">{{ item.name }}</view>
           <view class="user-detail u-flex-y-center">
             {{ item.total }}KM
-            <view class="flex-center group-tag">飞跑战队</view>
+            <view class="flex-center group-tag">{{ item.team_name }}</view>
           </view>
           <view class="user-time">10次</view>
         </view>
@@ -102,13 +100,9 @@
           <text class="progress-percent"><text style="font-size:36rpx;">{{ item.progress }}</text>km</text>
         </view>
       </view>
-      <view v-if="!rankList.length"><u-empty
-        mode="data"
-        text="暂无数据"
->
-</u-empty></view>
-       
-      
+      <view v-if="!rankList.length"><u-empty mode="data" text="暂无数据">
+        </u-empty></view>
+
     </view>
   </view>
 </template>
@@ -116,60 +110,72 @@
 <script setup>
 import { ref, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
-import request from "@/utils/request.js"
+import request from "@/utils/request.js";
 import dayjs from "dayjs";
-import { useTabAnimation } from "@/composables/useTabAnimation.js"; // 排行榜
-const activetyId = ref('01KH0WQX4H2C7Q4GJ217P8T922');
+import { useTabAnimation } from "@/composables/useTabAnimation.js"; 
+
+const activetyId = ref("");
 const detailInfo = ref(null);
-onLoad((options) => {
-	console.log(options);
-	// activetyId.value = options.id;
-	init();
-	initTabRects();
-  getRankList(0,activetyId.value)
-});
-const init=()=>{ 
-  request.get('/event-api/online_events/01KH0WQX4H2C7Q4GJ217P8T922').then(res => {
-	  let date2 = dayjs(res.end_time).format('YYYY-MM-DD')
-	  let date1 = dayjs(res.start_time).format('YYYY-MM-DD')
-	  console.log('date1',date1,'date2',date2)
-	  let diffDays = dayjs(date2+'').diff(date1+'','day');
-	  
 
-	  detailInfo.value = res || {}
-	  detailInfo.value.diffDays = diffDays || 0;
-	  detailInfo.value.registration_end_time = dayjs(detailInfo.value.registration_end_time).format('M月D日')
-	  detailInfo.value.start_time = dayjs(detailInfo.value.start_time).format('M月D日')
-	//   detailInfo.value.total_prize_pool = formatNumber(detailInfo.value.total_prize_pool)
-	  detailInfo.value.total_registrations = formatNumber(detailInfo.value.total_registrations);
-	  detailInfo.value.status = detailInfo.value.status.toLowerCase()
 
-	  
-  })
+const init = () => {
+  request
+    .get(`/event-api/online_events/${activetyId.value}`)
+    .then((res) => {
+      let date2 = dayjs(res.end_time).format("YYYY-MM-DD");
+      let date1 = dayjs(res.start_time).format("YYYY-MM-DD");
+      
+      res = {
+        ...res,
+        diffDays: dayjs(date2 + "").diff(date1 + "", "day"),
+        registration_end_time: dayjs(res.registration_end_time).format("M月D日"),
+        start_time: dayjs(res.start_time).format("M月D日"),
+        total_registrations: formatNumber(res.total_registrations),
+        status: res.status.toLowerCase(),
+      }
+
+      detailInfo.value = res;
+    });
+};
+
+const userStatusInfo = ref({});
+function getUserStatus() {
+  request.get("/event-api/online_events_team/user_status?event_id=" + activetyId.value).then((res) => {
+    console.log('userStatus', res)
+    userStatusInfo.value = res;
+  });
 }
 
 // 数字格式化
-const formatNumber =(num) =>{
-  let [integerPart, decimalPart] = String(num).split('.');
-  integerPart = integerPart.split('').reverse().join('');
-  integerPart = integerPart.match(/\d{1,3}/g).join(',');
-  integerPart = integerPart.split('').reverse().join('');
+const formatNumber = (num) => {
+  let [integerPart, decimalPart] = String(num).split(".");
+  integerPart = integerPart.split("").reverse().join("");
+  integerPart = integerPart.match(/\d{1,3}/g).join(",");
+  integerPart = integerPart.split("").reverse().join("");
   return decimalPart ? `${integerPart}.${decimalPart}` : integerPart;
-}
+};
+
 // 立即报名
-const onceJoin = () =>{ 
-//   uni.navigateTo({ url: '/pages/join/join' });
-uni.$u.route('pagesDashboard/pkEvent/pkEventForm',{id: activetyId.value})
-}
+const onceJoin = () => {
+  uni.$u.route("pagesDashboard/pkEvent/pkEventForm", { id: activetyId.value });
+};
+
 // 跳转
 const goto = (url) => {
-	if(detailInfo?.status !== 'act') {
-		// return uni.$u.toast('活动未开始');
-	}
-	uni.$u.route(url,{id: activetyId.value})
-}
+  if (detailInfo?.status !== "act") {
+    // return uni.$u.toast('活动未开始');
+  }
+  uni.$u.route(url, { id: activetyId.value });
+};
 
-/*===========排行榜================*/ 
+onLoad((options) => {
+  console.log(options);
+  activetyId.value = options.id || "01KH0WQX4H2C7Q4GJ217P8T922";
+  init();
+  initTabRects();
+  getUserStatus();
+  getRankList(0, activetyId.value);
+});
 
 // Tab 配置
 const tabList = ref([
@@ -206,66 +212,20 @@ const handleTouchEnd = (e) => {
 const handleTabChange = (item, index) => {
   if (currentIndex.value === index) return;
   changeTab(index);
-  getRankList(index,activetyId.value)
+  getRankList(index, activetyId.value);
 };
 // 排行榜数据
-const rankList = ref([
-  {
-    id: 1,
-    name: "吴金根",
-    avatar: "/static/avatar1.png",
-    completed: 10,
-    total: 10,
-    time: "2026-2-3-03:59:58",
-    progress: "100",
-  },
-  {
-    id: 2,
-    name: "赵德霞",
-    avatar: "/static/avatar2.png",
-    completed: 10,
-    total: 10,
-    time: "2026-2-3-04:26:45",
-    progress: "100",
-  },
-  {
-    id: 3,
-    name: "王誉玲",
-    avatar: "/static/avatar3.png",
-    completed: 8,
-    total: 10,
-    time: "2026-2-3-03:59:58",
-    progress: "80",
-  },
-  {
-    id: 4,
-    name: "孙木",
-    avatar: "/static/avatar4.png",
-    completed: 8,
-    total: 10,
-    time: "2026-2-3-03:59:58",
-    progress: "80",
-  },
-  {
-    id: 5,
-    name: "李菁",
-    avatar: "/static/avatar5.png",
-    completed: 8,
-    total: 10,
-    time: "2026-2-3-03:59:58",
-    progress: "80",
-  },
-]);
+const rankList = ref([]);
+
 // 排行榜type 0个人 1战队,id是activity_id
-const getRankList = (type,id) => {
-  let url = !type ? '/event-api/ranking/personal?event_id=' + id : '/event-api/ranking/team?event_id='+ id
-  request.get(url).then(res => {
-    rankList.value = res || []
-    // if (res.code === 200) {
-    //   rankList.value = res.data
-    // }
-  })
-}
+const getRankList = (type, id) => {
+  let url = !type
+    ? "/event-api/ranking/personal?event_id=" + id
+    : "/event-api/ranking/team?event_id=" + id;
+  request.get(url).then((res) => {
+    rankList.value = res || [];
+  });
+};
 </script>
 
 <style lang="scss" scoped>
@@ -274,51 +234,59 @@ const getRankList = (type,id) => {
   padding: 80rpx 64rpx 0rpx;
   position: relative;
   z-index: 1;
-	background: linear-gradient( 226deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%);
-	height: 512rpx;
+  background: linear-gradient(
+    226deg,
+    #c70036 0%,
+    #d2003c 20%,
+    #dd0043 40%,
+    #e90249 60%,
+    #f41450 80%,
+    #ff2056 100%
+  );
+  height: 512rpx;
 }
 
 .status-bar {
   font-size: 24rpx;
   color: #fff;
   margin-bottom: 26rpx;
-	.bar{
-		height: 48rpx;
-		padding: 0 10rpx;
-		background: rgba(255,255,255,0.2);
-		border-radius: 20rpx 20rpx 20rpx 20rpx;
-	}
-	.status-dot {
-	  width: 32rpx;
-	  height: 32rpx;
-	  background: #05DF72;
-	  border-radius: 50%;
-	  margin-right: 5rpx;
-	}
+  .bar {
+    height: 48rpx;
+    padding: 0 10rpx;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20rpx 20rpx 20rpx 20rpx;
+  }
+  .status-dot {
+    width: 32rpx;
+    height: 32rpx;
+    background: #05df72;
+    border-radius: 50%;
+    margin-right: 5rpx;
+  }
 }
 
-.section-header{
-	.title {
-	  font-size: 60rpx;
-	  font-weight: bold;
-	  line-height: 1.2;
-	  margin-bottom: 20rpx;
-	}
-	
-	.subtitle {
-	  font-size: 36rpx;
-	  color: #FFE4E6;
-		line-height: 50rpx;
-	  margin-bottom: 50rpx;
-	}
-	
-	.start-time {
-	  width: 242rpx;
-	  height: 62rpx;
-		color: #fff;
-	  background: #B72550;
-	  border-radius: 20rpx 20rpx 20rpx 20rpx;
-	}
+.section-header {
+  .title {
+    font-size: 60rpx;
+    font-weight: bold;
+    line-height: 1.2;
+    margin-bottom: 20rpx;
+  }
+
+  .subtitle {
+    font-size: 36rpx;
+    color: #ffe4e6;
+    line-height: 50rpx;
+    margin-bottom: 50rpx;
+  }
+
+  .start-time {
+    width: 242rpx;
+    height: 62rpx;
+    color: #fff;
+    background: #b72550;
+    border-radius: 20rpx 20rpx 20rpx 20rpx;
+  }
 }
 
 .section-stats-card {
@@ -326,34 +294,33 @@ const getRankList = (type,id) => {
   border-radius: 24rpx;
   padding: 40rpx 30rpx;
   width: 686rpx;
-	margin: 0 auto;
-	transform: translateY(-30rpx);
-	position: relative;
-	z-index: 10;
-	box-shadow: 0rpx 8rpx 10rpx 0rpx rgba(0,0,0,0.02);
+  margin: 0 auto;
+  transform: translateY(-30rpx);
+  position: relative;
+  z-index: 10;
+  box-shadow: 0rpx 8rpx 10rpx 0rpx rgba(0, 0, 0, 0.02);
   display: flex;
 
-	.stat-item {
-	  text-align: center;
-		height: 96rpx;
-		border-right: 1rpx solid #F3F4F6;
-		&:last-child{
-			border:0;
-		}
-	}
-	.label {
-	  font-size: 24rpx;
-	  color: #64748B;
-	  margin-bottom: 8rpx;
-	}
-	.value {
-	  font-size: 40rpx;
-	  font-weight: bold;
-	  color: #1E2939;
-		line-height: 60rpx;
-	}
+  .stat-item {
+    text-align: center;
+    height: 96rpx;
+    border-right: 1rpx solid #f3f4f6;
+    &:last-child {
+      border: 0;
+    }
+  }
+  .label {
+    font-size: 24rpx;
+    color: #64748b;
+    margin-bottom: 8rpx;
+  }
+  .value {
+    font-size: 40rpx;
+    font-weight: bold;
+    color: #1e2939;
+    line-height: 60rpx;
+  }
 }
-
 
 /* 功能按钮组 */
 .section-func-buttons {
@@ -362,22 +329,22 @@ const getRankList = (type,id) => {
   background-color: white;
   border-radius: 24rpx;
   margin: 0 30rpx 30rpx;
-	font-weight: 500;
-	color: #364153;
+  font-weight: 500;
+  color: #364153;
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
-	.func-item {
-	  padding: 20rpx 0rpx;
-		width: 155rpx;
-	  text-align: center;
-	}
-	.iconfont {
-	  width: 80rpx;
-	  height: 80rpx;
-		font-size: 40rpx;
-		background: #FEF9C2;
-		border-radius: 32rpx;
-	  margin-bottom: 26rpx;
-	}
+  .func-item {
+    padding: 20rpx 0rpx;
+    width: 155rpx;
+    text-align: center;
+  }
+  .iconfont {
+    width: 80rpx;
+    height: 80rpx;
+    font-size: 40rpx;
+    background: #fef9c2;
+    border-radius: 32rpx;
+    margin-bottom: 26rpx;
+  }
 }
 
 // 排行榜样式
@@ -440,8 +407,8 @@ const getRankList = (type,id) => {
     font-size: 16rpx;
     color: #155dfc;
     height: 32rpx;
-		padding: 0 10rpx;
-		margin-left: 10rpx;
+    padding: 0 10rpx;
+    margin-left: 10rpx;
     background: #eff6ff;
     border-radius: 12rpx 12rpx 12rpx 12rpx;
   }
