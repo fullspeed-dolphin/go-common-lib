@@ -14,13 +14,15 @@
       <view class="card-section">
         <view class="section-content">
           <up-form-item label="团队名称" prop="name" required>
-            <view class="flex-start" style="width: 650rpx;
+            <view class="flex-start" style="
 height: 100rpx;
 background: #F5F8FB;
 padding-left: 30rpx;
 border-radius: 16rpx 16rpx 16rpx 16rpx;
 border: 2rpx solid #E2E8F0;">
-              <input v-model="form.name" class="u-input" @input="validateField('name')" maxlength="50" placeholder-style="color: #64748B;" placeholder="给你的战队起个响亮的名字吧~" />
+              <div style="width: 606rpx;">
+								<input v-model="form.name" class="u-input" @input="validateField('name')" maxlength="50" placeholder-style="color: #64748B;" placeholder="给你的战队起个响亮的名字吧~" />
+							</div>
             </view>
           </up-form-item>
           <up-form-item label="选择组别" prop="categoryType" required>
@@ -115,28 +117,22 @@ onLoad((options) => {
 const submitForm = () => {
   uForm.value.validate().then((res) => {
     const data = {
-			"activity_id": activetyId.value,
-			"contact_number": form.value.phone,
-			"create_team": {
-				"team_avatar_url": form.value.poster,
-				"team_goal_km": form.value.categoryType,
-				"team_introduction": form.value.description,
-				"team_name": form.value.name
-			},
-			"package_id": "",
-			"real_name": "",
-			"shipping_address": "",
-			"team_id": ""
+			"event_id": activetyId.value,
+			"team_avatar_url": form.value.poster,
+			"team_goal_km": form.value.categoryType,
+			"team_introduction": form.value.description,
+			"team_name": form.value.name
     };
+		
     uni.showLoading({
       mask: true,
     });
 
-    let url = "/booking-api/onlineActivity/registration";
+    let url = "/event-api/online_events_team/create";
 
     request
       .post(url, data)
-      .then(async (res) => {
+      .then((res) => {
         console.log(res);
 
         // 跳转回上一级页面，返回上一页并传递参数
@@ -144,8 +140,7 @@ const submitForm = () => {
           isChange: true,
         });
 
-        // 创建俱乐部时显示审批提示弹窗
-        if (!group_id.value) {
+        if (!activetyId.value) {
           uni.showModal({
             title: "提示",
             content: "你的俱乐部正在审批中，审批完成之后将在此显示",

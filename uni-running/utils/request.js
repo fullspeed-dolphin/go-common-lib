@@ -51,7 +51,7 @@ function fetch(options) {
 					
 					// 没有权限，清除 token，重定向登录页
 					if (response?.code == 401 || res.statusCode == 401) {
-						clearUserInfo();
+						// clearUserInfo();
 						
 						// setTimeout(() => {
 						// 	uni.redirectTo({

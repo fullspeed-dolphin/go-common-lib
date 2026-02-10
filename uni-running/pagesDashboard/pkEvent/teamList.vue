@@ -74,10 +74,9 @@ function joinTeamAPi(item) {
 	console.log("joinTeamAPi", item);
 	uni.showLoading({ mask: true });
   request
-    .post("/booking-api/onlineActivity/registration", {
-			activity_id: activetyId.value,
+    .post("/event-api/online_events_team/join", {
+			event_id: activetyId.value,
 			team_id: item.id,
-			...item,
     })
     .then((res) => {
       if (res.code === 200) {

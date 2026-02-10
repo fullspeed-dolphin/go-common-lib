@@ -3,11 +3,11 @@
     <section class="team-header">
 			<section class=" flex-between-center">
 			  <view class="flex-row">
-					<image :src="teamAvatar" class="team-avatar" />
+					<image :src="detailInfo.team_avatar_url" class="team-avatar" />
 					<view class="team-info">
-					  <view class="team-name">无敌先锋队</view>
-					  <view class="team-meta">21KM | 67人 | 队长：王总</view>
-					  <view class="welcome-text">欢迎大家加入无敌先锋队~</view>
+					  <view class="team-name">{{ detailInfo.team_name }}</view>
+					  <view class="team-meta">{{ detailInfo.team_goal_km }}KM | {{ detailInfo.current_members }}人 | 队长：{{ detailInfo.leader_name }}</view>
+					  <view class="welcome-text">欢迎大家加入{{ detailInfo.team_name }}~</view>
 					</view>
 				</view>
 				<view class="iconfont icon-bianji edit-icon" @click="handleEdit"></view>
@@ -16,7 +16,7 @@
 			<!-- 统计卡片 -->
 			<view class="stats-container flex-between-center">
 			  <view class="stat-item flex-col-center">
-			    <text class="stat-value">1224.00</text>
+			    <text class="stat-value">{{ detailInfo.total_run_km }}</text>
 			    <text class="stat-label">总跑量(km)</text>
 			  </view>
 			  <view class="stat-item flex-col-center">
@@ -55,7 +55,11 @@
         <view class="rank-number flex-center">
 					{{ index === 0 ? 'NO.1' : index === 1 ? 'NO.2' : index === 2 ? 'NO.3' : index + 1 }}
 				</view>
-        <image :src="item.avatar" class="user-avatar" />
+				<div class="user-avatar">
+					<up-lazy-load height="110" borderRadius="14" :is-effect="false" :image="
+						(item.team_avatar_url)  + '?x-oss-process=image/resize,w_110,h_110,m_fill'
+					" mode="aspectFill" />
+				</div>
         <view class="user-info">
           <view class="user-name">{{ item.name }}</view>
           <view class="user-detail">{{ item.completed }}次 | {{ item.total }}次</view>
@@ -75,12 +79,21 @@ import {
 	onLoad,
 } from "@dcloudio/uni-app";
 import { useTabAnimation } from "@/composables/useTabAnimation.js";
-const activetyId = ref('')
+
 // Tab 配置
 const tabList = ref([
 	{ label: "3.14KM", value: "" },
 	{ label: "5.20KM", value: "SUCC" },
 ]);
+
+const teamID = ref('')
+const detailInfo = ref({});
+function getDetailInfo() {
+  request.get(`/event-api/online_events_team/${teamID.value}`).then((res) => {
+    console.log('userStatus', res)
+    detailInfo.value = res;
+  });
+}
 
 // 使用 Tab 动画 composable
 const {
@@ -98,7 +111,8 @@ const {
 });
 
 onLoad((options) => {
-	activetyId.value = options.id
+	teamID.value = options.id
+	getDetailInfo()
 	initTabRects();
 });
 

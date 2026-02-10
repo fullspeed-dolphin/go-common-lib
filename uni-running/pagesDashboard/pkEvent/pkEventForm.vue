@@ -67,7 +67,6 @@ import request from "@/utils/request.js";
 const uForm = ref(null);
 const activetyId = ref("");
 
-const group_id = ref("");
 const form = ref({
   poster: "",
   name: "",
@@ -106,32 +105,13 @@ const rules = ref({
 // 页面加载
 onLoad((options) => {
   console.log("option", options);
-  group_id.value = options.group_id;
   activetyId.value = options.id;
-  // form.value = options.from;
-  getDetail();
   // 套餐列表
-  getComboList();
+  getPackageList();
 });
-
-// 方法定义
-const getDetail = (page) => {
-  if (!group_id.value) return;
-  request
-    .get(`/running-group/api/v1/groups/info?group_id=${group_id.value}`)
-    .then((res) => {
-      form.value = {
-        ...res,
-        poster: res.avatar_url,
-        name: res.name,
-      };
-    });
-};
 
 const submitForm = () => {
   uForm.value.validate().then((res) => {
-    if (!isAgree.value) return uni.$u.toast("请勾选同意协议");
-
     const data = {
       avatar_url: form.value.poster,
       name: form.value.name,
@@ -147,10 +127,6 @@ const submitForm = () => {
 
     let url = "/running-group/api/v1/groups";
 
-    // 更新跑团
-    if (group_id.value) {
-      url = "/running-group/api/v1/groups/update";
-    }
     request
       .post(url, data)
       .then(async (res) => {
@@ -159,8 +135,6 @@ const submitForm = () => {
         // 跳转回上一级页面，返回上一页并传递参数
         uni.$emit("updateList", {
           isChange: true,
-          from: from.value,
-          group_id: res1.running_group,
         });
 
         // 创建俱乐部时显示审批提示弹窗
@@ -194,12 +168,13 @@ const submitForm = () => {
   });
 };
 // 获取套餐列表
-const getComboList = (type,id) => {
-  // let url = !type ? '/ranking/personal?activity_id=' + id : '/ranking/team?activity_id='+ id
-  request.get(`/online_activity_package?activity_id=${activetyId.value}`).then(res => {
-    if (res.code === 200) {
-      rankList.value = res.data
-    }
+const packageList = ref([])
+const getPackageList = () => {
+	const data = {
+		event_id: activetyId.value,
+	};
+  request.post(`/booking-api/user/price`, data).then(res => {
+    packageList.value = res.data
   })
 }
 </script>
