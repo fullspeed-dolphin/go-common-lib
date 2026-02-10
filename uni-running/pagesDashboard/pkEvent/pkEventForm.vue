@@ -3,41 +3,36 @@
     <up-form :model="form" ref="uForm" :rules="rules" labelPosition="top" labelWidth="auto">
 
       <view class="card-section">
-				<up-form-item label="真实姓名" prop="name" required>
-					<view class="flex-start input-wrap">
-						<input v-model="form.name" class="u-input" @input="validateField('name')" maxlength="50" placeholder-style="color: #64748B;" placeholder="请输入您的真实姓名" />
-					</view>
-				</up-form-item>
-				<up-form-item label="联系电话" prop="phone" required class="last-item">
-					<view class="flex-start input-wrap">
-						<input v-model="form.phone" class="u-input" @input="validateField('phone')" maxlength="11" placeholder-style="color: #64748B;" placeholder="请输入您的联系电话" />
-					</view>
-				</up-form-item>
-				<up-form-item label="收货地址" prop="name" required>
-					<view class="flex-start input-wrap">
-						<input v-model="form.name" class="u-input" @input="validateField('name')" maxlength="50" placeholder-style="color: #64748B;" placeholder="请输入您的收货地址" />
-					</view>
-				</up-form-item>
-				<up-form-item label="选择套餐" prop="categoryType" required>
-					<view class="u-pt-5">
-						<view class="category-item u-flex-row" :class="{active: form.categoryType === 1}" @click="form.categoryType = 1">
-							<view class="iconfont flex-center icon-shoppingbaggouwudai"></view>
-							<view>
-								<view class="name">A套餐 - 基础约定</view>
-								<view class="target">52元约定金</view>
-								<view class="txt">报名参加活动达成月度打卡任务即可退还约定金</view>
-							</view>
-						</view>
-						<view class="category-item u-flex-row " :class="{active: form.categoryType === 2}" @click="form.categoryType = 2">
-							<view class="iconfont flex-center icon-shoppingbaggouwudai"></view>
-							<view>
-								<view class="name">B套餐 - 悦跑礼包</view>
-								<view class="target">52元约定金 + 99元</view>
-								<view class="txt">让爱意随脚步延伸</view>
-							</view>
-						</view>
-					</view>
-				</up-form-item>
+        <up-form-item label="真实姓名" prop="name" required>
+          <view class="flex-start input-wrap">
+            <input v-model="form.name" class="u-input" @input="validateField('name')" maxlength="50" placeholder-style="color: #64748B;" placeholder="请输入您的真实姓名" />
+          </view>
+        </up-form-item>
+        <up-form-item label="联系电话" prop="phone" required class="last-item">
+          <view class="flex-start input-wrap">
+            <input v-model="form.phone" class="u-input" @input="validateField('phone')" maxlength="11" placeholder-style="color: #64748B;" placeholder="请输入您的联系电话" />
+          </view>
+        </up-form-item>
+        <up-form-item label="收货地址" prop="name" required>
+          <view class="flex-start input-wrap">
+            <input v-model="form.name" class="u-input" @input="validateField('name')" maxlength="50" placeholder-style="color: #64748B;" placeholder="请输入您的收货地址" />
+          </view>
+        </up-form-item>
+        <up-form-item label="选择套餐" prop="packageID" required>
+          <view class="u-pt-5">
+            <view class="package-item u-flex-row" v-for="item in packageList" :key="item.id" :class="{active: form.packageID === item.id}" @click="changePackage(item.id)">
+              <view v-if="!item.package_image_url" class="package-image iconfont flex-center icon-shoppingbaggouwudai"></view>
+              <image v-if="item.package_image_url" :src="item.package_image_url" class="package-image" mode="aspectFill" />
+              <view>
+                <view class="name">{{ item.package_name }}</view>
+                <view class="target">{{ item.package_subtitle }}</view>
+                <view class="txt">{{ item.package_description }}</view>
+              </view>
+
+              <div v-if="item.is_recommended" class="recommended-tag">推荐</div>
+            </view>
+          </view>
+        </up-form-item>
       </view>
     </up-form>
 
@@ -45,7 +40,7 @@
       <view class="" style="font-size: 24rpx;color: #6A7282;">
         应付金额
         <view class="u-mt-10" style="font-weight: bold;font-size: 40rpx;color: #E11D48;">
-          ￥151.00
+          ￥{{ packageList.find((item) => item.id === form.packageID)?.price || "0.00" }}
         </view>
       </view>
       <u-button type="primary" color="#E11D48" shape="circle" customStyle="width: 196rpx;height: 72rpx;margin:0;border-radius: 32rpx;" @click="submitForm()">
@@ -63,15 +58,16 @@ import PickerMap from "@/components/common/PickerMap.vue";
 import PickerTime from "@/components/common/PickerTime.vue";
 import PickerCell from "@/components/common/PickerCell.vue";
 import request from "@/utils/request.js";
+import { func } from "../../uni_modules/uview-plus/libs/function/test";
 
 const uForm = ref(null);
 const activetyId = ref("");
 
 const form = ref({
-  poster: "",
   name: "",
-  categoryType: 1,
-  description: "",
+  phone: '',
+  address: "",
+  packageID: "",
 });
 
 function validateField(propName) {
@@ -79,13 +75,6 @@ function validateField(propName) {
 }
 
 const rules = ref({
-  poster: [
-    {
-      required: true,
-      message: "请点击上传图片",
-      trigger: ["blur", "change"],
-    },
-  ],
   name: [
     {
       required: true,
@@ -93,7 +82,26 @@ const rules = ref({
       trigger: ["blur", "change"],
     },
   ],
-  description: [
+  phone: [
+    {
+      required: true,
+      message: "请输入手机号码",
+      trigger: "blur",
+    },
+    {
+      pattern: /^1[3-9]\d{9}$/,
+      message: "请输入正确的手机号码",
+      trigger: "blur",
+    },
+  ],
+  address: [
+    {
+      required: true,
+      message: "必填项",
+      trigger: ["blur", "change"],
+    },
+  ],
+  packageID: [
     {
       required: true,
       message: "必填项",
@@ -113,80 +121,92 @@ onLoad((options) => {
 const submitForm = () => {
   uForm.value.validate().then((res) => {
     const data = {
-      avatar_url: form.value.poster,
       name: form.value.name,
       club_type: form.value.club_type,
-      establish_location: form.value.establish_location,
-      creator_real_name: form.value.fullName,
-      introduction: form.value.description,
       creator_phone: form.value.phone,
     };
+
     uni.showLoading({
       mask: true,
     });
 
     let url = "/running-group/api/v1/groups";
 
-    request
-      .post(url, data)
-      .then(async (res) => {
-        console.log(res);
-
-        // 跳转回上一级页面，返回上一页并传递参数
-        uni.$emit("updateList", {
-          isChange: true,
-        });
-
-        // 创建俱乐部时显示审批提示弹窗
-        if (!group_id.value) {
-          uni.showModal({
-            title: "提示",
-            content: "你的俱乐部正在审批中，审批完成之后将在此显示",
-            showCancel: false,
-            confirmText: "我知道了",
-            success: () => {
-              uni.navigateBack();
-            },
-          });
-        } else {
-          // 更新俱乐部时直接提示并返回
-          uni.$u.toast("更新成功");
-          setTimeout(() => {
-            uni.navigateBack();
-          }, 500);
-        }
-      })
-      .catch((e) => {
-        uni.hideLoading();
-        uni.showModal({
-          title: "提示",
-          content: e.msg,
-          showCancel: false, // 如果不需要“取消”按钮
-          confirmText: "我知道了",
-        });
-      });
+    request.post(url, data).then(async (res) => {
+      console.log(res);
+      payOrder(res.order_no);
+    });
   });
 };
 // 获取套餐列表
-const packageList = ref([])
+const packageList = ref([]);
 const getPackageList = () => {
-	const data = {
-		event_id: activetyId.value,
-	};
-  request.post(`/booking-api/user/price`, data).then(res => {
-    packageList.value = res.data
-  })
+  const data = {
+    event_id: activetyId.value,
+  };
+  request.get(`/event-api/online_events_package`, data).then((res) => {
+    packageList.value = res;
+    form.value.packageID = res.find((i) => i.recommend)?.id || "";
+  });
+};
+
+function changePackage(id) {
+  form.value.packageID = id;
+}
+
+const payOrder = async (reg_no) => {
+  const data = {
+    reg_no,
+    event_id: event_id.value,
+    openid: userInfo.value.openid,
+  };
+
+  uni.showLoading({
+    mask: true,
+  });
+
+  request.post(`/pay/wechat/payment`, data).then((res) => {
+    wxPay(res);
+  });
+};
+
+function wxPay(respay) {
+  // 触发微信支付
+  wx.requestPayment({
+    timeStamp: respay.timeStamp,
+    nonceStr: respay.nonceStr,
+    package: respay.package,
+    signType: respay.signType,
+    paySign: respay.paySign,
+    success: (res) => {
+      uni.hideLoading();
+      uni.$u.toast("支付成功");
+      setTimeout(() => {
+        // uni.navigateBack()
+        // uni.$u.route("pagesSub/orderSuccess?order_no=" + respay.order_no);
+      }, 300);
+    },
+    fail: (res) => {
+      uni.hideLoading();
+      console.log("res======>", res);
+      uni.$u.toast("支付未完成");
+      setTimeout(() => {
+        // uni.navigateBack()
+        // uni.$u.route("pagesSub/orderFail?order_no=" + respay.order_no);
+      }, 300);
+    },
+  });
 }
 </script>
 
 <style lang="less" scoped>
-	.input-wrap{
-		height: 100rpx;
-		padding-left: 30rpx;
-		border-radius: 16rpx 16rpx 16rpx 16rpx;
-		border: 2rpx solid #E2E8F0;
-	}
-.category-item {
+.input-wrap {
+  height: 100rpx;
+  padding-left: 30rpx;
+  border-radius: 16rpx 16rpx 16rpx 16rpx;
+  border: 2rpx solid #e2e8f0;
+}
+.package-item {
   width: 686rpx;
   height: 222rpx;
   padding: 42rpx 20rpx 0 34rpx;
@@ -194,8 +214,18 @@ const getPackageList = () => {
   border-radius: 32rpx 32rpx 32rpx 32rpx;
   border: 2rpx solid #e2e8f0;
   margin-bottom: 20rpx;
-
-  .iconfont {
+  position: relative;
+  .recommended-tag{
+    position: absolute;
+    top: 20rpx;
+    right: 20rpx;
+    background: #e11d48;
+    color: #fff;
+    font-size: 24rpx;
+    padding: 4rpx 16rpx;
+    border-radius: 16rpx 16rpx 16rpx 16rpx;
+  }
+  .package-image {
     width: 80rpx;
     height: 80rpx;
     background: #f3f4f6;
@@ -216,7 +246,7 @@ const getPackageList = () => {
     line-height: 48rpx;
     font-size: 32rpx;
     color: #e11d48;
-		font-weight: 500;
+    font-weight: 500;
     margin-bottom: 10rpx;
   }
 
@@ -239,7 +269,7 @@ const getPackageList = () => {
 
 // 卡片通用样式
 .card-section {
-	padding: 0 32rpx;
+  padding: 0 32rpx;
   margin-bottom: 24rpx;
 }
 
