@@ -294,6 +294,35 @@ export function regExp(o) {
     return o && Object.prototype.toString.call(o) === '[object RegExp]'
 }
 
+// 澳门居民身份证
+export function isValidMacauId(id) {
+  // 移除非数字字符（保留最后一位校验码的括号）
+  const clean = id.replace(/[^0-9()]/g, '');
+  
+  // 支持两种格式：1234567(8) 或 12345678
+  if (/^[157][0-9]{6}\([0-9]\)$/.test(clean)) {
+    return true;
+  }
+  if (/^[157][0-9]{7}$/.test(clean)) {
+    return true;
+  }
+  return false;
+}
+
+// 香港居民身份证（
+export function isValidHKId(value) {
+    const hongKongIdRegex = /^[A-Z]{1,2}[0-9]{6,7}[0-9A]$/i;
+    return hongKongIdRegex.test(value)
+}
+
+// 港澳居民来往内地通行证（回乡证）
+function isValidExitPermit(id) {
+    console.log('港澳居民来往内地通行证校验', id);
+  const str = id.trim().toUpperCase();
+  // 新版：H/M + 8位数字；旧版：11位数字
+  return /^[HM]\d{8}$/.test(str) || /^\d{11}$/.test(str);
+}
+
 export default {
     email,
     mobile,
@@ -302,6 +331,9 @@ export default {
     dateISO,
     number,
     digits,
+    isValidExitPermit,
+    isValidMacauId,
+    isValidHKId,
     idCard,
     carNo,
     amount,

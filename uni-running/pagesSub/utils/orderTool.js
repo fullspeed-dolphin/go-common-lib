@@ -45,12 +45,19 @@ export const wxPay = (respay) => {
 			success: (res) => {
 				uni.hideLoading();
 				uni.$u.toast("支付成功");
+        if (respay.success) {
+          return respay.success();
+        }
 				setTimeout(() => {
 					// uni.navigateBack()
 					uni.$u.route("pagesSub/orderSuccess?order_no=" + respay.order_no);
 				}, 300);
 			},
 			fail: (res) => {
+        if (respay.fail) {
+          return respay.fail();
+        }
+
 				uni.hideLoading();
 				console.log("res======>", res);
 				uni.$u.toast("支付未完成");

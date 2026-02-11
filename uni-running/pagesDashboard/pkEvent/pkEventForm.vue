@@ -1,30 +1,43 @@
 <template>
-  <view class="form-page">
-    <up-form :model="form" ref="uForm" :rules="rules" labelPosition="top" labelWidth="auto">
-
+  <view class="">
+    <up-form :model="form" ref="uForm" :rules="formRules" labelPosition="top" labelWidth="auto">
       <view class="card-section">
-        <up-form-item label="真实姓名" prop="name" required>
+        <up-form-item label="真实姓名" prop="real_name" required>
           <view class="flex-start input-wrap">
-            <input v-model="form.name" class="u-input" @input="validateField('name')" maxlength="50" placeholder-style="color: #64748B;" placeholder="请输入您的真实姓名" />
+            <input v-model="form.real_name" class="u-input" @input="validateField('real_name')" maxlength="50" placeholder-style="color: #64748B;" placeholder="请输入您的真实姓名" />
           </view>
         </up-form-item>
-        <up-form-item label="联系电话" prop="phone" required class="last-item">
+        <up-form-item label="联系电话" prop="contact_number" required>
           <view class="flex-start input-wrap">
-            <input v-model="form.phone" class="u-input" @input="validateField('phone')" maxlength="11" placeholder-style="color: #64748B;" placeholder="请输入您的联系电话" />
+            <input v-model="form.contact_number" class="u-input" @input="validateField('contact_number')" maxlength="11" placeholder-style="color: #64748B;" placeholder="请输入您的联系电话" />
           </view>
         </up-form-item>
-        <up-form-item label="收货地址" prop="name" required>
+        <template v-if="packageList.find((i) => i.id === form.package_id)?.require_cert === 1">
+          <up-form-item label="证件类型" prop="cert_type">
+            <view class="flex-start input-wrap cert_type-line">
+            <PickerCell v-model="form.cert_type" :border="false" @change="validateField('cert_type')" :columns="cert_typeOptions" />
+            </view>
+          </up-form-item>
+
+          <up-form-item label="证件号码" prop="cert_number" required>
+            <view class="flex-start input-wrap">
+              <input v-model="form.cert_number" class="u-input" @input="validateField('cert_number')" maxlength="18" placeholder-style="color: #64748B;" placeholder="请输入您的证件号码" />
+            </view>
+          </up-form-item>
+        </template>
+        <up-form-item label="收货地址" prop="shipping_address" required>
           <view class="flex-start input-wrap">
-            <input v-model="form.name" class="u-input" @input="validateField('name')" maxlength="50" placeholder-style="color: #64748B;" placeholder="请输入您的收货地址" />
+            <input v-model="form.shipping_address" class="u-input" @input="validateField('shipping_address')" maxlength="50" placeholder-style="color: #64748B;" placeholder="请输入您的收货地址" />
           </view>
         </up-form-item>
-        <up-form-item label="选择套餐" prop="packageID" required>
+
+        <up-form-item label="选择套餐" prop="package_id" required>
           <view class="u-pt-5">
-            <view class="package-item u-flex-row" v-for="item in packageList" :key="item.id" :class="{active: form.packageID === item.id}" @click="changePackage(item.id)">
+            <view class="package-item u-flex-row" v-for="item in packageList" :key="item.id" :class="{active: form.package_id === item.id}" @click="changePackage(item.id)">
               <view v-if="!item.package_image_url" class="package-image iconfont flex-center icon-shoppingbaggouwudai"></view>
               <image v-if="item.package_image_url" :src="item.package_image_url" class="package-image" mode="aspectFill" />
               <view>
-                <view class="name">{{ item.package_name }}</view>
+                <view class="real_name">{{ item.package_name }}</view>
                 <view class="target">{{ item.package_subtitle }}</view>
                 <view class="txt">{{ item.package_description }}</view>
               </view>
@@ -40,7 +53,7 @@
       <view class="" style="font-size: 24rpx;color: #6A7282;">
         应付金额
         <view class="u-mt-10" style="font-weight: bold;font-size: 40rpx;color: #E11D48;">
-          ￥{{ packageList.find((item) => item.id === form.packageID)?.price || "0.00" }}
+          ￥{{ packageList.find((item) => item.id === form.package_id)?.price || "0.00" }}
         </view>
       </view>
       <u-button type="primary" color="#E11D48" shape="circle" customStyle="width: 196rpx;height: 72rpx;margin:0;border-radius: 32rpx;" @click="submitForm()">
@@ -58,57 +71,133 @@ import PickerMap from "@/components/common/PickerMap.vue";
 import PickerTime from "@/components/common/PickerTime.vue";
 import PickerCell from "@/components/common/PickerCell.vue";
 import request from "@/utils/request.js";
-import { func } from "../../uni_modules/uview-plus/libs/function/test";
+
+import { useStore } from "vuex";
+const store = useStore();
+const userInfo = computed(() => store.state.userInfo);
 
 const uForm = ref(null);
 const activetyId = ref("");
 
 const form = ref({
-  name: "",
-  phone: '',
-  address: "",
-  packageID: "",
+  real_name: "",
+  contact_number: "",
+  shipping_address: "",
+  package_id: "",
+  cert_type: "",
+  cert_number: ""
 });
 
 function validateField(propName) {
   uForm.value.validateField(propName, () => {}, "change");
 }
 
-const rules = ref({
-  name: [
+const cert_typeOptions = [
+  {
+    label: "身份证",
+    value: "CN_ID"
+  },
+  {
+    label: "香港居民身份证",
+    value: "HK_ID"
+  },
+  {
+    label: "澳门居民身份证",
+    value: "MA_ID"
+  },
+  {
+    label: "港澳居民往来大陆通行证(回乡证)",
+    value: "HK_MA_PASS"
+  },
+];
+
+const formRules = ref({
+  real_name: [
     {
       required: true,
       message: "必填项",
       trigger: ["blur", "change"],
     },
   ],
-  phone: [
+  contact_number: [
     {
       required: true,
       message: "请输入手机号码",
-      trigger: "blur",
+      trigger: ["blur", "change"],
     },
     {
       pattern: /^1[3-9]\d{9}$/,
       message: "请输入正确的手机号码",
-      trigger: "blur",
+      trigger: ["blur", "change"],
     },
   ],
-  address: [
+  shipping_address: [
     {
       required: true,
       message: "必填项",
       trigger: ["blur", "change"],
     },
   ],
-  packageID: [
+  cert_type: [
     {
       required: true,
       message: "必填项",
+      trigger: ["blur", "change"],
+    },
+  ],
+  cert_number: [
+    {
+      required: true,
+      message: "必填项",
+      trigger: ["blur", "change"],
+    },
+    {
+      pattern: /(^\d{15}$)|(^\d{17}([0-9]|X|x)$)/,
+      message: "请输入正确的身份证号码",
+      trigger: ["blur", "change"],
+    },
+  ],
+  package_id: [
+    {
+      required: true,
+      message: "请选择套餐",
       trigger: ["blur", "change"],
     },
   ],
 });
+
+watch(
+  () => form.value.cert_type,
+  () => {
+    formRules.value.cert_number = [
+      {
+        required: true,
+        message: "必填项",
+        trigger: ["blur", "change"],
+      },
+      {
+        validator: (rule, value, callback) => {
+          const type = form.value.cert_type;
+          const typeMapping = {
+            CN_ID: "idCard",
+            HK_ID: "isValidHKId",
+            MA_ID: "isValidMacauId",
+            HK_MA_PASS: "isValidExitPermit",
+          };
+          const validatorFuncName = typeMapping[type];
+          if (!validatorFuncName) {
+            callback(new Error("未知的证件类型"));
+            return;
+          }
+          const validatorFunc = uni.$u.test[validatorFuncName];
+          return validatorFunc(value);
+        },
+        message: "请输入正确的证件号码",
+        trigger: ["blur", "change"],
+      },
+    ];
+  }
+);
 
 // 页面加载
 onLoad((options) => {
@@ -121,20 +210,17 @@ onLoad((options) => {
 const submitForm = () => {
   uForm.value.validate().then((res) => {
     const data = {
-      name: form.value.name,
-      club_type: form.value.club_type,
-      creator_phone: form.value.phone,
+      ...form.value,
+      event_id: activetyId.value,
     };
 
     uni.showLoading({
       mask: true,
     });
 
-    let url = "/running-group/api/v1/groups";
-
-    request.post(url, data).then(async (res) => {
+    request.post("/booking-api/online_events/registration", data).then(async (res) => {
       console.log(res);
-      payOrder(res.order_no);
+      payOrder(res.reg_no);
     });
   });
 };
@@ -144,21 +230,23 @@ const getPackageList = () => {
   const data = {
     event_id: activetyId.value,
   };
-  request.get(`/event-api/online_events_package`, data).then((res) => {
+  request.get(`/event-api/online_events_packages`, data).then((res) => {
     packageList.value = res;
-    form.value.packageID = res.find((i) => i.recommend)?.id || "";
+    const package_id = res.find((i) => i.is_recommended)?.id || "";
+    changePackage(package_id);
   });
 };
 
 function changePackage(id) {
-  form.value.packageID = id;
+  form.value.package_id = id;
 }
 
 const payOrder = async (reg_no) => {
   const data = {
     reg_no,
-    event_id: event_id.value,
+    event_id: activetyId.value,
     openid: userInfo.value.openid,
+    order_type: 'online_events'
   };
 
   uni.showLoading({
@@ -182,7 +270,7 @@ function wxPay(respay) {
       uni.hideLoading();
       uni.$u.toast("支付成功");
       setTimeout(() => {
-        // uni.navigateBack()
+        uni.navigateBack()
         // uni.$u.route("pagesSub/orderSuccess?order_no=" + respay.order_no);
       }, 300);
     },
@@ -215,7 +303,7 @@ function wxPay(respay) {
   border: 2rpx solid #e2e8f0;
   margin-bottom: 20rpx;
   position: relative;
-  .recommended-tag{
+  .recommended-tag {
     position: absolute;
     top: 20rpx;
     right: 20rpx;
@@ -264,6 +352,20 @@ function wxPay(respay) {
     color: #929dae;
     font-size: 24rpx;
     line-height: 1.2;
+  }
+}
+
+.cert_type-line{
+  padding-right: 20rpx;
+  ::v-deep{
+    .u-cell__body__content{
+      display: none;
+    }
+    .u-cell__value {
+      flex:1;
+        text-align: left;
+        margin-left: 0;
+    }
   }
 }
 
@@ -317,7 +419,7 @@ function wxPay(respay) {
 ::v-deep {
   .u-form-item__body__left__content__required {
     top: 0;
-    font-size: 14px;
+    font-size: 24px;
     position: relative !important;
     top: 0 !important;
     left: 0 !important;
@@ -326,7 +428,7 @@ function wxPay(respay) {
   }
 
   .u-form-item__body__left__content__label {
-    flex: none;
+    flex: none !important;
   }
 
   .u-FileUploader {
