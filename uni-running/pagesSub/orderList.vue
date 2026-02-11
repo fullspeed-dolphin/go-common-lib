@@ -58,8 +58,8 @@
 									</view>
 
 									<view class="flex-between-center u-mt-10">
-										<view v-if="order.sign_info_list" class="c9 fs24 ellipsis" style="max-width:380rpx;">
-											报名人: {{order.sign_list}}
+										<view class="c9 fs24 ellipsis" style="max-width:380rpx;">
+											<block v-if="order.sign_info_list?.length > 0">报名人: {{order.signor}}</block>
 										</view>
 										<view class="b" style="color: red;">
 											<text style="font-size: 20rpx;">￥</text>{{order.amount_yuan}}
@@ -240,7 +240,7 @@ const getList = (mescroll) => {
 			return {
 				...item,
 				...(getRefundInfo(item.created_at, item.refund_valid_hour || 24)),
-				sign_list: sign_info_list?.map(i => i.full_name).join(',') || ''
+				signor: sign_info_list?.map(i => i.full_name).join(',') || ''
 			}
 		})
 

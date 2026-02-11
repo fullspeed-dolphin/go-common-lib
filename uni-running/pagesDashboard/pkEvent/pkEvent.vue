@@ -1,5 +1,6 @@
 <template>
   <view class="">
+    <u-navbar :title="null" bgColor="transparent"></u-navbar>
     <section class="section-header header-bg" :style="{background:'url('+detailInfo?.background_image_url+')'}">
       <view class="status-bar flex-start">
         <view class="flex-center bar">
@@ -231,7 +232,7 @@ const getRankList = (type, id) => {
 <style lang="scss" scoped>
 .header-bg {
   color: white;
-  padding: 80rpx 64rpx 0rpx;
+  padding: 220rpx 64rpx 70rpx;
   position: relative;
   z-index: 1;
   background: linear-gradient(
@@ -243,7 +244,7 @@ const getRankList = (type, id) => {
     #f41450 80%,
     #ff2056 100%
   );
-  height: 512rpx;
+  min-height: 512rpx;
 }
 
 .status-bar {

@@ -53,7 +53,7 @@
 				{ "path": "eventAlbum/albumDetail","style": { "navigationBarTitleText": "详情", "navigationStyle": "custom"} },
 				{ "path": "eventAlbum/contractForm","style": { "navigationBarTitleText": "入驻摄影师"} },
 				{ "path": "eventAlbum/faceSearchResult","style": { "navigationBarTitleText": "搜索结果", "navigationStyle": "custom"} },
-				{ "path": "pkEvent/pkEvent","style": { "navigationBarTitleText": "为爱奔跑520"} },
+				{ "path": "pkEvent/pkEvent","style": { "navigationStyle": "custom", "navigationBarTitleText": "为爱奔跑520"} },
 				{ "path": "pkEvent/pkEventForm","style": { "navigationBarTitleText": "活动报名"} },
 				{ "path": "pkEvent/pkRankList","style": { "navigationBarTitleText": "排行榜"} },
 				{ "path": "pkEvent/teamForm","style": { "navigationBarTitleText": "创建战队"} },
