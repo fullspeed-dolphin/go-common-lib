@@ -12,8 +12,8 @@
 				
 				<div class="u-flex-row u-flex-wrap">
 					<view class="event-item" :class="{ 'active': item.checked }"
-						@click="item.checked = !item.checked"
-					 v-for="(item,index) in options_events" :key="index">
+						@click="selectEvent(item)"
+						 v-for="(item,index) in options_events" :key="index">
 						{{item.label}}
 					</view>
 				</div>
@@ -148,6 +148,14 @@
 
 			console.log('options_events', options_events.value)
 		});
+	}
+
+	function selectEvent(item) {
+		if (options_events.value.filter(i => i.checked).length === 1 && item.checked) {
+			// 如果当前只有一个选项被选中，并且用户点击的正是这个选项，则不允许取消选中
+			return;
+		}
+		item.checked = !item.checked
 	}
 
 	const pageIndex = ref(0)
