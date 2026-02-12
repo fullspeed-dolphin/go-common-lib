@@ -401,9 +401,7 @@ defineOptions({
   bottom: 0;
   left: 0;
   width: 100%;
-  padding: 20rpx 32rpx;
-  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
-  background: #fff;
-  z-index: 100;
+  padding: 48rpx 54rpx;
+  z-index: 10;
 }
 </style>

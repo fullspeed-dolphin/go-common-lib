@@ -33,13 +33,6 @@
       </view>
     </section>
 
-    <section class="btn-container u-mb-30">
-      <u-button class="join-btn" color="linear-gradient( 64deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%)"
-        customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;letter-spacing: 1px;font-size: 34rpx;" :disabled="detailInfo?.status !== 'act'" @click="onceJoin()">
-        立即报名参赛
-      </u-button>
-    </section>
-
     <!-- 功能按钮组 -->
     <section class="section-func-buttons flex-wrap">
       <view v-if="!userStatusInfo.in_team" class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/teamForm')">
@@ -104,6 +97,13 @@
       <view v-if="!rankList.length"><u-empty mode="data" text="暂无数据">
         </u-empty></view>
 
+    </view>
+
+    <view class="join-btn-wrapper">
+      <u-button class="join-btn" color="linear-gradient(64deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%)"
+        customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;letter-spacing: 1px;font-size: 34rpx;" :disabled="detailInfo?.status !== 'act'" @click="onceJoin()">
+        立即报名参赛
+      </u-button>
     </view>
   </view>
 </template>
@@ -512,5 +512,14 @@ const getRankList = (type, id) => {
       color: #e11d48;
     }
   }
+}
+
+.join-btn-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 48rpx 54rpx;
+  z-index: 10;
 }
 </style>
