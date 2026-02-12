@@ -120,7 +120,7 @@
         </u-empty></view>
     </view>
 
-    <view v-if="!userStatusInfo.in_team" class="join-btn-wrapper">
+    <view v-if="userStatusInfo.in_team" class="join-btn-wrapper">
       <u-button class="join-btn" color="linear-gradient(64deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%)"
         customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;letter-spacing: 1px;font-size: 34rpx;" :disabled="detailInfo?.status !== 'act'" @click="onceJoin()">
         立即报名参赛
@@ -207,7 +207,7 @@ const goto = (url) => {
   if (detailInfo?.status !== "act") {
     // return uni.$u.toast('活动未开始');
   }
-  uni.$u.route(url, { id: activetyId.value });
+  uni.$u.route(url, { id: activetyId.value, eventId: activetyId.value });
 };
 
 onLoad((options) => {

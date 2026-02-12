@@ -7,7 +7,7 @@
 					<view class="team-info">
 					  <view class="team-name">{{ detailInfo.team_name }}</view>
 					  <view class="team-meta">{{ detailInfo.team_goal_km }}KM | {{ detailInfo.current_members }}人 | 队长：{{ detailInfo.leader_nickname }}</view>
-					  <view class="welcome-text">欢迎大家加入{{ detailInfo.team_name }}~</view>
+					  <view class="welcome-text">{{ detailInfo.team_introduction }}</view>
 					</view>
 				</view>
 				<!-- <view class="iconfont icon-bianji edit-icon" @click="handleEdit"></view> -->
@@ -34,11 +34,9 @@
 		<view class="tab-container">
 			<view class="category-tags">
 				<view class="tags-inner">
-					<view class="tag-slider" :style="sliderStyle" :class="sliderAnimClass"></view>
 					<view
 						v-for="(item, index) in tabList"
 						:key="item.value"
-						:id="'tab-' + index"
 						class="tag-item"
 						:class="{ active: currentIndex === index }"
 						@click="handleTabChange(item, index)"
@@ -49,25 +47,24 @@
 			</view>
 		</view>
 
-    <view class="rank-list" @touchstart="onTouchStart"
-			@touchend="handleTouchEnd">
+    <view class="rank-list">
       <view v-for="(item, index) in rankList" :key="item.id" class="rank-item">
         <view class="rank-number flex-center">
 					{{ index === 0 ? 'NO.1' : index === 1 ? 'NO.2' : index === 2 ? 'NO.3' : index + 1 }}
 				</view>
 				<div class="user-avatar">
 					<up-lazy-load height="110" borderRadius="14" :is-effect="false" :image="
-						(item.team_avatar_url)  + '?x-oss-process=image/resize,w_110,h_110,m_fill'
+						(item.avatar_url)  + '?x-oss-process=image/resize,w_110,h_110,m_fill'
 					" mode="aspectFill" />
 				</div>
         <view class="user-info">
-          <view class="user-name">{{ item.name }}</view>
-          <view class="user-detail">{{ item.completed }}次 | {{ item.total }}次</view>
-          <view class="user-time">{{ item.time }}</view>
+          <view class="user-name">{{ item.real_name }}</view>
+          <view class="user-detail">{{ item.total_qualified_sessions }}次 | {{ item.total_sessions }}次</view>
+          <!-- <view class="user-time">{{ item.time }}</view> -->
         </view>
-        <view class="progress">
+        <!-- <view class="progress">
           <text class="progress-percent">{{ item.progress }}%</text>
-        </view>
+        </view> -->
       </view>
     </view>
 
@@ -82,15 +79,10 @@ import { ref, computed, watch } from 'vue'
 import {
 	onLoad,
 } from "@dcloudio/uni-app";
-import { useTabAnimation } from "@/composables/useTabAnimation.js";
 import request from "@/utils/request.js";
 import { useShare, buildPath } from "@/composables/useShare.js";
 
-// Tab 配置
-const tabList = ref([
-	{ label: "3.14KM", value: "" },
-	{ label: "5.20KM", value: "SUCC" },
-]);
+
 
 const teamID = ref('')
 const detailInfo = ref({});
@@ -101,25 +93,20 @@ function getDetailInfo() {
   });
 }
 
-// 使用 Tab 动画 composable
-const {
-	currentIndex,
-	sliderStyle,
-	sliderAnimClass,
-	listAnimClass,
-	changeTab,
-	initTabRects,
-	onTouchStart,
-	onTouchEnd
-} = useTabAnimation({
-	tabCount: tabList.value.length,
-	loop: true
-});
+const eventID = ref('')
+const rankList = ref([]);
+function getRankData() {
+  request.get(`/event-api/online_events_team/members?team_id=${teamID.value}&event_id=${eventID.value}`).then((res) => {
+    console.log('userStatus', res)
+    rankList.value = res;
+  });
+}
 
 onLoad((options) => {
 	teamID.value = options.teamId || options.id
+	eventID.value = options.eventId
 	getDetailInfo()
-	initTabRects();
+	getRankData()
 });
 
 useShare(() => ({
@@ -127,40 +114,14 @@ useShare(() => ({
 	path: buildPath('/pagesDashboard/pkEvent/teamDetail', { teamId: teamID.value }),
 }));
 
-// 当前选中的 tab
-const curTab = computed(() => tabList.value[currentIndex.value]);
-
-// Tab 切换处理
+const currentIndex = ref(0)
+const tabList = ref([
+	{ label: "3.14KM", value: "" },
+	{ label: "5.20KM", value: "SUCC" },
+]);
 const handleTabChange = (item, index) => {
-	if (currentIndex.value === index) return;
-	changeTab(index);
+	currentIndex.value = index;
 };
-
-// 数据
-const dataList = ref([]);
-
-// 监听 tab 切换，重新加载数据
-watch(currentIndex, () => {
-	// 立即清空旧数据，避免切换时显示旧 tab 的数据
-	dataList.value = [];
-	setTimeout(() => {
-		refreshList();
-	}, 300);
-});
-
-// 手势切换处理
-const handleTouchEnd = (e) => {
-	onTouchEnd(e, tabList.value);
-};
-
-// 排行榜数据
-const rankList = ref([
-  { id: 1, name: '吴金根', avatar: '/static/avatar1.png', completed: 10, total: 10, time: '2026-2-3-03:59:58', progress: '100' },
-  { id: 2, name: '赵德霞', avatar: '/static/avatar2.png', completed: 10, total: 10, time: '2026-2-3-04:26:45', progress: '100' },
-  { id: 3, name: '王誉玲', avatar: '/static/avatar3.png', completed: 8, total: 10, time: '2026-2-3-03:59:58', progress: '80' },
-  { id: 4, name: '孙木', avatar: '/static/avatar4.png', completed: 8, total: 10, time: '2026-2-3-03:59:58', progress: '80' },
-  { id: 5, name: '李菁', avatar: '/static/avatar5.png', completed: 8, total: 10, time: '2026-2-3-03:59:58', progress: '80' }
-])
 
 // 编辑按钮点击
 const handleEdit = () => {
@@ -374,7 +335,9 @@ const handleEdit = () => {
 		font-weight: bold;
 		text-align: center;
 		&.active {
-			color: #E11D48;
+		  color: #e11d48;
+		  border-radius: 999rpx;
+		  background: #f3f4f6;
 		}
 	}
 }

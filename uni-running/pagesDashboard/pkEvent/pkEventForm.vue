@@ -235,11 +235,17 @@ const submitForm = () => {
     });
 
     request.post("/booking-api/online_events/registration", data).then(async (res) => {
-      console.log(res);
-      payOrder(res.reg_no);
+      // 检测到某个package的price为0的情况下，调用此接口，不要走支付接口
+      const isFree = packageList.value.find((i) => i.id === form.value.package_id)?.price === 0;
+      if (isFree) {
+        freeToPay(res.reg_no);
+      } else {
+        payOrder(res.reg_no);
+      }
     });
   });
 };
+
 // 获取套餐列表
 const packageList = ref([]);
 const getPackageList = () => {
@@ -273,6 +279,17 @@ const payOrder = async (reg_no) => {
     wxPay(res);
   });
 };
+
+function freeToPay(){
+  const data = {
+    reg_no: form.value.reg_no,
+    event_id: activetyId.value,
+    "status":"SUCC"
+  };
+  request.post(`/booking-api/online_events/registration/status`, data).then((res) => {
+    wxPay(res);
+  });
+}
 
 function wxPay(respay) {
   // 触发微信支付
