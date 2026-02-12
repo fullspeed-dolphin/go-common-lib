@@ -31,12 +31,12 @@
             <view class="content">
               <view class="title">{{ item.team_name }}</view>
               <view class="subtitle">{{ item.team_goal_km }} KM | {{item.current_members}}人</view>
-              <view class="leader">队长：{{ item.team_name }}</view>
+              <view class="leader">队长：{{ item.leader_nickname }}</view>
             </view>
 
-            <u-button class="join-btn flex-center" @click="joinTeam(item)">
+            <view class="join-btn flex-center" @click="joinTeam(item)">
               {{!userStatusInfo.in_team ? '加入战队' : '查看'}}
-            </u-button>
+            </view>
           </view>
         </view>
       </mescroll-body>
