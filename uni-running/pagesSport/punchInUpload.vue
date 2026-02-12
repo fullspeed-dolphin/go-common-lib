@@ -39,7 +39,7 @@
 		<!-- 底部信息区 -->
 		<view v-if="pageIndex === 0 || !ruleForm.picture || !isSuccess" class="bottom-info-content">
 			<view @click="$u.route('pagesSport/punchInRule?type=rule')" 
-				style="color:#777;font-size: 24rpx;position: fixed;right:0;top: 120rpx;background: #ddd;padding: 10rpx 20rpx; border-radius: 32rpx 0 0 32rpx;" 
+				style="color:#777;font-size: 24rpx;position: fixed;right:0;top: 220rpx;background: #ddd;padding: 10rpx 20rpx; border-radius: 32rpx 0 0 32rpx;" 
 				class="rule-link flex-center">
 				打卡规则
 			</view>

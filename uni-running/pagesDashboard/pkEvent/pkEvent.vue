@@ -3,7 +3,7 @@
     <u-navbar :title="null" bgColor="transparent"></u-navbar>
 
     <view v-if="!isShowSignButton"
-				style="color:#fff;font-size: 24rpx;position: fixed;z-index: 999;right:0;top: 180rpx;background: rgba(25, 190, 107, .8);padding: 10rpx 20rpx; border-radius: 32rpx 0 0 32rpx;" 
+				style="color:#fff;font-size: 24rpx;position: fixed;z-index: 999;right:0;top: 220rpx;background: rgba(25, 190, 107, .8);padding: 10rpx 20rpx; border-radius: 32rpx 0 0 32rpx;" 
 				class="rule-link flex-center">
 				已报名
 			</view>
