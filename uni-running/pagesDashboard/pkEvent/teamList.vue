@@ -174,8 +174,8 @@ const getList = (mescroll) => {
   uni.showLoading({ mask: true });
 
   const data = {
-    pageIndex: mescroll.num - 1,
-    pageSize: 10,
+    page_index: mescroll.num - 1,
+    page_size: 10,
     team_goal_km: parseFloat(teamGoalKm.value),
     team_name: searchTxt.value,
   };
