@@ -1,6 +1,13 @@
 <template>
   <view class="">
     <u-navbar :title="null" bgColor="transparent"></u-navbar>
+
+    <view v-if="!isShowSignButton"
+				style="color:#fff;font-size: 24rpx;position: fixed;z-index: 999;right:0;top: 180rpx;background: rgba(25, 190, 107, .8);padding: 10rpx 20rpx; border-radius: 32rpx 0 0 32rpx;" 
+				class="rule-link flex-center">
+				已报名
+			</view>
+
     <section class="section-header header-bg" :style="{background:'url('+detailInfo?.background_image_url+')'}">
       <view class="status-bar flex-start">
         <view class="flex-center bar">
@@ -128,7 +135,7 @@
         </u-empty></view>
     </view>
 
-    <view v-if="userStatusInfo.in_team" class="join-btn-wrapper">
+    <view v-if="userStatusInfo.in_team && isShowSignButton" class="join-btn-wrapper">
       <u-button class="join-btn" color="linear-gradient(64deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%)"
         customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;letter-spacing: 1px;font-size: 34rpx;" :disabled="detailInfo?.status !== 'act'" @click="onceJoin()">
         立即报名参赛
@@ -191,13 +198,16 @@ function getUserStatus() {
   });
 }
 
-const myEvents = ref({});
+const myEvents = ref([]);
 function getMyEvents() {
   request.get("/event-api/online_events/my_events").then((res) => {
     console.log('myEvents', res)
     myEvents.value = res;
   });
 }
+const isShowSignButton = computed(() => {
+  return !myEvents.value.some((i) => i.event_id === activetyId.value);
+})
 
 // 数字格式化
 const formatNumber = (num) => {
