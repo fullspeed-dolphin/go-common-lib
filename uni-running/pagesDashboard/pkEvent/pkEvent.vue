@@ -218,7 +218,7 @@ const handleTabChange = (item, index) => {
 // 排行榜数据
 const rankList = ref([]);
 
-// 排行榜type 0个人 1战队,id是activity_id
+// 排行榜type 0个人 1战队,id是event_id
 const getRankList = (type, id) => {
   let url = !type
     ? "/event-api/ranking/personal?event_id=" + id

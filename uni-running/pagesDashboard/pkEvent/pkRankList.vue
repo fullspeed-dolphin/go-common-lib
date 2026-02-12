@@ -164,7 +164,7 @@ const handleEdit = () => {
     url: "/pages/edit-team/edit-team",
   });
 };
-// 排行榜type 0个人 1战队,id是activity_id
+// 排行榜type 0个人 1战队,id是event_id
 const getRankList = (type,id) => {
   let url = !type ? '/event-api/ranking/personal?event_id=' + id : '/event-api/ranking/team?event_id='+ id
   request.get(url).then(res => {

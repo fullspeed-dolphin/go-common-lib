@@ -181,7 +181,7 @@ const getList = (mescroll) => {
   };
 
   request
-    .get(`/event-api/online_events_team?activity_id=${activetyId.value}`, data)
+    .get(`/event-api/online_events_team?event_id=${activetyId.value}`, data)
     .then((res) => {
       mescroll.endSuccess(res.length);
 
