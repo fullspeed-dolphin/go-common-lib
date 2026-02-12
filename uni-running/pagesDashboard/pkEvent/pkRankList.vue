@@ -6,7 +6,7 @@
 
       <view class="rank-container">
         <!-- NO.2 -->
-        <view class="rank-item-top flex-col-center rank-2" v-if="topList[1]">
+        <view class="rank-item-top flex-col-center rank-2" v-if="topList[1]" @click="currentIndex !== 0 && goTeamDetail(topList[1].id)">
           <image :src="currentIndex === 0 ? topList[1].avatar_url : topList[1].team_avatar_url" class="avatar" />
           <text class="rank-label flex-center">NO.2</text>
           <text class="name">{{ currentIndex === 0 ? topList[1].real_name : topList[1].team_name }}</text>
@@ -14,7 +14,7 @@
         </view>
 
         <!-- NO.1 -->
-        <view class="rank-item-top flex-col-center rank-1" v-if="topList[0]">
+        <view class="rank-item-top flex-col-center rank-1" v-if="topList[0]" @click="currentIndex !== 0 && goTeamDetail(topList[0].id)">
           <image :src="currentIndex === 0 ? topList[0].avatar_url : topList[0].team_avatar_url" class="avatar" />
           <text class="rank-label flex-center">NO.1</text>
           <text class="name">{{ currentIndex === 0 ? topList[0].real_name : topList[0].team_name }}</text>
@@ -22,7 +22,7 @@
         </view>
 
         <!-- NO.3 -->
-        <view class="rank-item-top flex-col-center rank-3" v-if="topList[2]">
+        <view class="rank-item-top flex-col-center rank-3" v-if="topList[2]" @click="currentIndex !== 0 && goTeamDetail(topList[2].id)">
           <image :src="currentIndex === 0 ? topList[2].avatar_url : topList[2].team_avatar_url" class="avatar" />
           <text class="rank-label flex-center">NO.3</text>
           <text class="name">{{ currentIndex === 0 ? topList[2].real_name : topList[2].team_name }}</text>
@@ -65,7 +65,7 @@
       </template>
       <!-- 战队排行榜 -->
       <template v-else>
-        <view v-for="(item, index) in rankList" :key="item.id" class="rank-item">
+        <view v-for="(item, index) in rankList" :key="item.id" class="rank-item" @click="goTeamDetail(item.id)">
           <view class="rank-number flex-center">
             {{ index === 0 ? 'NO.1' : index === 1 ? 'NO.2' : index === 2 ? 'NO.3' : index + 1 }}
           </view>
@@ -135,6 +135,10 @@ onLoad((options) => {
 
 // 当前选中的 tab
 const curTab = computed(() => tabList.value[currentIndex.value]);
+
+const goTeamDetail = (teamId) => {
+  uni.$u.route('pagesDashboard/pkEvent/teamDetail', { teamId, id: activetyId.value });
+};
 
 // Tab 切换处理
 const handleTabChange = (item, index) => {

@@ -99,7 +99,7 @@
       </template>
       <!-- 战队排行榜 -->
       <template v-else>
-        <view v-for="(item, index) in rankList" :key="item.id" class="rank-item">
+        <view v-for="(item, index) in rankList" :key="item.id" class="rank-item" @click="goto('pagesDashboard/pkEvent/teamDetail?teamId=' + item.id)">
           <view class="rank-number flex-center">
             {{ index === 0 ? 'NO.1' : index === 1 ? 'NO.2' : index === 2 ? 'NO.3' : index + 1 }}
           </view>
