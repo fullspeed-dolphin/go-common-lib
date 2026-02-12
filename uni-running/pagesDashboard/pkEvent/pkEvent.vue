@@ -68,17 +68,16 @@
     <view class="tab-container">
       <view class="category-tags">
         <view class="tags-inner">
-          <view class="tag-slider" :style="sliderStyle" :class="sliderAnimClass"></view>
-          <view v-for="(item, index) in tabList" :key="item.value" :id="'tab-' + index" class="tag-item" :class="{ active: currentIndex === index }" @click="handleTabChange(item, index)">
+          <view v-for="(item, index) in tabList" :key="item.value" class="tag-item" :class="{ active: tabIndex === index }" @click="changeTab(index)">
             {{ item.label }}
           </view>
         </view>
       </view>
     </view>
 
-    <view class="rank-list" @touchstart="onTouchStart" @touchend="handleTouchEnd">
+    <view class="rank-list">
       <!-- 个人排行榜 -->
-      <template v-if="currentIndex === 0">
+      <template v-if="tabIndex === 0">
         <view v-for="(item, index) in rankList" :key="item.wechat_openid" class="rank-item">
           <view class="rank-number flex-center">
             {{ index === 0 ? 'NO.1' : index === 1 ? 'NO.2' : index === 2 ? 'NO.3' : index + 1 }}
@@ -135,11 +134,26 @@ import { ref, computed, watch } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
-import { useTabAnimation } from "@/composables/useTabAnimation.js"; 
 
 const activetyId = ref("");
 const detailInfo = ref(null);
 
+const tabIndex = ref(0);
+const tabList = ref([
+  {
+    label: "个人排行榜",
+    value: "",
+  },
+  {
+    label: "战队排行榜",
+    value: "",
+  },
+]);
+
+function changeTab(index) {
+  tabIndex.value = index;
+  getRankList()
+}
 
 const init = () => {
   request
@@ -200,64 +214,16 @@ onLoad((options) => {
   console.log(options);
   activetyId.value = options.id || "01KH0WQX4H2C7Q4GJ217P8T922";
   init();
-  initTabRects();
   getUserStatus();
-  getRankList(0, activetyId.value);
+  getRankList();
 });
 
-// Tab 配置
-const tabList = ref([
-  {
-    label: "个人排行榜",
-    value: "",
-  },
-  {
-    label: "战队排行榜",
-    value: "SUCC",
-  },
-]);
-// 使用 Tab 动画 composable
-const {
-  currentIndex,
-  sliderStyle,
-  sliderAnimClass,
-  listAnimClass,
-  changeTab,
-  initTabRects,
-  onTouchStart,
-  onTouchEnd,
-} = useTabAnimation({
-  tabCount: tabList.value.length,
-  loop: true,
-});
-// 当前选中的 tab
-const curTab = computed(() => tabList.value[currentIndex.value]);
-// 手势切换处理
-const handleTouchEnd = (e) => {
-  onTouchEnd(e, tabList.value);
-};
-// Tab 切换处理
-const handleTabChange = (item, index) => {
-  if (currentIndex.value === index) return;
-  changeTab(index);
-};
-// 排行榜数据
 const rankList = ref([]);
-let rankRequestId = 0;
-
-watch(currentIndex, (val) => {
-  getRankList(val, activetyId.value);
-});
-
-// 排行榜type 0个人 1战队,id是event_id
-const getRankList = (type, id) => {
-  rankList.value = [];
-  const reqId = ++rankRequestId;
-  let url = !type
-    ? "/event-api/ranking/personal?event_id=" + id
-    : "/event-api/ranking/team?event_id=" + id;
+const getRankList = () => {
+  let url = tabIndex.value == 0
+    ? "/event-api/ranking/personal?event_id=" + activetyId.value
+    : "/event-api/ranking/team?event_id=" + activetyId.value;
   request.get(url).then((res) => {
-    if (reqId !== rankRequestId) return;
     rankList.value = res || [];
   });
 };
@@ -539,6 +505,8 @@ const getRankList = (type, id) => {
 
     &.active {
       color: #e11d48;
+      border-radius: 999rpx;
+      background: #f3f4f6;
     }
   }
 }

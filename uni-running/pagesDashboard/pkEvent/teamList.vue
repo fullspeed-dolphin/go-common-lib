@@ -8,8 +8,7 @@
       <view class="tab-container">
         <view class="category-tags">
           <view class="tags-inner">
-            <view class="tag-slider" :style="sliderStyle" :class="sliderAnimClass"></view>
-            <view v-for="(item, index) in tabList" :key="item.value" :id="'tab-' + index" class="tag-item" :class="{ active: currentIndex === index }" @click="handleTabChange(item, index)">
+            <view v-for="(item, index) in tabList" :key="item.value" :id="'tab-' + index" class="tag-item" :class="{ active: currentIndex === index }" @click="changeTab(index)">
               {{ item.label }}
             </view>
           </view>
@@ -57,10 +56,8 @@
 import { ref, computed, watch } from "vue";
 import { onLoad, onShow, onPageScroll, onReachBottom } from "@dcloudio/uni-app";
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
-import { useTabAnimation } from "@/composables/useTabAnimation.js";
 import request from "@/utils/request.js";
 const activetyId = ref(""); // 活动ID
-const teamGoalKm = ref("3.14KM"); // 战队目标里程
 const searchTxt = ref("");
 const { mescrollInit, downCallback, getMescroll } = useMescroll(
   onPageScroll,
@@ -128,50 +125,15 @@ function joinTeam(item) {
 }
 
 // Tab 配置
+const currentIndex = ref(0);
 const tabList = ref([
   { label: "3.14KM", value: "" },
   { label: "5.20KM", value: "SUCC" },
 ]);
 
-// 使用 Tab 动画 composable
-const {
-  currentIndex,
-  sliderStyle,
-  sliderAnimClass,
-  listAnimClass,
-  changeTab,
-  initTabRects,
-  onTouchStart,
-  onTouchEnd,
-} = useTabAnimation({
-  tabCount: tabList.value.length,
-  loop: true,
-});
-
-// 当前选中的 tab
-const curTab = computed(() => tabList.value[currentIndex.value]);
-
-// Tab 切换处理
-const handleTabChange = (item, index) => {
-  if (currentIndex.value === index) return;
-  changeTab(index);
-};
-
-const dataList = ref([]);
-
-// 监听 tab 切换，重新加载数据
-watch(currentIndex, () => {
-	teamGoalKm.value = currentIndex.value ? "5.20KM" : "3.14KM";
+const changeTab = (index) => {
+  currentIndex.value = index
   refreshList();
-});
-
-// 手势切换处理
-const handleTouchEnd = (e) => {
-  onTouchEnd(e, tabList.value);
-};
-
-const viewDetail = (item) => {
-  uni.$u.route(`pagesSub/orderSuccess?order_no=${item.order_no}`);
 };
 
 const refreshList = () => {
@@ -179,13 +141,13 @@ const refreshList = () => {
   getMescroll().scrollTo(0, 0);
 };
 
+const dataList = ref([]);
 const getList = (mescroll) => {
   uni.showLoading({ mask: true });
-
   const data = {
     page_index: mescroll.num - 1,
     page_size: 10,
-    team_goal_km: parseFloat(teamGoalKm.value),
+    team_goal_km: parseFloat(currentIndex.value ? "5.20KM" : "3.14KM"),
     team_name: searchTxt.value,
   };
 
@@ -206,38 +168,9 @@ const getList = (mescroll) => {
     });
 };
 
-function getRefundInfo(orderTime, endHour) {
-  const orderDate = new Date(orderTime.replace(/-/g, "/"));
-  const now = new Date();
-  const refundDeadline = new Date(
-    orderDate.getTime() + endHour * 60 * 60 * 1000
-  );
-  const canRefund = now < refundDeadline;
-
-  let remainingTimeStr = "";
-
-  if (canRefund) {
-    const diffMs = refundDeadline - now;
-    const hours = Math.floor(diffMs / (1000 * 60 * 60));
-    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-    remainingTimeStr = `还剩 ${hours} 小时 ${minutes} 分钟可申请退款`;
-  } else {
-    remainingTimeStr = `已超过 ${endHour} 小时，无法退款`;
-  }
-
-  return {
-    canRefund,
-    refundDeadline,
-    remainingTimeStr,
-  };
-}
 
 onLoad((options) => {
   activetyId.value = options.id;
-  initTabRects();
-});
-
-onShow(() => {
   getUserStatus();
 });
 
@@ -307,6 +240,8 @@ defineOptions({
     text-align: center;
     &.active {
       color: #e11d48;
+      border-radius: 999rpx;
+      background: #f3f4f6;
     }
   }
 }
