@@ -82,7 +82,11 @@
           <view class="rank-number flex-center">
             {{ index === 0 ? 'NO.1' : index === 1 ? 'NO.2' : index === 2 ? 'NO.3' : index + 1 }}
           </view>
-          <image :src="item.avatar_url" class="user-avatar" />
+          <div class="user-avatar">
+            <up-lazy-load height="110" borderRadius="14" :is-effect="false" :image="
+              (item.avatar_url)  + '?x-oss-process=image/resize,w_110,h_110,m_fill'
+            " mode="aspectFill" />
+          </div>
           <view class="user-info">
             <view class="user-name">{{ item.real_name }}</view>
             <view class="user-detail u-flex-y-center">
@@ -102,7 +106,11 @@
           <view class="rank-number flex-center">
             {{ index === 0 ? 'NO.1' : index === 1 ? 'NO.2' : index === 2 ? 'NO.3' : index + 1 }}
           </view>
-          <image :src="item.team_avatar_url" class="user-avatar" />
+          <div class="user-avatar">
+            <up-lazy-load height="110" borderRadius="14" :is-effect="false" :image="
+              (item.team_avatar_url)  + '?x-oss-process=image/resize,w_110,h_110,m_fill'
+            " mode="aspectFill" />
+          </div>
           <view class="user-info">
             <view class="user-name">{{ item.team_name }}</view>
             <view class="user-detail u-flex-y-center">
@@ -183,6 +191,14 @@ function getUserStatus() {
   });
 }
 
+const myEvents = ref({});
+function getMyEvents() {
+  request.get("/event-api/online_events/my_events").then((res) => {
+    console.log('myEvents', res)
+    myEvents.value = res;
+  });
+}
+
 // 数字格式化
 const formatNumber = (num) => {
   let [integerPart, decimalPart] = String(num).split(".");
@@ -215,6 +231,7 @@ onLoad((options) => {
   activetyId.value = options.id || "01KH0WQX4H2C7Q4GJ217P8T922";
   init();
   getUserStatus();
+  getMyEvents();
   getRankList();
 });
 

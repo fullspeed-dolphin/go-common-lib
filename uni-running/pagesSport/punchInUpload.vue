@@ -9,6 +9,14 @@
 					全速运动
 				</view>
 				<view class="u-mt-20" style="color: #6A7282;">记录每一次汗水，赢取跑币奖励</view>
+				
+				<div class="u-flex-row u-flex-wrap">
+					<view class="event-item" :class="{ 'active': item.checked }"
+						@click="item.checked = !item.checked"
+					 v-for="(item,index) in options_events" :key="index">
+						{{item.label}}
+					</view>
+				</div>
 			</section>
 		</block>
 		
@@ -30,9 +38,10 @@
 		
 		<!-- 底部信息区 -->
 		<view v-if="pageIndex === 0 || !ruleForm.picture || !isSuccess" class="bottom-info-content">
-			<view @click="$u.route('pagesSport/punchInRule?type=rule')" style="color:rgba(255, 140, 0, .75)" class="rule-link flex-center">
-				截图打卡规则
-				<u-icon name="arrow-right" color="rgba(255, 140, 0, .75)"></u-icon>
+			<view @click="$u.route('pagesSport/punchInRule?type=rule')" 
+				style="color:#777;font-size: 24rpx;position: fixed;right:0;top: 120rpx;background: #ddd;padding: 10rpx 20rpx; border-radius: 32rpx 0 0 32rpx;" 
+				class="rule-link flex-center">
+				打卡规则
 			</view>
 			<view class="" style="font-size: 24rpx;color: #C9CCD1;margin-top: 90rpx;padding-left:34rpx; line-height: 34rpx;text-align: left;">
 				<view>1. 每日打卡即可获跑币，每日上限 100 个跑币(1km=10 跑币)。</view> 
@@ -110,6 +119,7 @@
 	import { ref } from "vue";
 	import { onLoad, onUnload } from "@dcloudio/uni-app";
 	import FileUpload from "@/components/common/FileUpload.vue";
+	import PickerCell from "@/components/common/PickerCell.vue";
 	import request from "../utils/request";
 	import { useShare } from "@/composables/useShare.js";
 
@@ -118,6 +128,27 @@
 		title: '运动截图打卡',
 		path: '/pagesSport/punchInUpload'
 	});
+
+	const routerParams = ref({})
+	const options_events = ref([]);
+	const myEvents = ref([]);
+	function getMyEvents() {
+		request.get("/event-api/online_events/my_events").then((res) => {
+			let activeEvents = res.filter(i => i.status === 'ACT');
+
+			options_events.value = [...activeEvents.map(i => ({
+				label: i.event_name,
+				value: i.event_id,
+				checked: true
+			})), {
+				label: '打卡送跑币',
+				value: 'default',
+				checked: true
+			}]
+
+			console.log('options_events', options_events.value)
+		});
+	}
 
 	const pageIndex = ref(0)
 
@@ -131,7 +162,7 @@
 	const isSuccess = ref(false)
 	const isSuccessCheck = ref(false)
 	const isSubmitted = ref(false) // 标记用户是否已提交数据
-
+	
 	// 删除已上传的图片
 	const deleteUploadedImage = async (imageUrl) => {
 		if (!imageUrl) return;
@@ -145,6 +176,11 @@
 			console.error('删除图片失败:', error);
 		}
 	};
+
+	onLoad((options) => {
+		routerParams.value = options
+		getMyEvents()
+	})
 
 	// 页面卸载时检查是否需要删除图片
 	onUnload(() => {
@@ -239,7 +275,8 @@
 	
 	function confirmToCheck() {
 		request.post('/ocr-api/checkin', {
-			token: verifyToken
+			token: verifyToken,
+			event_id: options_events.value.filter(i => i.checked).map(i => i.value),
 		}, { showError: false, includeResponse: true }).then(res => {
 			// 标记已提交，防止页面卸载时删除图片
 			isSubmitted.value = true
@@ -255,6 +292,18 @@
 </script>
 
 <style lang="less" scoped>
+	.event-item{
+		padding: 15rpx 20rpx;
+		border: 1px solid #e09840;
+		border-radius: 32rpx;
+		margin: 20rpx 20rpx 0 0;
+		color: #FF8C00;
+		font-size: 24rpx;
+		&.active{
+			background: #FF8C00;
+			color: #fff;
+		}
+	}
 	.section-loading{
 		position: fixed;
 		width: 100%;
@@ -313,6 +362,9 @@
 	}
 
 	::v-deep {
+		.uicon-arrow-right{
+			color: #FF8C00!important;
+		}
 		.upload-wrapper {
 			.uicon-checkmark-circle {
 				font-weight: 800;

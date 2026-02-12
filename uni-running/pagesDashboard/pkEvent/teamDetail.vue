@@ -16,15 +16,15 @@
 			<!-- 统计卡片 -->
 			<view class="stats-container flex-between-center">
 			  <view class="stat-item flex-col-center">
-			    <text class="stat-value">{{ detailInfo.total_run_km }}</text>
+			    <text class="stat-value">{{ detailInfo.team_goal_km }}</text>
 			    <text class="stat-label">总跑量(km)</text>
 			  </view>
 			  <view class="stat-item flex-col-center">
-			    <text class="stat-value">23%</text>
+			    <text class="stat-value">{{ detailInfo.team_completion_rate }}%</text>
 			    <text class="stat-label">今日完赛率</text>
 			  </view>
 			  <view class="stat-item flex-col-center">
-			    <text class="stat-value">99</text>
+			    <text class="stat-value">{{ detailInfo.rank }}</text>
 			    <text class="stat-label">跑名</text>
 			  </view>
 			</view>
@@ -50,21 +50,23 @@
     <view class="rank-list">
       <view v-for="(item, index) in rankList" :key="item.id" class="rank-item">
         <view class="rank-number flex-center">
-					{{ index === 0 ? 'NO.1' : index === 1 ? 'NO.2' : index === 2 ? 'NO.3' : index + 1 }}
-				</view>
-				<div class="user-avatar">
-					<up-lazy-load height="110" borderRadius="14" :is-effect="false" :image="
-						(item.avatar_url)  + '?x-oss-process=image/resize,w_110,h_110,m_fill'
-					" mode="aspectFill" />
-				</div>
-        <view class="user-info">
-          <view class="user-name">{{ item.real_name }}</view>
-          <view class="user-detail">{{ item.total_qualified_sessions }}次 | {{ item.total_sessions }}次</view>
-          <!-- <view class="user-time">{{ item.time }}</view> -->
-        </view>
-        <!-- <view class="progress">
-          <text class="progress-percent">{{ item.progress }}%</text>
-        </view> -->
+            {{ index === 0 ? 'NO.1' : index === 1 ? 'NO.2' : index === 2 ? 'NO.3' : index + 1 }}
+          </view>
+          <div class="user-avatar">
+            <up-lazy-load height="110" borderRadius="14" :is-effect="false" :image="
+              (item.avatar_url)  + '?x-oss-process=image/resize,w_110,h_110,m_fill'
+            " mode="aspectFill" />
+          </div>
+          <view class="user-info">
+            <view class="user-name">{{ item.real_name }}</view>
+            <view class="user-detail u-flex-y-center">
+              {{ item.total_distance_km }}KM
+            </view>
+            <view class="user-time">{{ item.total_sessions }}次</view>
+          </view>
+          <view class="progress">
+            <text class="progress-percent"><text style="font-size:36rpx;">{{ item.total_distance_km }}</text>km</text>
+          </view>
       </view>
     </view>
 
