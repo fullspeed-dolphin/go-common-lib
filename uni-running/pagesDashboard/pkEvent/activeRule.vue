@@ -7,33 +7,21 @@
 import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { activeRule } from "../assets/rules.js"
-// import { useShare, buildPath } from "@/composables/useShare.js"
+import { declareTerms } from "./utils.js"
 
-// 路由参数
-// const routeType = ref('');
-
-// 分享配置
-// useShare(() => ({
-//   title: routeType.value === 'coinRule' ? '跑币规则' : '打卡规则',
-//   path: buildPath('/pagesSport/punchInRule', { type: routeType.value })
-// }));
-
-// 响应式数据
 const ruleText = ref('')
 
 // 页面加载
 onLoad((options) => {
+	if (options.type === 'disclaimer') {
+		ruleText.value = declareTerms
+		uni.setNavigationBarTitle({
+			title: '免责声明'
+		})
+		return
+	}
+
 	ruleText.value = activeRule
-	// routeType.value = options.type || '';
-	// if (options.type === 'rule') {
-	// 	ruleText.value = pouchInRule
-	// }
-	// if (options.type === 'failUpload') {
-	// 	ruleText.value = failUpload
-	// }
-	// if (options.type === 'coinRule') {
-	// 	ruleText.value = coinRule
-	// }
 })
 </script>
 

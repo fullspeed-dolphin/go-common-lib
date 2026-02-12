@@ -49,6 +49,18 @@
       </view>
     </up-form>
 
+
+    <section class="section-bottom" style="width: 682rpx;margin: 48rpx auto;">
+				<view class="txt flex-start">
+					<up-checkbox shape="circle" activeColor="#8CC63E" v-model:checked="isAgree" :usedAlone="true"
+						:customStyle="{ marginRight: '-10rpx' }" size="32rpx" />
+					<text @click="isAgree = !isAgree">
+						<text class="u-ml-5">我已阅读并同意该</text>
+					</text>
+					<text style="color: #ff8c00" @click="$u.route('pagesDashboard/pkEvent/activeRule?type=disclaimer')">《免责声明》</text>
+				</view>
+			</section>
+
     <view class="submit-wrapper flex-between-center bgf" style="padding: 34rpx 32rpx;">
       <view class="" style="font-size: 24rpx;color: #6A7282;">
         应付金额
@@ -78,6 +90,8 @@ const userInfo = computed(() => store.state.userInfo);
 
 const uForm = ref(null);
 const activetyId = ref("");
+
+const isAgree = ref(false);
 
 const form = ref({
   real_name: "",
@@ -209,6 +223,8 @@ onLoad((options) => {
 
 const submitForm = () => {
   uForm.value.validate().then((res) => {
+    if (!isAgree.value) return uni.$u.toast('请查阅并勾选免责声明~');
+
     const data = {
       ...form.value,
       event_id: activetyId.value,
