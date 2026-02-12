@@ -87,7 +87,7 @@
           <view class="user-info">
             <view class="user-name">{{ item.real_name }}</view>
             <view class="user-detail u-flex-y-center">
-              {{ item.total_distance_km }}KM
+              {{ item.team_goal_km }}KM
               <view class="flex-center group-tag">{{ item.team_name }}</view>
             </view>
             <view class="user-time">{{ item.total_sessions }}次</view>
@@ -107,7 +107,7 @@
           <view class="user-info">
             <view class="user-name">{{ item.team_name }}</view>
             <view class="user-detail u-flex-y-center">
-              目标 {{ item.team_goal_km }}KM
+              组别 {{ item.team_goal_km }}KM
               <view class="flex-center group-tag">{{ item.current_members }}人</view>
             </view>
             <view class="user-time">完成率 {{ item.team_completion_rate }}%</view>
@@ -131,7 +131,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
@@ -240,17 +240,24 @@ const handleTouchEnd = (e) => {
 const handleTabChange = (item, index) => {
   if (currentIndex.value === index) return;
   changeTab(index);
-  getRankList(index, activetyId.value);
 };
 // 排行榜数据
 const rankList = ref([]);
+let rankRequestId = 0;
+
+watch(currentIndex, (val) => {
+  getRankList(val, activetyId.value);
+});
 
 // 排行榜type 0个人 1战队,id是event_id
 const getRankList = (type, id) => {
+  rankList.value = [];
+  const reqId = ++rankRequestId;
   let url = !type
     ? "/event-api/ranking/personal?event_id=" + id
     : "/event-api/ranking/team?event_id=" + id;
   request.get(url).then((res) => {
+    if (reqId !== rankRequestId) return;
     rankList.value = res || [];
   });
 };
