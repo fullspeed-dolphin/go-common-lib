@@ -6,11 +6,11 @@
 					<image :src="detailInfo.team_avatar_url" class="team-avatar" />
 					<view class="team-info">
 					  <view class="team-name">{{ detailInfo.team_name }}</view>
-					  <view class="team-meta">{{ detailInfo.team_goal_km }}KM | {{ detailInfo.current_members }}人 | 队长：{{ detailInfo.leader_name }}</view>
+					  <view class="team-meta">{{ detailInfo.team_goal_km }}KM | {{ detailInfo.current_members }}人 | 队长：{{ detailInfo.leader_nickname }}</view>
 					  <view class="welcome-text">欢迎大家加入{{ detailInfo.team_name }}~</view>
 					</view>
 				</view>
-				<view class="iconfont icon-bianji edit-icon" @click="handleEdit"></view>
+				<!-- <view class="iconfont icon-bianji edit-icon" @click="handleEdit"></view> -->
 			</section>
 			
 			<!-- 统计卡片 -->
@@ -79,6 +79,7 @@ import {
 	onLoad,
 } from "@dcloudio/uni-app";
 import { useTabAnimation } from "@/composables/useTabAnimation.js";
+import request from "@/utils/request.js";
 
 // Tab 配置
 const tabList = ref([
@@ -111,7 +112,7 @@ const {
 });
 
 onLoad((options) => {
-	teamID.value = options.id
+	teamID.value = options.teamId || options.id
 	getDetailInfo()
 	initTabRects();
 });

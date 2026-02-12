@@ -39,7 +39,7 @@
         <view class="iconfont flex-center icon-zhandui1" style="color:#FCD515;background: #FEF9C2;"></view>
         <text class="func-text">创建战队</text>
       </view>
-      <view v-if="userStatusInfo.in_team" class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/teamDetail?id='+userStatusInfo.team_info?.team_id)">
+      <view v-if="userStatusInfo.in_team" class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/teamDetail?teamId='+userStatusInfo.team_info?.id)">
         <view class="iconfont flex-center icon-zhandui1" style="color:#FCD515;background: #FEF9C2;"></view>
         <text class="func-text">进入战队</text>
       </view>
@@ -81,9 +81,9 @@
         <view class="rank-number flex-center">
           {{ index === 0 ? 'NO.1' : index === 1 ? 'NO.2' : index === 2 ? 'NO.3' : index + 1 }}
         </view>
-        <image :src="item.avatar" class="user-avatar" />
+        <image :src="item.team_avatar_url" class="user-avatar" />
         <view class="user-info">
-          <view class="user-name">{{ item.name }}</view>
+          <view class="user-name">{{ item.team_name }}</view>
           <view class="user-detail u-flex-y-center">
             {{ item.total }}KM
             <view class="flex-center group-tag">{{ item.team_name }}</view>
@@ -91,7 +91,7 @@
           <view class="user-time">10次</view>
         </view>
         <view class="progress">
-          <text class="progress-percent"><text style="font-size:36rpx;">{{ item.progress }}</text>km</text>
+          <text class="progress-percent"><text style="font-size:36rpx;">{{ item.team_completion_rate }}</text>%</text>
         </view>
       </view>
       <view v-if="!rankList.length"><u-empty mode="data" text="暂无数据">
@@ -99,7 +99,7 @@
 
     </view>
 
-    <view class="join-btn-wrapper">
+    <view v-if="!userStatusInfo.in_team" class="join-btn-wrapper">
       <u-button class="join-btn" color="linear-gradient(64deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%)"
         customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;letter-spacing: 1px;font-size: 34rpx;" :disabled="detailInfo?.status !== 'act'" @click="onceJoin()">
         立即报名参赛

@@ -139,14 +139,14 @@ const curTab = computed(() => tabList.value[currentIndex.value]);
 const handleTabChange = (item, index) => {
   if (currentIndex.value === index) return;
   changeTab(index);
-  getRankList(index,activetyId.value)
+  getRankList(index)
 };
 
 const dataList = ref([]);
 
 watch(currentIndex, () => {
   setTimeout(() => {
-    refreshList();
+    getRankList();
   }, 300);
 });
 
@@ -164,10 +164,11 @@ const handleEdit = () => {
     url: "/pages/edit-team/edit-team",
   });
 };
-// 排行榜type 0个人 1战队,id是event_id
+
+// 排行榜type 0个人 1战队
 const getRankList = (type,id) => {
-  let url = !type ? '/event-api/ranking/personal?event_id=' + id : '/event-api/ranking/team?event_id='+ id
-  request.get(url).then(res => {
+  let url = !type ? '/event-api/ranking/personal?event_id=' : '/event-api/ranking/team?event_id='
+  request.get(url + activetyId.value).then(res => {
     rankList.value = res || []
   })
 }
