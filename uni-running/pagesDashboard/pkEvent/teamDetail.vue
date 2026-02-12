@@ -70,6 +70,10 @@
         </view>
       </view>
     </view>
+
+    <view class="share-btn-wrapper">
+      <button class="share-btn" open-type="share">邀请好友加入</button>
+    </view>
   </view>
 </template>
 
@@ -80,6 +84,7 @@ import {
 } from "@dcloudio/uni-app";
 import { useTabAnimation } from "@/composables/useTabAnimation.js";
 import request from "@/utils/request.js";
+import { useShare, buildPath } from "@/composables/useShare.js";
 
 // Tab 配置
 const tabList = ref([
@@ -116,6 +121,11 @@ onLoad((options) => {
 	getDetailInfo()
 	initTabRects();
 });
+
+useShare(() => ({
+	title: detailInfo.value.team_name ? `加入${detailInfo.value.team_name}，一起跑起来！` : '邀请你加入战队',
+	path: buildPath('/pagesDashboard/pkEvent/teamDetail', { teamId: teamID.value }),
+}));
 
 // 当前选中的 tab
 const curTab = computed(() => tabList.value[currentIndex.value]);
@@ -247,6 +257,7 @@ const handleEdit = () => {
 /* 排行榜列表 */
 .rank-list {
   margin: 0 30rpx;
+  padding-bottom: 200rpx;
 }
 
 .rank-item {
@@ -366,5 +377,31 @@ const handleEdit = () => {
 			color: #E11D48;
 		}
 	}
+}
+
+.share-btn-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 48rpx 54rpx;
+  z-index: 10;
+}
+
+.share-btn {
+  width: 686rpx;
+  height: 96rpx;
+  line-height: 96rpx;
+  border-radius: 999rpx;
+  font-size: 34rpx;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #fff;
+  background: linear-gradient(64deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%);
+  border: none;
+
+  &::after {
+    border: none;
+  }
 }
 </style>
