@@ -77,26 +77,48 @@
     </view>
 
     <view class="rank-list" @touchstart="onTouchStart" @touchend="handleTouchEnd">
-      <view v-for="(item, index) in rankList" :key="item.id" class="rank-item">
-        <view class="rank-number flex-center">
-          {{ index === 0 ? 'NO.1' : index === 1 ? 'NO.2' : index === 2 ? 'NO.3' : index + 1 }}
-        </view>
-        <image :src="item.team_avatar_url" class="user-avatar" />
-        <view class="user-info">
-          <view class="user-name">{{ item.team_name }}</view>
-          <view class="user-detail u-flex-y-center">
-            {{ item.total }}KM
-            <view class="flex-center group-tag">{{ item.team_name }}</view>
+      <!-- 个人排行榜 -->
+      <template v-if="currentIndex === 0">
+        <view v-for="(item, index) in rankList" :key="item.wechat_openid" class="rank-item">
+          <view class="rank-number flex-center">
+            {{ index === 0 ? 'NO.1' : index === 1 ? 'NO.2' : index === 2 ? 'NO.3' : index + 1 }}
           </view>
-          <view class="user-time">10次</view>
+          <image :src="item.avatar_url" class="user-avatar" />
+          <view class="user-info">
+            <view class="user-name">{{ item.real_name }}</view>
+            <view class="user-detail u-flex-y-center">
+              {{ item.total_distance_km }}KM
+              <view class="flex-center group-tag">{{ item.team_name }}</view>
+            </view>
+            <view class="user-time">{{ item.total_sessions }}次</view>
+          </view>
+          <view class="progress">
+            <text class="progress-percent"><text style="font-size:36rpx;">{{ item.total_distance_km }}</text>km</text>
+          </view>
         </view>
-        <view class="progress">
-          <text class="progress-percent"><text style="font-size:36rpx;">{{ item.team_completion_rate }}</text>%</text>
+      </template>
+      <!-- 战队排行榜 -->
+      <template v-else>
+        <view v-for="(item, index) in rankList" :key="item.id" class="rank-item">
+          <view class="rank-number flex-center">
+            {{ index === 0 ? 'NO.1' : index === 1 ? 'NO.2' : index === 2 ? 'NO.3' : index + 1 }}
+          </view>
+          <image :src="item.team_avatar_url" class="user-avatar" />
+          <view class="user-info">
+            <view class="user-name">{{ item.team_name }}</view>
+            <view class="user-detail u-flex-y-center">
+              目标 {{ item.team_goal_km }}KM
+              <view class="flex-center group-tag">{{ item.current_members }}人</view>
+            </view>
+            <view class="user-time">完成率 {{ item.team_completion_rate }}%</view>
+          </view>
+          <view class="progress">
+            <text class="progress-percent"><text style="font-size:36rpx;">{{ item.team_goal_km }}</text>km</text>
+          </view>
         </view>
-      </view>
+      </template>
       <view v-if="!rankList.length"><u-empty mode="data" text="暂无数据">
         </u-empty></view>
-
     </view>
 
     <view v-if="!userStatusInfo.in_team" class="join-btn-wrapper">

@@ -2,31 +2,31 @@
   <view class="">
     <section class="honor-rank">
       <view class="title">荣誉榜单</view>
-      <view class="subtitle">3月赛季实时排名</view>
+      <view class="subtitle">实时排名</view>
 
       <view class="rank-container">
         <!-- NO.2 -->
-        <view class="rank-item-top flex-col-center rank-2">
-          <image :src="rank2.avatar" class="avatar" />
+        <view class="rank-item-top flex-col-center rank-2" v-if="topList[1]">
+          <image :src="currentIndex === 0 ? topList[1].avatar_url : topList[1].team_avatar_url" class="avatar" />
           <text class="rank-label flex-center">NO.2</text>
-          <text class="name">{{ rank2.name }}</text>
-          <text class="distance">{{ rank2.distance }}km</text>
+          <text class="name">{{ currentIndex === 0 ? topList[1].real_name : topList[1].team_name }}</text>
+          <text class="distance">{{ currentIndex === 0 ? topList[1].total_distance_km : topList[1].team_goal_km }}km</text>
         </view>
 
         <!-- NO.1 -->
-        <view class="rank-item-top flex-col-center rank-1">
-          <image :src="rank1.avatar" class="avatar" />
+        <view class="rank-item-top flex-col-center rank-1" v-if="topList[0]">
+          <image :src="currentIndex === 0 ? topList[0].avatar_url : topList[0].team_avatar_url" class="avatar" />
           <text class="rank-label flex-center">NO.1</text>
-          <text class="name">{{ rank1.name }}</text>
-          <text class="distance">{{ rank1.distance }}km</text>
+          <text class="name">{{ currentIndex === 0 ? topList[0].real_name : topList[0].team_name }}</text>
+          <text class="distance">{{ currentIndex === 0 ? topList[0].total_distance_km : topList[0].team_goal_km }}km</text>
         </view>
 
         <!-- NO.3 -->
-        <view class="rank-item-top flex-col-center rank-3">
-          <image :src="rank3.avatar" class="avatar" />
+        <view class="rank-item-top flex-col-center rank-3" v-if="topList[2]">
+          <image :src="currentIndex === 0 ? topList[2].avatar_url : topList[2].team_avatar_url" class="avatar" />
           <text class="rank-label flex-center">NO.3</text>
-          <text class="name">{{ rank3.name }}</text>
-          <text class="distance">{{ rank3.distance }}km</text>
+          <text class="name">{{ currentIndex === 0 ? topList[2].real_name : topList[2].team_name }}</text>
+          <text class="distance">{{ currentIndex === 0 ? topList[2].total_distance_km : topList[2].team_goal_km }}km</text>
         </view>
       </view>
     </section>
@@ -43,31 +43,49 @@
     </view>
 
     <view class="rank-list" @touchstart="onTouchStart" @touchend="handleTouchEnd">
-      <view v-for="(item, index) in rankList" :key="item.id" class="rank-item">
-        <view class="rank-number flex-center">
-          {{ index === 0 ? 'NO.1' : index === 1 ? 'NO.2' : index === 2 ? 'NO.3' : index + 1 }}
-        </view>
-        <image :src="item.avatar" class="user-avatar" />
-        <view class="user-info">
-          <view class="user-name">{{ item.name }}</view>
-          <view class="user-detail u-flex-y-center">
-            {{ item.total }}KM
-            <view class="flex-center group-tag">{{ item.team_name }}</view>
+      <!-- 个人排行榜 -->
+      <template v-if="currentIndex === 0">
+        <view v-for="(item, index) in rankList" :key="item.wechat_openid" class="rank-item">
+          <view class="rank-number flex-center">
+            {{ index === 0 ? 'NO.1' : index === 1 ? 'NO.2' : index === 2 ? 'NO.3' : index + 1 }}
           </view>
-          <view class="user-time">10次</view>
+          <image :src="item.avatar_url" class="user-avatar" />
+          <view class="user-info">
+            <view class="user-name">{{ item.real_name }}</view>
+            <view class="user-detail u-flex-y-center">
+              {{ item.total_distance_km }}KM
+              <view class="flex-center group-tag">{{ item.team_name }}</view>
+            </view>
+            <view class="user-time">{{ item.total_sessions }}次</view>
+          </view>
+          <view class="progress">
+            <text class="progress-percent"><text style="font-size:36rpx;">{{ item.total_distance_km }}</text>km</text>
+          </view>
         </view>
-        <view class="progress">
-          <text class="progress-percent"><text style="font-size:36rpx;">{{ item.progress }}</text>km</text>
+      </template>
+      <!-- 战队排行榜 -->
+      <template v-else>
+        <view v-for="(item, index) in rankList" :key="item.id" class="rank-item">
+          <view class="rank-number flex-center">
+            {{ index === 0 ? 'NO.1' : index === 1 ? 'NO.2' : index === 2 ? 'NO.3' : index + 1 }}
+          </view>
+          <image :src="item.team_avatar_url" class="user-avatar" />
+          <view class="user-info">
+            <view class="user-name">{{ item.team_name }}</view>
+            <view class="user-detail u-flex-y-center">
+              目标 {{ item.team_goal_km }}KM
+              <view class="flex-center group-tag">{{ item.current_members }}人</view>
+            </view>
+            <view class="user-time">完成率 {{ item.team_completion_rate }}%</view>
+          </view>
+          <view class="progress">
+            <text class="progress-percent"><text style="font-size:36rpx;">{{ item.team_goal_km }}</text>km</text>
+          </view>
         </view>
-      </view>
+      </template>
       <view v-if="!rankList.length">
-        <u-empty
-        mode="data"
-        text="暂无数据"
->
-</u-empty>
+        <u-empty mode="data" text="暂无数据"></u-empty>
       </view>
-      
     </view>
   </view>
 </template>
@@ -78,26 +96,9 @@ import { onLoad } from "@dcloudio/uni-app";
 import { useTabAnimation } from "@/composables/useTabAnimation.js";
 import request from "@/utils/request.js"
 const activetyId = ref('')
-const rank1 = {
-  name: "王嘉骐",
-  distance: "320.50",
-  avatar:
-    "https://ccrun.oss-cn-guangzhou.aliyuncs.com/images/2025/12/19/f2088e21-f5ff-4de3-84cb-6aa2a6da77b3.jpeg?x-oss-process=image/resize,w_150,h_150,m_fill", // 可替换为实际图片
-};
 
-const rank2 = {
-  name: "钱潆龙",
-  distance: "315.00",
-  avatar:
-    "https://ccrun.oss-cn-guangzhou.aliyuncs.com/images/2025/12/19/f2088e21-f5ff-4de3-84cb-6aa2a6da77b3.jpeg?x-oss-process=image/resize,w_150,h_150,m_fill",
-};
-
-const rank3 = {
-  name: "晨跑达人",
-  distance: "298.00",
-  avatar:
-    "https://ccrun.oss-cn-guangzhou.aliyuncs.com/images/2025/12/19/f2088e21-f5ff-4de3-84cb-6aa2a6da77b3.jpeg?x-oss-process=image/resize,w_150,h_150,m_fill",
-};
+// top3 从 rankList 中取
+const topList = computed(() => rankList.value.slice(0, 3));
 
 // Tab 配置
 const tabList = ref([
@@ -142,30 +143,18 @@ const handleTabChange = (item, index) => {
   getRankList(index)
 };
 
-const dataList = ref([]);
+// 排行榜数据
+const rankList = ref([]);
 
-watch(currentIndex, () => {
-  setTimeout(() => {
-    getRankList();
-  }, 300);
+watch(currentIndex, (val) => {
+  getRankList(val, activetyId.value);
 });
 
 // 手势切换处理
 const handleTouchEnd = (e) => {
   onTouchEnd(e, tabList.value);
 };
-
-// 排行榜数据
-const rankList = ref([]);
-
-// 编辑按钮点击
-const handleEdit = () => {
-  uni.navigateTo({
-    url: "/pages/edit-team/edit-team",
-  });
-};
-
-// 排行榜type 0个人 1战队
+// 排行榜type 0个人 1战队,id是event_id
 const getRankList = (type,id) => {
   let url = !type ? '/event-api/ranking/personal?event_id=' : '/event-api/ranking/team?event_id='
   request.get(url + activetyId.value).then(res => {
