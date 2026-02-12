@@ -35,7 +35,7 @@
 
     <section class="btn-container u-mb-30">
       <u-button class="join-btn" color="linear-gradient( 64deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%)"
-        customStyle="width: 686rpx;height: 96rpx;border-radius: 32rpx;letter-spacing: 1px;font-size: 34rpx;" :disabled="detailInfo?.status !== 'act'" @click="onceJoin()">
+        customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;letter-spacing: 1px;font-size: 34rpx;" :disabled="detailInfo?.status !== 'act'" @click="onceJoin()">
         立即报名参赛
       </u-button>
     </section>
@@ -158,6 +158,11 @@ const formatNumber = (num) => {
 
 // 立即报名
 const onceJoin = () => {
+  if (!userStatusInfo.value.in_team) {
+    uni.$u.toast("请先加入战队");
+    uni.$u.route("pagesDashboard/pkEvent/teamList", { id: activetyId.value });
+    return;
+  }
   uni.$u.route("pagesDashboard/pkEvent/pkEventForm", { id: activetyId.value });
 };
 

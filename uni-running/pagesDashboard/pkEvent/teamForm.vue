@@ -51,7 +51,7 @@ border: 2rpx solid #E2E8F0;">
     </up-form>
 
     <view class="submit-wrapper">
-      <u-button type="primary" color="linear-gradient(64deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%)" shape="circle" customStyle="width: 686rpx;height: 96rpx;border-radius: 32rpx;"
+      <u-button type="primary" color="linear-gradient(64deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%)" shape="circle" customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;"
         @click="submitForm()">
         立即创建战队
       </u-button>

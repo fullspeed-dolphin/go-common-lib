@@ -56,7 +56,7 @@
           ￥{{ packageList.find((item) => item.id === form.package_id)?.price || "0.00" }}
         </view>
       </view>
-      <u-button type="primary" color="#E11D48" shape="circle" customStyle="width: 196rpx;height: 72rpx;margin:0;border-radius: 32rpx;" @click="submitForm()">
+      <u-button type="primary" color="#E11D48" shape="circle" customStyle="width: 196rpx;height: 72rpx;margin:0;border-radius: 999rpx;" @click="submitForm()">
         立即支付
       </u-button>
     </view>

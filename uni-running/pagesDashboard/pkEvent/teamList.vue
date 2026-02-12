@@ -41,6 +41,15 @@
         </view>
       </mescroll-body>
     </view>
+
+    <view v-if="!userStatusInfo.in_team" class="create-team-wrapper">
+      <u-button class="create-team-btn"
+        color="linear-gradient(64deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%)"
+        customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;font-size: 34rpx;letter-spacing: 1px;"
+        @click="$u.route('pagesDashboard/pkEvent/teamForm', { id: activetyId })">
+        创建战队
+      </u-button>
+    </view>
   </view>
 </template>
 
@@ -228,6 +237,10 @@ onLoad((options) => {
   initTabRects();
 });
 
+onShow(() => {
+  getUserStatus();
+});
+
 defineOptions({
   options: {
     styleIsolation: "shared",
@@ -379,7 +392,18 @@ defineOptions({
       #f41450 80%,
       #ff2056 100%
     );
-    border-radius: 16rpx 16rpx 16rpx 16rpx;
+    border-radius: 999rpx;
   }
+}
+
+.create-team-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 20rpx 32rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  z-index: 100;
 }
 </style>
