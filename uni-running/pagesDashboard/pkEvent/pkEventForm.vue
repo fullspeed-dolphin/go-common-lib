@@ -15,7 +15,7 @@
         <template v-if="packageList.find((i) => i.id === form.package_id)?.require_cert === 1">
           <up-form-item label="证件类型" prop="cert_type">
             <view class="flex-start input-wrap cert_type-line">
-            <PickerCell v-model="form.cert_type" :border="false" @change="validateField('cert_type')" :columns="cert_typeOptions" />
+              <PickerCell v-model="form.cert_type" :border="false" @change="validateField('cert_type')" :columns="cert_typeOptions" />
             </view>
           </up-form-item>
 
@@ -358,6 +358,9 @@ function wxPay(respay) {
 .cert_type-line{
   padding-right: 20rpx;
   ::v-deep{
+    .u-cell{
+      width: 630rpx;
+    }
     .u-cell__body__content{
       display: none;
     }
