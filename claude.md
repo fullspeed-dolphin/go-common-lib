@@ -145,6 +145,10 @@
    "这10行可以变成3行"
    "数据结构错了，应该是..."
    ```
+## Git 工作流
+- **多人协作分支禁止 rebase**：本项目多人同时在同一分支开发，`git pull` 时使用默认 merge 策略，不要用 `--rebase`，避免改写历史导致其他协作者 pull 出问题。
+- push 被 reject 时：先 `git pull origin <branch>`（merge），再 `git push`。
+
 ## 工具使用
 ### 文档工具
 1. **查看官方文档**
