@@ -48,7 +48,7 @@
 		</view>
 
     <view class="rank-list">
-      <view v-for="(item, index) in rankList" :key="item.id" class="rank-item">
+      <view v-for="(item, index) in rankList" :key="item.wechat_openid" class="rank-item">
         <view class="rank-number flex-center">
             {{ index === 0 ? 'NO.1' : index === 1 ? 'NO.2' : index === 2 ? 'NO.3' : index + 1 }}
           </view>
@@ -58,16 +58,26 @@
             " mode="aspectFill" />
           </div>
           <view class="user-info">
-            <view class="user-name">{{ item.real_name }}</view>
-            <view class="user-detail u-flex-y-center">
-              {{ item.total_distance_km }}KM
+            <view class="user-name u-flex-y-center">
+              {{ item.real_name }}
+              <view v-if="item.is_team_leader" class="leader-tag">队长</view>
+              <view v-if="item.status === 'PND'" class="status-tag pnd">未报名</view>
             </view>
-            <view class="user-time">{{ item.total_sessions }}次</view>
+            <view class="user-detail u-flex-y-center">
+              {{ item.total_distance_km }} KM
+            </view>
+            <view class="user-time">{{ item.total_qualified_sessions }}/{{ item.required_checkins }}次打卡</view>
           </view>
           <view class="progress">
-            <text class="progress-percent"><text style="font-size:36rpx;">{{ item.total_distance_km }}</text>km</text>
+            <template v-if="currentIndex === 0">
+              <text class="progress-percent"><text style="font-size:36rpx;">{{ item.total_qualified_sessions }}</text>/{{ item.required_checkins }}次</text>
+            </template>
+            <template v-else>
+              <text class="progress-percent"><text style="font-size:36rpx;">{{ item.total_distance_km }}</text>km</text>
+            </template>
           </view>
       </view>
+      <view v-if="!rankList.length"><u-empty mode="data" text="暂无数据"></u-empty></view>
     </view>
 
     <view class="share-btn-wrapper">
@@ -279,6 +289,26 @@ const handleEdit = () => {
 		font-weight: bold;
 		font-size: 28rpx;
 		color: #1E2939;
+	}
+	.leader-tag {
+		font-size: 18rpx;
+		font-weight: 500;
+		color: #ff5c5c;
+		background: #FFF0F0;
+		padding: 2rpx 10rpx;
+		border-radius: 8rpx;
+		margin-left: 10rpx;
+	}
+	.status-tag {
+		font-size: 18rpx;
+		font-weight: 500;
+		padding: 2rpx 10rpx;
+		border-radius: 8rpx;
+		margin-left: 10rpx;
+	}
+	.status-tag.pnd {
+		color: #999;
+		background: #F3F4F6;
 	}
 	
 	.user-detail {
