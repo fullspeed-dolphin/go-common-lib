@@ -27,7 +27,10 @@
         </template>
         <up-form-item label="收货地址" prop="shipping_address" required>
           <view class="flex-start input-wrap">
-            <input v-model="form.shipping_address" class="u-input" @input="validateField('shipping_address')" maxlength="50" placeholder-style="color: #64748B;" placeholder="请输入您的收货地址" />
+            <input v-model="form.shipping_address" class="u-input u-flex-1" @input="validateField('shipping_address')" maxlength="100" placeholder-style="color: #64748B;" placeholder="请输入您的收货地址" />
+            <view class="map-btn iconfont icon-riqi" @click="chooseAddress">
+              <up-icon name="map" size="40rpx" color="#ff5c5c" />
+            </view>
           </view>
         </up-form-item>
 
@@ -263,6 +266,15 @@ function changePackage(id) {
   form.value.package_id = id;
 }
 
+function chooseAddress() {
+  uni.chooseLocation({
+    success: (res) => {
+      form.value.shipping_address = res.address + (res.name ? ' ' + res.name : '');
+      validateField('shipping_address');
+    },
+  });
+}
+
 const payOrder = async (reg_no) => {
   const data = {
     reg_no,
@@ -326,6 +338,12 @@ function wxPay(respay) {
   padding-left: 30rpx;
   border-radius: 16rpx 16rpx 16rpx 16rpx;
   border: 2rpx solid #e2e8f0;
+  .map-btn {
+    padding: 0 24rpx;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
 }
 .package-item {
   width: 686rpx;
