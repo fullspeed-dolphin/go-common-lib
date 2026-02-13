@@ -27,15 +27,17 @@
 			</view>
 		</section>
 		
-		<view class="u-flex-y-center u-mt-30 bgf b" style="height: 80rpx;padding-left: 34rpx;font-size: 32rpx;">打卡活动</view>
-		<section class="section-result panel u-flex-row">
-			<image :src="punchInUploadResult.background_image_url" style="width:160rpx;height:160rpx;border-radius:20rpx;" mode="aspectFill"></image>
-			<view class="u-ml-20">
-				<view class="name u-mb-20 u-mt-10" style="font-size:32rpx;">{{punchInUploadResult.event_name}}</view>
-				<view class="name" style="color:#666;">{{punchInUploadResult.event_subtitle}}</view>
-				<view class="name u-mt-20" style="color:#666;">活动日期：{{punchInUploadResult?.start_time?.slice(0, 10)}}</view>
-			</view>
-		</section>
+		<block v-if="punchInUploadResult.background_image_url">
+			<view class="u-flex-y-center u-mt-30 bgf b" style="height: 80rpx;padding-left: 34rpx;font-size: 32rpx;">打卡活动</view>
+			<section class="section-result panel u-flex-row">
+				<image :src="punchInUploadResult.background_image_url" style="width:160rpx;height:160rpx;border-radius:20rpx;" mode="aspectFill"></image>
+				<view class="u-ml-20">
+					<view class="name u-mb-20 u-mt-10" style="font-size:32rpx;">{{punchInUploadResult.event_name}}</view>
+					<view class="name" style="color:#666;">{{punchInUploadResult.event_subtitle}}</view>
+					<view class="name u-mt-20" style="color:#666;">活动日期：{{punchInUploadResult?.start_time?.slice(0, 10)}}</view>
+				</view>
+			</section>
+		</block>
 		
 		<view class="flex-center" style="position: fixed;bottom: 30rpx;width:100%;">
 			<u-button type="primary" custom-style="width:642rpx;" color="#ff8c00" shape="circle" @click="routeTo()">查看我的跑币</u-button>
