@@ -105,224 +105,108 @@ export const failUpload = `
 `
 
 export const activeRule = `
-<p style="text-align: center; margin-bottom: 20px;font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    <span style="font-size: 18px;"><strong>活动形式及规则</strong></span>
+<div style="font-size: 14px; line-height: 1.8; color: #333; padding: 0 8px;">
+
+<p style="text-align: center; font-size: 18px; font-weight: bold; color: #E11D48; margin-bottom: 6px;">
+  广州全速体育"为爱奔跑520·线上跑"
 </p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    <strong>&nbsp;</strong>
+<p style="text-align: center; font-size: 16px; font-weight: bold; color: #E11D48; margin-bottom: 16px;">
+  3月活动方案
 </p>
-<p style="margin: 0px 0px 0px 8px; text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 0px; line-height: 1.5em;">
-    （一）<strong>活动形式：月度</strong>自律健康跑线上打卡任务
+
+<div style="background: #FFF5F5; border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; font-size: 13px; color: #555;">
+  <p><strong>活动主题：</strong>为爱奔跑520·爱家人·爱生活·爱自己</p>
+  <p><strong>主办单位：</strong>广州全速体育</p>
+  <p><strong>合作品牌：</strong>斯凯奇、中国平安、华为系watch pt6 pro运动手表</p>
+  <p><strong>报名平台：</strong>广州全速体育"全速运动"小程序</p>
+  <p><strong>报名时间：</strong>2026年2月14日 - 3月21日</p>
+  <p><strong>活动时间：</strong>2026年3月1日 - 3月31日</p>
+</div>
+
+<p style="font-size: 16px; font-weight: bold; color: #E11D48; margin: 20px 0 8px; border-left: 3px solid #E11D48; padding-left: 8px;">
+  活动说明
 </p>
-<p style="margin: 0px 0px 0px 8px; text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 0px; line-height: 1.5em;">
-    （二）<strong>活动规则：</strong><strong></strong>
+<p style="text-indent: 2em; margin-bottom: 6px;">活动在"全速运动"小程序报名，参与者可在活动页面创建战队（10人以上）或加入已有战队报名参加活动。个人选择3.14公里或5.20公里组，月度达成10次运动打卡即视为达成月度任务，可获得电子完赛证书、抽奖等奖励。</p>
+<p style="margin-bottom: 12px; color: #666;">适合人群：跑步小白（刚开始跑步）、健康跑者、有健康认知的大众。活动报名者年龄限16-60周岁，无严重疾病史，能熟练使用智能手机。</p>
+
+<p style="font-size: 16px; font-weight: bold; color: #E11D48; margin: 20px 0 8px; border-left: 3px solid #E11D48; padding-left: 8px;">
+  活动报名费
 </p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 32px; line-height: 1.5em;">
-    <span style="font-family:宋体">活动报名者在“全速运动”小程序月度达成10次运动打卡即视为达成月度任务，可获得抽奖、平分奖金池及荣誉奖励。</span>
+<div style="background: #FAFAFA; border-radius: 8px; padding: 12px 14px; margin-bottom: 16px;">
+  <p style="margin-bottom: 8px;"><strong style="color: #E11D48;">A、0元 轻跑礼包</strong><br/>含月度线上跑赛事服务、电子完赛证书</p>
+  <p style="margin-bottom: 8px;"><strong style="color: #E11D48;">B、99元 暖跑礼包</strong><br/>含月度线上跑赛事服务、电子完赛证书、全速体育纯钛保温杯一个，价值269元</p>
+  <p style="margin-bottom: 8px;"><strong style="color: #E11D48;">C、499元 爽跑礼包</strong><br/>含月度线上跑赛事服务、电子完赛证书、斯凯奇品牌跑鞋一双（梁朝伟同款），平安跑者险31天，价值899元</p>
+  <p><strong style="color: #E11D48;">D、1399元 智跑礼包</strong><br/>含月度线上跑赛事服务、电子完赛证书、华为系watch pt6 pro运动手表一只，平安跑者险31天，价值1899元</p>
+</div>
+
+<p style="font-size: 16px; font-weight: bold; color: #E11D48; margin: 20px 0 8px; border-left: 3px solid #E11D48; padding-left: 8px;">
+  月度任务
 </p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 32px; line-height: 1.5em;">
-    活动适合跑步小白（刚开始跑步）、健康跑者、有健康认知的大众养成跑步运动习惯。活动报名者年龄限16-60周岁，无严重疾病史，能熟练使用智能手机。<strong></strong>
-</p>
-<p style="margin: 0px 0px 0px 8px; text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 0px; line-height: 1.5em;">
-    1.&nbsp;<strong>活动</strong><strong>报名</strong><strong>费</strong><strong>&nbsp;</strong>&nbsp;
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 28px; line-height: 1.5em;">
-    A<span style="font-family:宋体">、52</span>元约定金
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 28px; line-height: 1.5em;">
-    B<span style="font-family:宋体">、52</span>元<span style="font-family:宋体">约定金+99 飒跑礼包（含斯凯奇跑步速干短袖一件，价值169元</span>）
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 28px; line-height: 1.5em;">
-    C<span style="font-family:宋体">、52</span>元<span style="font-family:宋体">约定金+499爽跑礼包（含斯凯奇跑鞋一双，平安跑者险30天，价值899元）</span>
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 28px; line-height: 1.5em;">
-    D<span style="font-family:宋体">、52</span>元<span style="font-family:宋体">约定金+1399智跑礼包（含华为系watch pt6 pro运动手表一只，平安跑者险30天，价值1899元）</span>
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 28px; line-height: 1.5em;">
-    <strong><span style="font-family:宋体">为爱奔跑520·</span></strong><strong>悦月跑</strong><strong>月度</strong><strong>任务</strong><strong></strong>
-</p>
-<table cellspacing="0">
-    <tbody>
-        <tr class="firstRow">
-            <td width="82" valign="top" style="padding: 0px 7px; border-width: 1px; border-color: windowtext;">
-                <p style="text-align: center; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-                    月度任务
-                </p>
-            </td>
-            <td width="215" valign="top" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: windowtext; border-top-width: 1px; border-top-color: windowtext; border-bottom-width: 1px; border-bottom-color: windowtext;">
-                <p style="text-align: center; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-                    任务内容
-                </p>
-            </td>
-            <td width="271" valign="top" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: windowtext; border-top-width: 1px; border-top-color: windowtext; border-bottom-width: 1px; border-bottom-color: windowtext;">
-                <p style="text-align: center; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-                    完成标准
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td width="82" valign="top" style="padding: 0px 7px; border-left-width: 1px; border-left-color: windowtext; border-right-width: 1px; border-right-color: windowtext; border-top: none; border-bottom-width: 1px; border-bottom-color: windowtext;">
-                <p style="text-align: center; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-                    个人
-                </p>
-            </td>
-            <td width="215" valign="top" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: windowtext; border-top: none; border-bottom-width: 1px; border-bottom-color: windowtext;">
-                <p style="font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-                    月份完成10<span style="font-family:宋体">次</span>3.14/5.20<span style="font-family:宋体">公里</span>运动打卡
-                </p>
-            </td>
-            <td width="271" valign="top" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: windowtext; border-top: none; border-bottom-width: 1px; border-bottom-color: windowtext;">
-                <p style="font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-                    单次≥3.14/5.20km<span style="font-family:宋体">，</span>配速不低于<span style="font-family:Calibri">12分/公里</span>
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td width="82" valign="top" style="padding: 0px 7px; border-left-width: 1px; border-left-color: windowtext; border-right-width: 1px; border-right-color: windowtext; border-top: none; border-bottom-width: 1px; border-bottom-color: windowtext;">
-                <p style="text-align: center; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-                    团队
-                </p>
-            </td>
-            <td width="215" valign="top" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: windowtext; border-top: none; border-bottom-width: 1px; border-bottom-color: windowtext;">
-                <p style="font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-                    10<span style="font-family:宋体">人成团，团队</span>完成率≥<span style="font-family:Calibri">8</span>5% ，跑量超<span style="font-family:Calibri">1314公里</span>
-                </p>
-            </td>
-            <td width="271" valign="top" style="padding: 0px 7px; border-left: none; border-right-width: 1px; border-right-color: windowtext; border-top: none; border-bottom-width: 1px; border-bottom-color: windowtext;">
-                <p style="font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-                    成员每日限<span style="font-family:Calibri">1次</span>，单次≥3.14/5.20km，配速不低于<span style="font-family:Calibri">12分/公里</span>
-                </p>
-            </td>
-        </tr>
-    </tbody>
+<table style="width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 13px;">
+  <tr style="background: #E11D48; color: #fff;">
+    <td style="padding: 8px; text-align: center; border: 1px solid #ddd; font-weight: bold;">月度任务</td>
+    <td style="padding: 8px; text-align: center; border: 1px solid #ddd; font-weight: bold;">任务内容</td>
+    <td style="padding: 8px; text-align: center; border: 1px solid #ddd; font-weight: bold;">完成标准</td>
+  </tr>
+  <tr>
+    <td style="padding: 8px; text-align: center; border: 1px solid #eee; font-weight: bold;">个人</td>
+    <td style="padding: 8px; border: 1px solid #eee;">月份完成10次3.14/5.20公里运动打卡</td>
+    <td style="padding: 8px; border: 1px solid #eee;">单次≥3.14/5.20km，配速不低于12分/公里</td>
+  </tr>
+  <tr style="background: #FAFAFA;">
+    <td style="padding: 8px; text-align: center; border: 1px solid #eee; font-weight: bold;">团队</td>
+    <td style="padding: 8px; border: 1px solid #eee;">10人成团，团队完成率≥85%，跑量超1314公里</td>
+    <td style="padding: 8px; border: 1px solid #eee;">成员每日限1次，单次≥3.14/5.20km，配速不低于12分/公里</td>
+  </tr>
 </table>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 32px; line-height: 1.5em;">
-    <strong>打卡规则</strong>&nbsp;&nbsp;
+
+<p style="font-size: 16px; font-weight: bold; color: #E11D48; margin: 20px 0 8px; border-left: 3px solid #E11D48; padding-left: 8px;">
+  打卡规则
 </p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    - <span style="font-family:宋体">数据来源：&quot;</span>全速运动&quot;<span style="font-family:宋体">小程序轨迹截图打卡/</span>GPS<span style="font-family:宋体">手表（需</span>绑定<span style="font-family:宋体">同步数据） &nbsp;</span>
+<p style="margin-bottom: 4px;">· 数据来源："全速运动"小程序运动轨迹截图打卡（支持主流运动APP运动轨迹截图识别）</p>
+<p style="margin-bottom: 12px;">· 打卡时间限定：每日 5:00 - 23:00 上传记录</p>
+
+<p style="font-size: 16px; font-weight: bold; color: #E11D48; margin: 20px 0 8px; border-left: 3px solid #E11D48; padding-left: 8px;">
+  活动奖励
 </p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    - 打卡时间限定：每日5:00-23:00<span style="font-family:宋体">上传记录 &nbsp;</span>
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    &nbsp;
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    &nbsp;
-</p>
-<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    2.&nbsp;<strong>活动</strong><strong>奖励</strong>&nbsp;
-</p>
-<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    (1)&nbsp;<strong>游戏约定金</strong><strong></strong>
-</p>
-<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    A.&nbsp;报名参加活动达成月度打卡任务即可退还约定金，未达成任务者不予退还。<strong></strong>
-</p>
-<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    B.&nbsp;<span style="font-family:宋体">未达成月度任务者所缴纳约定金，扣除10%平台费用后进入月度活动奖金池，达成月度打卡任务者平分约定奖金池。</span>&nbsp;
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    &nbsp;
-</p>
-<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    (2)&nbsp;<strong>个人</strong><strong><span style="font-family:宋体">奖励 &nbsp;</span></strong><strong></strong>
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    <strong>- </strong><strong>月度任务</strong><strong>完赛</strong><strong>奖励</strong><strong>：</strong><strong></strong>
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    <span style="font-family:宋体">平分约定奖金池奖金+</span>电子证书+<span style="font-family:宋体">斯凯奇周边产品抽奖（按报名人数10%设中奖奖品，不含前五名）</span>
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    &nbsp;
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    <strong>- </strong><strong><span style="font-family:宋体">月度报名活动人数1000人以上，</span></strong><strong>个人</strong><strong>跑量</strong><strong>TOP</strong><strong>5</strong><strong><span style="font-family:宋体">： </span></strong>&nbsp;
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 16px; line-height: 1.5em;">
-    &nbsp;&nbsp;<span style="font-family:宋体">冠军：</span>斯凯奇新款高端跑鞋+<span style="font-family:宋体">广州全速定制纯钛保温杯</span>
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 16px; line-height: 1.5em;">
-    &nbsp;&nbsp;<span style="font-family:宋体">亚军：</span>斯凯奇新款跑鞋+<span style="font-family:宋体">广州全速定制纯钛保温杯</span>
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 16px; line-height: 1.5em;">
-    &nbsp;&nbsp;<span style="font-family:宋体">季军：</span>斯凯奇经典跑鞋+<span style="font-family:宋体">广州全速定制纯钛保温杯</span>
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 32px; line-height: 1.5em;">
-    第四名：斯凯奇慢跑鞋+<span style="font-family:宋体">广州全速定制纯钛保温杯</span>
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 32px; line-height: 1.5em;">
-    第五名：斯凯奇慢跑鞋+<span style="font-family:宋体">广州全速定制纯钛保温杯</span>
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    <strong>- </strong><strong><span style="font-family:宋体">月度报名活动人数1000人以下，</span></strong><strong>个人</strong><strong>跑量</strong><strong>TOP</strong><strong>3<span style="font-family:宋体">：</span></strong><strong></strong>
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 16px; line-height: 1.5em;">
-    &nbsp;&nbsp;<span style="font-family:宋体">冠军：</span>斯凯奇新款高端跑鞋+<span style="font-family:宋体">广州全速定制纯钛保温杯</span>
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 16px; line-height: 1.5em;">
-    &nbsp;&nbsp;<span style="font-family:宋体">亚军：</span>斯凯奇新款跑鞋+<span style="font-family:宋体">广州全速定制纯钛保温杯</span>
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; text-indent: 16px; line-height: 1.5em;">
-    &nbsp;&nbsp;<span style="font-family:宋体">季军：</span>斯凯奇经典跑鞋+<span style="font-family:宋体">广州全速定制纯钛保温杯</span><strong></strong>
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;" class="" data-tools-id="94943">
-    &nbsp;
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    <strong>- <span style="font-family:宋体">荣誉激励 </span></strong>&nbsp;
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    <span style="font-family:宋体">为爱奔跑520·月度</span>之星：<span style="font-family:宋体">达成任务且月跑量150公里以上，</span>获得电子勋章
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;" class="" data-tools-id="82990">
-    &nbsp;
-</p>
-<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    (3)&nbsp;<strong>团队奖励</strong><strong></strong>
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    <strong>创团邀约奖励：</strong><strong></strong>
-</p>
-<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    A.&nbsp;<span style="font-family:宋体">战队人数≥50人，奖励6双斯凯奇运动袜</span>
-</p>
-<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    B.&nbsp;<span style="font-family:宋体">战队人数≥100人，奖励6双斯凯奇运动袜+斯凯奇跑鞋1双（梁朝伟同款）</span>
-</p>
-<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    C.&nbsp;<span style="font-family:宋体">战队人数≥200人，奖励12双斯凯奇运动袜+斯凯奇跑鞋2双（梁朝伟同款）</span>
-</p>
-<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    D.&nbsp;<span style="font-family:宋体">战队人数≥300人，奖励24双斯凯奇运动袜+斯凯奇跑鞋3双（梁朝伟同款</span><strong></strong>
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    <strong>&nbsp;</strong>
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    <strong>团队任务完成奖励：</strong><strong></strong>
-</p>
-<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    A.&nbsp;<span style="font-family:宋体">达成任务且月跑量1314公里以上，</span>获得“<span style="font-family:宋体">为爱奔跑520·高能战队”奖牌</span>
-</p>
-<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    B.&nbsp;<span style="font-family:宋体">成员报名费（不含约定金）10%奖励团长</span>
-</p>
-<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    C.&nbsp;<span style="font-family:宋体">团队跑量TOP10团队长获得</span>斯凯奇新款跑鞋<span style="font-family:宋体">一双（战队成员100以上）</span>
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    <strong>&nbsp;</strong>
-</p>
-<p style="margin: 0px 0px 0px 28px; text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    3.&nbsp;<strong>活动体验官奖励</strong><strong></strong>
-</p>
-<p style="text-align: justify; font-family: Calibri; font-size: 14px; line-height: 1.5em;">
-    &nbsp;&nbsp;<span style="font-family:宋体">粉丝1w以上可报名参加活动体验官活动，视频号自媒体发布作品带话题：#为爱奔跑520</span>挑战赛，#<span style="font-family:宋体">全速体育</span>悦月跑，#<span style="font-family:宋体">广州全速体育，视频播放量前5名（播放5000以上）及“点赞+评价”排名前5者（互动100以上）获得斯凯奇跑鞋一双（不可兼得）。</span>
-</p>
-<p>
-    <br/>
-</p>
+
+<p style="font-size: 15px; font-weight: bold; margin: 14px 0 6px;">一、个人奖励</p>
+<p style="font-weight: bold; margin-bottom: 4px;">月度任务完赛奖励：</p>
+<p style="margin-bottom: 10px;">电子完赛证书 + 斯凯奇品牌跑鞋及周边产品抽奖（按报名人数10%设中奖奖品，不含个人跑量TOP5）</p>
+
+<p style="font-weight: bold; margin-bottom: 4px;">月度报名活动人数1000人以上，个人跑量TOP5奖励：</p>
+<div style="padding-left: 14px; margin-bottom: 10px;">
+  <p>🥇 冠军：斯凯奇新款高端跑鞋 + 广州全速定制纯钛保温杯</p>
+  <p>🥈 亚军：斯凯奇新款跑鞋 + 广州全速定制纯钛保温杯</p>
+  <p>🥉 季军：斯凯奇经典跑鞋 + 广州全速定制纯钛保温杯</p>
+  <p>第四名：斯凯奇慢跑鞋 + 广州全速定制纯钛保温杯</p>
+  <p>第五名：斯凯奇慢跑鞋 + 广州全速定制纯钛保温杯</p>
+</div>
+
+<p style="font-weight: bold; margin-bottom: 4px;">月度报名活动人数1000人以下，个人跑量TOP3奖励：</p>
+<div style="padding-left: 14px; margin-bottom: 10px;">
+  <p>🥇 冠军：斯凯奇新款高端跑鞋 + 广州全速定制纯钛保温杯</p>
+  <p>🥈 亚军：斯凯奇新款跑鞋 + 广州全速定制纯钛保温杯</p>
+  <p>🥉 季军：斯凯奇经典跑鞋 + 广州全速定制纯钛保温杯</p>
+</div>
+
+<p style="font-size: 15px; font-weight: bold; margin: 14px 0 6px;">二、团队奖励</p>
+<p style="font-weight: bold; margin-bottom: 4px;">创团邀约奖励：</p>
+<div style="background: #FAFAFA; border-radius: 8px; padding: 10px 14px; margin-bottom: 10px;">
+  <p>· 战队人数≥50人，奖励6双斯凯奇运动袜</p>
+  <p>· 战队人数≥100人，奖励6双斯凯奇运动袜 + 跑鞋1双</p>
+  <p>· 战队人数≥200人，奖励12双斯凯奇运动袜 + 跑鞋2双</p>
+  <p>· 战队人数≥300人，奖励24双斯凯奇运动袜 + 跑鞋3双</p>
+</div>
+
+<p style="font-weight: bold; margin-bottom: 4px;">团队任务完成奖励：</p>
+<div style="padding-left: 14px; margin-bottom: 10px;">
+  <p>· 团队10人以上，达成任务且月跑量1314公里以上，获得"为爱奔跑520·高能战队"奖牌</p>
+  <p>· 团队跑量TOP10团队长获得斯凯奇新款跑鞋一双（战队成员100以上）</p>
+</div>
+
+<p style="font-size: 15px; font-weight: bold; margin: 14px 0 6px;">三、活动体验官奖励</p>
+<p style="margin-bottom: 16px;">粉丝1w以上可报名参加活动体验官活动，视频号自媒体发布作品带话题：#为爱奔跑520·线上跑 #广州全速体育，视频播放量前5名（播放5000以上）或"点赞+评价"排名前5者（互动100以上）获得斯凯奇跑鞋一双（不可兼得）。</p>
+
+</div>
 `

@@ -26,5 +26,9 @@ onLoad((options) => {
 </script>
 
 <style lang="scss" scoped>
-
+.u-p-20 {
+  padding: 20rpx;
+  background: #fff;
+  min-height: 100vh;
+}
 </style>
