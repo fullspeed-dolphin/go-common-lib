@@ -142,7 +142,7 @@
             <view class="user-time">{{ item.current_members }}人 | 完成率 {{ item.team_completion_rate }}%</view>
           </view>
           <view class="progress">
-            <text class="progress-percent"><text style="font-size:36rpx;">{{ item.team_goal_km }}</text>km</text>
+            <text class="progress-percent"><text style="font-size:36rpx;">{{ item.total_distance_km }}</text>km</text>
           </view>
         </view>
       </template>
