@@ -20,7 +20,7 @@
     <view class="content-wrapper" @touchstart="onTouchStart" @touchend="handleTouchEnd">
       <mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" :top="100">
         <view class="order-list" :class="['list-transition', listAnimClass]">
-          <view class="team-card" v-for="(item, index) in dataList" :key="index" @click="$u.route('pagesDashboard/pkEvent/teamDetail?id=' + item.id)">
+          <view class="team-card" v-for="(item, index) in dataList" :key="index" @click="$u.route('pagesDashboard/pkEvent/teamDetail?id=' + item.id + '&eventId=' + activetyId)">
             <!-- <image :src="item.team_avatar_url" class="avatar" /> -->
             <div class="avatar">
               <up-lazy-load height="110" borderRadius="14" :is-effect="false" :image="
@@ -121,7 +121,7 @@ function joinTeam(item) {
     });
     return;
   }
-  uni.$u.route(`pagesDashboard/pkEvent/teamDetail?id=${item.id}`);
+  uni.$u.route(`pagesDashboard/pkEvent/teamDetail?id=${item.id}&eventId=${activetyId.value}`);
 }
 
 // Tab 配置
