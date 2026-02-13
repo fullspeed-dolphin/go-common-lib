@@ -49,6 +49,14 @@
         创建战队
       </u-button>
     </view>
+    <view v-else-if="!hasSignedUp" class="create-team-wrapper flex-center">
+      <u-button class="create-team-btn"
+        color="#ff5c5c"
+        customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;font-size: 34rpx;letter-spacing: 1px;"
+        @click="$u.route('pagesDashboard/pkEvent/pkEventForm', { id: activetyId })">
+        立即报名参赛
+      </u-button>
+    </view>
   </view>
 </template>
 
@@ -74,6 +82,16 @@ function getUserStatus() {
       console.log("userStatus", res);
       userStatusInfo.value = res;
     });
+}
+
+const myEvents = ref([]);
+const hasSignedUp = computed(() => {
+  return myEvents.value?.some((i) => i.event_id === activetyId.value && i.status === 'SUCC');
+});
+function getMyEvents() {
+  request.get("/event-api/online_events/my_events").then((res) => {
+    myEvents.value = res;
+  });
 }
 
 function joinTeamAPi(item) {
@@ -177,6 +195,18 @@ const getList = (mescroll) => {
 onLoad((options) => {
   activetyId.value = options.id;
   getUserStatus();
+  getMyEvents();
+});
+
+const isFirstShow = ref(true);
+onShow(() => {
+  if (isFirstShow.value) {
+    isFirstShow.value = false;
+    return;
+  }
+  refreshList();
+  getUserStatus();
+  getMyEvents();
 });
 
 defineOptions({

@@ -9,7 +9,7 @@
 
     <section class="section-header header-bg" style="margin-top: -372rpx;">
       <view class="status-bar" style="display:flex;justify-content:flex-end;">
-        <view v-if="isSignUpEvent"
+        <view v-if="!isSignUpEvent"
           style="color:#fff;font-size: 32rpx;font-weight: bold;background: rgba(25, 190, 107, .9);padding: 16rpx 32rpx; border-radius: 32rpx 0 0 32rpx;"
           class="rule-link flex-center">
           已报名
@@ -38,6 +38,10 @@
           <view class="stat-item u-flex-1 flex-col-center">
             <text class="label">已报名</text>
             <text class="value">{{detailInfo?.total_registrations}}</text>
+          </view>
+          <view class="stat-item u-flex-1 flex-col-center">
+            <text class="label">战队总数</text>
+            <text class="value">{{detailInfo?.total_teams}}</text>
           </view>
           <view class="stat-item u-flex-1 flex-col-center">
             <text class="label">天数</text>
@@ -80,7 +84,7 @@
 			</view> -->
     </section>
 
-    <view v-if="userStatusInfo.in_team && isSignUpEvent" class="section-btn flex-center" @click="goto('/pagesSport/punchInUpload')">
+    <view v-if="userStatusInfo.in_team && !isSignUpEvent" class="section-btn flex-center" @click="goto('/pagesSport/punchInUpload')">
     	<view class="iconfont flex-center icon-lijidaka u-mr-10" style="color:#fff;font-size:42rpx;"></view>
     	立即打卡
     </view>
@@ -161,7 +165,7 @@
 
 <script setup>
 import { ref, computed, watch } from "vue";
-import { onLoad } from "@dcloudio/uni-app";
+import { onLoad, onShow } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
 import UserLogin from "@/components/UserLogin.vue";
@@ -225,6 +229,7 @@ const init = () => {
         registration_end_time: dayjs(res.registration_end_time).format("M月D日"),
         start_time: dayjs(res.start_time).format("M月D日"),
         total_registrations: formatNumber(res.total_registrations),
+        total_teams: formatNumber(res.total_teams),
         status: res.status.toLowerCase(),
       }
 
@@ -249,7 +254,7 @@ function getMyEvents() {
 }
 const isSignUpEvent = computed(() => {
   if (!myEvents.value) return true;
-  return !myEvents.value.some((i) => i.event_id === activetyId.value);
+  return !myEvents.value.some((i) => i.event_id === activetyId.value && i.status === 'SUCC');
 })
 
 // 数字格式化
@@ -297,6 +302,18 @@ const goto = (url) => {
 onLoad((options) => {
   console.log(options);
   activetyId.value = options.id || "01KH0WQX4H2C7Q4GJ217P8T922";
+  init();
+  getUserStatus();
+  getMyEvents();
+  getRankList();
+});
+
+const isFirstShow = ref(true);
+onShow(() => {
+  if (isFirstShow.value) {
+    isFirstShow.value = false;
+    return;
+  }
   init();
   getUserStatus();
   getMyEvents();
