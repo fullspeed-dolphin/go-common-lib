@@ -114,7 +114,7 @@ function joinTeamAPi(item) {
 }
 
 function goToSignEvent() {
-	uni.$u.route("pagesDashboard/pkEvent/pkEventForm", { id: teamID.value });
+	uni.$u.route("pagesDashboard/pkEvent/pkEventForm", { id: activetyId.value });
 }
 
 function joinTeam(item) {

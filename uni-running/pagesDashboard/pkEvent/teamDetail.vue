@@ -173,7 +173,7 @@ function joinTeamAPi() {
 }
 
 function goToSignEvent() {
-	uni.$u.route("pagesDashboard/pkEvent/pkEventForm", { id: teamID.value });
+	uni.$u.route("pagesDashboard/pkEvent/pkEventForm", { id: eventID.value });
 }
 
 function joinTeam() {
