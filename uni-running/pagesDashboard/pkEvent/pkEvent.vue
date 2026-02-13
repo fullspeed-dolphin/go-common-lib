@@ -342,7 +342,9 @@ const getRankList = () => {
 }
 
 .section-stats-card {
-  background-color: #f5f5f5;
+  // background-color: #f5f5f5;
+  background: rgba(255, 92, 92, .3);
+  border: 1px solid rgba(255, 92, 92, .6);
   border-radius: 24rpx;
   padding: 30rpx 30rpx 20rpx;
   // width: 686rpx;
@@ -363,7 +365,7 @@ const getRankList = () => {
   }
   .label {
     font-size: 24rpx;
-    color: #64748b;
+    color: #333;
     margin-bottom: 8rpx;
   }
   .value {
