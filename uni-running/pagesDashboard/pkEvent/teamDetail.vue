@@ -116,13 +116,18 @@ useShare(() => ({
 	path: buildPath('/pagesDashboard/pkEvent/teamDetail', { teamId: teamID.value }),
 }));
 
-const currentIndex = ref(0)
+const currentIndex = ref(1)
 const tabList = ref([
-	{ label: "3.14KM", value: "" },
-	{ label: "5.20KM", value: "SUCC" },
+	{ label: "个人完赛", value: "" },
+	{ label: "总距离", value: "SUCC" },
 ]);
 const handleTabChange = (item, index) => {
 	currentIndex.value = index;
+	if (index === 1) {
+		getRankData();
+	} else {
+		rankList.value = [];
+	}
 };
 
 // 编辑按钮点击
