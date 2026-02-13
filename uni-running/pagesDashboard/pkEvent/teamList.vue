@@ -102,26 +102,14 @@ function joinTeamAPi(item) {
 			event_id: activetyId.value,
 			team_id: item.id,
     })
-    .then((res) => {
-      if (res.code === 200) {
+    .then(() => {
 				getUserStatus();
 				uni.$u.toast("成功加入战队, 准备跳转到活动报名页...", 2000, function success() {
 					goToSignEvent();
 				});
-       
-      } else {
-        uni.showToast({
-          title: res.msg || "加入战队失败",
-          icon: "error",
-        });
-      }
     })
     .catch((e) => {
-      console.log("e", e)
-      // uni.showToast({
-      //   title: "加入战队失败",
-      //   icon: "error",
-      // });
+      console.log("e", e);
     });
 }
 

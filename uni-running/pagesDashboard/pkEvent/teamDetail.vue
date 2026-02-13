@@ -161,15 +161,11 @@ function joinTeamAPi() {
 			event_id: eventID.value,
 			team_id: item.id,
     })
-    .then((res) => {
-      if (res.code === 200) {
+    .then(() => {
 				getUserStatus();
 				uni.$u.toast("成功加入战队, 准备跳转到活动报名页...", 2000, function success() {
 					goToSignEvent();
 				});
-      } else {
-        uni.$u.toast(e.msg || "加入战队失败");
-      }
     })
     .catch((e) => {
       uni.$u.toast(e.msg || "加入战队失败");
