@@ -152,7 +152,8 @@ onLoad((options) => {
   }
 });
 
-function joinTeamAPi(item) {
+function joinTeamAPi() {
+	const item = detailInfo.value
 	console.log("joinTeamAPi", item);
 	uni.showLoading({ mask: true });
   request
@@ -179,9 +180,10 @@ function goToSignEvent() {
 	uni.$u.route("pagesDashboard/pkEvent/pkEventForm", { id: teamID.value });
 }
 
-function joinTeam(item) {
+function joinTeam() {
+	
 	if (!userInfo.value.id) {
-		loginCallBack.value = joinTeam(item);
+		loginCallBack.value = joinTeam;
 
 		nextTick(() => {
 			refUserLogin.value.open();
@@ -196,7 +198,7 @@ function joinTeam(item) {
       content: "确定加入该战队吗？",
       success: (res) => {
         if (res.confirm) {
-					joinTeamAPi(item)
+					joinTeamAPi()
         } else if (res.cancel) {
           console.log("用户点击取消");
         }

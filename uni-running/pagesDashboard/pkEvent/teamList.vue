@@ -20,7 +20,7 @@
     <view class="content-wrapper" @touchstart="onTouchStart" @touchend="handleTouchEnd">
       <mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" :top="100">
         <view class="order-list" :class="['list-transition', listAnimClass]">
-          <view class="team-card" v-for="(item, index) in dataList" :key="index" @click="$u.route('pagesDashboard/pkEvent/teamDetail?id=' + item.id + '&eventId=' + activetyId)">
+          <view class="team-card" v-for="(item, index) in dataList" :key="index" @click="joinTeam(item)">
             <!-- <image :src="item.team_avatar_url" class="avatar" /> -->
             <div class="avatar">
               <up-lazy-load height="110" borderRadius="14" :is-effect="false" :image="
@@ -33,7 +33,7 @@
               <view class="leader">队长：{{ item.leader_nickname }}</view>
             </view>
 
-            <view class="join-btn flex-center" @click="joinTeam(item)">
+            <view class="join-btn flex-center">
               {{!userStatusInfo.in_team ? '加入战队' : '查看'}}
             </view>
           </view>
@@ -86,11 +86,11 @@ function joinTeamAPi(item) {
     })
     .then((res) => {
       if (res.code === 200) {
-        uni.showToast({
-          title: "成功加入战队",
-          icon: "success",
-        });
-        getUserStatus();
+				getUserStatus();
+				uni.$u.toast("成功加入战队, 准备跳转到活动报名页...", 2000, function success() {
+					goToSignEvent();
+				});
+       
       } else {
         uni.showToast({
           title: res.msg || "加入战队失败",
@@ -105,6 +105,10 @@ function joinTeamAPi(item) {
       //   icon: "error",
       // });
     });
+}
+
+function goToSignEvent() {
+	uni.$u.route("pagesDashboard/pkEvent/pkEventForm", { id: teamID.value });
 }
 
 function joinTeam(item) {
