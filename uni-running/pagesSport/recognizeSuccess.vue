@@ -27,6 +27,16 @@
 			</view>
 		</section>
 		
+		<view class="u-flex-y-center u-mt-30 bgf b" style="height: 80rpx;padding-left: 34rpx;font-size: 32rpx;">打卡活动</view>
+		<section class="section-result panel u-flex-row">
+			<image :src="punchInUploadResult.background_image_url" style="width:160rpx;height:160rpx;border-radius:20rpx;" mode="aspectFill"></image>
+			<view class="u-ml-20">
+				<view class="name u-mb-20 u-mt-10" style="font-size:32rpx;">{{punchInUploadResult.event_name}}</view>
+				<view class="name" style="color:#666;">{{punchInUploadResult.event_subtitle}}</view>
+				<view class="name u-mt-20" style="color:#666;">活动日期：{{punchInUploadResult?.start_time?.slice(0, 10)}}</view>
+			</view>
+		</section>
+		
 		<view class="flex-center" style="position: fixed;bottom: 30rpx;width:100%;">
 			<u-button type="primary" custom-style="width:642rpx;" color="#ff8c00" shape="circle" @click="routeTo()">查看我的跑币</u-button>
 		</view>
@@ -49,9 +59,35 @@ function hasDigit(str) {
   return /\d/.test(str);
 }
 
+const punchInUploadResult = ref({})
 onLoad((options) => {
 	console.log('options', options)
 	routerParems.value = options.msg
+	
+	punchInUploadResult.value = uni.getStorageSync('punchInUpload')?.events?.[0] || {}
+	// punchInUploadResult.value = {
+	// 	background_image_url: "https://ccrun.oss-cn-guangzhou.aliyuncs.com/images/2026/02/13/6ab4b3b6-82f0-44c1-952c-c5ab989154b8.png",
+	// 	created_at: "2026-02-09T17:46:51Z",
+	// 	end_time: "2026-04-01T07:59:59Z",
+	// 	event_description: "火热报名中·3月21日截止",
+	// 	event_name: "为爱奔跑520·第一期",
+	// 	event_subtitle: "全速体育线上跑月度挑战赛",
+	// 	event_type: "running",
+	// 	group_config: '{"groups": [{"name": "3.14公里", "target_km": 3.14, "description": "圆周率无限挑战"}, {"name": "5.20公里", "target_km": 5.2, "description": "让爱意随脚步延伸"}]}',
+	// 	id: "01KH0WQX4H2C7Q4GJ217P8T922",
+	// 	refund_valid_hour: 168,
+	// 	registration_end_time: "2026-03-01T07:59:59Z",
+	// 	registration_start_time: "2026-02-11T08:00:00Z",
+	// 	required_checkins: 10,
+	// 	start_time: "2026-03-01T16:00:00Z",
+	// 	status: "ACT",
+	// 	total_prize_pool: "0.00",
+	// 	total_registrations: 2,
+	// 	total_teams: 2,
+	// 	updated_at: "2026-02-13T23:49:50Z",
+	// }
+	console.log("punchInUploadResult.value====>", punchInUploadResult.value)
+
 })
 
 function routeTo() {
