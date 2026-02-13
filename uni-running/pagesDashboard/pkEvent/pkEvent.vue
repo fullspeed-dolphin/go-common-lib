@@ -1,12 +1,18 @@
 <template>
   <view class="">
     <u-navbar :title="null" bgColor="transparent"></u-navbar>
+    <section class="flex-center" style="height: 512rpx;filter1: blur(10px);">
+      <image class="img" style="width:750rpx;height:512rpx;" :src="
+          (detailInfo?.background_image_url)  + '?x-oss-process=image/resize,w_750,h_500,m_fill'
+        " mode="aspectFill"></image>
+        
+    </section>
 
-    <section class="section-header header-bg" :style="{background:'url('+detailInfo?.background_image_url+')'}">
+    <section class="section-header header-bg" style="margin-top: -512rpx;">
       <view class="status-bar flex-between-center">
         <view class="flex-center bar">
           <view class="status-dot"></view>
-          <text class="status-text">火热报名中·{{detailInfo?.registration_end_time}}截止</text>
+          <text class="status-text" style="color:#222">火热报名中·{{detailInfo?.registration_end_time}}截止</text>
         </view>
         <view v-if="!isShowSignButton"
           style="color:#fff;font-size: 24rpx;background: rgba(25, 190, 107, .8);padding: 10rpx 20rpx; border-radius: 32rpx 0 0 32rpx;" 
@@ -15,13 +21,15 @@
         </view>
       </view>
 
-      <view class="title">{{ detailInfo?.event_name }}</view>
-      <view class="subtitle">{{ detailInfo?.event_subtitle }}</view>
+      <div style="background: rgba(255,255,255,.6); box-shadow: 0rpx 8rpx 10rpx 0rpx rgba(0, 0, 0, 0.02);border-radius: 20px;margin: 30rpx 30rpx 10rpx;padding: 30rpx;">
+        <view class="title" style="color: #222">{{ detailInfo?.event_name }}</view>
+        <view class="subtitle">{{ detailInfo?.event_subtitle }}</view>
 
-      <view class="start-time flex-center">
-        <view class="iconfont icon-riqi u-mr-10"></view>
-        <text class="time-text">{{detailInfo?.start_time}} 开跑</text>
-      </view>
+        <view class="start-time flex-center">
+          <view class="iconfont icon-riqi u-mr-10"></view>
+          <text class="time-text">{{detailInfo?.start_time}} 开跑</text>
+        </view>
+      </div>
     </section>
 
     <section class="section-stats-card">
@@ -135,7 +143,7 @@
     </view>
 
     <view v-if="isShowSignButton" class="join-btn-wrapper">
-      <u-button class="join-btn" color="linear-gradient(64deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%)"
+      <u-button class="join-btn" color="#ff5c5c" color1="linear-gradient(64deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%)"
         customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;letter-spacing: 1px;font-size: 34rpx;" :disabled="detailInfo?.status !== 'act'" @click="onceJoin()">
         立即报名参赛
       </u-button>
@@ -272,19 +280,19 @@ const getRankList = () => {
 
 <style lang="scss" scoped>
 .header-bg {
-  color: white;
-  padding: 220rpx 0rpx 70rpx 64rpx;
+  // color: white;
+  padding: 220rpx 0rpx 40rpx 0rpx;
   position: relative;
   z-index: 1;
-  background: linear-gradient(
-    226deg,
-    #c70036 0%,
-    #d2003c 20%,
-    #dd0043 40%,
-    #e90249 60%,
-    #f41450 80%,
-    #ff2056 100%
-  );
+  // background: linear-gradient(
+  //   226deg,
+  //   #c70036 0%,
+  //   #d2003c 20%,
+  //   #dd0043 40%,
+  //   #e90249 60%,
+  //   #f41450 80%,
+  //   #ff2056 100%
+  // );
   min-height: 512rpx;
 }
 
@@ -295,7 +303,8 @@ const getRankList = () => {
   .bar {
     height: 48rpx;
     padding: 0 10rpx;
-    background: rgba(255, 255, 255, 0.2);
+    margin-left: 64rpx;
+    background: rgba(255, 255, 255, 0.8);
     border-radius: 20rpx 20rpx 20rpx 20rpx;
   }
   .status-dot {
@@ -309,17 +318,17 @@ const getRankList = () => {
 
 .section-header {
   .title {
-    font-size: 60rpx;
+    font-size: 45rpx;
     font-weight: bold;
     line-height: 1.2;
     margin-bottom: 20rpx;
   }
 
   .subtitle {
-    font-size: 36rpx;
-    color: #ffe4e6;
+    font-size: 32rpx;
+    // color: #ffe4e6;
     line-height: 50rpx;
-    margin-bottom: 50rpx;
+    margin-bottom: 30rpx;
   }
 
   .start-time {
