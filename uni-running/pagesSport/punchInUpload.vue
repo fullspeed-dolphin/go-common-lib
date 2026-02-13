@@ -20,9 +20,9 @@
 			</section>
 		</block>
 		
-		<section class="flex-center" :style="isSuccess ? 'margin-top: 30rpx;' : 'margin-top: 80rpx;'">
+		<section class="flex-center" :style="isSuccess ? 'margin-top: 30rpx;' : 'margin-top: 80rpx;'" @click="checkBeforeUpload">
 			<view :class="isSuccess ? 'upload-wrapper-confirm' : 'upload-wrapper'">
-				<FileUpload v-model="ruleForm.picture" additional="ocr-checkin" isCustom :width="isSuccess ? 500 : 448" :height="isSuccess ? 750 : 600" @change="onImageUploaded">
+				<FileUpload v-model="ruleForm.picture" additional="ocr-checkin" isCustom :readonly="!hasCheckedEvent" :width="isSuccess ? 500 : 448" :height="isSuccess ? 750 : 600" @change="onImageUploaded">
 					<template #trigger>
 						<view class="section-upload flex-col-center" style="color: #99A1AF;line-height: 1.3;">
 							<view class="iconfont flex-center icon-shangchuan"></view>
@@ -116,7 +116,7 @@
 	</view>
 </template>
 <script setup>
-	import { ref } from "vue";
+	import { ref, computed } from "vue";
 	import { onLoad, onUnload } from "@dcloudio/uni-app";
 	import FileUpload from "@/components/common/FileUpload.vue";
 	import PickerCell from "@/components/common/PickerCell.vue";
@@ -134,7 +134,7 @@
 	const myEvents = ref([]);
 	function getMyEvents() {
 		request.get("/event-api/online_events/my_events").then((res) => {
-			let activeEvents = res.filter(i => i.status === 'ACT');
+			let activeEvents = (res || []).filter(i => i.status === 'ACT');
 
 			options_events.value = [...activeEvents.map(i => ({
 				label: i.event_name,
@@ -151,11 +151,19 @@
 	}
 
 	function selectEvent(item) {
-		if (options_events.value.filter(i => i.checked).length === 1 && item.checked) {
-			// 如果当前只有一个选项被选中，并且用户点击的正是这个选项，则不允许取消选中
-			return;
-		}
 		item.checked = !item.checked
+	}
+
+	const hasCheckedEvent = computed(() => options_events.value.some(i => i.checked))
+
+	function checkBeforeUpload() {
+		if (!hasCheckedEvent.value && !ruleForm.value.picture) {
+			uni.showModal({
+				title: '提示',
+				content: '请至少选择一个活动',
+				showCancel: false
+			})
+		}
 	}
 
 	const pageIndex = ref(0)
@@ -284,7 +292,7 @@
 	function confirmToCheck() {
 		request.post('/ocr-api/checkin', {
 			token: verifyToken,
-			event_id: options_events.value.filter(i => i.checked).map(i => i.value),
+			event_ids: options_events.value.filter(i => i.checked).map(i => i.value),
 		}, { showError: false, includeResponse: true }).then(res => {
 			// 标记已提交，防止页面卸载时删除图片
 			isSubmitted.value = true
@@ -302,7 +310,7 @@
 <style lang="less" scoped>
 	.event-item{
 		padding: 15rpx 20rpx;
-		border: 1px solid #e09840;
+		border: 1px solid #FF8C00;
 		border-radius: 32rpx;
 		margin: 20rpx 20rpx 0 0;
 		color: #FF8C00;
