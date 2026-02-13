@@ -344,7 +344,7 @@ const getRankList = () => {
 .section-stats-card {
   // background-color: #f5f5f5;
   background: rgba(255, 92, 92, .3);
-  border: 1px solid rgba(255, 92, 92, .6);
+  border: 1px solid rgba(255, 92, 92, .4);
   border-radius: 24rpx;
   padding: 30rpx 30rpx 20rpx;
   // width: 686rpx;
