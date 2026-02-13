@@ -347,11 +347,14 @@ function wxPay(respay) {
   padding-left: 30rpx;
   border-radius: 16rpx 16rpx 16rpx 16rpx;
   border: 2rpx solid #e2e8f0;
+  display: flex;
+  align-items: center;
   .map-btn {
     padding: 0 24rpx;
     height: 100%;
     display: flex;
     align-items: center;
+    flex-shrink: 0;
   }
 }
 .package-item {
