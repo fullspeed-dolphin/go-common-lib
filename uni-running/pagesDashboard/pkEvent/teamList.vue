@@ -41,7 +41,7 @@
       </mescroll-body>
     </view>
 
-    <view v-if="!userStatusInfo.in_team" class="create-team-wrapper">
+    <view v-if="!userStatusInfo.in_team" class="create-team-wrapper flex-center">
       <u-button class="create-team-btn"
         color="#ff5c5c"
         customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;font-size: 34rpx;letter-spacing: 1px;"
@@ -333,7 +333,7 @@ defineOptions({
   bottom: 0;
   left: 0;
   width: 100%;
-  padding: 48rpx 54rpx;
+  padding: 48rpx 0rpx;
   z-index: 10;
 }
 </style>
