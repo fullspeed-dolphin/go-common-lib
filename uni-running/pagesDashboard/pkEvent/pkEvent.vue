@@ -8,7 +8,7 @@
         
     </section>
 
-    <section class="section-header header-bg" style="margin-top: -312rpx;">
+    <section class="section-header header-bg" style="margin-top: -372rpx;">
       <view class="status-bar flex-between-center">
         <view class="flex-center bar">
           <view class="status-dot"></view>
