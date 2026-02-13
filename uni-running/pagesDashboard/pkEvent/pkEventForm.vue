@@ -389,8 +389,8 @@ function wxPay(respay) {
 }
 .package-item {
   width: 686rpx;
-  height: 222rpx;
-  padding: 42rpx 20rpx 0 34rpx;
+  min-height: 222rpx;
+  padding: 42rpx 20rpx 32rpx 34rpx;
   background: #ffffff;
   border-radius: 32rpx 32rpx 32rpx 32rpx;
   border: 2rpx solid #e2e8f0;
@@ -407,6 +407,7 @@ function wxPay(respay) {
     border-radius: 16rpx 16rpx 16rpx 16rpx;
   }
   .package-image {
+    flex-shrink: 0;
     width: 80rpx;
     height: 80rpx;
     background: #f3f4f6;
