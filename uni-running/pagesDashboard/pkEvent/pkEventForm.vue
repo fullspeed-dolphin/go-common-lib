@@ -269,7 +269,16 @@ function changePackage(id) {
 function chooseAddress() {
   uni.chooseLocation({
     success: (res) => {
-      form.value.shipping_address = res.address + (res.name ? ' ' + res.name : '');
+      const addr = res.address || '';
+      const name = res.name || '';
+      // address 包含 name 则不重复拼接；address 为空则只用 name
+      if (!addr) {
+        form.value.shipping_address = name;
+      } else if (addr.includes(name)) {
+        form.value.shipping_address = addr;
+      } else {
+        form.value.shipping_address = addr + ' ' + name;
+      }
       validateField('shipping_address');
     },
   });
