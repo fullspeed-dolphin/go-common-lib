@@ -86,7 +86,7 @@ function getUserStatus() {
 
 const myEvents = ref([]);
 const hasSignedUp = computed(() => {
-  return myEvents.value?.some((i) => i.event_id === activetyId.value && i.status === 'SUCC');
+  return myEvents.value?.some((i) => i.event_id === activetyId.value && i.status?.toUpperCase() === 'SUCC');
 });
 function getMyEvents() {
   request.get("/event-api/online_events/my_events").then((res) => {
