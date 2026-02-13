@@ -9,13 +9,9 @@
     </section>
 
     <section class="section-header header-bg" style="margin-top: -372rpx;">
-      <view class="status-bar flex-between-center">
-        <view class="flex-center bar">
-          <view class="status-dot"></view>
-          <text class="status-text" style="color:#222">{{detailInfo?.event_description}}</text>
-        </view>
+      <view class="status-bar" style="display:flex;justify-content:flex-end;">
         <view v-if="!isShowSignButton"
-          style="color:#fff;font-size: 24rpx;background: rgba(25, 190, 107, .8);padding: 10rpx 20rpx; border-radius: 32rpx 0 0 32rpx;" 
+          style="color:#fff;font-size: 32rpx;font-weight: bold;background: rgba(25, 190, 107, .9);padding: 16rpx 32rpx; border-radius: 32rpx 0 0 32rpx;"
           class="rule-link flex-center">
           已报名
         </view>
@@ -25,9 +21,15 @@
         <view class="title" style="color: #222">{{ detailInfo?.event_name }}</view>
         <view class="subtitle">{{ detailInfo?.event_subtitle }}</view>
 
-        <view class="start-time flex-center">
-          <view class="iconfont icon-riqi u-mr-10"></view>
-          <text class="time-text">{{detailInfo?.start_time}} 开跑</text>
+        <view style="display:flex;align-items:center;justify-content:space-between;">
+          <view v-if="detailInfo?.event_description" class="start-time flex-center" style="margin:0;width:auto;padding: 0 24rpx;">
+            <text style="margin-right:8rpx;">🔥</text>
+            <text class="time-text">{{detailInfo?.event_description}}</text>
+          </view>
+          <view class="start-time flex-center" style="margin:0;">
+            <view class="iconfont icon-riqi u-mr-10"></view>
+            <text class="time-text">{{detailInfo?.start_time}} 开跑</text>
+          </view>
         </view>
         <section class="section-stats-card" style="margin-top: 30rpx;">
           <!-- <view class="stat-item u-flex-1 flex-col-center">
@@ -98,20 +100,20 @@
             {{ index === 0 ? 'NO.1' : index === 1 ? 'NO.2' : index === 2 ? 'NO.3' : index + 1 }}
           </view>
           <div class="user-avatar">
-            <up-lazy-load height="110" borderRadius="14" :is-effect="false" :image="
-              (item.avatar_url)  + '?x-oss-process=image/resize,w_110,h_110,m_fill'
+            <up-lazy-load height="120" borderRadius="16" :is-effect="false" :image="
+              (item.avatar_url)  + '?x-oss-process=image/resize,w_120,h_120,m_fill'
             " mode="aspectFill" />
           </div>
           <view class="user-info">
-            <view class="user-name">{{ item.real_name }}</view>
-            <view class="user-detail u-flex-y-center">
-              {{ item.team_goal_km }}KM
-              <view class="flex-center group-tag">{{ item.team_name }}</view>
+            <view style="display:flex;align-items:center;">
+              <view class="user-name">{{ item.real_name }}</view>
+              <view class="group-tag">{{ item.team_name }}</view>
             </view>
-            <view class="user-time">{{ item.total_sessions }}次</view>
+            <view class="user-time">{{ item.team_goal_km }}KM组</view>
           </view>
           <view class="progress">
-            <text class="progress-percent"><text style="font-size:36rpx;">{{ item.total_distance_km }}</text>km</text>
+            <text class="progress-percent"><text style="font-size:40rpx;">{{ item.total_distance_km }}</text>km</text>
+            <text style="font-size:24rpx;color:#999;font-weight:normal;">{{ item.total_qualified_sessions }}/{{ item.required_checkins }}次打卡</text>
           </view>
         </view>
       </template>
@@ -128,11 +130,8 @@
           </div>
           <view class="user-info">
             <view class="user-name">{{ item.team_name }}</view>
-            <view class="user-detail u-flex-y-center">
-              组别 {{ item.team_goal_km }}KM
-              <view class="flex-center group-tag">{{ item.current_members }}人</view>
-            </view>
-            <view class="user-time">完成率 {{ item.team_completion_rate }}%</view>
+            <view class="user-time">组别：{{ item.team_goal_km }}KM</view>
+            <view class="user-time">{{ item.current_members }}人 | 完成率 {{ item.team_completion_rate }}%</view>
           </view>
           <view class="progress">
             <text class="progress-percent"><text style="font-size:36rpx;">{{ item.team_goal_km }}</text>km</text>
@@ -304,7 +303,7 @@ const getRankList = () => {
   .bar {
     height: 48rpx;
     padding: 0 10rpx;
-    margin-left: 64rpx;
+    margin-left: 0;
     background: rgba(255, 255, 255, 0.8);
     border-radius: 20rpx 20rpx 20rpx 20rpx;
   }
@@ -433,7 +432,7 @@ const getRankList = () => {
   align-items: center;
   margin: 10rpx 0;
   width: 686rpx;
-  height: 144rpx;
+  height: 180rpx;
   background: #ffffff;
   box-shadow: 0rpx 8rpx 10rpx 0rpx rgba(0, 0, 0, 0.01);
   border-radius: 32rpx 32rpx 32rpx 32rpx;
@@ -457,18 +456,22 @@ const getRankList = () => {
   }
   .group-tag {
     font-weight: 500;
-    font-size: 16rpx;
+    font-size: 22rpx;
     color: #155dfc;
-    height: 32rpx;
-    padding: 0 10rpx;
-    margin-left: 10rpx;
+    padding: 4rpx 14rpx;
+    margin-left: 12rpx;
     background: #eff6ff;
-    border-radius: 12rpx 12rpx 12rpx 12rpx;
+    border-radius: 12rpx;
+    max-width: 160rpx;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .rank-number {
     width: 96rpx;
     font-family: Inter, Inter;
-    font-size: 24rpx;
+    font-size: 28rpx;
     font-weight: bold;
     color: #acacac;
     text-align: center;
@@ -476,40 +479,45 @@ const getRankList = () => {
 
   .user-avatar {
     margin-right: 26rpx;
-    width: 96rpx;
-    height: 96rpx;
-    border-radius: 14rpx 14rpx 14rpx 14rpx;
+    width: 110rpx;
+    height: 110rpx;
+    border-radius: 16rpx;
     background: #f5f5f5;
   }
 
   .user-info {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8rpx;
   }
 
   .user-name {
-    line-height: 42rpx;
-    font-weight: bold;
-    font-size: 28rpx;
+    line-height: 48rpx;
+    font-weight: 800;
+    font-size: 34rpx;
     color: #1e2939;
   }
 
   .user-detail {
-    font-size: 24rpx;
-    color: #5c626f;
-    margin-bottom: 8rpx;
+    font-size: 26rpx;
+    color: #155dfc;
   }
 
   .user-time {
-    font-size: 20rpx;
+    font-size: 24rpx;
     color: #ff5c5c;
   }
 
   .progress {
-    font-size: 28rpx;
+    font-size: 30rpx;
     color: #ff5c5c;
     font-weight: bold;
     margin-left: 20rpx;
     padding-right: 20rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
   }
 }
 

@@ -278,15 +278,32 @@ function chooseAddress() {
     success: (res) => {
       const addr = res.address || '';
       const name = res.name || '';
-      // address 包含 name 则不重复拼接；address 为空则只用 name
-      if (!addr) {
-        form.value.shipping_address = name;
-      } else if (addr.includes(name)) {
-        form.value.shipping_address = addr;
+
+      if (addr) {
+        form.value.shipping_address = addr.includes(name) ? addr : addr + ' ' + name;
+        validateField('shipping_address');
+      } else if (res.latitude && res.longitude) {
+        // address 为空，用高德逆地理编码 REST API 获取完整地址
+        wx.request({
+          url: 'https://restapi.amap.com/v3/geocode/regeo',
+          data: {
+            key: '86473c6f37b174b14803c2c118c4ab62',
+            location: `${res.longitude},${res.latitude}`,
+          },
+          success: (apiRes) => {
+            const regeoAddr = apiRes.data?.regeocode?.formatted_address || '';
+            form.value.shipping_address = regeoAddr ? regeoAddr + ' ' + name : name;
+            validateField('shipping_address');
+          },
+          fail: () => {
+            form.value.shipping_address = name;
+            validateField('shipping_address');
+          }
+        });
       } else {
-        form.value.shipping_address = addr + ' ' + name;
+        form.value.shipping_address = name;
+        validateField('shipping_address');
       }
-      validateField('shipping_address');
     },
   });
 }
@@ -308,14 +325,18 @@ const payOrder = async (reg_no) => {
   });
 };
 
-function freeToPay(){
+function freeToPay(reg_no){
   const data = {
-    reg_no: form.value.reg_no,
+    reg_no,
     event_id: activetyId.value,
-    "status":"SUCC"
+    status: "SUCC"
   };
-  request.post(`/booking-api/online_events/registration/status`, data).then((res) => {
-    wxPay(res);
+  request.post(`/booking-api/online_events/registration/status`, data).then(() => {
+    uni.hideLoading();
+    uni.$u.toast("报名成功");
+    setTimeout(() => {
+      uni.navigateBack();
+    }, 300);
   });
 }
 

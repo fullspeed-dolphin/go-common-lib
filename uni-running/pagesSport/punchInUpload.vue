@@ -303,6 +303,15 @@
 				isSuccessCheck.value = false
 				uni.$u.route('pagesSport/recognizeSuccess', res)
 			}, 2000)
+		}).catch(err => {
+			uni.showModal({
+				title: '打卡失败',
+				content: err?.msg || '请稍后重试',
+				showCancel: false,
+				success: () => {
+					uni.navigateBack()
+				}
+			})
 		})
 	}
 </script>

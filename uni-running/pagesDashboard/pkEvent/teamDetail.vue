@@ -70,7 +70,8 @@
           </view>
           <view class="progress">
             <template v-if="currentIndex === 0">
-              <text class="progress-percent"><text style="font-size:36rpx;">{{ item.total_qualified_sessions }}</text>/{{ item.required_checkins }}次</text>
+              <text class="progress-percent" style="font-size:36rpx;">{{ item.required_checkins ? Math.round(item.total_qualified_sessions / item.required_checkins * 100) : 0 }}%</text>
+              <text class="progress-sub">{{ item.total_qualified_sessions }}/{{ item.required_checkins }}次</text>
             </template>
             <template v-else>
               <text class="progress-percent"><text style="font-size:36rpx;">{{ item.total_distance_km }}</text>km</text>
@@ -119,15 +120,15 @@ onLoad((options) => {
 	teamID.value = options.teamId || options.id
 	eventID.value = options.eventId
 	getDetailInfo()
-	getRankData()
+	getRankData('checkins')
 });
 
 useShare(() => ({
-	title: detailInfo.value.team_name ? `加入${detailInfo.value.team_name}，一起跑起来！` : '邀请你加入战队',
+	title: detailInfo.value.team_name ? `加入${detailInfo.value.team_name}，一起为爱奔跑！` : '邀请你加入战队',
 	path: buildPath('/pagesDashboard/pkEvent/teamDetail', { teamId: teamID.value, eventId: eventID.value }),
 }));
 
-const currentIndex = ref(1)
+const currentIndex = ref(0)
 const tabList = ref([
 	{ label: "个人完赛", value: "" },
 	{ label: "总距离", value: "SUCC" },
@@ -328,6 +329,14 @@ const handleEdit = () => {
 	  font-weight: bold;
 	  margin-left: 20rpx;
 		padding-right: 20rpx;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+	}
+	.progress-sub {
+		font-size: 22rpx;
+		color: #999;
+		font-weight: normal;
 	}
 }
 
