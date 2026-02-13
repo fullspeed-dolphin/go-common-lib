@@ -5,12 +5,11 @@
       <image class="img" style="width:750rpx;height:512rpx;" :src="
           (detailInfo?.background_image_url)  + '?x-oss-process=image/resize,w_750,h_500,m_fill'
         " mode="aspectFill"></image>
-        
     </section>
 
     <section class="section-header header-bg" style="margin-top: -372rpx;">
       <view class="status-bar" style="display:flex;justify-content:flex-end;">
-        <view v-if="!isShowSignButton"
+        <view v-if="isSignUpEvent"
           style="color:#fff;font-size: 32rpx;font-weight: bold;background: rgba(25, 190, 107, .9);padding: 16rpx 32rpx; border-radius: 32rpx 0 0 32rpx;"
           class="rule-link flex-center">
           已报名
@@ -48,8 +47,6 @@
       </div>
     </section>
 
-    
-
     <!-- 功能按钮组 -->
     <section class="section-func-buttons flex-wrap">
       <view v-if="!userStatusInfo.in_team" class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/teamForm')">
@@ -68,19 +65,26 @@
         <view class="iconfont flex-center icon-huodongguize" style="color:#FC9C15;background: #FEE8C2;"></view>
         <text class="func-text">活动规则</text>
       </view>
-      <view class="func-item flex-col-center" @click="goto('/pagesSport/punchInUpload')">
-        <view class="iconfont flex-center icon-lijidaka" style="color:#8515FC;background: #EBDBFE;"></view>
-        <text class="func-text">立即打卡</text>
-      </view>
-      <!-- <view class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/pkRankList')">
-			  <view class="iconfont flex-center icon-zhengshu" style="color:#EE2061;background: #FEDBE6;"></view>
-			  <text class="func-text">完赛证书</text>
-			</view> -->
       <view class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/pkRankList')">
         <view class="iconfont flex-center icon-paihangbang" style="color:#FC9C15;background: #FEE8C2;"></view>
         <text class="func-text">排行榜</text>
       </view>
+
+      <!-- <view class="func-item flex-col-center" @click="goto('/pagesSport/punchInUpload')">
+        <view class="iconfont flex-center icon-lijidaka" style="color:#8515FC;background: #EBDBFE;"></view>
+        <text class="func-text">立即打卡</text>
+      </view> -->
+      <!-- <view class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/pkRankList')">
+			  <view class="iconfont flex-center icon-zhengshu" style="color:#EE2061;background: #FEDBE6;"></view>
+			  <text class="func-text">完赛证书</text>
+			</view> -->
     </section>
+
+    <view v-if="userStatusInfo.in_team && isSignUpEvent" class="section-btn flex-center" @click="goto('/pagesSport/punchInUpload')">
+    	<view class="iconfont flex-center icon-lijidaka u-mr-10" style="color:#fff;font-size:42rpx;"></view>
+    	立即打卡
+    </view>
+		
     <!-- 排行榜 -->
     <view class="tab-container">
       <view class="category-tags">
@@ -142,9 +146,9 @@
         </u-empty></view>
     </view>
 
-    <view v-if="isShowSignButton" class="join-btn-wrapper flex-center">
+    <view v-if="isSignUpEvent" class="join-btn-wrapper flex-center">
       <u-button class="join-btn" color="#ff5c5c" color1="linear-gradient(64deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%)"
-        customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;letter-spacing: 1px;font-size: 34rpx;" :disabled="detailInfo?.status !== 'act'" @click="onceJoin()">
+        customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;letter-spacing: 1px;font-size: 34rpx;" :disabled="detailInfo?.status !== 'act'" @click="SignUpEvent()">
         立即报名参赛
       </u-button>
     </view>
@@ -169,6 +173,26 @@ const refUserLogin = ref(null);
 const activetyId = ref("");
 const detailInfo = ref(null);
 
+// 授权登录后的回调，用户授权后的跳转
+const loginCallBack = ref(null)
+const loginCallAction = ref('')
+function onLoginSuccess () {
+	if (loginCallAction.value === 'SignUpEvent') {
+		uni.$u.toast('前往选择战队')
+		setTimeout(() => {
+			console.log("loginCallBack?.value=====>", loginCallBack.value)
+			loginCallBack?.value?.()
+		}, 500)
+		
+		return;
+	}
+	
+	if (loginCallAction.value.includes('routeTo')) {
+		loginCallBack?.value?.(loginCallAction.value.replace('routeTo', ''))
+		return;
+	}
+}
+
 const tabIndex = ref(0);
 const tabList = ref([
   {
@@ -180,10 +204,6 @@ const tabList = ref([
     value: "",
   },
 ]);
-
-function onLoginSuccess () {
-
-}
 
 function changeTab(index) {
   tabIndex.value = index;
@@ -225,7 +245,7 @@ function getMyEvents() {
     myEvents.value = res;
   });
 }
-const isShowSignButton = computed(() => {
+const isSignUpEvent = computed(() => {
   if (!myEvents.value) return true;
   return !myEvents.value.some((i) => i.event_id === activetyId.value);
 })
@@ -240,7 +260,13 @@ const formatNumber = (num) => {
 };
 
 // 立即报名
-const onceJoin = () => {
+const SignUpEvent = () => {
+	if (!userInfo.value.id) {
+		loginCallAction.value = 'SignUpEvent'
+		loginCallBack.value = SignUpEvent;
+	  refUserLogin.value.open();
+	  return;
+	}
   if (!userStatusInfo.value.in_team) {
     uni.$u.route("pagesDashboard/pkEvent/teamList", { id: activetyId.value });
     return;
@@ -255,6 +281,10 @@ const goto = (url) => {
   }
 
   if (!userInfo.value.id) {
+		loginCallAction.value = 'routeTo' + url
+		loginCallBack.value = goto;
+		
+		console.log("loginCallBack.value=====>", loginCallBack.value)
     refUserLogin.value.open();
     return;
   }
@@ -283,9 +313,36 @@ const getRankList = () => {
 </script>
 
 <style lang="scss" scoped>
+	.section-btn{
+		position: relative;
+		height: 120rpx;
+		border-radius: 200rpx;
+		margin: 20rpx 20rpx 40rpx;
+		font-size: 32rpx;
+		background: #fff;
+		animation-name: zoomIn;
+		animation-duration: 1s;
+		 animation-iteration-count: infinite;
+		color: #fff;
+		background: #ff5c5c;
+	}
+	@keyframes zoomIn {
+	    0% {
+	      transform: scale(0.97);
+	    }
+	
+	    50% {
+	        transform: scale(1)
+	    }
+			
+			100% {
+			  transform: scale(0.97);
+			}
+	}
+	
 .header-bg {
   // color: white;
-  padding: 220rpx 0rpx 40rpx 0rpx;
+  padding: 220rpx 0rpx 20rpx 0rpx;
   position: relative;
   z-index: 1;
   // background: linear-gradient(
