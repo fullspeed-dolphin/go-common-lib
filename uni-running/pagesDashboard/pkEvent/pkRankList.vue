@@ -293,8 +293,8 @@ const getRankList = () => {
 }
 
 .tab-item.active {
-  color: #e12a48;
-  border-bottom: 2rpx solid #e12a48;
+  color: #ff5c5c;
+  border-bottom: 2rpx solid #ff5c5c;
 }
 
 .rank-list {
@@ -374,12 +374,12 @@ const getRankList = () => {
 
   .user-time {
     font-size: 20rpx;
-    color: #e11d48;
+    color: #ff5c5c;
   }
 
   .progress {
     font-size: 28rpx;
-    color: #e12a48;
+    color: #ff5c5c;
     font-weight: bold;
     margin-left: 20rpx;
     padding-right: 20rpx;
@@ -420,7 +420,7 @@ const getRankList = () => {
     z-index: 1;
     padding: 12rpx 24rpx;
     font-size: 28rpx;
-    color: #e11d48;
+    color: #ff5c5c;
     line-height: 40rpx;
     width: 336rpx;
     white-space: nowrap;
@@ -429,7 +429,7 @@ const getRankList = () => {
     text-align: center;
 
     &.active {
-      color: #e11d48;
+      color: #ff5c5c;
       border-radius: 999rpx;
       background: #f3f4f6;
     }

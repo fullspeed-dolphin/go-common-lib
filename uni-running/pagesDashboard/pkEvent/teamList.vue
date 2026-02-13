@@ -43,7 +43,7 @@
 
     <view v-if="!userStatusInfo.in_team" class="create-team-wrapper">
       <u-button class="create-team-btn"
-        color="linear-gradient(64deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%)"
+        color="#ff5c5c"
         customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;font-size: 34rpx;letter-spacing: 1px;"
         @click="$u.route('pagesDashboard/pkEvent/teamForm', { id: activetyId })">
         创建战队
@@ -231,7 +231,7 @@ defineOptions({
     z-index: 1;
     padding: 12rpx 24rpx;
     font-size: 28rpx;
-    color: #e11d48;
+    color: #ff5c5c;
     line-height: 40rpx;
     width: 336rpx;
     white-space: nowrap;
@@ -239,7 +239,7 @@ defineOptions({
     font-weight: bold;
     text-align: center;
     &.active {
-      color: #e11d48;
+      color: #ff5c5c;
       border-radius: 999rpx;
       background: #f3f4f6;
     }
@@ -318,15 +318,7 @@ defineOptions({
     font-weight: bold;
     font-size: 20rpx;
     color: #ffffff;
-    background: linear-gradient(
-      226deg,
-      #c70036 0%,
-      #d2003c 20%,
-      #dd0043 40%,
-      #e90249 60%,
-      #f41450 80%,
-      #ff2056 100%
-    );
+    background: #ff5c5c;
     border-radius: 999rpx;
   }
 }

@@ -64,11 +64,11 @@
     <view class="submit-wrapper flex-between-center bgf" style="padding: 34rpx 32rpx;">
       <view class="" style="font-size: 24rpx;color: #6A7282;">
         应付金额
-        <view class="u-mt-10" style="font-weight: bold;font-size: 40rpx;color: #E11D48;">
+        <view class="u-mt-10" style="font-weight: bold;font-size: 40rpx;color: #ff5c5c;">
           ￥{{ packageList.find((item) => item.id === form.package_id)?.price || "0.00" }}
         </view>
       </view>
-      <u-button type="primary" color="#E11D48" shape="circle" customStyle="width: 196rpx;height: 72rpx;margin:0;border-radius: 999rpx;" @click="submitForm()">
+      <u-button type="primary" color="#ff5c5c" shape="circle" customStyle="width: 196rpx;height: 72rpx;margin:0;border-radius: 999rpx;" @click="submitForm()">
         立即支付
       </u-button>
     </view>
@@ -340,7 +340,7 @@ function wxPay(respay) {
     position: absolute;
     top: 20rpx;
     right: 20rpx;
-    background: #e11d48;
+    background: #ff5c5c;
     color: #fff;
     font-size: 24rpx;
     padding: 4rpx 16rpx;
@@ -366,18 +366,18 @@ function wxPay(respay) {
   .target {
     line-height: 48rpx;
     font-size: 32rpx;
-    color: #e11d48;
+    color: #ff5c5c;
     font-weight: 500;
     margin-bottom: 10rpx;
   }
 
   &.active {
     background: #fff1f2;
-    border: 2rpx solid #e11d48;
+    border: 2rpx solid #ff5c5c;
 
     .iconfont {
       background: #fff;
-      color: #e11d48;
+      color: #ff5c5c;
     }
   }
 

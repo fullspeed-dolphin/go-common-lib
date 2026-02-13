@@ -97,9 +97,10 @@ function getDetailInfo() {
 
 const eventID = ref('')
 const rankList = ref([]);
-function getRankData() {
-  request.get(`/event-api/online_events_team/members?team_id=${teamID.value}&event_id=${eventID.value}`).then((res) => {
-    console.log('userStatus', res)
+function getRankData(sortBy) {
+  let url = `/event-api/online_events_team/members?team_id=${teamID.value}&event_id=${eventID.value}`;
+  if (sortBy) url += `&sort_by=${sortBy}`;
+  request.get(url).then((res) => {
     rankList.value = res;
   });
 }
@@ -123,10 +124,10 @@ const tabList = ref([
 ]);
 const handleTabChange = (item, index) => {
 	currentIndex.value = index;
-	if (index === 1) {
-		getRankData();
+	if (index === 0) {
+		getRankData('checkins');
 	} else {
-		rankList.value = [];
+		getRankData();
 	}
 };
 
@@ -146,7 +147,7 @@ const handleEdit = () => {
 	  width: 120rpx;
 	  height: 120rpx;
 	  border-radius: 16rpx 16rpx 16rpx 16rpx;
-	  border: 4rpx solid #F9D2DA;
+	  border: 4rpx solid #ffb3b3;
 		margin-right: 30rpx;
 	}
 	.team-meta {
@@ -218,8 +219,8 @@ const handleEdit = () => {
 }
 
 .tab-item.active {
-  color: #e12a48;
-  border-bottom: 2rpx solid #e12a48;
+  color: #ff5c5c;
+  border-bottom: 2rpx solid #ff5c5c;
 }
 
 /* 排行榜列表 */
@@ -293,7 +294,7 @@ const handleEdit = () => {
 	
 	.progress {
 	  font-size: 28rpx;
-	  color: #e12a48;
+	  color: #ff5c5c;
 	  font-weight: bold;
 	  margin-left: 20rpx;
 		padding-right: 20rpx;
@@ -334,7 +335,7 @@ const handleEdit = () => {
 		z-index: 1;
 		padding: 12rpx 24rpx;
 		font-size: 28rpx;
-		color: #E11D48;
+		color: #ff5c5c;
 		line-height: 40rpx;
 		width: 336rpx;
 		white-space: nowrap;
@@ -342,7 +343,7 @@ const handleEdit = () => {
 		font-weight: bold;
 		text-align: center;
 		&.active {
-		  color: #e11d48;
+		  color: #ff5c5c;
 		  border-radius: 999rpx;
 		  background: #f3f4f6;
 		}
@@ -367,7 +368,7 @@ const handleEdit = () => {
   font-weight: bold;
   letter-spacing: 1px;
   color: #fff;
-  background: linear-gradient(64deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%);
+  background: #ff5c5c;
   border: none;
 
   &::after {

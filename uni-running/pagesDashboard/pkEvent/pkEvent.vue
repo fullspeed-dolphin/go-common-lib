@@ -1,6 +1,6 @@
 <template>
   <view class="">
-    <u-navbar :title="null" bgColor="transparent"></u-navbar>
+    <u-navbar autoBack placeholder :title="detailInfo?.event_name || '活动详情'"></u-navbar>
     <section class="flex-center" style="height: 512rpx;filter1: blur(10px);">
       <image class="img" style="width:750rpx;height:512rpx;" :src="
           (detailInfo?.background_image_url)  + '?x-oss-process=image/resize,w_750,h_500,m_fill'
@@ -32,7 +32,7 @@
         <section class="section-stats-card" style="margin-top: 30rpx;">
           <!-- <view class="stat-item u-flex-1 flex-col-center">
             <text class="label">奖金池</text>
-            <text class="value" style="color:#E11D48;">¥{{detailInfo?.total_prize_pool}}</text>
+            <text class="value" style="color:#ff5c5c;">¥{{detailInfo?.total_prize_pool}}</text>
           </view> -->
           <view class="stat-item u-flex-1 flex-col-center">
             <text class="label">已报名</text>
@@ -419,8 +419,8 @@ const getRankList = () => {
 }
 
 .tab-item.active {
-  color: #e12a48;
-  border-bottom: 2rpx solid #e12a48;
+  color: #ff5c5c;
+  border-bottom: 2rpx solid #ff5c5c;
 }
 
 .rank-list {
@@ -501,12 +501,12 @@ const getRankList = () => {
 
   .user-time {
     font-size: 20rpx;
-    color: #e11d48;
+    color: #ff5c5c;
   }
 
   .progress {
     font-size: 28rpx;
-    color: #e12a48;
+    color: #ff5c5c;
     font-weight: bold;
     margin-left: 20rpx;
     padding-right: 20rpx;
@@ -547,7 +547,7 @@ const getRankList = () => {
     z-index: 1;
     padding: 12rpx 24rpx;
     font-size: 28rpx;
-    color: #e11d48;
+    color: #ff5c5c;
     line-height: 40rpx;
     width: 336rpx;
     white-space: nowrap;
@@ -556,7 +556,7 @@ const getRankList = () => {
     text-align: center;
 
     &.active {
-      color: #e11d48;
+      color: #ff5c5c;
       border-radius: 999rpx;
       background: #f3f4f6;
     }
