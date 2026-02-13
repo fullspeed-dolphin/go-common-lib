@@ -8,7 +8,7 @@
         
     </section>
 
-    <section class="section-header header-bg" style="margin-top: -372rpx;">
+    <section class="section-header header-bg" style="margin-top: -312rpx;">
       <view class="status-bar flex-between-center">
         <view class="flex-center bar">
           <view class="status-dot"></view>
@@ -342,9 +342,7 @@ const getRankList = () => {
 }
 
 .section-stats-card {
-  // background-color: #f5f5f5;
-  background: rgba(255, 92, 92, .3);
-  border: 1px solid rgba(255, 92, 92, .4);
+  background-color: #f5f5f5;
   border-radius: 24rpx;
   padding: 30rpx 30rpx 20rpx;
   // width: 686rpx;
@@ -365,7 +363,7 @@ const getRankList = () => {
   }
   .label {
     font-size: 24rpx;
-    color: #333;
+    color: #64748b;
     margin-bottom: 8rpx;
   }
   .value {
