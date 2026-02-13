@@ -142,8 +142,10 @@
           </view>
         </view>
       </template>
-      <view v-if="!rankList.length"><u-empty mode="data" text="暂无数据">
-        </u-empty></view>
+
+      <view v-if="!rankList.length" class="flex-center" style="min-height: 350rpx;">
+        <u-empty mode="data" text="暂无数据" />
+      </view>
     </view>
 
     <view v-if="isSignUpEvent" class="join-btn-wrapper flex-center">
