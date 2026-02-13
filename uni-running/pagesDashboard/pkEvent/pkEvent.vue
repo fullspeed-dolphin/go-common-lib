@@ -356,7 +356,7 @@ const getRankList = () => {
   .stat-item {
     text-align: center;
     height: 96rpx;
-    border-right: 1rpx solid #f3f4f6;
+    border-right: 1rpx solid #fff;
     &:last-child {
       border: 0;
     }
