@@ -254,7 +254,7 @@ function getMyEvents() {
 }
 const isSignUpEvent = computed(() => {
   if (!myEvents.value) return true;
-  return !myEvents.value.some((i) => i.event_id === activetyId.value && i.status?.toUpperCase() === 'SUCC');
+  return !myEvents.value.some((i) => i.event_id === activetyId.value);
 })
 
 // 数字格式化
