@@ -26,8 +26,10 @@
           </up-form-item>
         </template>
         <up-form-item label="收货地址" prop="shipping_address" required>
-          <view class="flex-start input-wrap">
-            <input v-model="form.shipping_address" class="u-input u-flex-1" @input="validateField('shipping_address')" maxlength="100" placeholder-style="color: #64748B;" placeholder="请输入您的收货地址" />
+          <view class="address-row">
+            <view class="flex-start input-wrap" style="flex:1;">
+              <input v-model="form.shipping_address" class="u-input" @input="validateField('shipping_address')" maxlength="100" placeholder-style="color: #64748B;" placeholder="请输入您的收货地址" />
+            </view>
             <view class="map-btn" @click="chooseAddress">
               <up-icon name="map-fill" size="44rpx" color="#ff5c5c" />
             </view>
@@ -347,13 +349,19 @@ function wxPay(respay) {
   padding-left: 30rpx;
   border-radius: 16rpx 16rpx 16rpx 16rpx;
   border: 2rpx solid #e2e8f0;
+}
+.address-row {
   display: flex;
   align-items: center;
+  gap: 16rpx;
   .map-btn {
-    padding: 0 24rpx;
-    height: 100%;
+    width: 80rpx;
+    height: 80rpx;
     display: flex;
     align-items: center;
+    justify-content: center;
+    background: #FFF0F0;
+    border-radius: 16rpx;
     flex-shrink: 0;
   }
 }
