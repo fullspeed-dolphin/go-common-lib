@@ -298,6 +298,9 @@
 			isSubmitted.value = true
 			// 显示"后台核验成功"弹窗
 			isSuccessCheck.value = true
+			
+			uni.setStorageSync('punchInUploadResult', res)
+			
 			// 2秒后隐藏弹窗并跳转
 			setTimeout(() => {
 				isSuccessCheck.value = false
