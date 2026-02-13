@@ -302,18 +302,9 @@ const goto = (url) => {
 onLoad((options) => {
   console.log(options);
   activetyId.value = options.id || "01KH0WQX4H2C7Q4GJ217P8T922";
-  init();
-  getUserStatus();
-  getMyEvents();
-  getRankList();
 });
 
-const isFirstShow = ref(true);
 onShow(() => {
-  if (isFirstShow.value) {
-    isFirstShow.value = false;
-    return;
-  }
   init();
   getUserStatus();
   getMyEvents();
