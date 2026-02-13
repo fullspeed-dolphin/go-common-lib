@@ -385,8 +385,10 @@ const handleEdit = () => {
   bottom: 0;
   left: 0;
   width: 100%;
-  padding: 48rpx 54rpx;
+  padding: 48rpx 0;
   z-index: 10;
+  display: flex;
+  justify-content: center;
 }
 
 .share-btn {
