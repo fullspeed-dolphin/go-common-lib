@@ -41,9 +41,6 @@ export function rpx2px(value) {
 	// #ifdef APP
 	return uni.upx2px(value)
 	// #endif
-	// #ifndef APP
-	return uni.rpx2px(value)
-	// #endif
 }
 
 /**
@@ -66,9 +63,6 @@ export function sleep(value = 30) {
 export function os() {
 	// #ifdef APP || H5 || MP-WEIXIN
 	return uni.getDeviceInfo().platform.toLowerCase()
-	// #endif
-	// #ifndef APP || H5 || MP-WEIXIN
-	return uni.getSystemInfoSync().platform.toLowerCase()
 	// #endif
 }
 /**
@@ -541,7 +535,7 @@ export function queryParams(data = {}, isPrefix = true, arrayFormat = 'brackets'
  * @param {String} title 提示的内容，长度与 icon 取值有关。
  * @param {Number} duration 提示的延迟时间，单位毫秒，默认：2000
  */
-export function toast(text, duration = 2000) {
+export function toast(text, duration = 2000, success, cancel) {
 	const title = String(text)
 	if (title.length <= 14) {
 		uni.showToast({
@@ -552,7 +546,15 @@ export function toast(text, duration = 2000) {
 	} else {
 		uni.showModal({
 			title: '提示',
-			content: title
+			content: title,
+			success: (res) => {
+        if (res.confirm) {
+					success?.()
+        } else if (res.cancel) {
+					cancel?.()
+          console.log("用户点击取消");
+        }
+      },
 		})
 	}
 }

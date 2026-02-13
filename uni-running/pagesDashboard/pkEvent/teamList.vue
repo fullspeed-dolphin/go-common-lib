@@ -93,16 +93,17 @@ function joinTeamAPi(item) {
         getUserStatus();
       } else {
         uni.showToast({
-          title: res.message || "加入战队失败",
+          title: res.msg || "加入战队失败",
           icon: "error",
         });
       }
     })
-    .catch(() => {
-      uni.showToast({
-        title: "加入战队失败",
-        icon: "error",
-      });
+    .catch((e) => {
+      console.log("e", e)
+      // uni.showToast({
+      //   title: "加入战队失败",
+      //   icon: "error",
+      // });
     });
 }
 

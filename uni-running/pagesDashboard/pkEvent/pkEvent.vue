@@ -21,7 +21,7 @@
         <view class="title" style="color: #222">{{ detailInfo?.event_name }}</view>
         <view class="subtitle">{{ detailInfo?.event_subtitle }}</view>
 
-        <view style="display:flex;align-items:center;justify-content:space-between;">
+        <view style="display:flex;align-items:center;justify-content:space-between;font-size:24rpx;">
           <view v-if="detailInfo?.event_description" class="start-time flex-center" style="margin:0;width:auto;padding: 0 24rpx;">
             <text style="margin-right:8rpx;">🔥</text>
             <text class="time-text">{{detailInfo?.event_description}}</text>
@@ -180,6 +180,10 @@ const tabList = ref([
     value: "",
   },
 ]);
+
+function onLoginSuccess () {
+
+}
 
 function changeTab(index) {
   tabIndex.value = index;
