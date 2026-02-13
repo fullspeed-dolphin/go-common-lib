@@ -1,36 +1,28 @@
 <template>
   <view class="tabbar-box">
-    <u-tabbar
-      :value="active"
-      @change="onChange"
-      activeColor="#FF8C00"
-      inactiveColor="#000"
-      fixed
-      placeholder
-      zIndex="100"
-      safeAreaInsetBottom
-      :border="false"
-    >
-      <u-tabbar-item
-        :text="item.text"
-        v-for="(item, index) in tabList"
-        :key="index"
-        :name="item.name"
-      >
-        <template #active-icon>
-          <view class="iconfont active" :class="item.icon"></view>
-        </template>
-        <template #inactive-icon>
-          <view class="iconfont" :class="item.icon"></view>
-        </template>
-        <template #text>
-          <text
-            class="tabbar-text"
-            :class="{ 'tabbar-text--active': active === item.name }"
-            >{{ item.text }}</text
-          >
-        </template>
-      </u-tabbar-item>
+    <u-tabbar :value="active" @change="onChange" activeColor="#FF8C00" inactiveColor="#000" fixed placeholder zIndex="100" safeAreaInsetBottom :border="false">
+      <block v-for="(item, index) in tabList" :key="index">
+        <!-- <up-tabbar-item v-if="index === 2" text="">
+          <template #active-icon>
+            打卡
+          </template>
+          <template #inactive-icon>
+            打卡
+          </template>
+        </up-tabbar-item> -->
+
+        <u-tabbar-item vif="index !== 2" :text="item.text" :name="item.name">
+          <template #active-icon>
+            <view class="iconfont active" :class="item.icon"></view>
+          </template>
+          <template #inactive-icon>
+            <view class="iconfont" :class="item.icon"></view>
+          </template>
+          <template #text>
+            <text class="tabbar-text" :class="{ 'tabbar-text--active': active === item.name }">{{ item.text }}</text>
+          </template>
+        </u-tabbar-item>
+      </block>
     </u-tabbar>
   </view>
 </template>
@@ -65,6 +57,16 @@ const tabList = ref([
       "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/tab_01.png",
   },
   {
+    text: "打卡",
+    name: "punchInUpload",
+    pagePath: "/pagesSport/punchInUpload",
+    icon: "icon-rili",
+    normal:
+      "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/tab_00.png",
+    active:
+      "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/tab_01.png",
+  },
+  {
     text: "运动",
     name: "sport",
     pagePath: "/pages/sport",
@@ -89,6 +91,11 @@ const tabList = ref([
 // 方法定义
 const onChange = (detail) => {
   if (detail === props.type) return;
+
+  if (detail === 'punchInUpload') {
+    uni.$u.route('/pagesSport/punchInUpload')
+    return;
+  }
 
   uni.switchTab({
     url: "/pages/" + detail,

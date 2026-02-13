@@ -2,17 +2,16 @@
   <view class="">
     <u-navbar :title="null" bgColor="transparent"></u-navbar>
 
-    <view v-if="!isShowSignButton"
-				style="color:#fff;font-size: 24rpx;position: fixed;z-index: 999;right:0;top: 220rpx;background: rgba(25, 190, 107, .8);padding: 10rpx 20rpx; border-radius: 32rpx 0 0 32rpx;" 
-				class="rule-link flex-center">
-				已报名
-			</view>
-
     <section class="section-header header-bg" :style="{background:'url('+detailInfo?.background_image_url+')'}">
-      <view class="status-bar flex-start">
+      <view class="status-bar flex-between-center">
         <view class="flex-center bar">
           <view class="status-dot"></view>
           <text class="status-text">火热报名中·{{detailInfo?.registration_end_time}}截止</text>
+        </view>
+        <view v-if="!isShowSignButton"
+          style="color:#fff;font-size: 24rpx;background: rgba(25, 190, 107, .8);padding: 10rpx 20rpx; border-radius: 32rpx 0 0 32rpx;" 
+          class="rule-link flex-center">
+          已报名
         </view>
       </view>
 
@@ -26,10 +25,10 @@
     </section>
 
     <section class="section-stats-card">
-      <view class="stat-item u-flex-1 flex-col-center">
+      <!-- <view class="stat-item u-flex-1 flex-col-center">
         <text class="label">奖金池</text>
         <text class="value" style="color:#E11D48;">¥{{detailInfo?.total_prize_pool}}</text>
-      </view>
+      </view> -->
       <view class="stat-item u-flex-1 flex-col-center">
         <text class="label">已报名</text>
         <text class="value">{{detailInfo?.total_registrations}}</text>
@@ -141,6 +140,8 @@
         立即报名参赛
       </u-button>
     </view>
+
+    <UserLogin ref="refUserLogin" @success="onLoginSuccess" />
   </view>
 </template>
 
@@ -149,6 +150,13 @@ import { ref, computed, watch } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
+import UserLogin from "@/components/UserLogin.vue";
+import { useStore } from "vuex";
+
+const store = useStore();
+const userInfo = computed(() => store.state.userInfo);
+
+const refUserLogin = ref(null);
 
 const activetyId = ref("");
 const detailInfo = ref(null);
@@ -233,6 +241,12 @@ const goto = (url) => {
   if (detailInfo?.status !== "act") {
     // return uni.$u.toast('活动未开始');
   }
+
+  if (!userInfo.value.id) {
+    refUserLogin.value.open();
+    return;
+  }
+
   uni.$u.route(url, { id: activetyId.value, eventId: activetyId.value });
 };
 
@@ -259,7 +273,7 @@ const getRankList = () => {
 <style lang="scss" scoped>
 .header-bg {
   color: white;
-  padding: 220rpx 64rpx 70rpx;
+  padding: 220rpx 0rpx 70rpx 64rpx;
   position: relative;
   z-index: 1;
   background: linear-gradient(
