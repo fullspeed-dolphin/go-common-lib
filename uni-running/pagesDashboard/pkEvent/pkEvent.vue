@@ -21,7 +21,7 @@
         </view>
       </view>
 
-      <div style="background: rgba(255,255,255,.6); box-shadow: 0rpx 8rpx 10rpx 0rpx rgba(0, 0, 0, 0.02);border-radius: 20px;margin: 30rpx 30rpx 10rpx;padding: 30rpx;">
+      <div style="background: rgba(255,255,255,1); box-shadow: 0rpx 8rpx 10rpx 0rpx rgba(0, 0, 0, 0.02);border-radius: 24rpx;margin: 30rpx 30rpx 10rpx;padding: 30rpx;">
         <view class="title" style="color: #222">{{ detailInfo?.event_name }}</view>
         <view class="subtitle">{{ detailInfo?.event_subtitle }}</view>
 
@@ -29,23 +29,24 @@
           <view class="iconfont icon-riqi u-mr-10"></view>
           <text class="time-text">{{detailInfo?.start_time}} 开跑</text>
         </view>
+        <section class="section-stats-card" style="margin-top: 30rpx;">
+          <!-- <view class="stat-item u-flex-1 flex-col-center">
+            <text class="label">奖金池</text>
+            <text class="value" style="color:#E11D48;">¥{{detailInfo?.total_prize_pool}}</text>
+          </view> -->
+          <view class="stat-item u-flex-1 flex-col-center">
+            <text class="label">已报名</text>
+            <text class="value">{{detailInfo?.total_registrations}}</text>
+          </view>
+          <view class="stat-item u-flex-1 flex-col-center">
+            <text class="label">天数</text>
+            <text class="value">{{ detailInfo?.diffDays }}</text>
+          </view>
+        </section>
       </div>
     </section>
 
-    <section class="section-stats-card">
-      <!-- <view class="stat-item u-flex-1 flex-col-center">
-        <text class="label">奖金池</text>
-        <text class="value" style="color:#E11D48;">¥{{detailInfo?.total_prize_pool}}</text>
-      </view> -->
-      <view class="stat-item u-flex-1 flex-col-center">
-        <text class="label">已报名</text>
-        <text class="value">{{detailInfo?.total_registrations}}</text>
-      </view>
-      <view class="stat-item u-flex-1 flex-col-center">
-        <text class="label">天数</text>
-        <text class="value">{{ detailInfo?.diffDays }}</text>
-      </view>
-    </section>
+    
 
     <!-- 功能按钮组 -->
     <section class="section-func-buttons flex-wrap">
@@ -142,7 +143,7 @@
         </u-empty></view>
     </view>
 
-    <view v-if="isShowSignButton" class="join-btn-wrapper">
+    <view v-if="isShowSignButton" class="join-btn-wrapper flex-center">
       <u-button class="join-btn" color="#ff5c5c" color1="linear-gradient(64deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%)"
         customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;letter-spacing: 1px;font-size: 34rpx;" :disabled="detailInfo?.status !== 'act'" @click="onceJoin()">
         立即报名参赛
@@ -341,15 +342,15 @@ const getRankList = () => {
 }
 
 .section-stats-card {
-  background-color: #ffffff;
+  background-color: #f5f5f5;
   border-radius: 24rpx;
-  padding: 40rpx 30rpx;
-  width: 686rpx;
+  padding: 30rpx 30rpx 20rpx;
+  // width: 686rpx;
   margin: 0 auto;
-  transform: translateY(-30rpx);
+  // transform: translateY(-30rpx);
   position: relative;
   z-index: 10;
-  box-shadow: 0rpx 8rpx 10rpx 0rpx rgba(0, 0, 0, 0.02);
+  // box-shadow: 0rpx 8rpx 10rpx 0rpx rgba(0, 0, 0, 0.02);
   display: flex;
 
   .stat-item {
@@ -566,7 +567,7 @@ const getRankList = () => {
   bottom: 0;
   left: 0;
   width: 100%;
-  padding: 48rpx 54rpx;
+  padding: 48rpx 0rpx;
   z-index: 10;
 }
 </style>
