@@ -12,7 +12,7 @@
       <view class="status-bar flex-between-center">
         <view class="flex-center bar">
           <view class="status-dot"></view>
-          <text class="status-text" style="color:#222">火热报名中·{{detailInfo?.registration_end_time}}截止</text>
+          <text class="status-text" style="color:#222">{{detailInfo?.event_description}}</text>
         </view>
         <view v-if="!isShowSignButton"
           style="color:#fff;font-size: 24rpx;background: rgba(25, 190, 107, .8);padding: 10rpx 20rpx; border-radius: 32rpx 0 0 32rpx;" 
@@ -336,7 +336,7 @@ const getRankList = () => {
     width: 242rpx;
     height: 62rpx;
     color: #fff;
-    background: #b72550;
+    background: #ff5c5c;
     border-radius: 20rpx 20rpx 20rpx 20rpx;
   }
 }
@@ -425,6 +425,7 @@ const getRankList = () => {
 
 .rank-list {
   margin: 0 30rpx;
+  padding-bottom: 200rpx;
 }
 
 .rank-item {
