@@ -124,7 +124,7 @@ onLoad((options) => {
 
 useShare(() => ({
 	title: detailInfo.value.team_name ? `加入${detailInfo.value.team_name}，一起跑起来！` : '邀请你加入战队',
-	path: buildPath('/pagesDashboard/pkEvent/teamDetail', { teamId: teamID.value }),
+	path: buildPath('/pagesDashboard/pkEvent/teamDetail', { teamId: teamID.value, eventId: eventID.value }),
 }));
 
 const currentIndex = ref(1)

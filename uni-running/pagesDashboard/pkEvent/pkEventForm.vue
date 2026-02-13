@@ -25,14 +25,15 @@
             </view>
           </up-form-item>
         </template>
-        <up-form-item label="收货地址" prop="shipping_address" required>
-          <view class="address-row">
-            <view class="flex-start input-wrap" style="flex:1;">
-              <input v-model="form.shipping_address" class="u-input" @input="validateField('shipping_address')" maxlength="100" placeholder-style="color: #64748B;" placeholder="请输入您的收货地址" />
-            </view>
-            <view class="map-btn" @click="chooseAddress">
-              <up-icon name="map-fill" size="44rpx" color="#ff5c5c" />
-            </view>
+        <up-form-item v-if="!isFreePackage" label="收货地址" prop="shipping_address" required>
+          <view class="flex-start input-wrap">
+            <up-input v-model="form.shipping_address" border="none" @change="validateField('shipping_address')" maxlength="100" placeholder="请输入您的收货地址">
+              <template #suffix>
+                <view class="map-btn" @click="chooseAddress">
+                  <up-icon name="map-fill" size="36rpx" color="#ff5c5c" />
+                </view>
+              </template>
+            </up-input>
           </view>
         </up-form-item>
 
@@ -84,7 +85,6 @@ import { ref, computed, watch, nextTick } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 
 import FileUpload from "@/components/common/FileUpload.vue";
-import PickerMap from "@/components/common/PickerMap.vue";
 import PickerTime from "@/components/common/PickerTime.vue";
 import PickerCell from "@/components/common/PickerCell.vue";
 import request from "@/utils/request.js";
@@ -268,6 +268,11 @@ function changePackage(id) {
   form.value.package_id = id;
 }
 
+const isFreePackage = computed(() => {
+  const pkg = packageList.value.find(i => i.id === form.value.package_id);
+  return pkg?.price === 0;
+});
+
 function chooseAddress() {
   uni.chooseLocation({
     success: (res) => {
@@ -350,20 +355,16 @@ function wxPay(respay) {
   border-radius: 16rpx 16rpx 16rpx 16rpx;
   border: 2rpx solid #e2e8f0;
 }
-.address-row {
+.map-btn {
   display: flex;
   align-items: center;
-  gap: 16rpx;
-  .map-btn {
-    width: 80rpx;
-    height: 80rpx;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #FFF0F0;
-    border-radius: 16rpx;
-    flex-shrink: 0;
-  }
+  justify-content: center;
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 12rpx;
+  border: 2rpx solid #e2e8f0;
+  background: #fafafa;
+  margin-right: 10rpx;
 }
 .package-item {
   width: 686rpx;
