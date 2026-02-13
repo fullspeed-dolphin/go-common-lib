@@ -28,8 +28,8 @@
         <up-form-item label="收货地址" prop="shipping_address" required>
           <view class="flex-start input-wrap">
             <input v-model="form.shipping_address" class="u-input u-flex-1" @input="validateField('shipping_address')" maxlength="100" placeholder-style="color: #64748B;" placeholder="请输入您的收货地址" />
-            <view class="map-btn iconfont icon-riqi" @click="chooseAddress">
-              <up-icon name="map" size="40rpx" color="#ff5c5c" />
+            <view class="map-btn" @click="chooseAddress">
+              <up-icon name="map-fill" size="44rpx" color="#ff5c5c" />
             </view>
           </view>
         </up-form-item>
