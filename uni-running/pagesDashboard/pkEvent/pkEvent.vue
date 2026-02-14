@@ -7,7 +7,7 @@
         " mode="aspectFill"></image>
     </section>
 
-    <section class="section-header header-bg" style="margin-top: -280rpx;">
+    <section class="section-header header-bg" style="margin-top: -372rpx;">
       <view class="status-bar" style="display:flex;justify-content:flex-end;">
         <view v-if="!isSignUpEvent"
           style="color:#fff;font-size: 32rpx;font-weight: bold;background: rgba(25, 190, 107, .9);padding: 16rpx 32rpx; border-radius: 32rpx 0 0 32rpx;"

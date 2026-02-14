@@ -2,16 +2,7 @@
   <view class="tabbar-box">
     <u-tabbar :value="active" @change="onChange" activeColor="#FF8C00" inactiveColor="#000" fixed placeholder zIndex="100" safeAreaInsetBottom :border="false">
       <block v-for="(item, index) in tabList" :key="index">
-        <!-- <up-tabbar-item v-if="index === 2" text="">
-          <template #active-icon>
-            打卡
-          </template>
-          <template #inactive-icon>
-            打卡
-          </template>
-        </up-tabbar-item> -->
-
-        <u-tabbar-item vif="index !== 2" :text="item.text" :name="item.name">
+        <u-tabbar-item :text="item.text" :name="item.name">
           <template #active-icon>
             <view class="iconfont active" :class="item.icon"></view>
           </template>

@@ -138,8 +138,8 @@ function joinTeam(item) {
 // Tab 配置
 const currentIndex = ref(0);
 const tabList = ref([
-  { label: "3.14KM", value: "" },
-  { label: "5.20KM", value: "SUCC" },
+  { label: "5.20KM", value: "" },
+  { label: "3.14KM", value: "SUCC" },
 ]);
 
 const changeTab = (index) => {
@@ -158,7 +158,7 @@ const getList = (mescroll) => {
   const data = {
     page_index: mescroll.num - 1,
     page_size: 10,
-    team_goal_km: parseFloat(currentIndex.value ? "5.20KM" : "3.14KM"),
+    team_goal_km: parseFloat(currentIndex.value ? "3.14KM" : "5.20KM"),
     team_name: searchTxt.value,
   };
 
