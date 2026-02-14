@@ -68,6 +68,10 @@
 			uni.$u.route(`pagesSub/runningTeam/teamEventDetail?id=${props.item.event_id}`);
 			return
 		};
+		if (props.item.is_online) {
+			uni.$u.route(`pagesDashboard/pkEvent/pkEvent`, { id: props.item.event_id || props.item.id });
+			return;
+		}
 		uni.$u.route(
 			`pagesSub/eventDetail?id=${props.item.event_id || props.item.id}&fsc_id=${props.item.fsc_id || ''}`
 		);
