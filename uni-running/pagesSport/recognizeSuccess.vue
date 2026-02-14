@@ -27,14 +27,15 @@
 			</view>
 		</section>
 		
-		<block v-if="punchInUploadResult.background_image_url">
+		<block v-if="eventList.length">
 			<view class="u-flex-y-center u-mt-30 bgf b" style="height: 80rpx;padding-left: 34rpx;font-size: 32rpx;">打卡活动</view>
-			<section class="section-result panel u-flex-row">
-				<image :src="punchInUploadResult.background_image_url" style="width:160rpx;height:160rpx;border-radius:20rpx;" mode="aspectFill"></image>
+			<section v-for="item in eventList" :key="item.event_id" class="section-result panel u-flex-row" @click="$u.route('pagesDashboard/pkEvent/pkEvent', { id: item.event_id })">
+				<image :src="item.background_image_url" style="width:160rpx;height:160rpx;border-radius:20rpx;" mode="aspectFill"></image>
 				<view class="u-ml-20">
-					<view class="name u-mb-20 u-mt-10" style="font-size:32rpx;">{{punchInUploadResult.event_name}}</view>
-					<view class="name" style="color:#666;">{{punchInUploadResult.event_subtitle}}</view>
-					<view class="name u-mt-20" style="color:#666;">活动日期：{{punchInUploadResult?.start_time?.slice(0, 10)}}</view>
+					<view class="name u-mb-20 u-mt-10" style="font-size:32rpx;">{{item.event_name}}</view>
+					<view class="name" style="color:#666;">{{item.event_subtitle}}</view>
+					<view class="name u-mt-20" style="color:#666;">活动日期：{{item?.start_time?.slice(0, 10)}}</view>
+					<view v-if="item.checkin_status === 'out_of_time'" class="out-of-time-tag u-mt-16">该活动打卡时间尚未开始</view>
 				</view>
 			</section>
 		</block>
@@ -61,12 +62,12 @@ function hasDigit(str) {
   return /\d/.test(str);
 }
 
-const punchInUploadResult = ref({})
+const eventList = ref([])
 onLoad((options) => {
 	console.log('options', options)
 	routerParems.value = options.msg
-	
-	punchInUploadResult.value = uni.getStorageSync('punchInUpload')?.events?.[0] || {}
+
+	eventList.value = uni.getStorageSync('punchInUploadResult')?.data?.events || []
 })
 
 function routeTo() {
@@ -104,6 +105,15 @@ function routeTo() {
 	color: #4A5565;
 	background: #F9FAFB;
 	border-radius: 28rpx 28rpx 28rpx 28rpx;
+}
+
+.out-of-time-tag{
+	display: inline-block;
+	font-size: 24rpx;
+	color: #e65100;
+	background: #fff3e0;
+	padding: 4rpx 16rpx;
+	border-radius: 8rpx;
 }
 
 ::v-deep{
