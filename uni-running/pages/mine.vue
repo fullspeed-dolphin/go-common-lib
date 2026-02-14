@@ -446,6 +446,7 @@
 			height: 122rpx;
 			border-radius: 24rpx 24rpx 24rpx 24rpx;
 			border: 2rpx solid rgba(0, 0, 0, 0.06);
+			background: #fff;
 
 			.u-cell__body {
 				height: 100%;
