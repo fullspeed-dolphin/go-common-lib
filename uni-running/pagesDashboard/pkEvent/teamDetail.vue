@@ -8,7 +8,7 @@
     <section class="team-header" style="height: 580rpx;margin-top: -512rpx;position:relative;z-index:10;">
       <section class=" flex-between-center">
         <view class="flex-row">
-          <image :src="detailInfo.team_avatar_url" class="team-avatar" />
+          <image :src="detailInfo.team_avatar_url" class="team-avatar" mode="aspectFill" />
           <view class="team-info">
             <view class="team-name">{{ detailInfo.team_name }}</view>
             <view class="team-meta">{{ detailInfo.team_goal_km }}KM | {{ detailInfo.current_members }}人 | 队长：{{ detailInfo.leader_nickname }}</view>
