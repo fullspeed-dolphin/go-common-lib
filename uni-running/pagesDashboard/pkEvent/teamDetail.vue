@@ -1,36 +1,37 @@
 <template>
   <view class="">
-		<section class="flex-center" style="height: 512rpx;filter: blur(10px);">
-      <image class="img" style="width:750rpx;height:512rpx;" :src="
-          (detailInfo?.team_avatar_url)  + '?x-oss-process=image/resize,w_750,h_500,m_fill'
-        " mode="aspectFill"></image>
-    </section>
-    <section class="team-header" style="margin-top: -512rpx;position:relative;z-index:10;padding-bottom: 30rpx;">
-      <section class=" flex-between-center">
-        <view class="flex-row" style="align-items: flex-start;">
-          <image :src="detailInfo.team_avatar_url" class="team-avatar" mode="aspectFill" />
-          <view class="team-info">
-            <view class="team-name">{{ detailInfo.team_name }}</view>
-            <view class="team-meta">{{ detailInfo.team_goal_km }}KM | {{ detailInfo.current_members }}人 | 队长：{{ detailInfo.leader_nickname }}</view>
-            <view class="welcome-text">{{ detailInfo.team_introduction }}</view>
+    <section class="team-header">
+      <!-- 毛玻璃背景：绝对定位，自动跟随 header 高度 -->
+      <view class="blur-bg">
+        <image class="blur-img" :src="(detailInfo?.team_avatar_url) + '?x-oss-process=image/resize,w_750,h_500,m_fill'" mode="aspectFill"></image>
+      </view>
+      <!-- 内容层 -->
+      <view class="header-content">
+        <section class="flex-between-center">
+          <view class="flex-row" style="align-items: flex-start;">
+            <image :src="detailInfo.team_avatar_url" class="team-avatar" mode="aspectFill" />
+            <view class="team-info">
+              <view class="team-name">{{ detailInfo.team_name }}</view>
+              <view class="team-meta">{{ detailInfo.team_goal_km }}KM | {{ detailInfo.current_members }}人 | 队长：{{ detailInfo.leader_nickname }}</view>
+              <view class="welcome-text">{{ detailInfo.team_introduction }}</view>
+            </view>
           </view>
-        </view>
-        <!-- <view class="iconfont icon-bianji edit-icon" @click="handleEdit"></view> -->
-      </section>
+        </section>
 
-      <!-- 统计卡片 -->
-      <view class="stats-container flex-between-center">
-        <view class="stat-item flex-col-center">
-          <text class="stat-value">{{ detailInfo.total_distance_km }}</text>
-          <text class="stat-label">总跑量(km)</text>
-        </view>
-        <view class="stat-item flex-col-center">
-          <text class="stat-value">{{ detailInfo.current_members }}</text>
-          <text class="stat-label">战队人数</text>
-        </view>
-        <view class="stat-item flex-col-center">
-          <text class="stat-value">{{ teamRank || '-' }}</text>
-          <text class="stat-label">战队排名</text>
+        <!-- 统计卡片 -->
+        <view class="stats-container flex-between-center">
+          <view class="stat-item flex-col-center">
+            <text class="stat-value">{{ detailInfo.total_distance_km }}</text>
+            <text class="stat-label">总跑量(km)</text>
+          </view>
+          <view class="stat-item flex-col-center">
+            <text class="stat-value">{{ detailInfo.current_members }}</text>
+            <text class="stat-label">战队人数</text>
+          </view>
+          <view class="stat-item flex-col-center">
+            <text class="stat-value">{{ teamRank || '-' }}</text>
+            <text class="stat-label">战队排名</text>
+          </view>
         </view>
       </view>
     </section>
@@ -53,7 +54,7 @@
         </view>
         <div class="user-avatar">
           <up-lazy-load height="110" borderRadius="14" :is-effect="false" :image="
-              (item.avatar_url)  + '?x-oss-process=image/resize,w_110,h_110,m_fill'
+              item.avatar_url ? item.avatar_url + '?x-oss-process=image/resize,w_110,h_110,m_fill' : '/static/images/user.png'
             " mode="aspectFill" />
         </div>
         <view class="user-info">
@@ -263,9 +264,30 @@ const handleEdit = () => {
 
 <style lang="scss" scoped>
 .team-header {
+  position: relative;
+  overflow: hidden;
   width: 750rpx;
-  padding: 86rpx 50rpx 0;
-  background: rgba(255,255,255,.7);
+}
+
+.blur-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  filter: blur(10px);
+}
+
+.blur-img {
+  width: 100%;
+  height: 100%;
+}
+
+.header-content {
+  position: relative;
+  z-index: 1;
+  padding: 86rpx 50rpx 30rpx;
+  background: linear-gradient(to bottom, rgba(255,255,255,.7) 60%, #f5f5f5);
   .team-avatar {
     width: 120rpx;
     height: 120rpx;
