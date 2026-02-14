@@ -5,9 +5,9 @@
           (detailInfo?.team_avatar_url)  + '?x-oss-process=image/resize,w_750,h_500,m_fill'
         " mode="aspectFill"></image>
     </section>
-    <section class="team-header" style="height: 580rpx;margin-top: -512rpx;position:relative;z-index:10;">
+    <section class="team-header" style="margin-top: -512rpx;position:relative;z-index:10;padding-bottom: 30rpx;">
       <section class=" flex-between-center">
-        <view class="flex-row">
+        <view class="flex-row" style="align-items: flex-start;">
           <image :src="detailInfo.team_avatar_url" class="team-avatar" mode="aspectFill" />
           <view class="team-info">
             <view class="team-name">{{ detailInfo.team_name }}</view>
@@ -264,7 +264,6 @@ const handleEdit = () => {
 <style lang="scss" scoped>
 .team-header {
   width: 750rpx;
-  height: 450rpx;
   padding: 86rpx 50rpx 0;
   background: rgba(255,255,255,.7);
   .team-avatar {
@@ -326,7 +325,7 @@ const handleEdit = () => {
 .tab-container {
   display: flex;
   justify-content: center;
-  margin: -100rpx 30rpx 20rpx;
+  margin: 30rpx 30rpx 20rpx;
   background-color: white;
   border-radius: 20rpx;
   overflow: hidden;
