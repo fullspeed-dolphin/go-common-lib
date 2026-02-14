@@ -132,8 +132,8 @@ function getRankData(sortBy) {
 
 const teamRank = ref(0);
 function getTeamRank() {
-  request.get("/event-api/ranking/team?event_id=" + eventID.value).then((res) => {
-    const list = res || [];
+  request.get("/event-api/ranking/team?event_id=" + eventID.value + "&page_index=0&page_size=100").then((res) => {
+    const list = res?.list || [];
     const idx = list.findIndex(item => item.id === teamID.value);
     teamRank.value = idx >= 0 ? idx + 1 : 0;
   });

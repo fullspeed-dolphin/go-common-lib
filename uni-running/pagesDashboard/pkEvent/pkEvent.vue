@@ -7,7 +7,7 @@
         " mode="aspectFill"></image>
     </section>
 
-    <section class="section-header header-bg" style="margin-top: -372rpx;">
+    <section class="section-header header-bg" style="margin-top: -280rpx;">
       <view class="status-bar" style="display:flex;justify-content:flex-end;">
         <view v-if="!isSignUpEvent"
           style="color:#fff;font-size: 32rpx;font-weight: bold;background: rgba(25, 190, 107, .9);padding: 16rpx 32rpx; border-radius: 32rpx 0 0 32rpx;"
@@ -109,7 +109,7 @@
           </view>
           <div class="user-avatar">
             <up-lazy-load height="120" borderRadius="16" :is-effect="false" :image="
-              (item.avatar_url)  + '?x-oss-process=image/resize,w_120,h_120,m_fill'
+              item.avatar_url ? item.avatar_url + '?x-oss-process=image/resize,w_120,h_120,m_fill' : '/static/images/user.png'
             " mode="aspectFill" />
           </div>
           <view class="user-info">
@@ -166,6 +166,7 @@
 <script setup>
 import { ref, computed, watch } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
+import { useShare, buildPath } from "@/composables/useShare.js";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
 import UserLogin from "@/components/UserLogin.vue";
@@ -311,13 +312,23 @@ onShow(() => {
   getRankList();
 });
 
+useShare(() => ({
+  title: detailInfo.value?.event_name
+    ? `${detailInfo.value.event_name}·线上跑`
+    : "线上跑活动",
+  path: buildPath("/pagesDashboard/pkEvent/pkEvent", {
+    id: activetyId.value,
+  }),
+}));
+
 const rankList = ref([]);
 const getRankList = () => {
   let url = tabIndex.value == 0
     ? "/event-api/ranking/personal?event_id=" + activetyId.value
     : "/event-api/ranking/team?event_id=" + activetyId.value;
+  url += "&page_index=0&page_size=100";
   request.get(url).then((res) => {
-    rankList.value = res || [];
+    rankList.value = res?.list || [];
   });
 };
 </script>
@@ -534,9 +545,7 @@ const getRankList = () => {
     background: #eff6ff;
     border-radius: 12rpx;
     max-width: 160rpx;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    line-height: 1.4;
     flex-shrink: 0;
   }
   .rank-number {

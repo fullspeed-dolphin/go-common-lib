@@ -146,9 +146,10 @@ const handleTouchEnd = (e) => {
 };
 const getRankList = () => {
   rankList.value = [];
-  let url =currentIndex.value === 0 ? '/event-api/ranking/personal?event_id=' : '/event-api/ranking/team?event_id='
-  request.get(url + activetyId.value).then(res => {
-    rankList.value = res || []
+  let url = currentIndex.value === 0 ? '/event-api/ranking/personal?event_id=' : '/event-api/ranking/team?event_id='
+  url += activetyId.value + '&page_index=0&page_size=100'
+  request.get(url).then(res => {
+    rankList.value = res?.list || []
   })
 }
 </script>
