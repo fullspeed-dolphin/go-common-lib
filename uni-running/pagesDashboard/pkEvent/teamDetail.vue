@@ -82,6 +82,7 @@
 
     <view v-if="isLoadedPage" class="share-btn-wrapper">
 			<!-- 加入任何一个战队后，不可加入其他战队 -->
+      <button v-if="userStatusInfo.in_team && isSignUpEvent" class="share-btn" @click="goToSignEvent">立即报名</button>
       <button v-if="userStatusInfo.in_team" class="share-btn" style="background:#07C160" open-type="share">邀请好友加入</button>
       <button v-if="!userStatusInfo.in_team" class="share-btn" @click="joinTeam(detailInfo)">加入战队</button>
     </view>
@@ -147,6 +148,17 @@ function getUserStatus() {
   });
 }
 
+const myEvents = ref([]);
+function getMyEvents() {
+  request.get("/event-api/online_events/my_events").then((res) => {
+    myEvents.value = res;
+  });
+}
+const isSignUpEvent = computed(() => {
+  if (!myEvents.value) return true;
+  return !myEvents.value.some((i) => i.event_id === eventID.value);
+});
+
 onLoad((options) => {
   teamID.value = options.teamId || options.id;
   eventID.value = options.eventId;
@@ -164,6 +176,7 @@ onShow(() => {
   getRankData(currentIndex.value === 0 ? "checkins" : undefined);
   getUserStatus();
   getTeamRank();
+  getMyEvents();
 });
 
 function joinTeamAPi() {
