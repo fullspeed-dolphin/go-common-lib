@@ -127,7 +127,7 @@
 				</u-cell> -->
 			</view>
 
-			<view v-if="userInfo.id" class="logout c9 flex-center u-mb-40">
+			<view v-if="userInfo.id" class="logout c9 flex-center" style="padding-bottom: 160rpx;">
 				<text class="u-pb-20" @click="logout()">-- 退出登录 --</text>
 			</view>
 		</view>
