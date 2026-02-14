@@ -21,16 +21,16 @@
       <!-- 统计卡片 -->
       <view class="stats-container flex-between-center">
         <view class="stat-item flex-col-center">
-          <text class="stat-value">{{ detailInfo.team_goal_km }}</text>
+          <text class="stat-value">{{ detailInfo.total_distance_km }}</text>
           <text class="stat-label">总跑量(km)</text>
         </view>
         <view class="stat-item flex-col-center">
-          <text class="stat-value">{{ detailInfo.team_completion_rate }}%</text>
-          <text class="stat-label">今日完赛率</text>
+          <text class="stat-value">{{ detailInfo.current_members }}</text>
+          <text class="stat-label">战队人数</text>
         </view>
         <view class="stat-item flex-col-center">
-          <text class="stat-value">{{ detailInfo.rank }}</text>
-          <text class="stat-label">跑名</text>
+          <text class="stat-value">{{ teamRank || '-' }}</text>
+          <text class="stat-label">战队排名</text>
         </view>
       </view>
     </section>
@@ -92,7 +92,7 @@
 
 <script setup>
 import { ref, computed, watch, nextTick } from "vue";
-import { onLoad } from "@dcloudio/uni-app";
+import { onLoad, onShow } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import { useShare, buildPath } from "@/composables/useShare.js";
 
@@ -128,6 +128,15 @@ function getRankData(sortBy) {
   });
 }
 
+const teamRank = ref(0);
+function getTeamRank() {
+  request.get("/event-api/ranking/team?event_id=" + eventID.value).then((res) => {
+    const list = res || [];
+    const idx = list.findIndex(item => item.id === teamID.value);
+    teamRank.value = idx >= 0 ? idx + 1 : 0;
+  });
+}
+
 const userStatusInfo = ref({});
 const isLoadedPage = ref(false)
 function getUserStatus() {
@@ -141,15 +150,20 @@ function getUserStatus() {
 onLoad((options) => {
   teamID.value = options.teamId || options.id;
   eventID.value = options.eventId;
-  getDetailInfo();
-  getRankData("checkins");
-	getUserStatus()
 
 	if (!userInfo.value.id) {
 		nextTick(() => {
 			refUserLogin.value.open();
 		})
   }
+});
+
+onShow(() => {
+  if (!teamID.value) return;
+  getDetailInfo();
+  getRankData(currentIndex.value === 0 ? "checkins" : undefined);
+  getUserStatus();
+  getTeamRank();
 });
 
 function joinTeamAPi() {
