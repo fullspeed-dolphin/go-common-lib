@@ -270,6 +270,7 @@ const handleEdit = () => {
   .team-avatar {
     width: 120rpx;
     height: 120rpx;
+    flex-shrink: 0;
     border-radius: 16rpx 16rpx 16rpx 16rpx;
     border: 4rpx solid #ffb3b3;
     margin-right: 30rpx;
