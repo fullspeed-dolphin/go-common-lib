@@ -190,6 +190,11 @@ const clickSwiper = (item) => {
     return;
   }
 
+  if (item.is_online && item.event_id) {
+    uni.$u.route(`pagesDashboard/pkEvent/pkEvent`, { id: item.event_id });
+    return;
+  }
+
   if (item.event_id) {
     uni.$u.route(
       `pagesSub/eventDetail?id=${item.event_id}&fsc_id=${item.fsc_id || ""}`
