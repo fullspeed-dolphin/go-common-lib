@@ -105,7 +105,7 @@
       <template v-if="tabIndex === 0">
         <view v-for="(item, index) in rankList" :key="item.wechat_openid" class="rank-item">
           <view class="rank-number flex-center">
-            {{ index === 0 ? 'NO.1' : index === 1 ? 'NO.2' : index === 2 ? 'NO.3' : index + 1 }}
+            {{ item.rank <= 3 ? 'NO.' + item.rank : item.rank }}
           </view>
           <div class="user-avatar">
             <up-lazy-load height="120" borderRadius="16" :is-effect="false" :image="
@@ -129,7 +129,7 @@
       <template v-else>
         <view v-for="(item, index) in rankList" :key="item.id" class="rank-item" @click="goto('pagesDashboard/pkEvent/teamDetail?teamId=' + item.id)">
           <view class="rank-number flex-center">
-            {{ index === 0 ? 'NO.1' : index === 1 ? 'NO.2' : index === 2 ? 'NO.3' : index + 1 }}
+            {{ item.rank <= 3 ? 'NO.' + item.rank : item.rank }}
           </view>
           <div class="user-avatar">
             <up-lazy-load height="110" borderRadius="14" :is-effect="false" :image="
@@ -165,7 +165,7 @@
 
 <script setup>
 import { ref, computed, watch } from "vue";
-import { onLoad, onShow } from "@dcloudio/uni-app";
+import { onLoad, onShow, onReachBottom } from "@dcloudio/uni-app";
 import { useShare, buildPath } from "@/composables/useShare.js";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
@@ -214,7 +214,10 @@ const tabList = ref([
 
 function changeTab(index) {
   tabIndex.value = index;
-  getRankList()
+  rankPage.value = 0;
+  rankHasMore.value = true;
+  rankList.value = [];
+  getRankList();
 }
 
 const init = () => {
@@ -309,6 +312,8 @@ onShow(() => {
   init();
   getUserStatus();
   getMyEvents();
+  rankPage.value = 0;
+  rankHasMore.value = true;
   getRankList();
 });
 
@@ -321,16 +326,36 @@ useShare(() => ({
   }),
 }));
 
+const RANK_PAGE_SIZE = 100;
 const rankList = ref([]);
+const rankPage = ref(0);
+const rankHasMore = ref(true);
+const rankLoading = ref(false);
+
 const getRankList = () => {
+  if (rankLoading.value || !rankHasMore.value) return;
+  rankLoading.value = true;
   let url = tabIndex.value == 0
     ? "/event-api/ranking/personal?event_id=" + activetyId.value
     : "/event-api/ranking/team?event_id=" + activetyId.value;
-  url += "&page_index=0&page_size=100";
+  url += `&page_index=${rankPage.value}&page_size=${RANK_PAGE_SIZE}`;
   request.get(url).then((res) => {
-    rankList.value = res?.list || [];
+    const list = res?.list || [];
+    if (rankPage.value === 0) {
+      rankList.value = list;
+    } else {
+      rankList.value = rankList.value.concat(list);
+    }
+    rankHasMore.value = list.length >= RANK_PAGE_SIZE;
+    rankPage.value++;
+  }).finally(() => {
+    rankLoading.value = false;
   });
 };
+
+onReachBottom(() => {
+  getRankList();
+});
 </script>
 
 <style lang="scss" scoped>

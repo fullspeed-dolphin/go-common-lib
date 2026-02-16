@@ -156,7 +156,7 @@ const dataList = ref([]);
 const getList = (mescroll) => {
   uni.showLoading({ mask: true });
   const data = {
-    page_index: mescroll.num - 1,
+    page: mescroll.num,
     page_size: 10,
     team_goal_km: parseFloat(currentIndex.value ? "3.14KM" : "5.20KM"),
     team_name: searchTxt.value,
@@ -165,13 +165,14 @@ const getList = (mescroll) => {
   request
     .get(`/event-api/online_events_team?event_id=${activetyId.value}`, data)
     .then((res) => {
-      mescroll.endSuccess(res.length);
+      const list = res?.list || [];
+      mescroll.endSuccess(list.length, list.length >= 10);
 
       if (mescroll.num == 1) {
         dataList.value = [];
       }
 
-      dataList.value = dataList.value.concat(res);
+      dataList.value = dataList.value.concat(list);
     })
     .catch((error) => {
       uni.hideLoading();

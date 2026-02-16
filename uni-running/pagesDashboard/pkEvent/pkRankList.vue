@@ -1,5 +1,6 @@
 <template>
   <view class="">
+    <mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="loadRankList">
     <section class="honor-rank">
       <view class="title">荣誉榜单</view>
       <view class="subtitle">实时排名</view>
@@ -46,7 +47,7 @@
       <template v-if="currentIndex === 0">
         <view v-for="(item, index) in rankList" :key="item.wechat_openid" class="rank-item">
           <view class="rank-number flex-center">
-            {{ index === 0 ? 'NO.1' : index === 1 ? 'NO.2' : index === 2 ? 'NO.3' : index + 1 }}
+            {{ item.rank <= 3 ? 'NO.' + item.rank : item.rank }}
           </view>
           <div class="user-avatar">
             <up-lazy-load height="110" borderRadius="14" :is-effect="false" :image="
@@ -70,7 +71,7 @@
       <template v-else>
         <view v-for="(item, index) in rankList" :key="item.id" class="rank-item" @click="goTeamDetail(item.id)">
           <view class="rank-number flex-center">
-            {{ index === 0 ? 'NO.1' : index === 1 ? 'NO.2' : index === 2 ? 'NO.3' : index + 1 }}
+            {{ item.rank <= 3 ? 'NO.' + item.rank : item.rank }}
           </view>
           <div class="user-avatar">
             <up-lazy-load height="110" borderRadius="14" :is-effect="false" :image="
@@ -94,64 +95,66 @@
         <u-empty mode="data" text="暂无数据"></u-empty>
       </view>
     </view>
+    </mescroll-body>
   </view>
 </template>
 
 <script setup>
-import { ref, computed, watch } from "vue";
-import { onLoad } from "@dcloudio/uni-app";
-import request from "@/utils/request.js"
-const activetyId = ref('')
+import { ref, computed } from "vue";
+import { onLoad, onPageScroll, onReachBottom } from "@dcloudio/uni-app";
+import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
+import request from "@/utils/request.js";
+
+const PAGE_SIZE = 100;
+const activetyId = ref("");
+const { mescrollInit, downCallback, getMescroll } = useMescroll(onPageScroll, onReachBottom);
 
 // top3 从 rankList 中取
 const topList = computed(() => rankList.value.slice(0, 3));
 
 // Tab 配置
 const tabList = ref([
-  {
-    label: "个人排行榜",
-    value: "",
-  },
-  {
-    label: "战队排行榜",
-    value: "SUCC",
-  },
+  { label: "个人排行榜", value: "" },
+  { label: "战队排行榜", value: "SUCC" },
 ]);
 const currentIndex = ref(0);
+
 onLoad((options) => {
-  activetyId.value = options.id
-  getRankList()
+  activetyId.value = options.id;
 });
 
-// 当前选中的 tab
-const curTab = computed(() => tabList.value[currentIndex.value]);
-
 const goTeamDetail = (teamId) => {
-  uni.$u.route('pagesDashboard/pkEvent/teamDetail', { teamId, id: activetyId.value });
+  uni.$u.route("pagesDashboard/pkEvent/teamDetail", { teamId, id: activetyId.value });
 };
 
 // Tab 切换处理
 const handleTabChange = (index) => {
   currentIndex.value = index;
-  getRankList()
+  getMescroll().resetUpScroll();
 };
 
 // 排行榜数据
 const rankList = ref([]);
-let rankRequestId = 0;
 
-// 手势切换处理
-const handleTouchEnd = (e) => {
-  onTouchEnd(e, tabList.value);
+const loadRankList = (mescroll) => {
+  let url = currentIndex.value === 0
+    ? "/event-api/ranking/personal?event_id="
+    : "/event-api/ranking/team?event_id=";
+  url += activetyId.value + `&page_index=${mescroll.num - 1}&page_size=${PAGE_SIZE}`;
+
+  request.get(url).then((res) => {
+    const list = res?.list || [];
+    mescroll.endSuccess(list.length, list.length >= PAGE_SIZE);
+
+    if (mescroll.num === 1) {
+      rankList.value = list;
+    } else {
+      rankList.value = rankList.value.concat(list);
+    }
+  }).catch(() => {
+    mescroll.endErr();
+  });
 };
-const getRankList = () => {
-  rankList.value = [];
-  let url = currentIndex.value === 0 ? '/event-api/ranking/personal?event_id=' : '/event-api/ranking/team?event_id='
-  url += activetyId.value + '&page_index=0&page_size=100'
-  request.get(url).then(res => {
-    rankList.value = res?.list || []
-  })
-}
 </script>
 
 <style lang="scss" scoped>
