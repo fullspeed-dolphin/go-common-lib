@@ -94,7 +94,7 @@
 
 <script setup>
 import { ref, computed, watch, nextTick } from "vue";
-import { onLoad, onShow } from "@dcloudio/uni-app";
+import { onLoad, onShow, onReachBottom } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import { useShare, buildPath } from "@/composables/useShare.js";
 
@@ -121,14 +121,40 @@ function getDetailInfo() {
 }
 
 const eventID = ref("");
+const MEMBER_PAGE_SIZE = 100;
 const rankList = ref([]);
-function getRankData(sortBy) {
-  let url = `/event-api/online_events_team/members?team_id=${teamID.value}&event_id=${eventID.value}`;
-  if (sortBy) url += `&sort_by=${sortBy}`;
+const memberPage = ref(0);
+const memberHasMore = ref(true);
+const memberLoading = ref(false);
+const memberSortBy = ref("checkins");
+
+function getRankData(sortBy, reset = true) {
+  if (memberLoading.value || (!reset && !memberHasMore.value)) return;
+  if (sortBy !== undefined) memberSortBy.value = sortBy;
+  if (reset) {
+    memberPage.value = 0;
+    memberHasMore.value = true;
+  }
+  memberLoading.value = true;
+  let url = `/event-api/online_events_team/members?team_id=${teamID.value}&event_id=${eventID.value}&page_index=${memberPage.value}&page_size=${MEMBER_PAGE_SIZE}`;
+  if (memberSortBy.value) url += `&sort_by=${memberSortBy.value}`;
   request.get(url).then((res) => {
-    rankList.value = res;
+    const list = res?.list || res || [];
+    if (memberPage.value === 0) {
+      rankList.value = list;
+    } else {
+      rankList.value = rankList.value.concat(list);
+    }
+    memberHasMore.value = list.length >= MEMBER_PAGE_SIZE;
+    memberPage.value++;
+  }).finally(() => {
+    memberLoading.value = false;
   });
 }
+
+onReachBottom(() => {
+  getRankData(undefined, false);
+});
 
 const teamRank = ref(0);
 function getTeamRank() {
@@ -190,10 +216,9 @@ function joinTeamAPi() {
 			team_id: item.id,
     })
     .then(() => {
+				uni.hideLoading();
 				getUserStatus();
-				uni.$u.toast("成功加入战队, 准备跳转到活动报名页...", 2000, function success() {
-					goToSignEvent();
-				});
+				goToSignEvent();
     })
     .catch((e) => {
       uni.$u.toast(e.msg || "加入战队失败");
@@ -217,18 +242,7 @@ function joinTeam() {
   }
 
   if (!userStatusInfo.value.in_team) {
-    uni.showModal({
-      title: "提示",
-      content: "确定加入该战队吗？",
-      success: (res) => {
-        if (res.confirm) {
-					joinTeamAPi()
-        } else if (res.cancel) {
-          console.log("用户点击取消");
-        }
-      },
-    });
-    return;
+    joinTeamAPi();
   }
 }
 
@@ -249,11 +263,7 @@ const tabList = ref([
 ]);
 const handleTabChange = (item, index) => {
   currentIndex.value = index;
-  if (index === 0) {
-    getRankData("checkins");
-  } else {
-    getRankData();
-  }
+  getRankData(index === 0 ? "checkins" : undefined);
 };
 
 // 编辑按钮点击
