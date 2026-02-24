@@ -56,11 +56,15 @@
           <up-lazy-load height="110" borderRadius="14" :is-effect="false" :image="
               item.avatar_url ? item.avatar_url + '?x-oss-process=image/resize,w_110,h_110,m_fill' : '/static/images/user.png'
             " mode="aspectFill" />
+            <view class="gender">
+								<u-icon v-if="item.gender === 1" color="#409eff" name="man" size="17"></u-icon>
+								<u-icon v-if="item.gender === 0" color="#f5abb8" name="woman" size="17"></u-icon>
+							</view>
         </div>
         <view class="user-info">
           <view class="user-name u-flex-y-center">
             {{ item.real_name }}
-            <view v-if="item.is_team_leader" class="leader-tag">队长</view>
+            <view v-if="item.is_team_leader" class="leader-tag">队长 {{item.phone}}</view>
             <view v-if="item.status === 'PND'" class="status-tag pnd">未报名</view>
           </view>
           <view class="user-detail u-flex-y-center">
@@ -84,7 +88,7 @@
     <view v-if="isLoadedPage" class="share-btn-wrapper">
 			<!-- 加入任何一个战队后，不可加入其他战队 -->
       <button v-if="userStatusInfo.in_team && isSignUpEvent" class="main-btn" @click="goToSignEvent">立即报名</button>
-      <button v-if="userStatusInfo.in_team" class="main-btn" style="background:#07C160" open-type="share">邀请好友加入</button>
+      <button v-if="userStatusInfo.in_team && userStatusInfo.team_info.id !== teamID" class="main-btn" style="background:#07C160" open-type="share">邀请好友加入</button>
       <button v-if="!userStatusInfo.in_team" class="main-btn" @click="joinTeam(detailInfo)">加入战队</button>
 			<!-- 只在当前team 可退出 -->
       <block v-if="userStatusInfo.in_team && userStatusInfo.team_info.id === teamID">
@@ -92,13 +96,19 @@
 			</block>
     </view>
 
+    <block v-if="userStatusInfo.in_team && isSignUpEvent && userStatusInfo.team_info.id === teamID">
+      <button class="share-btn flex-center" :class="{ active: isScroll }" open-type="share">
+        <u-icon name="share" color="#fff" size="18"></u-icon>
+      </button>
+    </block>
+
     <UserLogin ref="refUserLogin" @success="onLoginSuccess" />
   </view>
 </template>
 
 <script setup>
 import { ref, computed, watch, nextTick } from "vue";
-import { onLoad, onShow, onReachBottom } from "@dcloudio/uni-app";
+import { onLoad, onShow, onReachBottom, onPageScroll } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import { useShare, buildPath } from "@/composables/useShare.js";
 
@@ -131,6 +141,17 @@ const memberPage = ref(0);
 const memberHasMore = ref(true);
 const memberLoading = ref(false);
 const memberSortBy = ref("checkins");
+
+const isScroll = ref(false);
+let timer = null;
+onPageScroll((e) => {
+  isScroll.value = true;
+
+  clearTimeout(timer);
+  timer = setTimeout(() => {
+    isScroll.value = false;
+  }, 100);
+});
 
 function getRankData(sortBy, reset = true) {
   if (memberLoading.value || (!reset && !memberHasMore.value)) return;
@@ -417,7 +438,7 @@ const handleEdit = () => {
   align-items: center;
   margin: 10rpx 0;
   width: 686rpx;
-  height: 144rpx;
+  min-height: 144rpx;
   background: #ffffff;
   box-shadow: 0rpx 8rpx 10rpx 0rpx rgba(0, 0, 0, 0.01);
   border-radius: 32rpx 32rpx 32rpx 32rpx;
@@ -446,11 +467,19 @@ const handleEdit = () => {
   }
 
   .user-avatar {
+    position: relative;
     margin-right: 26rpx;
     width: 96rpx;
     height: 96rpx;
     border-radius: 14rpx 14rpx 14rpx 14rpx;
     background: #f5f5f5;
+    .gender {
+			position: absolute;
+			background: #fff;
+			bottom: -2rpx;
+			right: 0rpx;
+			border-radius: 40rpx;
+		}
   }
 
   .user-info {
@@ -589,4 +618,29 @@ const handleEdit = () => {
     border: none;
   }
 }
+.share-btn {
+		position: fixed;
+		right: 20rpx;
+		bottom: 200rpx;
+		width: 90rpx;
+		height: 90rpx;
+		border-radius: 200rpx;
+		color: #fff;
+		z-index: 20;
+		border: 1px solid #18b566;
+		background-color: #18b566 !important;
+		margin-bottom: 20rpx !important;
+		flex-direction: column;
+		font-size: 20rpx;
+		box-shadow: 0px 0px 6rpx rgba(0, 0, 0, 0.4);
+		transition: transform 0.3s;
+
+		&:after {
+			display: none;
+		}
+
+		&.active {
+			transform: translate(100rpx);
+		}
+	}
 </style>
