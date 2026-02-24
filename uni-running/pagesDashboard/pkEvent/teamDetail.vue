@@ -57,16 +57,17 @@
               item.avatar_url ? item.avatar_url + '?x-oss-process=image/resize,w_110,h_110,m_fill' : '/static/images/user.png'
             " mode="aspectFill" />
             <view class="gender">
-								<u-icon v-if="item.gender === 1" color="#409eff" name="man" size="17"></u-icon>
-								<u-icon v-if="item.gender === 0" color="#f5abb8" name="woman" size="17"></u-icon>
+								<u-icon v-if="item.gender === '1'" color="#409eff" name="man" size="17"></u-icon>
+								<u-icon v-if="item.gender === '0'" color="#f5abb8" name="woman" size="17"></u-icon>
 							</view>
         </div>
         <view class="user-info">
           <view class="user-name u-flex-y-center">
             {{ item.real_name }}
-            <view v-if="item.is_team_leader" class="leader-tag">队长 {{item.phone}}</view>
+            <view v-if="item.is_team_leader" class="leader-tag">队长</view>
             <view v-if="item.status === 'PND'" class="status-tag pnd">未报名</view>
           </view>
+          <div v-if="item.phone" @click="callPhone(item.phone)" style="padding: 10rpx 0;color:#1456f0;">{{item.phone}}</div>
           <view class="user-detail u-flex-y-center">
             {{ item.total_distance_km }} KM
           </view>
@@ -91,7 +92,7 @@
       <button v-if="userStatusInfo.in_team && userStatusInfo.team_info.id !== teamID" class="main-btn" style="background:#07C160" open-type="share">邀请好友加入</button>
       <button v-if="!userStatusInfo.in_team" class="main-btn" @click="joinTeam(detailInfo)">加入战队</button>
 			<!-- 只在当前team 可退出 -->
-      <block v-if="userStatusInfo.in_team && userStatusInfo.team_info.id === teamID">
+      <block v-if="userStatusInfo.in_team && userStatusInfo.team_info.id === teamID && !userStatusInfo.is_team_leader">
 				<button class="main-btn" style="background:#999" @click="leaveTeam(detailInfo)">退出战队</button>
 			</block>
     </view>
@@ -250,6 +251,13 @@ onShow(() => {
   getTeamRank();
   getMyEvents();
 });
+
+function callPhone(phone) {
+  if (!phone) return;
+  uni.makePhoneCall({
+    phoneNumber: phone,
+  })
+}
 
 function joinTeamAPi() {
 	const item = detailInfo.value
@@ -434,6 +442,7 @@ const handleEdit = () => {
 }
 
 .rank-item {
+  padding: 20rpx 0;
   display: flex;
   align-items: center;
   margin: 10rpx 0;
