@@ -48,7 +48,7 @@
     </view>
 
     <view class="rank-list">
-      <view v-for="(item, index) in rankList" :key="item.wechat_openid" class="rank-item">
+      <view v-for="(item, index) in rankList" :key="index" class="rank-item">
         <view class="rank-number flex-center">
           {{ index === 0 ? 'NO.1' : index === 1 ? 'NO.2' : index === 2 ? 'NO.3' : index + 1 }}
         </view>
@@ -83,9 +83,13 @@
 
     <view v-if="isLoadedPage" class="share-btn-wrapper">
 			<!-- 加入任何一个战队后，不可加入其他战队 -->
-      <button v-if="userStatusInfo.in_team && isSignUpEvent" class="share-btn" @click="goToSignEvent">立即报名</button>
-      <button v-if="userStatusInfo.in_team" class="share-btn" style="background:#07C160" open-type="share">邀请好友加入</button>
-      <button v-if="!userStatusInfo.in_team" class="share-btn" @click="joinTeam(detailInfo)">加入战队</button>
+      <button v-if="userStatusInfo.in_team && isSignUpEvent" class="main-btn" @click="goToSignEvent">立即报名</button>
+      <button v-if="userStatusInfo.in_team" class="main-btn" style="background:#07C160" open-type="share">邀请好友加入</button>
+      <button v-if="!userStatusInfo.in_team" class="main-btn" @click="joinTeam(detailInfo)">加入战队</button>
+			<!-- 只在当前team 可退出 -->
+      <block v-if="userStatusInfo.in_team && userStatusInfo.team_info.id === teamID">
+				<button class="main-btn" style="background:#999" @click="leaveTeam(detailInfo)">退出战队</button>
+			</block>
     </view>
 
     <UserLogin ref="refUserLogin" @success="onLoginSuccess" />
@@ -156,6 +160,26 @@ onReachBottom(() => {
   getRankData(undefined, false);
 });
 
+function leaveTeam() {
+	const params = {
+		event_id: eventID.value
+	}
+	uni.showModal({
+		title: "提示",
+		content: "确定退出战队吗？",
+		success: (res) => {
+			if (res.confirm) {
+				request.post("/event-api/online_events_team/quit", params).then((res) => {
+					uni.$u.toast('退出成功')
+					getUserStatus()
+				});
+			} else if (res.cancel) {
+				console.log("用户点击取消");
+			}
+		},
+	});
+}
+
 const teamRank = ref(0);
 function getTeamRank() {
   request.get("/event-api/ranking/team?event_id=" + eventID.value + "&page_index=0&page_size=100").then((res) => {
@@ -216,9 +240,11 @@ function joinTeamAPi() {
 			team_id: item.id,
     })
     .then(() => {
-				uni.hideLoading();
 				getUserStatus();
-				goToSignEvent();
+				uni.$u.toast("加入战队成功");
+				setTimeout(() => {
+					goToSignEvent();
+				}, 300)
     })
     .catch((e) => {
       uni.$u.toast(e.msg || "加入战队失败");
@@ -547,7 +573,7 @@ const handleEdit = () => {
   justify-content: center;
 }
 
-.share-btn {
+.main-btn {
   width: 686rpx;
   height: 96rpx;
   line-height: 96rpx;
