@@ -61,23 +61,16 @@ const album_total = computed(() => store.state.album_total);
 const refFindPhoto = ref(null);
 const routeParams = ref({});
 
-// 使用 onMounted + watch 替代 onLoad
-onMounted(() => {
-	if (props.eventId) {
-		routeParams.value = { event_id: props.eventId };
-		getDetail();
-		addVistAmount();
-	}
-});
-
-// 监听 eventId 变化（处理父组件异步传值的情况）
+// 统一用 watch + immediate 替代 onMounted + watch 双重触发
+const hasInitialized = ref(false);
 watch(() => props.eventId, (newVal) => {
-	if (newVal && !routeParams.value.event_id) {
+	if (newVal && !hasInitialized.value) {
+		hasInitialized.value = true;
 		routeParams.value = { event_id: newVal };
 		getDetail();
 		addVistAmount();
 	}
-});
+}, { immediate: true });
 
 const detail = ref({})
 const visitAmount = ref(0)

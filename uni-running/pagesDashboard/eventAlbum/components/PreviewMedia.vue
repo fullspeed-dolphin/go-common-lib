@@ -11,7 +11,6 @@
 <script setup>
 import SliderRange from "./xz-slider-range/xz-slider-range.vue";
 import SwiperSection from "./rswiper.vue"
-import request from "@/utils/request.js"
 	import {
 		ref, onMounted, computed
 	} from "vue";
@@ -36,10 +35,6 @@ import request from "@/utils/request.js"
 		console.log('link====>', link, index)
 		if(link) {
 			isShowModal.value = true;
-			const eventId = album_info.value?.event_id
-			if (eventId) {
-				request.post(`/image-service/albums/view/increment?event_id=${eventId}`)
-			}
 		}
 
 		originIndex.value = index
