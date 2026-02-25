@@ -87,21 +87,25 @@
     </view>
 
     <view v-if="isLoadedPage" class="share-btn-wrapper">
+      <block v-if="isShowShareBtn">
+        <button class="main-btn" style="background:#07C160" open-type="share">邀请好友加入</button>
+      </block>
+      
+      <button v-if="!userStatusInfo.in_team" class="main-btn" @click="joinTeam()">加入战队</button>
+
 			<!-- 加入任何一个战队后，不可加入其他战队 -->
-      <button v-if="userStatusInfo.in_team && isSignUpEvent" class="main-btn" @click="goToSignEvent">立即报名</button>
-      <button v-if="userStatusInfo.in_team && userStatusInfo.team_info.id !== teamID" class="main-btn" style="background:#07C160" open-type="share">邀请好友加入</button>
-      <button v-if="!userStatusInfo.in_team" class="main-btn" @click="joinTeam(detailInfo)">加入战队</button>
-			<!-- 只在当前team 可退出 -->
-      <block v-if="userStatusInfo.in_team && userStatusInfo.team_info.id === teamID && !userStatusInfo.is_team_leader">
-				<button class="main-btn" style="background:#999" @click="leaveTeam(detailInfo)">退出战队</button>
-			</block>
+      <block v-if="userStatusInfo.in_team">
+        <button v-if="isNoSignUpEvent" class="main-btn" @click="goToSignEvent">立即报名</button>
+        <!-- 只在当前team 成员可退出 -->
+        <block v-if="userStatusInfo.team_info.id === teamID && !userStatusInfo.is_team_leader">
+          <button class="main-btn" style="background:#999" @click="leaveTeam(detailInfo)">退出战队</button>
+        </block>
+      </block>
     </view>
 
-    <block v-if="userStatusInfo.in_team && userStatusInfo.team_info.id === teamID">
-      <button class="share-btn flex-center" :class="{ active: isScroll }" open-type="share">
+      <button v-if="!isShowShareBtn" class="share-btn flex-center" :class="{ active: isScroll }" open-type="share">
         <u-icon name="share" color="#fff" size="18"></u-icon>
       </button>
-    </block>
 
     <UserLogin ref="refUserLogin" @success="onLoginSuccess" />
   </view>
@@ -227,12 +231,32 @@ function getMyEvents() {
     myEvents.value = res;
   });
 }
-const isSignUpEvent = computed(() => {
+const isNoSignUpEvent = computed(() => {
   if (!myEvents.value) return true;
   return !myEvents.value.some((i) => i.event_id === eventID.value);
 });
 
+const isShowShareBtn = computed(() => {
+  const info = userStatusInfo.value || {};
+  let otherButtons = 0;
+
+  // 未加入战队时会显示「加入战队」按钮
+  if (!info.in_team) {
+    otherButtons++;
+  } else {
+    // 已加入战队：可能显示「立即报名」
+    if (isNoSignUpEvent.value) otherButtons++;
+    // 只有当前队员且非队长时显示「退出战队」按钮
+    if (info.team_info && info.team_info.id === teamID.value && !info.is_team_leader) otherButtons++;
+  }
+
+  // 如果其他按钮 + 邀请按钮 总数 > 3，则隐藏邀请按钮
+  return otherButtons + 1 <= 2;
+});
+
 onLoad((options) => {
+  console.log("options", options);
+  
   teamID.value = options.teamId || options.id;
   eventID.value = options.eventId;
 
@@ -273,7 +297,7 @@ function joinTeamAPi() {
 				uni.$u.toast("加入战队成功");
 				setTimeout(() => {
 					goToSignEvent();
-				}, 300)
+				}, 500)
     })
     .catch((e) => {
       uni.$u.toast(e.msg || "加入战队失败");
