@@ -97,7 +97,7 @@
 			</block>
     </view>
 
-    <block v-if="userStatusInfo.in_team && isSignUpEvent && userStatusInfo.team_info.id === teamID">
+    <block v-if="userStatusInfo.in_team && userStatusInfo.team_info.id === teamID">
       <button class="share-btn flex-center" :class="{ active: isScroll }" open-type="share">
         <u-icon name="share" color="#fff" size="18"></u-icon>
       </button>

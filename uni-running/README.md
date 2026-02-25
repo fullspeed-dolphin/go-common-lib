@@ -15,3 +15,7 @@
  to do list: 
  
  [喔图](https://m.alltuu.com/album/3004136206?menu=live#bigImageId=99cd49b25785d2505e9c725718f3fbe4)
+ 
+ 
+ 队长 token: 2c701a5d5bfba1094a628cfa8b4bf80f3a3d85182bc498df3136db6b5d1423fc
+ Eddie token: deb7e78bc68bb0062af5986574545277d5382e0f8c63917b9169781af174cbad
