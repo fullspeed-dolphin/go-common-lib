@@ -150,6 +150,7 @@
             "navigationBarTitleText": ""
           }
         },
+        { "path": "settings/aboutUs", "style": { "navigationStyle": "custom", "navigationBarTitleText": "关于我们" } },
         {
           "path": "settings/agreement",
           "style": {
