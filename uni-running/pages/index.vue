@@ -256,7 +256,7 @@ const getGroupList = () => {
       `/running-group/api/v1/groups/list?pageIndex=0&pageSize=5&club_type=cycling`
     ),
   ]).then((res) => {
-    console.log("GroupList res=====>", res);
+    // console.log("GroupList res=====>", res);
     GroupList.value = res.map((i) => i.data).flat();
   });
 };
