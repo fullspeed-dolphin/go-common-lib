@@ -262,18 +262,25 @@ onLoad((options) => {
 
 	if (!userInfo.value.id) {
 		nextTick(() => {
+			loginCallBack.value = getUserData
 			refUserLogin.value.open();
 		})
   }
 });
 
+function getUserData() {
+	getUserStatus();
+	getMyEvents();
+}
+
 onShow(() => {
   if (!teamID.value) return;
+
   getDetailInfo();
   getRankData(currentIndex.value === 0 ? "checkins" : undefined);
-  getUserStatus();
   getTeamRank();
-  getMyEvents();
+	
+	getUserData();
 });
 
 function callPhone(phone) {
