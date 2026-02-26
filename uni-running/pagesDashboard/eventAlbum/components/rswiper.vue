@@ -43,11 +43,18 @@
               :y="moveY"
               @scale="onScale"
             >
-              <image
-                class="slide-image"
-                :src="currentImage.url750"
-                mode="widthFix"
-              />
+                <image
+                  v-if="lookIdStatus"
+                  class="slide-image"
+                  :src="currentImage.url"
+                  mode="widthFix"
+                />
+                <image
+                v-else
+                  class="slide-image"
+                  :src="currentImage.url750"
+                  mode="widthFix"
+                />
             </movable-view>
           </movable-area>
         </view>
@@ -67,6 +74,7 @@
     <section class="bottom-info">
       <div class="flex-center">
         <up-button @click="loadHDimage()" shape="circle" type="primary"
+         v-if="!lookIdStatus"
           customStyle="width:188rpx;height:64rpx;margin:0;font-size:24rpx;color: #babab6;border-color:rgba(255, 255, 255, 0.27);background:rgba(34, 34, 34, 0.8);">
           查看高清图
         </up-button>
@@ -151,7 +159,8 @@ const originIndexArr = ref([0])
 const isloading = ref(false)
 const isShowAmount = ref(false)
 const isAlbumComplete = ref(false)
-
+// ==========查看高清图状态 ========
+const lookIdStatus = ref(false)
 // ==================== 屏幕宽度 ====================
 const screenWidth = ref(375)
 function updateScreenWidth() {
@@ -341,8 +350,10 @@ function onTouchEnd(e) {
   const shouldGoPrev = (deltaX > threshold || velocity > velocityThreshold) && originIndex.value > 0
 
   if (shouldGoNext) {
+    lookIdStatus.value = false
     goToNext()
   } else if (shouldGoPrev) {
+    lookIdStatus.value = false
     goToPrev()
   } else {
     // 回弹到原位
@@ -452,7 +463,7 @@ const sliderChange = (e) => {
   originIndex.value = e[0];
   translateX.value = -screenWidth.value
   addViewCount()
-
+  lookIdStatus.value = false
   const totalCount = Number(album_total.value) || 0
   const isAllLoaded = totalCount === 0 || originList.value.length >= totalCount
 
@@ -500,11 +511,13 @@ function openShare() {
   refSharePoster.value.open(currentImage.value.url)
 }
 
+// 加载高清图
 function loadHDimage() {
-  uni.previewImage({
-    urls: originList.value,
-    current: originList.value[originIndex.value],
-  })
+  lookIdStatus.value = true
+  // uni.previewImage({
+  //   urls: originList.value,
+  //   current: originList.value[originIndex.value],
+  // })
 }
 
 function downloadPicture() {
