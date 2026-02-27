@@ -133,7 +133,7 @@
 		&__content {
 			@include flex(column);
 			background-color: #fff;
-			margin: 0 20rpx 40rpx;
+			margin: 0 34rpx 40rpx;
 			border-radius: 99px;
 			box-shadow: 0rpx 8rpx 10rpx 0rpx rgba(0,0,0,0.1);
 			&__item-wrapper {

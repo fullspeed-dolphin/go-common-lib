@@ -4,7 +4,7 @@
       <block v-for="(item, index) in tabList" :key="index">
         <u-tabbar-item v-if="index === 2" :text="item.text" :name="item.name">
           <template #text>
-            <image src="/static/images/Frame 18@2x.png" mode="aspectFill" style="width:82rpx;height:82rpx;"/>
+            <image src="/static/images/Frame 18@2x.png" :class="{ 'filter': active !== item.name }" mode="aspectFill" style="width:82rpx;height:82rpx;"/>
           </template>
         </u-tabbar-item>
         <u-tabbar-item v-else :text="item.text" :name="item.name">
@@ -96,12 +96,13 @@ const onChange = (detail) => {
 
 <style lang="scss" scoped>
 .tabbar-box {
+  padding-top: 30rpx;
   box-sizing: content-box;
   margin-bottom: env(safe-area-inset-bottom);
 }
 
 .tabbar-text {
-  font-size: 24rpx;
+  font-size: 22rpx;
   // font-weight: 500;
   color:rgb(125, 126, 128);;
 }
@@ -117,7 +118,9 @@ const onChange = (detail) => {
   margin-bottom: 6rpx;
   color: rgb(125, 126, 128);
 }
-
+.filter {
+  filter: grayscale(100%);
+}
 .active {
   color: #ff8c00;
 }
