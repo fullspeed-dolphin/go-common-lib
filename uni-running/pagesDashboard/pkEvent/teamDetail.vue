@@ -1,4 +1,5 @@
 <template>
+	<mescroll-body ref="mescrollRef" @init="mescrollInit" :down="{ use: false }" @down="downCallback" @up="getList" :top="0">
   <view class="">
     <section class="team-header">
       <!-- 毛玻璃背景：绝对定位，自动跟随 header 高度 -->
@@ -40,7 +41,7 @@
     <view class="tab-container">
       <view class="category-tags">
         <view class="tags-inner">
-          <view v-for="(item, index) in tabList" :key="item.value" class="tag-item" :class="{ active: currentIndex === index }" @click="handleTabChange(item, index)">
+          <view v-for="(item, index) in tabList" :key="item.value" class="tag-item" :class="{ active: currentIndex === index }" @click="handleTabChange(index)">
             {{ item.label }}
           </view>
         </view>
@@ -83,7 +84,6 @@
           </template>
         </view>
       </view>
-      <view v-if="!rankList.length"><u-empty mode="data" text="暂无数据"></u-empty></view>
     </view>
 
     <view v-if="isLoadedPage" class="share-btn-wrapper">
@@ -109,11 +109,16 @@
 
     <UserLogin ref="refUserLogin" @success="onLoginSuccess" />
   </view>
+	</mescroll-body>
 </template>
 
 <script setup>
 import { ref, computed, watch, nextTick } from "vue";
 import { onLoad, onShow, onReachBottom, onPageScroll } from "@dcloudio/uni-app";
+
+import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
+const { mescrollInit, downCallback, getMescroll } = useMescroll(onPageScroll, onReachBottom);
+
 import request from "@/utils/request.js";
 import { useShare, buildPath } from "@/composables/useShare.js";
 
@@ -134,18 +139,11 @@ const teamID = ref("");
 const detailInfo = ref({});
 function getDetailInfo() {
   request.get(`/event-api/online_events_team/${teamID.value}`).then((res) => {
-    console.log("userStatus", res);
     detailInfo.value = res;
   });
 }
 
 const eventID = ref("");
-const MEMBER_PAGE_SIZE = 100;
-const rankList = ref([]);
-const memberPage = ref(0);
-const memberHasMore = ref(true);
-const memberLoading = ref(false);
-const memberSortBy = ref("checkins");
 
 const isScroll = ref(false);
 let timer = null;
@@ -158,33 +156,38 @@ onPageScroll((e) => {
   }, 100);
 });
 
-function getRankData(sortBy, reset = true) {
-  if (memberLoading.value || (!reset && !memberHasMore.value)) return;
-  if (sortBy !== undefined) memberSortBy.value = sortBy;
-  if (reset) {
-    memberPage.value = 0;
-    memberHasMore.value = true;
-  }
-  memberLoading.value = true;
-  let url = `/event-api/online_events_team/members?team_id=${teamID.value}&event_id=${eventID.value}&page_index=${memberPage.value}&page_size=${MEMBER_PAGE_SIZE}`;
-  if (memberSortBy.value) url += `&sort_by=${memberSortBy.value}`;
-  request.get(url).then((res) => {
-    const list = res?.list || res || [];
-    if (memberPage.value === 0) {
-      rankList.value = list;
-    } else {
-      rankList.value = rankList.value.concat(list);
-    }
-    memberHasMore.value = list.length >= MEMBER_PAGE_SIZE;
-    memberPage.value++;
-  }).finally(() => {
-    memberLoading.value = false;
-  });
-}
+const refreshList = () => {
+  getMescroll().resetUpScroll();
+  getMescroll().scrollTo(0, 0);
+};
 
-onReachBottom(() => {
-  getRankData(undefined, false);
-});
+const rankList = ref([]);
+const getList = (mescroll) => {
+	uni.showLoading({ mask: true });
+  const data = {
+    page_index: mescroll.num - 1,
+    page_size: 10,
+    team_id: teamID.value,
+    event_id: eventID.value,
+		sort_by: currentIndex.value === 0 ? 'checkins' : ''
+  };
+	
+  request
+    .get(`/event-api/online_events_team/members`, data)
+    .then((res) => {
+      const list = res || [];
+      mescroll.endSuccess(list.length, list.length >= 10);
+
+      if (mescroll.num == 1) {
+        rankList.value = [];
+      }
+
+      rankList.value = rankList.value.concat(list);
+    })
+    .catch((error) => {
+      mescroll.endErr();
+    });
+};
 
 function leaveTeam() {
 	const params = {
@@ -198,6 +201,7 @@ function leaveTeam() {
 				request.post("/event-api/online_events_team/quit", params).then((res) => {
 					uni.$u.toast('退出成功')
 					getUserStatus()
+					refreshList()
 				});
 			} else if (res.cancel) {
 				console.log("用户点击取消");
@@ -219,7 +223,6 @@ const userStatusInfo = ref({});
 const isLoadedPage = ref(false)
 function getUserStatus() {
   request.get("/event-api/online_events_team/user_status?event_id=" + eventID.value).then((res) => {
-    console.log('userStatus', res)
     userStatusInfo.value = res;
 		isLoadedPage.value = true
   });
@@ -277,7 +280,6 @@ onShow(() => {
   if (!teamID.value) return;
 
   getDetailInfo();
-  getRankData(currentIndex.value === 0 ? "checkins" : undefined);
   getTeamRank();
 	
 	getUserData();
@@ -301,6 +303,7 @@ function joinTeamAPi() {
     })
     .then(() => {
 				getUserStatus();
+				refreshList()
 				uni.$u.toast("加入战队成功");
 				setTimeout(() => {
 					goToSignEvent();
@@ -316,7 +319,6 @@ function goToSignEvent() {
 }
 
 function joinTeam() {
-	
 	if (!userInfo.value.id) {
 		loginCallBack.value = joinTeam;
 
@@ -347,9 +349,9 @@ const tabList = ref([
   { label: "个人完赛", value: "" },
   { label: "总距离", value: "SUCC" },
 ]);
-const handleTabChange = (item, index) => {
+const handleTabChange = (index) => {
   currentIndex.value = index;
-  getRankData(index === 0 ? "checkins" : undefined);
+	refreshList()
 };
 
 // 编辑按钮点击

@@ -17,7 +17,7 @@
     </section>
 
     <!-- 内容区域 -->
-    <view class="content-wrapper" @touchstart="onTouchStart" @touchend="handleTouchEnd">
+    <view class="content-wrapper">
       <mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" :top="100">
         <view class="order-list" :class="['list-transition', listAnimClass]">
           <view class="team-card" v-for="(item, index) in dataList" :key="index" @click="joinTeam(item)">
