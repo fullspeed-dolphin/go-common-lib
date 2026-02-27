@@ -9,9 +9,9 @@
                   userInfo.avatar_url ||
                   'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
                 " mode="aspectFill"></image>
-              <view class="gender">
-                <u-icon v-if="userInfo.gender === 1" color="#409eff" name="man" size="17"></u-icon>
-                <u-icon v-if="userInfo.gender === 0" color="#f5abb8" name="woman" size="17"></u-icon>
+              <view class="gender flex-center">
+                <u-icon v-if="userInfo.gender === 1" color="#409eff" name="man" size="20"></u-icon>
+                <u-icon v-if="userInfo.gender === 0" color="#f5abb8" name="woman" size="20"></u-icon>
               </view>
             </view>
             <view class="text">
@@ -29,7 +29,7 @@
                   <image class="coin-icon" src="/static/images/coin.png" mode="aspectFill"></image>
                   <text class="coin-label">我的跑币:</text>
                   <text class="coin-value">{{coinInfo.fscoin}}</text>
-                  <u-icon name="arrow-right" size="12"></u-icon>
+                  <u-icon name="arrow-right" color="#e65100" size="12"></u-icon>
                 </view>
               </block>
               <view class="name" v-else @click="handleUserClick">登录/注册</view>
@@ -276,7 +276,8 @@ const openOfficialAccount = () => {
     position: absolute;
     background: #fff;
     bottom: -2rpx;
-    right: 25rpx;
+    right: 40rpx;
+    width: 36rpx;
     border-radius: 40rpx;
   }
 }
