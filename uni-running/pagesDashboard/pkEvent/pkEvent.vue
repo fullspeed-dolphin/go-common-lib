@@ -1,5 +1,6 @@
 <template>
   <view class="">
+		<mescroll-body ref="mescrollRef" @init="mescrollInit" :down="{ use: false }" @down="downCallback" @up="getList" :top="0">
     <u-navbar autoBack placeholder :title="detailInfo?.event_name || '活动详情'"></u-navbar>
     <section class="flex-center" style="height: 512rpx;filter1: blur(10px);">
       <image class="img" style="width:750rpx;height:512rpx;" :src="
@@ -147,11 +148,11 @@
         </view>
       </template>
 
-      <view v-if="!rankList.length" class="flex-center" style="min-height: 350rpx;">
-        <u-empty mode="data" text="暂无数据" />
-      </view>
     </view>
-
+		</mescroll-body>
+		
+		
+		<div class="hr100" style="height:120rpx;"></div>
     <view v-if="isSignUpEvent" class="join-btn-wrapper flex-center">
       <u-button class="join-btn" color="#ff5c5c" color1="linear-gradient(64deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%)"
         customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;letter-spacing: 1px;font-size: 34rpx;" :disabled="detailInfo?.status !== 'act'" @click="SignUpEvent()">
@@ -165,10 +166,16 @@
 
 <script setup>
 import { ref, computed, watch } from "vue";
-import { onLoad, onShow, onReachBottom } from "@dcloudio/uni-app";
+import { onLoad, onShow, onReachBottom, onPageScroll } from "@dcloudio/uni-app";
+
+import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
+const { mescrollInit, downCallback, getMescroll } = useMescroll(onPageScroll, onReachBottom);
+
 import { useShare, buildPath } from "@/composables/useShare.js";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
+import { getRealName } from "@/utils/util.js"
+
 import UserLogin from "@/components/UserLogin.vue";
 import { useStore } from "vuex";
 
@@ -214,10 +221,7 @@ const tabList = ref([
 
 function changeTab(index) {
   tabIndex.value = index;
-  rankPage.value = 0;
-  rankHasMore.value = true;
-  rankList.value = [];
-  getRankList();
+  refreshList();
 }
 
 const init = () => {
@@ -312,9 +316,6 @@ onShow(() => {
   init();
   getUserStatus();
   getMyEvents();
-  rankPage.value = 0;
-  rankHasMore.value = true;
-  getRankList();
 });
 
 useShare(() => ({
@@ -326,36 +327,39 @@ useShare(() => ({
   }),
 }));
 
-const RANK_PAGE_SIZE = 100;
-const rankList = ref([]);
-const rankPage = ref(0);
-const rankHasMore = ref(true);
-const rankLoading = ref(false);
-
-const getRankList = () => {
-  if (rankLoading.value || !rankHasMore.value) return;
-  rankLoading.value = true;
-  let url = tabIndex.value == 0
-    ? "/event-api/ranking/personal?event_id=" + activetyId.value
-    : "/event-api/ranking/team?event_id=" + activetyId.value;
-  url += `&page_index=${rankPage.value}&page_size=${RANK_PAGE_SIZE}`;
-  request.get(url).then((res) => {
-    const list = res?.list || [];
-    if (rankPage.value === 0) {
-      rankList.value = list;
-    } else {
-      rankList.value = rankList.value.concat(list);
-    }
-    rankHasMore.value = list.length >= RANK_PAGE_SIZE;
-    rankPage.value++;
-  }).finally(() => {
-    rankLoading.value = false;
-  });
+const refreshList = () => {
+  getMescroll().resetUpScroll();
+  getMescroll().scrollTo(0, 0);
 };
 
-onReachBottom(() => {
-  getRankList();
-});
+const rankList = ref([]);
+const getList = (mescroll) => {
+	uni.showLoading({ mask: true });
+  const data = {
+    page_index: mescroll.num - 1,
+    page_size: 10,
+    event_id: activetyId.value,
+  };
+	let url = tabIndex.value == 0 ? '/event-api/ranking/personal' : '/event-api/ranking/team'
+  request.get(url, data).then((res) => {
+      const list = (res?.list || []).map(item => ({
+				...item,
+				real_name: getRealName(item.real_name)
+			}));
+      mescroll.endSuccess(list.length, list.length >= 10);
+
+      if (mescroll.num == 1) {
+        rankList.value = [];
+      }
+
+      rankList.value = rankList.value.concat(list);
+    })
+    .catch((error) => {
+      mescroll.endErr();
+    });
+};
+
+
 </script>
 
 <style lang="scss" scoped>
@@ -531,7 +535,6 @@ onReachBottom(() => {
 
 .rank-list {
   margin: 0 30rpx;
-  padding-bottom: 200rpx;
 }
 
 .rank-item {
