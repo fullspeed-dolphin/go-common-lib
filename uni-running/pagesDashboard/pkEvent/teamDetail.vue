@@ -85,27 +85,28 @@
         </view>
       </view>
     </view>
-		
-    <view v-if="isLoadedPage" class="share-btn-wrapper">
-      <block v-if="isShowShareBtn">
-        <button class="main-btn" style="background:#07C160" open-type="share">邀请好友加入</button>
-      </block>
-      
-      <button v-if="!userStatusInfo.in_team" class="main-btn" @click="joinTeam()">加入战队</button>
-
-			<!-- 加入任何一个战队后，不可加入其他战队 -->
-      <block v-if="userStatusInfo.in_team">
-        <button v-if="isNoSignUpEvent" class="main-btn" @click="goToSignEvent">立即报名</button>
-        <!-- 只在当前team 成员可退出 -->
-        <block v-if="userStatusInfo.team_info.id === teamID && !userStatusInfo.is_team_leader">
-          <button class="main-btn" style="background:#999" @click="leaveTeam(detailInfo)">退出战队</button>
-        </block>
-      </block>
-    </view>
   </view>
 	</mescroll-body>
+
+  <div class="hr100" style="height:120rpx;"></div>
+  <section v-if="isLoadedPage" class="share-btn-wrapper">
+    <block v-if="isShowShareBtn">
+      <button class="main-btn" style="background:#07C160" open-type="share">邀请好友加入</button>
+    </block>
+    
+    <button v-if="!userStatusInfo.in_team" class="main-btn" @click="joinTeam()">加入战队</button>
+
+    <!-- 加入任何一个战队后，不可加入其他战队 -->
+    <block v-if="userStatusInfo.in_team">
+      <button v-if="isNoSignUpEvent" class="main-btn" @click="goToSignEvent">立即报名</button>
+      <!-- 只在当前team 成员可退出 -->
+      <block v-if="userStatusInfo.team_info.id === teamID && !userStatusInfo.is_team_leader">
+        <button class="main-btn" style="background:#999" @click="leaveTeam(detailInfo)">退出战队</button>
+      </block>
+    </block>
+  </section>
 	
-	<div class="hr100" style="height:120rpx;"></div>
+	
 	<button v-if="!isShowShareBtn" class="share-btn flex-center" :class="{ active: isScroll }" open-type="share">
 		<u-icon name="share" color="#fff" size="18"></u-icon>
 	</button>
