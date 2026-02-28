@@ -44,7 +44,7 @@
       <view class="section-box">
         <u-cell title="我的订单" class="nav-cell" @click="routeTo(`pagesSub/orderList`)" :border="false" isLink>
           <template #icon>
-            <image class="nav-icon" style="width: 32rpx; height: 40rpx" src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-mine-event@2x.png"></image>
+						<view class="nav-icon iconfont icon-dingdan"></view>
           </template>
         </u-cell>
         <!-- <u-cell title="我的跑币" class="nav-cell" @click="routeTo('/pagesSub/runCoin/myCoin')" :border="false" isLink>
@@ -59,18 +59,18 @@
             )
           " :border="false" isLink>
           <template #icon>
-            <image class="nav-icon" style="width: 40rpx; height: 40rpx" src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-mine-group@2x.png"></image>
+						<view class="nav-icon iconfont icon-baomingmingdan"></view>
           </template>
         </u-cell>
         <u-cell title="报名卡" class="nav-cell" @click="routeTo('/pagesSub/registrationCard/list')" :border="false" isLink>
           <template #icon>
-            <image class="nav-icon" src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-mine-user@2x.png"></image>
+						<view class="nav-icon iconfont icon-baomingka1"></view>
           </template>
         </u-cell>
 
         <u-cell title="智能设备" class="nav-cell" @click="routeTo('/pagesSub/device/deviceList')" :border="false" isLink>
           <template #icon>
-            <image class="nav-icon" style="width: 28rpx; height: 46rpx" src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-mine-device@2x.png"></image>
+						<view class="nav-icon iconfont icon-zhinengshoubiao"></view>
           </template>
         </u-cell>
 
@@ -86,8 +86,7 @@
             <view class="flex-row" style="width: 100%">
               <view class="u-flex-y-center flex-1 service-content">
                 <view class="icon">
-                  <image class="nav-icon" src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-mine-customer@2x.png">
-                  </image>
+									<view class="nav-icon iconfont icon-lianxikefu"></view>
                 </view>
                 <text class="service-text">联系客服</text>
               </view>
@@ -98,36 +97,30 @@
 
         <u-cell title="现场签到" class="nav-cell" @click="routeTo('/pagesMine/PunchEvent')" :border="false" isLink>
           <template #icon>
-            <image class="nav-icon" style="width: 40rpx; height: 36rpx" src="/static/images/现场签到 @2x.png"></image>
+						<view class="nav-icon iconfont icon-qiandao_daka"></view>
           </template>
         </u-cell>
 
         <u-cell title="全速之家" class="nav-cell" @click="routeTo('/pagesMine/toolkit/UserRole')" :border="false" isLink>
           <template #icon>
-            <image class="nav-icon" style="width: 36rpx; height: 38rpx" src="/static/images/quansuzhijia.png"></image>
+						<view class="nav-icon iconfont icon-zhuye"></view>
           </template>
         </u-cell>
 
         <u-cell v-if="isReleaseVersion()" title="关注全速体育" class="nav-cell" @click="openOfficialAccount" :border="false" isLink>
           <template #icon>
-            <image class="nav-icon" style="width: 43rpx; height: 34rpx" src="/static/images/Wei20260108212025_5184_21.png"></image>
+						<view class="nav-icon iconfont icon-weixin"></view>
           </template>
         </u-cell>
 
 				<u-cell title="关于我们" class="nav-cell" @click="routeTo('/pagesSub/settings/aboutUs')" :border="false" isLink>
           <template #icon>
-						<view class="iconfont icon-guanyuwomen" style="width: 43rpx; height: 34rpx;font-size:38rpx;color:#FF8C00;"></view>
+						<view class="nav-icon iconfont icon-guanyuwomen"></view>
           </template>
         </u-cell>
-
-        <!-- <u-cell title="意见反馈" class="nav-cell" @click="routeTo('/pagesSub/settings/feedback')" :border="false" isLink>
-					<template #icon>
-						<image class="nav-icon" src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/帮助反馈Icon@2x.png"></image>
-					</template>
-				</u-cell> -->
       </view>
 
-      <view v-if="userInfo.id" class="logout c9 flex-center" style="padding-bottom: 160rpx;">
+      <view v-if="userInfo.id" class="logout c9 flex-center" style="padding-bottom: 60rpx;">
         <text class="u-pb-20" @click="logout()">-- 退出登录 --</text>
       </view>
     </view>
@@ -265,10 +258,6 @@ const openOfficialAccount = () => {
 </script>
 
 <style lang="less" scoped>
-.page {
-  background: #f5f5f5;
-}
-
 .img-box {
   position: relative;
 
@@ -373,6 +362,8 @@ const openOfficialAccount = () => {
   height: 34rpx;
   display: block;
   flex-shrink: 0;
+	font-weight: 600;
+	width: 43rpx; height: 34rpx;font-size:38rpx;color:#FF8C00;
 }
 
 .user-box {
@@ -435,7 +426,7 @@ const openOfficialAccount = () => {
     border-radius: 10rpx;
     width: 680rpx;
     margin: 26rpx auto;
-    height: 122rpx;
+    height: 110rpx;
     border-radius: 24rpx 24rpx 24rpx 24rpx;
     border: 2rpx solid rgba(0, 0, 0, 0.06);
     background: #fff;
