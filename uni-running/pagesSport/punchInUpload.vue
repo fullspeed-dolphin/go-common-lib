@@ -113,6 +113,7 @@
 			<view class="u-ml-10">后台核验成功</view>
 		</view>
 		
+		<SharePoster ref="refSharePoster" />
 	</view>
 </template>
 <script setup>
@@ -120,14 +121,22 @@
 	import { onLoad, onUnload } from "@dcloudio/uni-app";
 	import FileUpload from "@/components/common/FileUpload.vue";
 	import PickerCell from "@/components/common/PickerCell.vue";
+	import SharePoster from "./SharePoster.vue"
 	import request from "../utils/request";
 	import { useShare } from "@/composables/useShare.js";
-
+	import dayjs from "dayjs";
+	import { useStore } from "vuex";
+	const store = useStore();
+	// 计算属性
+	const userInfo = computed(() => store.state.userInfo);
+	
 	// 分享配置
 	useShare({
 		title: '运动截图打卡',
 		path: '/pagesSport/punchInUpload'
 	});
+	
+	const refSharePoster = ref(null)
 
 	const routerParams = ref({})
 	const options_events = ref([]);
@@ -300,13 +309,30 @@
 			isSuccessCheck.value = true
 			
 			uni.setStorageSync('punchInUploadResult', res)
+
+			function extractNumbers(str) {
+				const matches = str.match(/\d+/g);
+				return matches ? matches.map(Number)?.[0] : '';
+			}
+			
+			refSharePoster.value.open({
+				...userInfo.value,
+				distance: parseFloat(res.data.km),
+				duration: res.data.time,
+				pace: res.data.speed,
+				coinAmount: extractNumbers(res?.msg || ''),
+				coinAmountMsg: res?.msg,
+				checkinCount: res.events?.[0]?.checkin_count || 1,
+				checkinTime: dayjs().format("YYYY年MM月DD日 HH:mm")
+			})
 			
 			// 2秒后隐藏弹窗并跳转
-			setTimeout(() => {
-				isSuccessCheck.value = false
-				uni.$u.route('pagesSport/recognizeSuccess', res)
-			}, 2000)
+			// setTimeout(() => {
+			// 	isSuccessCheck.value = false
+			// 	uni.$u.route('pagesSport/recognizeSuccess', res)
+			// }, 2000)
 		}).catch(err => {
+			console.log('err======>', err)
 			uni.showModal({
 				title: '打卡失败',
 				content: err?.msg || '请稍后重试',
@@ -390,6 +416,11 @@
 	}
 
 	::v-deep {
+		.u-popup__content__close{
+			left: 50rpx!important;
+			top: 150rpx!important;
+			right: auto!important;
+		}
 		.uicon-arrow-right{
 			color: #FF8C00!important;
 		}
