@@ -85,7 +85,7 @@
         </view>
       </view>
     </view>
-
+		
     <view v-if="isLoadedPage" class="share-btn-wrapper">
       <block v-if="isShowShareBtn">
         <button class="main-btn" style="background:#07C160" open-type="share">邀请好友加入</button>
@@ -102,14 +102,15 @@
         </block>
       </block>
     </view>
-
-      <button v-if="!isShowShareBtn" class="share-btn flex-center" :class="{ active: isScroll }" open-type="share">
-        <u-icon name="share" color="#fff" size="18"></u-icon>
-      </button>
-
-    <UserLogin ref="refUserLogin" @success="onLoginSuccess" />
   </view>
 	</mescroll-body>
+	
+	<div class="hr100" style="height:120rpx;"></div>
+	<button v-if="!isShowShareBtn" class="share-btn flex-center" :class="{ active: isScroll }" open-type="share">
+		<u-icon name="share" color="#fff" size="18"></u-icon>
+	</button>
+	
+	<UserLogin ref="refUserLogin" @success="onLoginSuccess" />
 </template>
 
 <script setup>
@@ -121,6 +122,8 @@ const { mescrollInit, downCallback, getMescroll } = useMescroll(onPageScroll, on
 
 import request from "@/utils/request.js";
 import { useShare, buildPath } from "@/composables/useShare.js";
+
+import { getRealName } from "@/utils/util.js"
 
 import UserLogin from "@/components/UserLogin.vue";
 import { useStore } from "vuex";
@@ -175,7 +178,10 @@ const getList = (mescroll) => {
   request
     .get(`/event-api/online_events_team/members`, data)
     .then((res) => {
-      const list = res || [];
+      const list = (res?.list || []).map(item => ({
+				...item,
+				real_name: getRealName(item.real_name)
+			}));
       mescroll.endSuccess(list.length, list.length >= 10);
 
       if (mescroll.num == 1) {
@@ -471,7 +477,6 @@ const handleEdit = () => {
 /* 排行榜列表 */
 .rank-list {
   margin: 0 30rpx;
-  padding-bottom: 200rpx;
 }
 
 .rank-item {
