@@ -64,7 +64,7 @@
               {{ item.team_goal_km }}KM
               <view class="flex-center group-tag">{{ item.team_name }}</view>
             </view>
-            <view class="user-time">{{ item.total_sessions }}次</view>
+            <!-- <view class="user-time">{{ item.total_sessions }}次</view> -->
           </view>
           <view class="progress">
             <text class="progress-percent"><text style="font-size:36rpx;">{{ item.total_distance_km }}</text>km</text>
@@ -458,24 +458,22 @@ const loadRankList = (mescroll) => {
       opacity: 0;
     }
   }
-
   .tag-item {
     position: relative;
     z-index: 1;
     padding: 12rpx 24rpx;
     font-size: 28rpx;
-    color: #ff5c5c;
+    color: #999;
+    background: #f5f5f5;
     line-height: 40rpx;
     width: 336rpx;
     white-space: nowrap;
-    transition: color 0.3s ease;
     font-weight: bold;
     text-align: center;
-
+    border-radius: 999rpx;
     &.active {
-      color: #ff5c5c;
-      border-radius: 999rpx;
-      background: #f3f4f6;
+      color: #fff;
+      background: #ff5c5c;
     }
   }
 }

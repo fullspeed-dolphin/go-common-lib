@@ -106,8 +106,6 @@
       </view>
     </view>
 		
-    <!-- v-if placeholder removed; sorting buttons moved into tab-container above -->
-
     <view class="rank-list">
       <!-- 个人排行榜 -->
       <template v-if="tabIndex === 0">
@@ -120,12 +118,20 @@
               item.avatar_url ? item.avatar_url + '?x-oss-process=image/resize,w_120,h_120,m_fill' : '/static/images/user.png'
             " mode="aspectFill" />
           </div>
-          <view class="user-info">
+          <!-- <view class="user-info">
             <view style="display:flex;align-items:center;">
               <view class="user-name">{{ item.real_name }}</view>
               <view class="group-tag">{{ item.team_name }}</view>
             </view>
             <view class="user-time">{{ item.team_goal_km }}KM组</view>
+          </view> -->
+          <view class="user-info">
+            <view class="user-name">{{ item.real_name }}</view>
+            <view class="user-detail">
+              <view style="color:#999;font-size:24rpx;">{{ item.team_goal_km }}KM组</view>
+              <view class="flex-center group-tag u-mb-10 u-mt-10">{{ item.team_name }}</view>
+            </view>
+            <!-- <view class="user-time">{{ item.total_sessions }}次</view> -->
           </view>
           <view class="progress">
             <text class="progress-percent"><text style="font-size:40rpx;">{{ item.total_distance_km }}</text>km</text>
@@ -587,8 +593,8 @@ const teamRankValue = (item) => {
 }
 
 .tab-item.active {
-  color: #ff5c5c;
-  border-bottom: 2rpx solid #ff5c5c;
+  color: #fff;
+  background: #ff5c5c;
 }
 
 .rank-list {
@@ -626,13 +632,11 @@ const teamRankValue = (item) => {
     font-weight: 500;
     font-size: 22rpx;
     color: #155dfc;
-    padding: 4rpx 14rpx;
-    margin-left: 12rpx;
+    padding: 4rpx 10rpx;
     background: #eff6ff;
     border-radius: 12rpx;
-    max-width: 160rpx;
-    line-height: 1.4;
-    flex-shrink: 0;
+    max-width: 260rpx;
+    display: inline-block;
   }
   .rank-number {
     width: 96rpx;
@@ -721,18 +725,17 @@ const teamRankValue = (item) => {
     z-index: 1;
     padding: 12rpx 24rpx;
     font-size: 28rpx;
-    color: #ff5c5c;
+    color: #999;
+    background: #f5f5f5;
     line-height: 40rpx;
     width: 336rpx;
     white-space: nowrap;
-    transition: color 0.3s ease;
     font-weight: bold;
     text-align: center;
-
+    border-radius: 999rpx;
     &.active {
-      color: #ff5c5c;
-      border-radius: 999rpx;
-      background: #f3f4f6;
+      color: #fff;
+      background: #ff5c5c;
     }
   }
 }
