@@ -99,7 +99,14 @@
           </view>
         </view>
       </view>
+      <!-- 战队排序开关(仅在战队榜时显示) -->
+      <view v-if="tabIndex === 1" class="sort-switch u-mt-20">
+        <view class="sort-btn" :class="{ active: teamSortBy === 'members' }" @click="switchTeamSort('members')">人数排行</view>
+        <view class="sort-btn" :class="{ active: teamSortBy === 'distance' }" @click="switchTeamSort('distance')">跑量排行</view>
+      </view>
     </view>
+		
+    <!-- v-if placeholder removed; sorting buttons moved into tab-container above -->
 
     <view class="rank-list">
       <!-- 个人排行榜 -->
@@ -143,7 +150,9 @@
             <view class="user-time">{{ item.current_members }}人 | 完成率 {{ item.team_completion_rate }}%</view>
           </view>
           <view class="progress">
-            <text class="progress-percent"><text style="font-size:36rpx;">{{ item.total_distance_km }}</text>km</text>
+            <text class="progress-percent">
+              <text style="font-size:36rpx;">{{ teamRankValue(item) }}</text>
+            </text>
           </view>
         </view>
       </template>
@@ -218,6 +227,10 @@ const tabList = ref([
     value: "",
   },
 ]);
+
+// 战队排行榜排序字段
+const teamSortBy = ref('members');
+
 
 function changeTab(index) {
   tabIndex.value = index;
@@ -341,6 +354,10 @@ const getList = (mescroll) => {
     event_id: activetyId.value,
   };
 	let url = tabIndex.value == 0 ? '/event-api/ranking/personal' : '/event-api/ranking/team'
+
+  if (tabIndex.value === 1) {
+    data.sort_by = teamSortBy.value;
+  }
   request.get(url, data).then((res) => {
       const list = (res?.list || []).map(item => ({
 				...item,
@@ -357,6 +374,20 @@ const getList = (mescroll) => {
     .catch((error) => {
       mescroll.endErr();
     });
+};
+
+// 切换战队排序方式
+const switchTeamSort = (sort) => {
+  if (teamSortBy.value === sort) return;
+  teamSortBy.value = sort;
+  refreshList();
+};
+
+// 战队显示字符
+const teamRankValue = (item) => {
+  return teamSortBy.value === 'distance'
+    ? item.total_distance_km + 'km'
+    : item.current_members + '人';
 };
 
 
@@ -424,6 +455,33 @@ const getList = (mescroll) => {
     background: #05df72;
     border-radius: 50%;
     margin-right: 5rpx;
+  }
+}
+
+.tab-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20rpx 30rpx;
+}
+
+.sort-switch {
+  display: flex;
+  justify-content: center;
+  gap: 16rpx;
+  padding: 0 0 16rpx;
+
+  .sort-btn {
+    padding: 10rpx 32rpx;
+    font-size: 24rpx;
+    color: #999;
+    background: #f5f5f5;
+    border-radius: 999rpx;
+
+    &.active {
+      color: #fff;
+      background: #ff5c5c;
+    }
   }
 }
 
