@@ -2,20 +2,20 @@
 <template>
   <up-popup v-if="show" :show="show" @close="close" closeable custom-style="background:rgba(0,0,0,.8);top:0;">
     <view style="height:100vh;padding-top:250rpx;">
-			<swiper class="event-swiper" circular @change="changeSwiper" indicator-active-color="#FF8C00" :display-multiple-items="1.2">
-				<swiper-item>
-					<view class="event-swiper-item u-pr-20 u-pl-40" style="margin-left1: 54rpx;">
+			<swiper class="event-swiper" :circular="posterPaths.length > 1" @change="changeSwiper" indicator-active-color="#FF8C00" :display-multiple-items="posterPaths.length > 1 ? 1.2 : 1">
+				<swiper-item v-if="showPoster1">
+					<view class="event-swiper-item" :class="posterPaths.length > 1 ? 'u-pr-20 u-pl-40' : 'poster-center'">
 						<image :src="pictureImage" v-if="pictureImage" show-menu-by-longpress mode="widthFix" style="width: 584rpx"></image>
 					</view>
 				</swiper-item>
-				<swiper-item>
-					<view class="event-swiper-item u-pl-40" style="margin-right1: 84rpx;">
+				<swiper-item v-if="showPoster2">
+					<view class="event-swiper-item" :class="posterPaths.length > 1 ? 'u-pl-40' : 'poster-center'">
 						<image :src="pictureImage1" v-if="pictureImage1" show-menu-by-longpress mode="widthFix" style="width: 584rpx"></image>
 					</view>
 				</swiper-item>
 			</swiper>
 			
-			<view class="flex-center">
+			<view class="flex-center" v-if="posterPaths.length > 1">
 				<view class="point" :class="{active: swiperIndex === 0}"></view>
 				<view class="point" :class="{active: swiperIndex === 1}"></view>
 			</view>
@@ -35,7 +35,7 @@
 			<l-painter ref="posterRef1" @success="painterSsuccess1" isCanvasToTempFilePath performance path-type="url" 
 			custom-style="position: fixed; left: 200%" />
 				
-			<view class="flex-center cf" style="margin-top:30rpx;">左右切换活动</view>
+			<view class="flex-center cf" style="margin-top:30rpx;" v-if="posterPaths.length > 1">左右切换活动</view>
 			
       <section class="section-btns flex-row">
 				<div class="flex-col-center flex-1" @click="shareImage">
@@ -56,6 +56,7 @@ import { ref, nextTick, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 
+import { resolvePosterVisibility, buildPosterPaths, getCurrentPosterPath as _getCurrentPosterPath } from "./posterUtils.js"
 import { getRandomMotivation } from "./assets/rules.js"
 const motivationText = ref(getRandomMotivation().join(''))
 
@@ -68,9 +69,15 @@ function changeSwiper({detail}) {
 const posterRef = ref(null);
 const posterRef1 = ref(null);
 
+const showPoster1 = ref(false); // 520活动海报
+const showPoster2 = ref(false); // 跑币海报
+
 // 存储最终生成的海报图片URL
 const pictureImage = ref("");
 const pictureImage1 = ref("");
+
+// 可见海报的图片路径列表
+const posterPaths = computed(() => buildPosterPaths(showPoster1.value, showPoster2.value, pictureImage.value, pictureImage1.value));
 
 const posterJson = ref({});
 const posterJson1 = ref({});
@@ -823,9 +830,16 @@ async function open(propsData) {
   });
 
   show.value = true;
-	
+
+	const visibility = resolvePosterVisibility(propsData.eventIds);
+	showPoster1.value = visibility.showPoster1;
+	showPoster2.value = visibility.showPoster2;
+	swiperIndex.value = 0;
+	pictureImage.value = '';
+	pictureImage1.value = '';
+
 	propsData.fscoin = await getInfo(propsData)
-	
+
 	uni.showLoading({
 	  title: "正在生成海报",
 	  icon: "loading",
@@ -833,8 +847,8 @@ async function open(propsData) {
 
   setTimeout(() => {
 		nextTick(() => {
-		  renderPoster(propsData);
-		  renderPoster1(propsData);
+		  if (showPoster1.value) renderPoster(propsData);
+		  if (showPoster2.value) renderPoster1(propsData);
 		});
 	}, 100)
 }
@@ -846,7 +860,7 @@ async function getInfo(propsData) {
 }
 
 function getCurrentPosterPath() {
-  return swiperIndex.value === 0 ? pictureImage.value : pictureImage1.value;
+  return _getCurrentPosterPath(posterPaths.value, swiperIndex.value);
 }
 
 function shareImage() {
@@ -913,10 +927,14 @@ defineExpose({
 	.event-swiper {
 	  // padding: 0 34rpx;
 	  height: 1020rpx;
-	
+
 	  .event-swiper-item {
 	    // padding-right: 20rpx;
 	  }
+	}
+	.poster-center {
+	  display: flex;
+	  justify-content: center;
 	}
 	
 	.scroll-view_H {

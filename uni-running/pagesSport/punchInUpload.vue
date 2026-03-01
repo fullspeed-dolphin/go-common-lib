@@ -323,7 +323,8 @@
 				coinAmount: extractNumbers(res?.msg || ''),
 				coinAmountMsg: res?.msg,
 				checkinCount: res.events?.[0]?.checkin_count || 1,
-				checkinTime: dayjs().format("YYYY年MM月DD日 HH:mm")
+				checkinTime: dayjs().format("YYYY年MM月DD日 HH:mm"),
+				eventIds: options_events.value.filter(i => i.checked).map(i => i.value),
 			})
 			
 			// 2秒后隐藏弹窗并跳转
