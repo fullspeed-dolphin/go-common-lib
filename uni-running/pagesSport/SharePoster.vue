@@ -160,6 +160,8 @@ const renderPoster = (posterData) => {
               position: 'absolute',
               left: '120rpx',
               top: '92rpx',
+              display: 'flex',
+              alignItems: 'center',
             },
             views: [
               {
@@ -396,7 +398,7 @@ const renderPoster = (posterData) => {
                 },
               },
 							{
-							  text: "坚持扫码跑步",
+							  text: "扫码加入",
 							  type: "text",
 							  css: {
                   display: 'block',
@@ -542,6 +544,8 @@ const renderPoster1 = (posterData) => {
               position: 'absolute',
               left: '120rpx',
               top: '92rpx',
+              display: 'flex',
+              alignItems: 'center',
             },
             views: [
               {
@@ -778,7 +782,7 @@ const renderPoster1 = (posterData) => {
                 },
               },
 							{
-							  text: "坚持扫码跑步",
+							  text: "扫码加入",
 							  type: "text",
 							  css: {
                   display: 'block',
