@@ -852,6 +852,12 @@ function shareImage() {
     return;
   }
   wx.showShareImageMenu({ path });
+	
+	setTimeout(() => {
+		uni.switchTab({
+			url: '/pages/index'
+		})
+	}, 300)
 }
 
 function saveImage() {
