@@ -38,15 +38,11 @@
 			<view class="flex-center cf" style="margin-top:30rpx;">左右切换活动</view>
 			
       <section class="section-btns flex-row">
-				<div class="flex-col-center flex-1" @click="$u.toast('请长按图片操作')">
-					<view class="iconfont flex-center icon-weixin1"></view>
-					微信好友
+				<div class="flex-col-center flex-1" @click="shareImage">
+					<view class="iconfont flex-center icon-fenxiang"></view>
+					分享
 				</div>
-				<div class="flex-col-center flex-1" @click="$u.toast('请点击右上角 ●●● 操作')">
-					<view class="iconfont flex-center icon-pengyouquan"></view>
-					朋友圈
-				</div>
-				<div class="flex-col-center flex-1" @click="$u.toast('请长按图片操作')">
+				<div class="flex-col-center flex-1" @click="saveImage">
 					<view class="iconfont flex-center icon-baocuntupian" style="background:#FE837A"></view>
 					保存图片
 				</div>
@@ -61,7 +57,7 @@ import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 
 import { getRandomMotivation } from "./assets/rules.js"
-const motivationText = ref(getRandomMotivation())
+const motivationText = ref(getRandomMotivation().join(''))
 
 const swiperIndex = ref(0)
 function changeSwiper({detail}) {
@@ -175,7 +171,7 @@ const renderPoster = (posterData) => {
                 },
               },
 							{
-							  text: posterData.fscoin,
+							  text: String(posterData.fscoin || ''),
 							  type: "text",
 							  css: {
 									marginLeft: '10rpx',
@@ -200,12 +196,12 @@ const renderPoster = (posterData) => {
             },
             views: [
 							{
-							  text: posterData.checkinCount,
+							  text: String(posterData.checkinCount || ''),
 							  type: "text",
 							  css: {
                   fontSize: "36rpx",
                   fontWeight: 'bold',
-                  width: '105rpx',
+                  width: '100rpx',
                   height: '44rpx',
                   lineHeight: '44rpx',
 							    color: "#000",
@@ -214,12 +210,12 @@ const renderPoster = (posterData) => {
 							  },
 							},
               {
-							  text: posterData.distance,
+							  text: String(posterData.distance || ''),
 							  type: "text",
 							  css: {
                   fontSize: "36rpx",
                   fontWeight: 'bold',
-                  width: '125rpx',
+                  width: '120rpx',
                   height: '44rpx',
                   lineHeight: '44rpx',
 							    color: "#000",
@@ -228,12 +224,12 @@ const renderPoster = (posterData) => {
 							  },
 							},
               {
-							  text: posterData.duration,
+							  text: String(posterData.duration || ''),
 							  type: "text",
 							  css: {
                   fontSize: "36rpx",
                   fontWeight: 'bold',
-                  width: '135rpx',
+                  width: '175rpx',
                   height: '44rpx',
                   lineHeight: '44rpx',
 							    color: "#000",
@@ -242,12 +238,12 @@ const renderPoster = (posterData) => {
 							  },
 							},
               {
-							  text: posterData.pace,
+							  text: String(posterData.pace || ''),
 							  type: "text",
 							  css: {
                   fontSize: "36rpx",
                   fontWeight: 'bold',
-                  width: '125rpx',
+                  width: '130rpx',
                   height: '44rpx',
                   lineHeight: '44rpx',
 							    color: "#000",
@@ -262,7 +258,7 @@ const renderPoster = (posterData) => {
 							  css: {
                   fontSize: "16rpx",
                   fontWeight: 'bold',
-                  width: '105rpx',
+                  width: '100rpx',
                   height: '22rpx',
                   marginTop: '4rpx',
 							    color: "#000",
@@ -275,7 +271,7 @@ const renderPoster = (posterData) => {
 							  css: {
                   fontSize: "16rpx",
                   fontWeight: 'bold',
-                  width: '125rpx',
+                  width: '120rpx',
                   height: '22rpx',
                   marginTop: '4rpx',
 							    color: "#000",
@@ -288,7 +284,7 @@ const renderPoster = (posterData) => {
 							  css: {
                   fontSize: "16rpx",
                   fontWeight: 'bold',
-                  width: '135rpx',
+                  width: '175rpx',
                   height: '22rpx',
                   marginTop: '4rpx',
 							    color: "#000",
@@ -301,7 +297,7 @@ const renderPoster = (posterData) => {
 							  css: {
                   fontSize: "16rpx",
                   fontWeight: 'bold',
-                  width: '125rpx',
+                  width: '130rpx',
                   height: '22rpx',
                   marginTop: '4rpx',
 							    color: "#000",
@@ -557,7 +553,7 @@ const renderPoster1 = (posterData) => {
                 },
               },
 							{
-							  text: posterData.fscoin,
+							  text: String(posterData.fscoin || ''),
 							  type: "text",
 							  css: {
 									marginLeft: '10rpx',
@@ -582,12 +578,12 @@ const renderPoster1 = (posterData) => {
             },
             views: [
 							{
-							  text: posterData.checkinCount,
+							  text: String(posterData.checkinCount || ''),
 							  type: "text",
 							  css: {
                   fontSize: "36rpx",
                   fontWeight: 'bold',
-                  width: '105rpx',
+                  width: '100rpx',
                   height: '44rpx',
                   lineHeight: '44rpx',
 							    color: "#000",
@@ -596,12 +592,12 @@ const renderPoster1 = (posterData) => {
 							  },
 							},
               {
-							  text: posterData.distance,
+							  text: String(posterData.distance || ''),
 							  type: "text",
 							  css: {
                   fontSize: "36rpx",
                   fontWeight: 'bold',
-                  width: '125rpx',
+                  width: '120rpx',
                   height: '44rpx',
                   lineHeight: '44rpx',
 							    color: "#000",
@@ -610,12 +606,12 @@ const renderPoster1 = (posterData) => {
 							  },
 							},
               {
-							  text: posterData.duration,
+							  text: String(posterData.duration || ''),
 							  type: "text",
 							  css: {
                   fontSize: "36rpx",
                   fontWeight: 'bold',
-                  width: '135rpx',
+                  width: '175rpx',
                   height: '44rpx',
                   lineHeight: '44rpx',
 							    color: "#000",
@@ -624,12 +620,12 @@ const renderPoster1 = (posterData) => {
 							  },
 							},
               {
-							  text: posterData.pace,
+							  text: String(posterData.pace || ''),
 							  type: "text",
 							  css: {
                   fontSize: "36rpx",
                   fontWeight: 'bold',
-                  width: '125rpx',
+                  width: '130rpx',
                   height: '44rpx',
                   lineHeight: '44rpx',
 							    color: "#000",
@@ -644,7 +640,7 @@ const renderPoster1 = (posterData) => {
 							  css: {
                   fontSize: "16rpx",
                   fontWeight: 'bold',
-                  width: '105rpx',
+                  width: '100rpx',
                   height: '22rpx',
                   marginTop: '4rpx',
 							    color: "#000",
@@ -657,7 +653,7 @@ const renderPoster1 = (posterData) => {
 							  css: {
                   fontSize: "16rpx",
                   fontWeight: 'bold',
-                  width: '125rpx',
+                  width: '120rpx',
                   height: '22rpx',
                   marginTop: '4rpx',
 							    color: "#000",
@@ -670,7 +666,7 @@ const renderPoster1 = (posterData) => {
 							  css: {
                   fontSize: "16rpx",
                   fontWeight: 'bold',
-                  width: '135rpx',
+                  width: '175rpx',
                   height: '22rpx',
                   marginTop: '4rpx',
 							    color: "#000",
@@ -683,7 +679,7 @@ const renderPoster1 = (posterData) => {
 							  css: {
                   fontSize: "16rpx",
                   fontWeight: 'bold',
-                  width: '125rpx',
+                  width: '130rpx',
                   height: '22rpx',
                   marginTop: '4rpx',
 							    color: "#000",
@@ -774,7 +770,7 @@ const renderPoster1 = (posterData) => {
             },
             views: [
               {
-								src: "/static/poster/小程序二维码@2x.png",
+								src: "/static/poster/打卡.png",
 								type: "image",
                 css: {
                   width: "116rpx",
@@ -843,6 +839,43 @@ async function getInfo(propsData) {
   if (!propsData.id) return '';
   const res = await request.get(`/wallet-api/wallet/balance`) || {}
 	return res.fscoin
+}
+
+function getCurrentPosterPath() {
+  return swiperIndex.value === 0 ? pictureImage.value : pictureImage1.value;
+}
+
+function shareImage() {
+  const path = getCurrentPosterPath();
+  if (!path) {
+    uni.showToast({ title: '海报未生成', icon: 'none' });
+    return;
+  }
+  wx.showShareImageMenu({ path });
+}
+
+function saveImage() {
+  const filePath = swiperIndex.value === 0 ? pictureImage.value : pictureImage1.value;
+  if (!filePath) {
+    uni.showToast({ title: '海报未生成', icon: 'none' });
+    return;
+  }
+  uni.saveImageToPhotosAlbum({
+    filePath,
+    success() {
+      uni.showToast({ title: '保存成功', icon: 'success' });
+    },
+    fail(err) {
+      if (err.errMsg?.includes('auth deny') || err.errMsg?.includes('authorize')) {
+        uni.showModal({
+          title: '提示',
+          content: '需要授权相册权限才能保存图片',
+          confirmText: '去设置',
+          success(res) { if (res.confirm) uni.openSetting(); }
+        });
+      }
+    }
+  });
 }
 
 function close() {
