@@ -112,8 +112,24 @@
 			<up-icon name="checkmark-circle" size="40rpx" color="#00C950" />
 			<view class="u-ml-10">后台核验成功</view>
 		</view>
+
+		
 		
 		<SharePoster ref="refSharePoster" />
+
+		<!-- 固定联系客服按钮 -->
+		<button class="kefu-btn" open-type="contact">
+			<view class="iconfont icon-kefu"></view>
+			<view class="kefu-label">客服</view>
+		</button>
+
+		<up-modal :show="isShowModal" open-type="contact" 
+			:title="modalTitle"
+			:content="modalErrorText"
+			cancelText="联系客服" confirmText="知道了"
+			contentTextAlign="center"
+			cancelColor="rgb(41, 121, 255)" confirmColor="#ff8c00"
+			@confirm="() => uni.navigateBack()"  showCancelButton :asyncClose="true" />
 	</view>
 </template>
 <script setup>
@@ -215,6 +231,15 @@
 		}
 	});
 
+	const isShowModal = ref(false)
+	const modalTitle = ref('')
+	const modalErrorText = ref('')
+	function showModal({title, content}) {
+		modalTitle.value = title || '提示'
+		modalErrorText.value = content || '请稍后重试'
+		isShowModal.value = true
+	}
+
 	// 图片上传成功后调用OCR识别
 	let verifyToken = ''
 	const onImageUploaded = async (imageUrl) => {
@@ -264,11 +289,10 @@
 				deleteUploadedImage(imageUrl);
 				ruleForm.value.picture = ""
 				isSuccess.value = false
-				uni.showModal({
+				showModal({
 					title: '识别失败',
-					content: res?.msg || '无法识别截图中的运动数据，请确保上传的是有效的运动截图',
-					showCancel: false
-				});
+					content: res?.msg || '无法识别截图中的运动数据，请确保上传的是有效的运动截图'
+				})
 			}
 		} catch (error) {
 			isSuccess.value = false
@@ -278,10 +302,9 @@
 
 			uni.hideLoading();
 			console.error('OCR识别失败:', error);
-			uni.showModal({
+			showModal({
 				title: '识别失败',
 				content: error?.msg || error?.message || '识别服务异常，请稍后重试',
-				showCancel: false
 			});
 		}
 		
@@ -293,10 +316,6 @@
 	const ruleForm = ref({
 		picture: "",
 	});
-	
-	function routeTo() {
-		uni.$u.route('pagesSport/recognizeSuccess')
-	}
 	
 	function confirmToCheck() {
 		request.post('/ocr-api/checkin', {
@@ -334,13 +353,9 @@
 			// }, 2000)
 		}).catch(err => {
 			console.log('err======>', err)
-			uni.showModal({
+			showModal({
 				title: '打卡失败',
-				content: err?.msg || '请稍后重试',
-				showCancel: false,
-				success: () => {
-					uni.navigateBack()
-				}
+				content: err?.msg || '请稍后重试'
 			})
 		})
 	}
@@ -413,6 +428,33 @@
 			font-weight: 800;
 			font-size: 44rpx;
 			text-align: center;
+		}
+	}
+
+	/* 固定联系客服按钮 */
+	.kefu-btn {
+		position: fixed;
+		right: 24rpx;
+		top: 1060rpx;
+		width: 96rpx;
+		height: 96rpx;
+		border-radius: 999rpx;
+		background: #18b566;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		color: #fff;
+		z-index: 10;
+		box-shadow: 0 6rpx 18rpx rgba(24,181,102,0.25);
+		line-height: 1;
+		.icon-kefu {
+			font-size: 38rpx;
+		}
+		.kefu-label {
+			font-size: 16rpx;
+			color: #fff;
+			margin-top: 6rpx;
 		}
 	}
 
