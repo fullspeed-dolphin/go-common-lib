@@ -334,6 +334,11 @@
 				return matches ? matches.map(Number)?.[0] : '';
 			}
 			
+			// 从 events(.id) 和 results(.event_id) 合并打卡次数
+			const checkinCounts = {}
+			res.data.events?.forEach(e => { if (e.checkin_count != null) checkinCounts[e.id] = e.checkin_count })
+			res.data.results?.forEach(r => { if (r.checkin_count != null) checkinCounts[r.event_id] = r.checkin_count })
+
 			refSharePoster.value.open({
 				...userInfo.value,
 				distance: parseFloat(res.data.km),
@@ -341,7 +346,7 @@
 				pace: res.data.speed,
 				coinAmount: extractNumbers(res?.msg || ''),
 				coinAmountMsg: res?.msg,
-				events: res.events || [],
+				checkinCounts,
 				checkinTime: dayjs().format("YYYY年MM月DD日 HH:mm"),
 				eventIds: options_events.value.filter(i => i.checked).map(i => i.value),
 			})
