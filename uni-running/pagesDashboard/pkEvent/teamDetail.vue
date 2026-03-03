@@ -623,17 +623,18 @@ const handleEdit = () => {
     z-index: 1;
     padding: 12rpx 24rpx;
     font-size: 28rpx;
-    color: #ff5c5c;
+    color: #999;
+    background: #f5f5f5;
     line-height: 40rpx;
     width: 336rpx;
     white-space: nowrap;
     transition: color 0.3s ease;
     font-weight: bold;
     text-align: center;
+    border-radius: 999rpx;
     &.active {
-      color: #ff5c5c;
-      border-radius: 999rpx;
-      background: #f3f4f6;
+      color: #fff;
+      background: #ff5c5c;
     }
   }
 }
