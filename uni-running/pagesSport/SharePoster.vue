@@ -56,7 +56,12 @@ import { ref, nextTick, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 
-import { resolvePosterVisibility, buildPosterPaths, getCurrentPosterPath as _getCurrentPosterPath } from "./posterUtils.js"
+import { resolvePosterVisibility, buildPosterPaths, getCurrentPosterPath as _getCurrentPosterPath, ACTIVITY_EVENT_ID, DEFAULT_EVENT_ID } from "./posterUtils.js"
+
+function getCheckinCount(events, eventId) {
+	const event = events?.find(e => e.event_id === eventId)
+	return event?.checkin_count || 1
+}
 import { getRandomMotivation } from "./assets/rules.js"
 const motivationText = ref(getRandomMotivation().join(''))
 
@@ -847,8 +852,8 @@ async function open(propsData) {
 
   setTimeout(() => {
 		nextTick(() => {
-		  if (showPoster1.value) renderPoster(propsData);
-		  if (showPoster2.value) renderPoster1(propsData);
+		  if (showPoster1.value) renderPoster({ ...propsData, checkinCount: getCheckinCount(propsData.events, ACTIVITY_EVENT_ID) });
+		  if (showPoster2.value) renderPoster1({ ...propsData, checkinCount: getCheckinCount(propsData.events, DEFAULT_EVENT_ID) });
 		});
 	}, 100)
 }
