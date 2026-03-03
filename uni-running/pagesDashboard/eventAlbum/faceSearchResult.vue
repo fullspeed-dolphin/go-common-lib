@@ -16,8 +16,9 @@
 				@click="previewImage(url, index)"
 			/>
 		</view>
-
-		<qPreviewImage ref="refPreviewImage" :urls="image750List" :originalUrls="imageList"></qPreviewImage>
+		<!-- 轮播图 -->
+		<PreviewMedia ref="refPreviewImage" @clearList="clearList"/>
+		<!-- <qPreviewImage ref="refPreviewImage" :urls="image750List" :originalUrls="imageList"></qPreviewImage> -->
 	</view>
 </template>
 
@@ -25,7 +26,9 @@
 import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { useShare } from "@/composables/useShare.js";
+import PreviewMedia from "./components/PreviewMedia.vue"
 import qPreviewImage from "./components/q-previewImage/components/q-previewImage/q-previewImage.vue"
+import store from '../../utils/store';
 
 // 分享配置
 useShare({
@@ -47,11 +50,21 @@ onLoad(() => {
 		});
 		imageList.value = list
 		image750List.value = list.map(i => i + '?x-oss-process=image/resize,w_750/quality,q_80/format,webp')
+		// 修改store当中的album_data值
+		store.commit('set', {
+			type: 'album_data',
+			data: list
+		})
+		store.commit('set', {
+			type: 'album_total',
+			data: list.length
+		})
 	}
 });
 
 const previewImage = (url, index) => {
-	refPreviewImage.value.open(url);
+	// refPreviewImage.value.open(url);
+	refPreviewImage.value.openModal(url, index, imageList.value)
 };
 </script>
 
