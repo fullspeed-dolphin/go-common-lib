@@ -17,9 +17,9 @@
     </section>
 
     <!-- 内容区域 -->
-    <view class="content-wrapper" @touchstart="onTouchStart" @touchend="handleTouchEnd">
+    <view class="content-wrapper">
       <mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" :top="100">
-        <view class="order-list" :class="['list-transition', listAnimClass]">
+        <view class="order-list">
           <view class="team-card" v-for="(item, index) in dataList" :key="index" @click="joinTeam(item)">
             <!-- <image :src="item.team_avatar_url" class="avatar" /> -->
             <div class="avatar">
@@ -255,17 +255,18 @@ defineOptions({
     z-index: 1;
     padding: 12rpx 24rpx;
     font-size: 28rpx;
-    color: #ff5c5c;
+    color: #999;
+    background: #f5f5f5;
     line-height: 40rpx;
     width: 336rpx;
     white-space: nowrap;
     transition: color 0.3s ease;
     font-weight: bold;
     text-align: center;
+    border-radius: 999rpx;
     &.active {
-      color: #ff5c5c;
-      border-radius: 999rpx;
-      background: #f3f4f6;
+      color: #fff;
+      background: #ff5c5c;
     }
   }
 }

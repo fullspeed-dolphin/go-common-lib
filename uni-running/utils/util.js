@@ -56,3 +56,8 @@ export function isReleaseVersion() {
 	// shouldShow = envVersion === 'release';
 	return envVersion === 'trial' || envVersion === 'release' || envVersion === 'develop';
 }
+
+
+export function getRealName(name) {
+	return name?.startsWith('user_') ? '全速兔' + String(Math.random()*100000).slice(0,5) : name
+}

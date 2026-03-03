@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 5084314 */
-  src: url('//at.alicdn.com/t/c/font_5084314_3ue8wd44mw8.woff2?t=1770601351641') format('woff2'),
-       url('//at.alicdn.com/t/c/font_5084314_3ue8wd44mw8.woff?t=1770601351641') format('woff'),
-       url('//at.alicdn.com/t/c/font_5084314_3ue8wd44mw8.ttf?t=1770601351641') format('truetype');
+  src: url('//at.alicdn.com/t/c/font_5084314_g23chi9fqxh.woff2?t=1772442245245') format('woff2'),
+       url('//at.alicdn.com/t/c/font_5084314_g23chi9fqxh.woff?t=1772442245245') format('woff'),
+       url('//at.alicdn.com/t/c/font_5084314_g23chi9fqxh.ttf?t=1772442245245') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,98 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-kefu:before {
+  content: "\e60d";
+}
+
+.icon-pengyouquan:before {
+  content: "\e630";
+}
+
+.icon-weixin1:before {
+  content: "\e606";
+}
+
+.icon-baocuntupian:before {
+  content: "\e603";
+}
+
+.icon-guanyuwomen:before {
+  content: "\10202";
+}
+
+.icon-baomingka1:before {
+  content: "\e633";
+}
+
+.icon-baomingmingdan:before {
+  content: "\e607";
+}
+
+.icon-weixin:before {
+  content: "\e695";
+}
+
+.icon-lianxikefu:before {
+  content: "\e615";
+}
+
+.icon-renyuan-:before {
+  content: "\e612";
+}
+
+.icon-dingdan:before {
+  content: "\e8ae";
+}
+
+.icon-zhuye:before {
+  content: "\e63a";
+}
+
+.icon-qiandao_daka:before {
+  content: "\e790";
+}
+
+.icon-zhinengshoubiao:before {
+  content: "\e78a";
+}
+
+.icon-flag-fill:before {
+  content: "\e622";
+}
+
+.icon-wode:before {
+  content: "\e678";
+}
+
+.icon-shouye1-xuanzhong:before {
+  content: "\e618";
+}
+
+.icon-CRMEB-shoubiao2-mianxing:before {
+  content: "\e936";
+}
+
+.icon-youxiang:before {
+  content: "\e664";
+}
+
+.icon-diqiu:before {
+  content: "\e67d";
+}
+
+.icon-aixin1:before {
+  content: "\e8ab";
+}
+
+.icon-baxin:before {
+  content: "\e67e";
+}
+
+.icon-dianhua:before {
+  content: "\e65f";
 }
 
 .icon-huodongguize:before {

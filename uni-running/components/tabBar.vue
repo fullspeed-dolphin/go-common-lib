@@ -1,15 +1,15 @@
 <template>
   <view class="tabbar-box">
-    <u-tabbar :value="active" @change="onChange" activeColor="#FF8C00" inactiveColor="#000" fixed placeholder zIndex="100" safeAreaInsetBottom :border="false">
+    <u-tabbar :value="active" @change="onChange" activeColor="#FF8C00" inactiveColor="#000" fixed placeholder zIndex="100" :safeAreaInsetBottom="false" :border="false">
       <block v-for="(item, index) in tabList" :key="index">
-        <u-tabbar-item :text="item.text" :name="item.name">
-          <template #active-icon>
-            <view class="iconfont active" :class="item.icon"></view>
-          </template>
-          <template #inactive-icon>
-            <view class="iconfont" :class="item.icon"></view>
-          </template>
+        <u-tabbar-item v-if="index === 2" :text="item.text" :name="item.name">
           <template #text>
+            <image src="/static/images/Frame 18@2x.png" :class="{ 'filter': active !== item.name }" mode="aspectFill" style="width:82rpx;height:82rpx;"/>
+          </template>
+        </u-tabbar-item>
+        <u-tabbar-item v-else :text="item.text" :name="item.name">
+          <template #text>
+						<view class="iconfont" :class="{ 'active': active === item.name, [item.icon]: true }"></view>
             <text class="tabbar-text" :class="{ 'tabbar-text--active': active === item.name }">{{ item.text }}</text>
           </template>
         </u-tabbar-item>
@@ -31,7 +31,7 @@ const tabList = ref([
     text: "首页",
     name: "index",
     pagePath: "/pages/index",
-    icon: "icon-shouye",
+    icon: "icon-shouye1-xuanzhong",
     normal:
       "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/tab_00.png",
     active:
@@ -41,7 +41,7 @@ const tabList = ref([
     text: "活动",
     name: "event",
     pagePath: "/pages/event",
-    icon: "icon-rili",
+    icon: "icon-flag-fill",
     normal:
       "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/tab_00.png",
     active:
@@ -61,7 +61,7 @@ const tabList = ref([
     text: "运动",
     name: "sport",
     pagePath: "/pages/sport",
-    icon: "icon-huabi-",
+    icon: "icon-CRMEB-shoubiao2-mianxing",
     normal:
       "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/tab_00.png",
     active:
@@ -70,7 +70,7 @@ const tabList = ref([
   {
     text: "我的",
     name: "mine",
-    icon: "icon-wenzi",
+    icon: "icon-wode",
     pagePath: "/pages/mine",
     normal:
       "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/tab_20.png",
@@ -96,14 +96,15 @@ const onChange = (detail) => {
 
 <style lang="scss" scoped>
 .tabbar-box {
+  padding-top: 30rpx;
   box-sizing: content-box;
   margin-bottom: env(safe-area-inset-bottom);
 }
 
 .tabbar-text {
-  font-size: 36rpx;
-  font-weight: 500;
-  color: #000;
+  font-size: 22rpx;
+  // font-weight: 500;
+  color:rgb(125, 126, 128);;
 }
 
 .tabbar-text--active {
@@ -111,10 +112,15 @@ const onChange = (detail) => {
 }
 
 .iconfont {
-  font-size: 36rpx;
+	height: 42rpx;
+	width: 42rpx;
+  font-size: 46rpx;
+  margin-bottom: 6rpx;
   color: rgb(125, 126, 128);
 }
-
+.filter {
+  filter: grayscale(100%);
+}
 .active {
   color: #ff8c00;
 }

@@ -1,5 +1,6 @@
 <template>
   <view class="">
+		<mescroll-body ref="mescrollRef" @init="mescrollInit" :down="{ use: false }" @down="downCallback" @up="getList" :top="0">
     <u-navbar autoBack placeholder :title="detailInfo?.event_name || '活动详情'"></u-navbar>
     <section class="flex-center" style="height: 512rpx;filter1: blur(10px);">
       <image class="img" style="width:750rpx;height:512rpx;" :src="
@@ -98,8 +99,13 @@
           </view>
         </view>
       </view>
+      <!-- 战队排序开关(仅在战队榜时显示) -->
+      <view v-if="tabIndex === 1" class="sort-switch u-mt-20">
+        <view class="sort-btn" :class="{ active: teamSortBy === 'members' }" @click="switchTeamSort('members')">人数排行</view>
+        <view class="sort-btn" :class="{ active: teamSortBy === 'distance' }" @click="switchTeamSort('distance')">跑量排行</view>
+      </view>
     </view>
-
+		
     <view class="rank-list">
       <!-- 个人排行榜 -->
       <template v-if="tabIndex === 0">
@@ -112,12 +118,20 @@
               item.avatar_url ? item.avatar_url + '?x-oss-process=image/resize,w_120,h_120,m_fill' : '/static/images/user.png'
             " mode="aspectFill" />
           </div>
-          <view class="user-info">
+          <!-- <view class="user-info">
             <view style="display:flex;align-items:center;">
               <view class="user-name">{{ item.real_name }}</view>
               <view class="group-tag">{{ item.team_name }}</view>
             </view>
             <view class="user-time">{{ item.team_goal_km }}KM组</view>
+          </view> -->
+          <view class="user-info">
+            <view class="user-name">{{ item.real_name }}</view>
+            <view class="user-detail">
+              <view style="color:#999;font-size:24rpx;">{{ item.team_goal_km }}KM组</view>
+              <view class="flex-center group-tag u-mb-10 u-mt-10">{{ item.team_name }}</view>
+            </view>
+            <!-- <view class="user-time">{{ item.total_sessions }}次</view> -->
           </view>
           <view class="progress">
             <text class="progress-percent"><text style="font-size:40rpx;">{{ item.total_distance_km }}</text>km</text>
@@ -142,16 +156,18 @@
             <view class="user-time">{{ item.current_members }}人 | 完成率 {{ item.team_completion_rate }}%</view>
           </view>
           <view class="progress">
-            <text class="progress-percent"><text style="font-size:36rpx;">{{ item.total_distance_km }}</text>km</text>
+            <text class="progress-percent">
+              <text style="font-size:36rpx;">{{ teamRankValue(item) }}</text>
+            </text>
           </view>
         </view>
       </template>
 
-      <view v-if="!rankList.length" class="flex-center" style="min-height: 350rpx;">
-        <u-empty mode="data" text="暂无数据" />
-      </view>
     </view>
-
+		</mescroll-body>
+		
+		
+		<div class="hr100" style="height:120rpx;"></div>
     <view v-if="isSignUpEvent" class="join-btn-wrapper flex-center">
       <u-button class="join-btn" color="#ff5c5c" color1="linear-gradient(64deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%)"
         customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;letter-spacing: 1px;font-size: 34rpx;" :disabled="detailInfo?.status !== 'act'" @click="SignUpEvent()">
@@ -165,10 +181,16 @@
 
 <script setup>
 import { ref, computed, watch } from "vue";
-import { onLoad, onShow, onReachBottom } from "@dcloudio/uni-app";
+import { onLoad, onShow, onReachBottom, onPageScroll } from "@dcloudio/uni-app";
+
+import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
+const { mescrollInit, downCallback, getMescroll } = useMescroll(onPageScroll, onReachBottom);
+
 import { useShare, buildPath } from "@/composables/useShare.js";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
+import { getRealName } from "@/utils/util.js"
+
 import UserLogin from "@/components/UserLogin.vue";
 import { useStore } from "vuex";
 
@@ -212,12 +234,13 @@ const tabList = ref([
   },
 ]);
 
+// 战队排行榜排序字段
+const teamSortBy = ref('members');
+
+
 function changeTab(index) {
   tabIndex.value = index;
-  rankPage.value = 0;
-  rankHasMore.value = true;
-  rankList.value = [];
-  getRankList();
+  refreshList();
 }
 
 const init = () => {
@@ -312,9 +335,6 @@ onShow(() => {
   init();
   getUserStatus();
   getMyEvents();
-  rankPage.value = 0;
-  rankHasMore.value = true;
-  getRankList();
 });
 
 useShare(() => ({
@@ -326,36 +346,57 @@ useShare(() => ({
   }),
 }));
 
-const RANK_PAGE_SIZE = 100;
-const rankList = ref([]);
-const rankPage = ref(0);
-const rankHasMore = ref(true);
-const rankLoading = ref(false);
-
-const getRankList = () => {
-  if (rankLoading.value || !rankHasMore.value) return;
-  rankLoading.value = true;
-  let url = tabIndex.value == 0
-    ? "/event-api/ranking/personal?event_id=" + activetyId.value
-    : "/event-api/ranking/team?event_id=" + activetyId.value;
-  url += `&page_index=${rankPage.value}&page_size=${RANK_PAGE_SIZE}`;
-  request.get(url).then((res) => {
-    const list = res?.list || [];
-    if (rankPage.value === 0) {
-      rankList.value = list;
-    } else {
-      rankList.value = rankList.value.concat(list);
-    }
-    rankHasMore.value = list.length >= RANK_PAGE_SIZE;
-    rankPage.value++;
-  }).finally(() => {
-    rankLoading.value = false;
-  });
+const refreshList = () => {
+  getMescroll().resetUpScroll();
+  getMescroll().scrollTo(0, 0);
 };
 
-onReachBottom(() => {
-  getRankList();
-});
+const rankList = ref([]);
+const getList = (mescroll) => {
+	uni.showLoading({ mask: true });
+  const data = {
+    page_index: mescroll.num - 1,
+    page_size: 10,
+    event_id: activetyId.value,
+  };
+	let url = tabIndex.value == 0 ? '/event-api/ranking/personal' : '/event-api/ranking/team'
+
+  if (tabIndex.value === 1) {
+    data.sort_by = teamSortBy.value;
+  }
+  request.get(url, data).then((res) => {
+      const list = (res?.list || []).map(item => ({
+				...item,
+				real_name: getRealName(item.real_name)
+			}));
+      mescroll.endSuccess(list.length, list.length >= 10);
+
+      if (mescroll.num == 1) {
+        rankList.value = [];
+      }
+
+      rankList.value = rankList.value.concat(list);
+    })
+    .catch((error) => {
+      mescroll.endErr();
+    });
+};
+
+// 切换战队排序方式
+const switchTeamSort = (sort) => {
+  if (teamSortBy.value === sort) return;
+  teamSortBy.value = sort;
+  refreshList();
+};
+
+// 战队显示字符
+const teamRankValue = (item) => {
+  return teamSortBy.value === 'distance'
+    ? item.total_distance_km + 'km'
+    : item.current_members + '人';
+};
+
+
 </script>
 
 <style lang="scss" scoped>
@@ -420,6 +461,33 @@ onReachBottom(() => {
     background: #05df72;
     border-radius: 50%;
     margin-right: 5rpx;
+  }
+}
+
+.tab-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20rpx 30rpx;
+}
+
+.sort-switch {
+  display: flex;
+  justify-content: center;
+  gap: 16rpx;
+  padding: 0 0 16rpx;
+
+  .sort-btn {
+    padding: 10rpx 32rpx;
+    font-size: 24rpx;
+    color: #999;
+    background: #f5f5f5;
+    border-radius: 999rpx;
+
+    &.active {
+      color: #fff;
+      background: #ff5c5c;
+    }
   }
 }
 
@@ -525,13 +593,12 @@ onReachBottom(() => {
 }
 
 .tab-item.active {
-  color: #ff5c5c;
-  border-bottom: 2rpx solid #ff5c5c;
+  color: #fff;
+  background: #ff5c5c;
 }
 
 .rank-list {
   margin: 0 30rpx;
-  padding-bottom: 200rpx;
 }
 
 .rank-item {
@@ -565,13 +632,11 @@ onReachBottom(() => {
     font-weight: 500;
     font-size: 22rpx;
     color: #155dfc;
-    padding: 4rpx 14rpx;
-    margin-left: 12rpx;
+    padding: 4rpx 10rpx;
     background: #eff6ff;
     border-radius: 12rpx;
-    max-width: 160rpx;
-    line-height: 1.4;
-    flex-shrink: 0;
+    max-width: 260rpx;
+    display: inline-block;
   }
   .rank-number {
     width: 96rpx;
@@ -660,18 +725,17 @@ onReachBottom(() => {
     z-index: 1;
     padding: 12rpx 24rpx;
     font-size: 28rpx;
-    color: #ff5c5c;
+    color: #999;
+    background: #f5f5f5;
     line-height: 40rpx;
     width: 336rpx;
     white-space: nowrap;
-    transition: color 0.3s ease;
     font-weight: bold;
     text-align: center;
-
+    border-radius: 999rpx;
     &.active {
-      color: #ff5c5c;
-      border-radius: 999rpx;
-      background: #f3f4f6;
+      color: #fff;
+      background: #ff5c5c;
     }
   }
 }

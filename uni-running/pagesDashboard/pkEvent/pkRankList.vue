@@ -11,7 +11,7 @@
           <image :src="currentIndex === 0 ? topList[1].avatar_url : topList[1].team_avatar_url" class="avatar" />
           <text class="rank-label flex-center">NO.2</text>
           <text class="name">{{ currentIndex === 0 ? topList[1].real_name : topList[1].team_name }}</text>
-          <text class="distance">{{ currentIndex === 0 ? topList[1].total_distance_km : topList[1].team_goal_km }}km</text>
+          <text class="distance">{{ currentIndex === 0 ? topList[1].total_distance_km : teamRankValue(topList[1]) }}</text>
         </view>
 
         <!-- NO.1 -->
@@ -19,7 +19,7 @@
           <image :src="currentIndex === 0 ? topList[0].avatar_url : topList[0].team_avatar_url" class="avatar" />
           <text class="rank-label flex-center">NO.1</text>
           <text class="name">{{ currentIndex === 0 ? topList[0].real_name : topList[0].team_name }}</text>
-          <text class="distance">{{ currentIndex === 0 ? topList[0].total_distance_km : topList[0].team_goal_km }}km</text>
+          <text class="distance">{{ currentIndex === 0 ? topList[0].total_distance_km : teamRankValue(topList[0]) }}</text>
         </view>
 
         <!-- NO.3 -->
@@ -27,7 +27,7 @@
           <image :src="currentIndex === 0 ? topList[2].avatar_url : topList[2].team_avatar_url" class="avatar" />
           <text class="rank-label flex-center">NO.3</text>
           <text class="name">{{ currentIndex === 0 ? topList[2].real_name : topList[2].team_name }}</text>
-          <text class="distance">{{ currentIndex === 0 ? topList[2].total_distance_km : topList[2].team_goal_km }}km</text>
+          <text class="distance">{{ currentIndex === 0 ? topList[2].total_distance_km : teamRankValue(topList[2]) }}</text>
         </view>
       </view>
     </section>
@@ -39,6 +39,10 @@
             {{ item.label }}
           </view>
         </view>
+      </view>
+      <view v-if="currentIndex === 1" class="sort-switch">
+        <view class="sort-btn" :class="{ active: teamSortBy === 'members' }" @click="switchTeamSort('members')">人数排行</view>
+        <view class="sort-btn" :class="{ active: teamSortBy === 'distance' }" @click="switchTeamSort('distance')">跑量排行</view>
       </view>
     </view>
 
@@ -60,7 +64,7 @@
               {{ item.team_goal_km }}KM
               <view class="flex-center group-tag">{{ item.team_name }}</view>
             </view>
-            <view class="user-time">{{ item.total_sessions }}次</view>
+            <!-- <view class="user-time">{{ item.total_sessions }}次</view> -->
           </view>
           <view class="progress">
             <text class="progress-percent"><text style="font-size:36rpx;">{{ item.total_distance_km }}</text>km</text>
@@ -87,7 +91,7 @@
             <view class="user-time">完成率 {{ item.team_completion_rate }}%</view>
           </view>
           <view class="progress">
-            <text class="progress-percent"><text style="font-size:36rpx;">{{ item.team_goal_km }}</text>km</text>
+            <text class="progress-percent"><text style="font-size:36rpx;">{{ teamRankValue(item) }}</text></text>
           </view>
         </view>
       </template>
@@ -118,6 +122,7 @@ const tabList = ref([
   { label: "战队排行榜", value: "SUCC" },
 ]);
 const currentIndex = ref(0);
+const teamSortBy = ref('members');
 
 onLoad((options) => {
   activetyId.value = options.id;
@@ -133,6 +138,20 @@ const handleTabChange = (index) => {
   getMescroll().resetUpScroll();
 };
 
+// 战队排序切换
+const switchTeamSort = (sort) => {
+  if (teamSortBy.value === sort) return;
+  teamSortBy.value = sort;
+  getMescroll().resetUpScroll();
+};
+
+// 战队排行榜显示值：按人数排显示人数，按跑量排显示跑量
+const teamRankValue = (item) => {
+  return teamSortBy.value === 'distance'
+    ? item.total_distance_km + 'km'
+    : item.current_members + '人';
+};
+
 // 排行榜数据
 const rankList = ref([]);
 
@@ -141,6 +160,9 @@ const loadRankList = (mescroll) => {
     ? "/event-api/ranking/personal?event_id="
     : "/event-api/ranking/team?event_id=";
   url += activetyId.value + `&page_index=${mescroll.num - 1}&page_size=${PAGE_SIZE}`;
+  if (currentIndex.value === 1) {
+    url += `&sort_by=${teamSortBy.value}`;
+  }
 
   request.get(url).then((res) => {
     const list = res?.list || [];
@@ -280,11 +302,29 @@ const loadRankList = (mescroll) => {
 
 .tab-container {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   margin: 20rpx 30rpx;
-  background-color: white;
-  border-radius: 20rpx;
-  overflow: hidden;
+}
+
+.sort-switch {
+  display: flex;
+  justify-content: center;
+  gap: 16rpx;
+  padding: 0 0 16rpx;
+
+  .sort-btn {
+    padding: 10rpx 32rpx;
+    font-size: 24rpx;
+    color: #999;
+    background: #f5f5f5;
+    border-radius: 999rpx;
+
+    &.active {
+      color: #fff;
+      background: #ff5c5c;
+    }
+  }
 }
 
 .tab-item {
@@ -418,24 +458,22 @@ const loadRankList = (mescroll) => {
       opacity: 0;
     }
   }
-
   .tag-item {
     position: relative;
     z-index: 1;
     padding: 12rpx 24rpx;
     font-size: 28rpx;
-    color: #ff5c5c;
+    color: #999;
+    background: #f5f5f5;
     line-height: 40rpx;
     width: 336rpx;
     white-space: nowrap;
-    transition: color 0.3s ease;
     font-weight: bold;
     text-align: center;
-
+    border-radius: 999rpx;
     &.active {
-      color: #ff5c5c;
-      border-radius: 999rpx;
-      background: #f3f4f6;
+      color: #fff;
+      background: #ff5c5c;
     }
   }
 }

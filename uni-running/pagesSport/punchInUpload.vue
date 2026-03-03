@@ -112,7 +112,24 @@
 			<up-icon name="checkmark-circle" size="40rpx" color="#00C950" />
 			<view class="u-ml-10">后台核验成功</view>
 		</view>
+
 		
+		
+		<SharePoster ref="refSharePoster" />
+
+		<!-- 固定联系客服按钮 -->
+		<button class="kefu-btn" open-type="contact">
+			<view class="iconfont icon-kefu"></view>
+			<view class="kefu-label">客服</view>
+		</button>
+
+		<up-modal :show="isShowModal" open-type="contact" 
+			:title="modalTitle"
+			:content="modalErrorText"
+			cancelText="联系客服" confirmText="知道了"
+			contentTextAlign="center"
+			cancelColor="rgb(41, 121, 255)" confirmColor="#ff8c00"
+			@confirm="() => uni.navigateBack()"  showCancelButton :asyncClose="true" />
 	</view>
 </template>
 <script setup>
@@ -120,14 +137,22 @@
 	import { onLoad, onUnload } from "@dcloudio/uni-app";
 	import FileUpload from "@/components/common/FileUpload.vue";
 	import PickerCell from "@/components/common/PickerCell.vue";
+	import SharePoster from "./SharePoster.vue"
 	import request from "../utils/request";
 	import { useShare } from "@/composables/useShare.js";
-
+	import dayjs from "dayjs";
+	import { useStore } from "vuex";
+	const store = useStore();
+	// 计算属性
+	const userInfo = computed(() => store.state.userInfo);
+	
 	// 分享配置
 	useShare({
 		title: '运动截图打卡',
 		path: '/pagesSport/punchInUpload'
 	});
+	
+	const refSharePoster = ref(null)
 
 	const routerParams = ref({})
 	const options_events = ref([]);
@@ -206,6 +231,15 @@
 		}
 	});
 
+	const isShowModal = ref(false)
+	const modalTitle = ref('')
+	const modalErrorText = ref('')
+	function showModal({title, content}) {
+		modalTitle.value = title || '提示'
+		modalErrorText.value = content || '请稍后重试'
+		isShowModal.value = true
+	}
+
 	// 图片上传成功后调用OCR识别
 	let verifyToken = ''
 	const onImageUploaded = async (imageUrl) => {
@@ -255,11 +289,10 @@
 				deleteUploadedImage(imageUrl);
 				ruleForm.value.picture = ""
 				isSuccess.value = false
-				uni.showModal({
+				showModal({
 					title: '识别失败',
-					content: res?.msg || '无法识别截图中的运动数据，请确保上传的是有效的运动截图',
-					showCancel: false
-				});
+					content: res?.msg || '无法识别截图中的运动数据，请确保上传的是有效的运动截图'
+				})
 			}
 		} catch (error) {
 			isSuccess.value = false
@@ -269,10 +302,9 @@
 
 			uni.hideLoading();
 			console.error('OCR识别失败:', error);
-			uni.showModal({
+			showModal({
 				title: '识别失败',
 				content: error?.msg || error?.message || '识别服务异常，请稍后重试',
-				showCancel: false
 			});
 		}
 		
@@ -285,10 +317,6 @@
 		picture: "",
 	});
 	
-	function routeTo() {
-		uni.$u.route('pagesSport/recognizeSuccess')
-	}
-	
 	function confirmToCheck() {
 		request.post('/ocr-api/checkin', {
 			token: verifyToken,
@@ -300,20 +328,39 @@
 			isSuccessCheck.value = true
 			
 			uni.setStorageSync('punchInUploadResult', res)
+
+			function extractNumbers(str) {
+				const matches = str.match(/\d+/g);
+				return matches ? matches.map(Number)?.[0] : '';
+			}
+			
+			// 从 events(.id) 和 results(.event_id) 合并打卡次数
+			const checkinCounts = {}
+			res.data.events?.forEach(e => { if (e.checkin_count != null) checkinCounts[e.id] = e.checkin_count })
+			res.data.results?.forEach(r => { if (r.checkin_count != null) checkinCounts[r.event_id] = r.checkin_count })
+
+			refSharePoster.value.open({
+				...userInfo.value,
+				distance: parseFloat(res.data.km),
+				duration: res.data.time,
+				pace: res.data.speed,
+				coinAmount: extractNumbers(res?.msg || ''),
+				coinAmountMsg: res?.msg,
+				checkinCounts,
+				checkinTime: dayjs().format("YYYY年MM月DD日 HH:mm"),
+				eventIds: options_events.value.filter(i => i.checked).map(i => i.value),
+			})
 			
 			// 2秒后隐藏弹窗并跳转
-			setTimeout(() => {
-				isSuccessCheck.value = false
-				uni.$u.route('pagesSport/recognizeSuccess', res)
-			}, 2000)
+			// setTimeout(() => {
+			// 	isSuccessCheck.value = false
+			// 	uni.$u.route('pagesSport/recognizeSuccess', res)
+			// }, 2000)
 		}).catch(err => {
-			uni.showModal({
+			console.log('err======>', err)
+			showModal({
 				title: '打卡失败',
-				content: err?.msg || '请稍后重试',
-				showCancel: false,
-				success: () => {
-					uni.navigateBack()
-				}
+				content: err?.msg || '请稍后重试'
 			})
 		})
 	}
@@ -389,7 +436,39 @@
 		}
 	}
 
+	/* 固定联系客服按钮 */
+	.kefu-btn {
+		position: fixed;
+		right: 24rpx;
+		top: 1060rpx;
+		width: 96rpx;
+		height: 96rpx;
+		border-radius: 999rpx;
+		background: #18b566;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		color: #fff;
+		z-index: 10;
+		box-shadow: 0 6rpx 18rpx rgba(24,181,102,0.25);
+		line-height: 1;
+		.icon-kefu {
+			font-size: 38rpx;
+		}
+		.kefu-label {
+			font-size: 16rpx;
+			color: #fff;
+			margin-top: 6rpx;
+		}
+	}
+
 	::v-deep {
+		.u-popup__content__close{
+			left: 50rpx!important;
+			top: 150rpx!important;
+			right: auto!important;
+		}
 		.uicon-arrow-right{
 			color: #FF8C00!important;
 		}

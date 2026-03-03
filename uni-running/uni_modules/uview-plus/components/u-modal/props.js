@@ -12,6 +12,10 @@ export const props = defineMixin({
             type: [String],
             default: () => defProps.modal.title
         },
+        openType: {
+            type: String,
+            default: ''
+        },
         // 弹窗内容
         content: {
             type: String,

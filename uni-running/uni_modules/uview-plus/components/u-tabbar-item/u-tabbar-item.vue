@@ -148,7 +148,7 @@
 		&__icon {
 			@include flex;
 			position: relative;
-			width: 150rpx;
+			// width: 150rpx;
 			justify-content: center;
 		}
 

@@ -1,4 +1,5 @@
 <template>
+	<mescroll-body ref="mescrollRef" @init="mescrollInit" :down="{ use: false }" @down="downCallback" @up="getList" :top="0">
   <view class="">
     <section class="team-header">
       <!-- 毛玻璃背景：绝对定位，自动跟随 header 高度 -->
@@ -40,7 +41,7 @@
     <view class="tab-container">
       <view class="category-tags">
         <view class="tags-inner">
-          <view v-for="(item, index) in tabList" :key="item.value" class="tag-item" :class="{ active: currentIndex === index }" @click="handleTabChange(item, index)">
+          <view v-for="(item, index) in tabList" :key="item.value" class="tag-item" :class="{ active: currentIndex === index }" @click="handleTabChange(index)">
             {{ item.label }}
           </view>
         </view>
@@ -83,39 +84,47 @@
           </template>
         </view>
       </view>
-      <view v-if="!rankList.length"><u-empty mode="data" text="暂无数据"></u-empty></view>
     </view>
-
-    <view v-if="isLoadedPage" class="share-btn-wrapper">
-      <block v-if="isShowShareBtn">
-        <button class="main-btn" style="background:#07C160" open-type="share">邀请好友加入</button>
-      </block>
-      
-      <button v-if="!userStatusInfo.in_team" class="main-btn" @click="joinTeam()">加入战队</button>
-
-			<!-- 加入任何一个战队后，不可加入其他战队 -->
-      <block v-if="userStatusInfo.in_team">
-        <button v-if="isNoSignUpEvent" class="main-btn" @click="goToSignEvent">立即报名</button>
-        <!-- 只在当前team 成员可退出 -->
-        <block v-if="userStatusInfo.team_info.id === teamID && !userStatusInfo.is_team_leader">
-          <button class="main-btn" style="background:#999" @click="leaveTeam(detailInfo)">退出战队</button>
-        </block>
-      </block>
-    </view>
-
-      <button v-if="!isShowShareBtn" class="share-btn flex-center" :class="{ active: isScroll }" open-type="share">
-        <u-icon name="share" color="#fff" size="18"></u-icon>
-      </button>
-
-    <UserLogin ref="refUserLogin" @success="onLoginSuccess" />
   </view>
+	</mescroll-body>
+
+  <div class="hr100" style="height:120rpx;"></div>
+  <section v-if="isLoadedPage" class="share-btn-wrapper">
+    <block v-if="isShowShareBtn">
+      <button class="main-btn" style="background:#07C160" open-type="share">邀请好友加入</button>
+    </block>
+    
+    <button v-if="!userStatusInfo.in_team" class="main-btn" @click="joinTeam()">加入战队</button>
+
+    <!-- 加入任何一个战队后，不可加入其他战队 -->
+    <block v-if="userStatusInfo.in_team">
+      <button v-if="isNoSignUpEvent" class="main-btn" @click="goToSignEvent">立即报名</button>
+      <!-- 只在当前team 成员可退出 -->
+      <block v-if="userStatusInfo.team_info.id === teamID && !userStatusInfo.is_team_leader">
+        <button class="main-btn" style="background:#999" @click="leaveTeam(detailInfo)">退出战队</button>
+      </block>
+    </block>
+  </section>
+	
+	
+	<button v-if="!isShowShareBtn" class="share-btn flex-center" :class="{ active: isScroll }" open-type="share">
+		<u-icon name="share" color="#fff" size="18"></u-icon>
+	</button>
+	
+	<UserLogin ref="refUserLogin" @success="onLoginSuccess" />
 </template>
 
 <script setup>
 import { ref, computed, watch, nextTick } from "vue";
 import { onLoad, onShow, onReachBottom, onPageScroll } from "@dcloudio/uni-app";
+
+import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
+const { mescrollInit, downCallback, getMescroll } = useMescroll(onPageScroll, onReachBottom);
+
 import request from "@/utils/request.js";
 import { useShare, buildPath } from "@/composables/useShare.js";
+
+import { getRealName } from "@/utils/util.js"
 
 import UserLogin from "@/components/UserLogin.vue";
 import { useStore } from "vuex";
@@ -134,18 +143,11 @@ const teamID = ref("");
 const detailInfo = ref({});
 function getDetailInfo() {
   request.get(`/event-api/online_events_team/${teamID.value}`).then((res) => {
-    console.log("userStatus", res);
     detailInfo.value = res;
   });
 }
 
 const eventID = ref("");
-const MEMBER_PAGE_SIZE = 100;
-const rankList = ref([]);
-const memberPage = ref(0);
-const memberHasMore = ref(true);
-const memberLoading = ref(false);
-const memberSortBy = ref("checkins");
 
 const isScroll = ref(false);
 let timer = null;
@@ -158,33 +160,41 @@ onPageScroll((e) => {
   }, 100);
 });
 
-function getRankData(sortBy, reset = true) {
-  if (memberLoading.value || (!reset && !memberHasMore.value)) return;
-  if (sortBy !== undefined) memberSortBy.value = sortBy;
-  if (reset) {
-    memberPage.value = 0;
-    memberHasMore.value = true;
-  }
-  memberLoading.value = true;
-  let url = `/event-api/online_events_team/members?team_id=${teamID.value}&event_id=${eventID.value}&page_index=${memberPage.value}&page_size=${MEMBER_PAGE_SIZE}`;
-  if (memberSortBy.value) url += `&sort_by=${memberSortBy.value}`;
-  request.get(url).then((res) => {
-    const list = res?.list || res || [];
-    if (memberPage.value === 0) {
-      rankList.value = list;
-    } else {
-      rankList.value = rankList.value.concat(list);
-    }
-    memberHasMore.value = list.length >= MEMBER_PAGE_SIZE;
-    memberPage.value++;
-  }).finally(() => {
-    memberLoading.value = false;
-  });
-}
+const refreshList = () => {
+  getMescroll().resetUpScroll();
+  getMescroll().scrollTo(0, 0);
+};
 
-onReachBottom(() => {
-  getRankData(undefined, false);
-});
+const rankList = ref([]);
+const getList = (mescroll) => {
+	uni.showLoading({ mask: true });
+  const data = {
+    page_index: mescroll.num - 1,
+    page_size: 10,
+    team_id: teamID.value,
+    event_id: eventID.value,
+		sort_by: currentIndex.value === 0 ? 'checkins' : ''
+  };
+	
+  request
+    .get(`/event-api/online_events_team/members`, data)
+    .then((res) => {
+      const list = (res?.list || []).map(item => ({
+				...item,
+				real_name: getRealName(item.real_name)
+			}));
+      mescroll.endSuccess(list.length, list.length >= 10);
+
+      if (mescroll.num == 1) {
+        rankList.value = [];
+      }
+
+      rankList.value = rankList.value.concat(list);
+    })
+    .catch((error) => {
+      mescroll.endErr();
+    });
+};
 
 function leaveTeam() {
 	const params = {
@@ -198,6 +208,7 @@ function leaveTeam() {
 				request.post("/event-api/online_events_team/quit", params).then((res) => {
 					uni.$u.toast('退出成功')
 					getUserStatus()
+					refreshList()
 				});
 			} else if (res.cancel) {
 				console.log("用户点击取消");
@@ -219,7 +230,6 @@ const userStatusInfo = ref({});
 const isLoadedPage = ref(false)
 function getUserStatus() {
   request.get("/event-api/online_events_team/user_status?event_id=" + eventID.value).then((res) => {
-    console.log('userStatus', res)
     userStatusInfo.value = res;
 		isLoadedPage.value = true
   });
@@ -262,18 +272,24 @@ onLoad((options) => {
 
 	if (!userInfo.value.id) {
 		nextTick(() => {
+			loginCallBack.value = getUserData
 			refUserLogin.value.open();
 		})
   }
 });
 
+function getUserData() {
+	getUserStatus();
+	getMyEvents();
+}
+
 onShow(() => {
   if (!teamID.value) return;
+
   getDetailInfo();
-  getRankData(currentIndex.value === 0 ? "checkins" : undefined);
-  getUserStatus();
   getTeamRank();
-  getMyEvents();
+	
+	getUserData();
 });
 
 function callPhone(phone) {
@@ -294,6 +310,7 @@ function joinTeamAPi() {
     })
     .then(() => {
 				getUserStatus();
+				refreshList()
 				uni.$u.toast("加入战队成功");
 				setTimeout(() => {
 					goToSignEvent();
@@ -309,7 +326,6 @@ function goToSignEvent() {
 }
 
 function joinTeam() {
-	
 	if (!userInfo.value.id) {
 		loginCallBack.value = joinTeam;
 
@@ -340,9 +356,9 @@ const tabList = ref([
   { label: "个人完赛", value: "" },
   { label: "总距离", value: "SUCC" },
 ]);
-const handleTabChange = (item, index) => {
+const handleTabChange = (index) => {
   currentIndex.value = index;
-  getRankData(index === 0 ? "checkins" : undefined);
+	refreshList()
 };
 
 // 编辑按钮点击
@@ -462,7 +478,6 @@ const handleEdit = () => {
 /* 排行榜列表 */
 .rank-list {
   margin: 0 30rpx;
-  padding-bottom: 200rpx;
 }
 
 .rank-item {
@@ -608,17 +623,18 @@ const handleEdit = () => {
     z-index: 1;
     padding: 12rpx 24rpx;
     font-size: 28rpx;
-    color: #ff5c5c;
+    color: #999;
+    background: #f5f5f5;
     line-height: 40rpx;
     width: 336rpx;
     white-space: nowrap;
     transition: color 0.3s ease;
     font-weight: bold;
     text-align: center;
+    border-radius: 999rpx;
     &.active {
-      color: #ff5c5c;
-      border-radius: 999rpx;
-      background: #f3f4f6;
+      color: #fff;
+      background: #ff5c5c;
     }
   }
 }
