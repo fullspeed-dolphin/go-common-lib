@@ -17,7 +17,7 @@
 			/>
 		</view>
 		<!-- 轮播图 -->
-		<PreviewMedia ref="refPreviewImage" @clearList="clearList"/>
+		<PreviewMedia ref="refPreviewImage"/>
 		<!-- <qPreviewImage ref="refPreviewImage" :urls="image750List" :originalUrls="imageList"></qPreviewImage> -->
 	</view>
 </template>
