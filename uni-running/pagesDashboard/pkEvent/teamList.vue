@@ -34,7 +34,8 @@
             </view>
 
             <view class="join-btn flex-center">
-              {{!userStatusInfo.in_team ? '加入战队' : '查看'}}
+              <!-- {{!userStatusInfo.in_team ? '加入战队' : '查看'}} -->
+               查看
             </view>
           </view>
         </view>
@@ -57,11 +58,6 @@
         立即报名参赛
       </u-button>
     </view>
-    <up-popup :show="isShowModal" @close="close" overlayOpacity="0.9" bgColor="transparent" mode="top" closeable>
-			<view style="height: 100vh;width:100vw;overflow-y: auto;background: #fff;">
-				<pkEventForm :currentID="currentID"/>
-			</view>
-		</up-popup>
   </view>
 </template>
 
@@ -70,7 +66,6 @@ import { ref, computed, watch } from "vue";
 import { onLoad, onShow, onPageScroll, onReachBottom } from "@dcloudio/uni-app";
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 import request from "@/utils/request.js";
-import pkEventForm from "@/pagesDashboard/pkEvent/pkEventForm.vue";
 const activetyId = ref(""); // 活动ID
 const searchTxt = ref("");
 const { mescrollInit, downCallback, getMescroll } = useMescroll(
@@ -101,8 +96,8 @@ function getMyEvents() {
 }
 
 function joinTeamAPi(item) {
-	console.log("joinTeamAPi", item);
-	uni.showLoading({ mask: true });
+	/*console.log("joinTeamAPi", item);
+	 uni.showLoading({ mask: true });
   request
     .post("/event-api/online_events_team/join", {
 			event_id: activetyId.value,
@@ -116,7 +111,7 @@ function joinTeamAPi(item) {
     })
     .catch((e) => {
       console.log("e", e);
-    });
+    }); */
 }
 
 function goToSignEvent() {
@@ -124,22 +119,20 @@ function goToSignEvent() {
 }
 
 function joinTeam(item) {
-  if (!userStatusInfo.value.in_team) {
-    currentID.value = item.id
-    isShowModal.value = true;
-    // uni.showModal({
-    //   title: "提示",
-    //   content: "确定加入该战队吗？",
-    //   success: (res) => {
-    //     if (res.confirm) {
-		// 			joinTeamAPi(item)
-    //     } else if (res.cancel) {
-    //       console.log("用户点击取消");
-    //     }
-    //   },
-    // });
+  /* if (!userStatusInfo.value.in_team) {
+    uni.showModal({
+      title: "提示",
+      content: "确定加入该战队吗？",
+      success: (res) => {
+        if (res.confirm) {
+					joinTeamAPi(item)
+        } else if (res.cancel) {
+          console.log("用户点击取消");
+        }
+      },
+    });
     return;
-  }
+  } */
   uni.$u.route(`pagesDashboard/pkEvent/teamDetail?id=${item.id}&eventId=${activetyId.value}`);
 }
 
@@ -187,13 +180,6 @@ const getList = (mescroll) => {
       mescroll.endErr();
     });
 };
-
-//============================================ 报名
-const isShowModal = ref(false);
-const currentID = ref("");
-function close() {
-  isShowModal.value = false;
-}
 
 
 onLoad((options) => {

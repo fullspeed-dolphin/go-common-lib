@@ -112,6 +112,12 @@
 	</button>
 	
 	<UserLogin ref="refUserLogin" @success="onLoginSuccess" />
+  <!-- 套餐列表 -->
+  <up-popup :show="isShowModal" @close="close" overlayOpacity="0.9" bgColor="transparent" mode="bottom" closeable>
+    <view style="height: 100vh;width:100vw;overflow-y: auto;background: #fff;">
+      <pkEventForm :currentID="teamID"/>
+    </view>
+  </up-popup>
 </template>
 
 <script setup>
@@ -127,6 +133,7 @@ import { useShare, buildPath } from "@/composables/useShare.js";
 import { getRealName } from "@/utils/util.js"
 
 import UserLogin from "@/components/UserLogin.vue";
+import pkEventForm from "@/pagesDashboard/pkEvent/pkEventForm.vue";
 import { useStore } from "vuex";
 
 const store = useStore();
@@ -141,6 +148,7 @@ function onLoginSuccess () {
 
 const teamID = ref("");
 const detailInfo = ref({});
+const isShowModal = ref(false); // 是否显示套餐列表
 function getDetailInfo() {
   request.get(`/event-api/online_events_team/${teamID.value}`).then((res) => {
     detailInfo.value = res;
@@ -277,7 +285,6 @@ onLoad((options) => {
 		})
   }
 });
-
 function getUserData() {
 	getUserStatus();
 	getMyEvents();
@@ -300,7 +307,8 @@ function callPhone(phone) {
 }
 
 function joinTeamAPi() {
-	const item = detailInfo.value
+  isShowModal.value = true;
+	/* const item = detailInfo.value
 	console.log("joinTeamAPi", item);
 	uni.showLoading({ mask: true });
   request
@@ -313,14 +321,18 @@ function joinTeamAPi() {
 				refreshList()
 				uni.$u.toast("加入战队成功");
 				setTimeout(() => {
-					goToSignEvent();
+					// goToSignEvent();
+          isShowModal.value = true;
 				}, 500)
     })
     .catch((e) => {
       uni.$u.toast(e.msg || "加入战队失败");
-    });
+    }); */
+    
 }
-
+function close() {
+  isShowModal.value = false;
+}
 function goToSignEvent() {
 	uni.$u.route("pagesDashboard/pkEvent/pkEventForm", { id: eventID.value });
 }
