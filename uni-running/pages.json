@@ -122,34 +122,8 @@
             "navigationBarTitleText": "运动详情"
           }
         },
-        {
-          "path": "device/deviceList",
-          "style": {
-            "navigationStyle": "custom",
-            "navigationBarTitleText": ""
-          }
-        },
-        {
-          "path": "device/deviceBrands",
-          "style": {
-            "navigationStyle": "custom",
-            "navigationBarTitleText": ""
-          }
-        },
-        {
-          "path": "device/deviceDetail",
-          "style": {
-            "navigationStyle": "custom",
-            "navigationBarTitleText": ""
-          }
-        },
-        {
-          "path": "device/deviceBind",
-          "style": {
-            "navigationStyle": "custom",
-            "navigationBarTitleText": ""
-          }
-        },
+        { "path": "device/deviceList", "style": { "navigationStyle": "custom", "navigationBarTitleText": "" } },
+        { "path": "device/deviceDetail", "style": { "navigationStyle": "custom", "navigationBarTitleText": "" } },
         { "path": "settings/aboutUs", "style": { "navigationStyle": "custom", "navigationBarTitleText": "关于我们" } },
         {
           "path": "settings/agreement",
