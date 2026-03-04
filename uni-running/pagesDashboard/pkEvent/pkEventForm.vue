@@ -74,8 +74,8 @@
           ￥{{ packageList.find((item) => item.id === form.package_id)?.price || "0.00" }}
         </view>
       </view>
-      <u-button type="primary" color="#ff5c5c" shape="circle" customStyle="width: 196rpx;height: 72rpx;margin:0;border-radius: 999rpx;" @click="submitForm()">
-        立即支付
+      <u-button type="primary" color="#ff5c5c" shape="circle" customStyle="width: 256rpx;height: 72rpx;margin:0;border-radius: 999rpx;" @click="submitForm()">
+        加入战队并报名
       </u-button>
     </view>
   </view>
@@ -92,7 +92,12 @@ import request from "@/utils/request.js";
 import { useStore } from "vuex";
 const store = useStore();
 const userInfo = computed(() => store.state.userInfo);
-
+const props = defineProps({
+  currentID: {
+    type: String,
+    default: ""
+  }
+});
 const uForm = ref(null);
 const activetyId = ref("");
 
@@ -217,7 +222,18 @@ watch(
     ];
   }
 );
-
+// 获取套餐列表
+const packageList = ref([]);
+const getPackageList = () => {
+  const data = {
+    event_id: activetyId.value,
+  };
+  request.get(`/event-api/online_events_packages`, data).then((res) => {
+    packageList.value = res;
+    const package_id = res.find((i) => i.is_recommended)?.id || "";
+    changePackage(package_id);
+  });
+};
 // 页面加载
 onLoad((options) => {
   console.log("option", options);
@@ -230,6 +246,7 @@ const submitForm = () => {
   uForm.value.validate().then((res) => {
     if (!isAgree.value) return uni.$u.toast('请查阅并勾选免责声明~');
 
+    /*
     const data = {
       ...form.value,
       event_id: activetyId.value,
@@ -248,21 +265,13 @@ const submitForm = () => {
         payOrder(res.reg_no);
       }
     });
+    */
+    // 加入战队
+    joinTeamAPi()
   });
 };
 
-// 获取套餐列表
-const packageList = ref([]);
-const getPackageList = () => {
-  const data = {
-    event_id: activetyId.value,
-  };
-  request.get(`/event-api/online_events_packages`, data).then((res) => {
-    packageList.value = res;
-    const package_id = res.find((i) => i.is_recommended)?.id || "";
-    changePackage(package_id);
-  });
-};
+
 
 function changePackage(id) {
   form.value.package_id = id;
@@ -366,6 +375,56 @@ function wxPay(respay) {
       }, 300);
     },
   });
+}
+
+//加入战队
+function joinTeamAPi(item) {
+	console.log("joinTeamAPi", item);
+	uni.showLoading({ mask: true });
+  request
+    .post("/event-api/online_events_team/join", {
+			event_id: activetyId.value,
+			// team_id: item.id,
+			team_id: props.currentID,
+    })
+    .then(() => {
+				getUserStatus();
+				// uni.$u.toast("成功加入战队, 准备跳转到活动报名页...", 2000, function success() {
+				// 	goToSignEvent();
+				// });
+        const data = {
+          ...form.value,
+          event_id: activetyId.value,
+        };
+
+        uni.showLoading({
+          mask: true,
+        });
+
+        request.post("/booking-api/online_events/registration", data).then(async (res) => {
+          // 检测到某个package的price为0的情况下，调用此接口，不要走支付接口
+          const isFree = packageList.value.find((i) => i.id === form.value.package_id)?.price === 0;
+          if (isFree) {
+            freeToPay(res.reg_no);
+          } else {
+            payOrder(res.reg_no);
+          }
+        });
+    })
+    .catch((e) => {
+      console.log("e", e);
+    });
+}
+const userStatusInfo = ref({});
+function getUserStatus() {
+  request
+    .get(
+      "/event-api/online_events_team/user_status?event_id=" + activetyId.value
+    )
+    .then((res) => {
+      console.log("userStatus", res);
+      userStatusInfo.value = res;
+    });
 }
 </script>
 

@@ -57,6 +57,11 @@
         立即报名参赛
       </u-button>
     </view>
+    <up-popup :show="isShowModal" @close="close" overlayOpacity="0.9" bgColor="transparent" mode="top" closeable>
+			<view style="height: 100vh;width:100vw;overflow-y: auto;background: #fff;">
+				<pkEventForm :currentID="currentID"/>
+			</view>
+		</up-popup>
   </view>
 </template>
 
@@ -65,6 +70,7 @@ import { ref, computed, watch } from "vue";
 import { onLoad, onShow, onPageScroll, onReachBottom } from "@dcloudio/uni-app";
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 import request from "@/utils/request.js";
+import pkEventForm from "@/pagesDashboard/pkEvent/pkEventForm.vue";
 const activetyId = ref(""); // 活动ID
 const searchTxt = ref("");
 const { mescrollInit, downCallback, getMescroll } = useMescroll(
@@ -119,17 +125,19 @@ function goToSignEvent() {
 
 function joinTeam(item) {
   if (!userStatusInfo.value.in_team) {
-    uni.showModal({
-      title: "提示",
-      content: "确定加入该战队吗？",
-      success: (res) => {
-        if (res.confirm) {
-					joinTeamAPi(item)
-        } else if (res.cancel) {
-          console.log("用户点击取消");
-        }
-      },
-    });
+    currentID.value = item.id
+    isShowModal.value = true;
+    // uni.showModal({
+    //   title: "提示",
+    //   content: "确定加入该战队吗？",
+    //   success: (res) => {
+    //     if (res.confirm) {
+		// 			joinTeamAPi(item)
+    //     } else if (res.cancel) {
+    //       console.log("用户点击取消");
+    //     }
+    //   },
+    // });
     return;
   }
   uni.$u.route(`pagesDashboard/pkEvent/teamDetail?id=${item.id}&eventId=${activetyId.value}`);
@@ -179,6 +187,13 @@ const getList = (mescroll) => {
       mescroll.endErr();
     });
 };
+
+//============================================ 报名
+const isShowModal = ref(false);
+const currentID = ref("");
+function close() {
+  isShowModal.value = false;
+}
 
 
 onLoad((options) => {
