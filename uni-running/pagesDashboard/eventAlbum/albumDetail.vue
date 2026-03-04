@@ -1,6 +1,6 @@
 <!-- UI 参考 https://m.alltuu.com/album/3102256506/?menu=live -->
 <template>
-	<view class="albumDetail-page">
+	<view class="albumDetail-page" v-if="pageShow">
 		<zPaging ref="paging" use-virtual-list cell-height-mode="fixed" :virtual-list-col="4"
 			:inner-list-style="{'display':'flex','flex-wrap':'wrap'}" fixed-cell-height="180rpx" :default-page-size="60"
 			:force-close-inner-list="true" @virtualListChange="e => virtualList = e" @query="queryList" @scroll="onListScroll">
@@ -57,13 +57,17 @@
 <script setup>
 	import {
 		ref,
-		computed
+		computed,
+		onMounted
 	} from "vue";
 	import {
 		useStore
 	} from "vuex";
 	import {
-		onLoad
+		onLoad,
+		onHide,
+		onShow,
+		onUnload
 	} from "@dcloudio/uni-app";
 	import { useShare, buildPath } from "@/composables/useShare.js";
 	const store = useStore();
@@ -202,9 +206,22 @@
 		refPreviewMedia.value.openModal(link, index, currentPageData.value)
 	}
 
+	const pageShow = ref(false)
 	onLoad((options) => {
+		console.log("========",options)
 		currentEvent.value = options
 	})
+	onUnload(()=>{
+		console.log("========页面卸载了===")
+	}) 
+	onHide(()=>{
+		console.log("========页面隐藏了===")
+		pageShow.value = false
+	}) 
+	onShow(()=>{
+		console.log("========页面显示了===")
+		pageShow.value = true
+	}) 
 	
 </script>
 
