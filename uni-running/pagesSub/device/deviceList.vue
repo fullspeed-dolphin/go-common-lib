@@ -1,138 +1,77 @@
 <template>
-  <view class="">
-    <u-navbar title="智能设备" :bgHeight="370" />
-    <view
-      v-if="!deviceList.length"
-      class="flex-col-center section-empty"
-      style=""
-    >
-      尚未添加任何设备
-      <view class="">点击下面的“添加设备”按钮进行添加</view>
-    </view>
-
-    <view class="flex-row flex-wrap" style="padding-left: 34rpx">
-      <view
-        class="brand-item"
-        @click="$u.route('pagesSub/device/deviceDetail?value=' + item.label)"
-        v-for="(item, index) in deviceList"
-        :key="index"
-      >
-        <view class="flex-start u-mb-30">
-          <image class="img" :src="item.img" mode="aspectFill"></image>
-          <view class="label">{{ item.label }}</view>
-        </view>
-        <view class="" style="font-size: 22rpx; line-height: 1.6; color: #333">
-          <!-- <view class="">{{item.model}}</view> -->
-          <view class="">{{ item.account }}</view>
-          <view class="">{{ item.bindTime }}</view>
-        </view>
+  <view>
+    <u-navbar title="智能设备" placeholder />
+    <view class="">
+      <view class="brand-item flex-start" v-for="(item, index) in deviceList" :key="index" @click="routeToDetail(item)">
+        <image class="img" :src="item.imgUrl" mode="aspectFill"></image>
+        <div>
+          <view class="label b">{{ item.label }}</view>
+          <view class="label u-mt-20" style="font-size: 22rpx; color: #666">{{ item.created_at }}</view>
+        </div>
       </view>
     </view>
-
-    <section class="section-bottom">
-      <view style="padding: 56rpx 54rpx 40rpx">
-        <u-button
-          type="primary"
-          color="#FF8C00"
-          shape="circle"
-          @click="$u.route('pagesSub/device/deviceBrands')"
-          >添加设备</u-button
-        >
-      </view>
-    </section>
   </view>
 </template>
 <script setup>
 import { ref } from "vue";
-import { onLoad } from "@dcloudio/uni-app";
-import { useShare } from "@/composables/useShare.js";
+import { onLoad, onShow } from "@dcloudio/uni-app";
+import request from "@/utils/request.js";
 
-// 分享配置
-useShare({
-  title: '我的智能设备',
-  path: '/pagesSub/device/deviceList'
-});
+const deviceList = ref([]);
+function getDevicesList() {
+  uni.showLoading({
+    mask: true,
+  });
 
-// 响应式数据
-const deviceList = ref([
-  // {
-  // 	img: 'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/华为运动健康@2x.png',
-  // 	label: '华为运动健康',
-  // 	value: '',
-  // 	model: '设备型号：HUAWEI GT5',
-  // 	account: '绑定账号：15934560765',
-  // 	bindTime: '绑定时间：2025-10-14 ',
-  // },
-  // {
-  // 	img: 'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/佳明@2x.png',
-  // 	label: '佳明',
-  // 	value: '',
-  // 	model: '设备型号：HUAWEI GT5',
-  // 	account: '绑定账号：15934560765',
-  // 	bindTime: '绑定时间：2025-10-14 ',
-  // },
-  // {
-  // 	img: 'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/高驰@2x.png',
-  // 	label: '高驰',
-  // 	value: '',
-  // 	model: '设备型号：HUAWEI GT5',
-  // 	account: '绑定账号：15934560765',
-  // 	bindTime: '绑定时间：2025-10-14 ',
-  // },
-]);
-const options = ref({});
+  request.get("/sport-api/api/platform/bindings").then((res) => {
+    console.log("设备列表====>", res);
+    deviceList.value = (res.bindings || []).map((item) => {
+      const imgMapping = {
+        huawei:
+          "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/华为运动健康@2x.png",
+        garmin:
+          "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/佳明@2x.png",
+        gaochi:
+          "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/高驰@2x.png",
+      };
+
+      let created_at = item.created_at?.replace("T", " ")?.slice(0, 16);
+
+      return {
+        ...item,
+        imgUrl: imgMapping[item.platform] || "",
+        label: item.display_name || item.platform,
+        value: item.platform,
+        created_at: created_at ? created_at + '绑定' : "",
+      };
+    });
+  });
+}
+
+function routeToDetail(item) {
+  uni.$u.route(`/pagesSub/device/deviceDetail?platform=${item.platform}`);
+}
 
 // 页面加载
-onLoad((optionsParam) => {
-  options.value = optionsParam;
+onShow(() => {
+  getDevicesList();
 });
-
-// 方法定义
-const successLogin = () => {
-  if (options.value?.direct) {
-    uni.navigateBack();
-
-    return false;
-  }
-
-  uni.switchTab({
-    url: "/pages/index",
-    success() {
-      uni.hideLoading();
-    },
-  });
-};
 </script>
 
 <style lang="less" scoped>
-.section-empty {
-  min-height: 80vh;
-  font-size: 34rpx;
-  color: #707070;
-  line-height: 48rpx;
-  text-align: center;
-}
-.section-bottom {
-  position: fixed;
-  bottom: 0px;
-  width: 100%;
-  z-index: 10;
-}
 .brand-item {
-  width: 325rpx;
-  // height: 274rpx;
-  padding: 30rpx 32rpx;
+  width: 682rpx;
+  height: 120rpx;
+  border-radius: 24rpx 24rpx 24rpx 24rpx;
   background: #ffffff;
-  box-shadow: 0rpx 4rpx 10rpx 2rpx rgba(0, 0, 0, 0.16);
-  border-radius: 16rpx 16rpx 16rpx 16rpx;
-  margin-right: 34rpx;
-  margin-bottom: 34rpx;
+  border: 2rpx solid #f0f0f0;
+  padding: 20rpx 30rpx;
+  margin: 30rpx auto;
   .img {
     width: 80rpx;
     height: 80rpx;
     border-radius: 10rpx;
     margin-right: 20rpx;
-    border: 1px solid #f5f5f5;
   }
 }
 </style>

@@ -13,6 +13,9 @@
           <view class="u-mb-10" style="color: #222">{{
             item.nickname || "成员"
           }}</view>
+          <view class="gender-line">
+            <text>{{ item.gender === 1 ? '男' : item.gender === 0 ? '女' : '' }}</text>
+          </view>
         </view>
       </view>
     </mescroll-body>
@@ -95,6 +98,11 @@ const getList = (mescroll) => {
     display: block;
     width: 106rpx;
     height: 106rpx;
+  }
+  .gender-line {
+    font-size: 24rpx;
+    color: #999;
+    margin-top: 6rpx;
   }
 }
 </style>

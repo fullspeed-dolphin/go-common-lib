@@ -11,7 +11,8 @@
           <image :src="currentIndex === 0 ? topList[1].avatar_url : topList[1].team_avatar_url" class="avatar" />
           <text class="rank-label flex-center">NO.2</text>
           <text class="name">{{ currentIndex === 0 ? topList[1].real_name : topList[1].team_name }}</text>
-          <text class="distance">{{ currentIndex === 0 ? topList[1].total_distance_km : teamRankValue(topList[1]) }}</text>
+          <text class="distance">{{ currentIndex === 0 ? personalRankValue(topList[1]) : teamRankValue(topList[1]) }}</text>
+          <text v-if="currentIndex === 0 && personalSortBy === 'completion'" class="distance" style="font-size:20rpx;">{{ topList[1].total_distance_km }}km</text>
         </view>
 
         <!-- NO.1 -->
@@ -19,7 +20,8 @@
           <image :src="currentIndex === 0 ? topList[0].avatar_url : topList[0].team_avatar_url" class="avatar" />
           <text class="rank-label flex-center">NO.1</text>
           <text class="name">{{ currentIndex === 0 ? topList[0].real_name : topList[0].team_name }}</text>
-          <text class="distance">{{ currentIndex === 0 ? topList[0].total_distance_km : teamRankValue(topList[0]) }}</text>
+          <text class="distance">{{ currentIndex === 0 ? personalRankValue(topList[0]) : teamRankValue(topList[0]) }}</text>
+          <text v-if="currentIndex === 0 && personalSortBy === 'completion'" class="distance" style="font-size:20rpx;">{{ topList[0].total_distance_km }}km</text>
         </view>
 
         <!-- NO.3 -->
@@ -27,7 +29,8 @@
           <image :src="currentIndex === 0 ? topList[2].avatar_url : topList[2].team_avatar_url" class="avatar" />
           <text class="rank-label flex-center">NO.3</text>
           <text class="name">{{ currentIndex === 0 ? topList[2].real_name : topList[2].team_name }}</text>
-          <text class="distance">{{ currentIndex === 0 ? topList[2].total_distance_km : teamRankValue(topList[2]) }}</text>
+          <text class="distance">{{ currentIndex === 0 ? personalRankValue(topList[2]) : teamRankValue(topList[2]) }}</text>
+          <text v-if="currentIndex === 0 && personalSortBy === 'completion'" class="distance" style="font-size:20rpx;">{{ topList[2].total_distance_km }}km</text>
         </view>
       </view>
     </section>
@@ -39,6 +42,10 @@
             {{ item.label }}
           </view>
         </view>
+      </view>
+      <view v-if="currentIndex === 0" class="sort-switch">
+        <view class="sort-btn" :class="{ active: personalSortBy === 'distance' }" @click="switchPersonalSort('distance')">跑量排行</view>
+        <view class="sort-btn" :class="{ active: personalSortBy === 'completion' }" @click="switchPersonalSort('completion')">完赛率排行</view>
       </view>
       <view v-if="currentIndex === 1" class="sort-switch">
         <view class="sort-btn" :class="{ active: teamSortBy === 'members' }" @click="switchTeamSort('members')">人数排行</view>
@@ -67,7 +74,10 @@
             <!-- <view class="user-time">{{ item.total_sessions }}次</view> -->
           </view>
           <view class="progress">
-            <text class="progress-percent"><text style="font-size:36rpx;">{{ item.total_distance_km }}</text>km</text>
+            <text class="progress-percent">
+              <text style="font-size:36rpx;">{{ personalRankValue(item) }}</text>
+            </text>
+            <text v-if="personalSortBy === 'completion'" style="font-size:20rpx;color:#999;font-weight:normal;">{{ item.total_distance_km }}km</text>
           </view>
         </view>
       </template>
@@ -123,6 +133,7 @@ const tabList = ref([
 ]);
 const currentIndex = ref(0);
 const teamSortBy = ref('members');
+const personalSortBy = ref('distance');
 
 onLoad((options) => {
   activetyId.value = options.id;
@@ -138,11 +149,25 @@ const handleTabChange = (index) => {
   getMescroll().resetUpScroll();
 };
 
+// 个人排序切换
+const switchPersonalSort = (sort) => {
+  if (personalSortBy.value === sort) return;
+  personalSortBy.value = sort;
+  getMescroll().resetUpScroll();
+};
+
 // 战队排序切换
 const switchTeamSort = (sort) => {
   if (teamSortBy.value === sort) return;
   teamSortBy.value = sort;
   getMescroll().resetUpScroll();
+};
+
+// 个人排行榜显示值：按跑量排显示跑量，按完赛率排显示完赛率
+const personalRankValue = (item) => {
+  return personalSortBy.value === 'completion'
+    ? (item.required_checkins ? Math.round(item.total_qualified_sessions / item.required_checkins * 100) : 0) + '%'
+    : item.total_distance_km + 'km';
 };
 
 // 战队排行榜显示值：按人数排显示人数，按跑量排显示跑量
@@ -160,6 +185,9 @@ const loadRankList = (mescroll) => {
     ? "/event-api/ranking/personal?event_id="
     : "/event-api/ranking/team?event_id=";
   url += activetyId.value + `&page_index=${mescroll.num - 1}&page_size=${PAGE_SIZE}`;
+  if (currentIndex.value === 0) {
+    url += `&sort_by=${personalSortBy.value}`;
+  }
   if (currentIndex.value === 1) {
     url += `&sort_by=${teamSortBy.value}`;
   }
