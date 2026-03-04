@@ -99,6 +99,11 @@
           </view>
         </view>
       </view>
+      <!-- 个人排序开关(仅在个人榜时显示) -->
+      <view v-if="tabIndex === 0" class="sort-switch u-mt-20">
+        <view class="sort-btn" :class="{ active: personalSortBy === 'distance' }" @click="switchPersonalSort('distance')">跑量排行</view>
+        <view class="sort-btn" :class="{ active: personalSortBy === 'completion' }" @click="switchPersonalSort('completion')">完赛率排行</view>
+      </view>
       <!-- 战队排序开关(仅在战队榜时显示) -->
       <view v-if="tabIndex === 1" class="sort-switch u-mt-20">
         <view class="sort-btn" :class="{ active: teamSortBy === 'members' }" @click="switchTeamSort('members')">人数排行</view>
@@ -134,7 +139,15 @@
             <!-- <view class="user-time">{{ item.total_sessions }}次</view> -->
           </view>
           <view class="progress">
-            <text class="progress-percent"><text style="font-size:40rpx;">{{ item.total_distance_km }}</text>km</text>
+            <text class="progress-percent">
+              <template v-if="personalSortBy === 'completion'">
+                <text style="font-size:40rpx;">{{ item.required_checkins ? Math.round(item.total_qualified_sessions / item.required_checkins * 100) : 0 }}%</text>
+              </template>
+              <template v-else>
+                <text style="font-size:40rpx;">{{ item.total_distance_km }}</text>km
+              </template>
+            </text>
+            <text v-if="personalSortBy === 'completion'" style="font-size:24rpx;color:#999;font-weight:normal;">{{ item.total_distance_km }}km</text>
             <text style="font-size:24rpx;color:#999;font-weight:normal;">{{ item.total_qualified_sessions }}/{{ item.required_checkins }}次打卡</text>
           </view>
         </view>
@@ -189,7 +202,6 @@ const { mescrollInit, downCallback, getMescroll } = useMescroll(onPageScroll, on
 import { useShare, buildPath } from "@/composables/useShare.js";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
-import { getRealName } from "@/utils/util.js"
 
 import UserLogin from "@/components/UserLogin.vue";
 import { useStore } from "vuex";
@@ -236,6 +248,8 @@ const tabList = ref([
 
 // 战队排行榜排序字段
 const teamSortBy = ref('members');
+// 个人排行榜排序字段
+const personalSortBy = ref('distance');
 
 
 function changeTab(index) {
@@ -361,14 +375,14 @@ const getList = (mescroll) => {
   };
 	let url = tabIndex.value == 0 ? '/event-api/ranking/personal' : '/event-api/ranking/team'
 
+  if (tabIndex.value === 0) {
+    data.sort_by = personalSortBy.value;
+  }
   if (tabIndex.value === 1) {
     data.sort_by = teamSortBy.value;
   }
   request.get(url, data).then((res) => {
-      const list = (res?.list || []).map(item => ({
-				...item,
-				real_name: getRealName(item.real_name)
-			}));
+      const list = res?.list || [];
       mescroll.endSuccess(list.length, list.length >= 10);
 
       if (mescroll.num == 1) {
@@ -380,6 +394,13 @@ const getList = (mescroll) => {
     .catch((error) => {
       mescroll.endErr();
     });
+};
+
+// 切换个人排序方式
+const switchPersonalSort = (sort) => {
+  if (personalSortBy.value === sort) return;
+  personalSortBy.value = sort;
+  refreshList();
 };
 
 // 切换战队排序方式

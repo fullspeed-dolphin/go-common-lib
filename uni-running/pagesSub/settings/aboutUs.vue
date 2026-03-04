@@ -4,7 +4,7 @@
 			<u-navbar :title="isShowTitle ? '全速运动' : ''" bgColor="transparent" placeholder></u-navbar>
 
 			<div style="font-weight: bold;font-size: 55rpx;margin-top:70rpx;">全速运动</div>
-			<view class="u-mt-20" style="line-height:62rpx">让运动成为每个人的健康生活方式</view>
+			<view class="u-mt-20" style="line-height:62rpx">让运动成为每个人的生活方式</view>
 			<view style="">线上+线下融合，打造全民运动嘉年华</view>
 			<view class="flex-center" style="width: 157rpx;
 height: 46rpx;
@@ -166,7 +166,7 @@ background: #fff;
 border-radius: 10rpx 10rpx 10rpx 10rpx;
 border: 1rpx solid rgba(0,0,0,0.05);">
 				<view class="iconfont icon-youxiang flex-center" style="margin-right:10rpx;width:28rpx;height:28rpx;font-size: 28rpx;color:#000;"></view>
-				contact@quansu.com
+				enterprise@speexpay.com
 			</view>
 		</view>
   </view>
@@ -196,7 +196,7 @@ const benifitList = ref([
 	},
 	{
 		label: '科技赋能的人文体验',
-		text: '使用数字化工具提升参与和管理效率，始终坚持有温 度的服务。让每一份数据背后，都是对用户健康需求 的关切；让每一次活动，都能建立难忘的情感连接。'
+		text: '使用数字化工具提升参与和管理效率，始终坚持有温度的服务。让每一份数据背后，都是对用户健康需求的关切；让每一次活动，都能建立难忘的情感连接。'
 	},
 ])
 

@@ -48,6 +48,13 @@
       </view>
     </view>
 
+    <view v-if="isLeader" class="list-toolbar">
+      <view class="toolbar-btn" @click="toggleGlobalPhone">
+        <u-icon :name="showPhone ? 'eye-fill' : 'eye-off'" size="16" :color="showPhone ? '#1456f0' : '#999'"></u-icon>
+        <text class="toolbar-text">{{ showPhone ? '隐藏手机号' : '显示手机号' }}</text>
+      </view>
+    </view>
+
     <view class="rank-list">
       <view v-for="(item, index) in rankList" :key="index" class="rank-item">
         <view class="rank-number flex-center">
@@ -68,7 +75,17 @@
             <view v-if="item.is_team_leader" class="leader-tag">队长</view>
             <view v-if="item.status === 'PND'" class="status-tag pnd">未报名</view>
           </view>
-          <div v-if="item.phone" @click="callPhone(item.phone)" style="padding: 10rpx 0;color:#1456f0;">{{item.phone}}</div>
+          <view v-if="item.phone && showPhone" class="phone-row">
+            <text @click="isPhoneVisible(item) && callPhone(item.phone)" class="phone-text">
+              {{ isPhoneVisible(item) ? item.phone : maskPhone(item.phone) }}
+            </text>
+            <u-icon
+              :name="isPhoneVisible(item) ? 'eye-fill' : 'eye-off'"
+              size="14"
+              :color="isPhoneVisible(item) ? '#1456f0' : '#999'"
+              @click="togglePhoneVisible(item)"
+            />
+          </view>
           <view class="user-detail u-flex-y-center">
             {{ item.total_distance_km }} KM
           </view>
@@ -99,8 +116,8 @@
     <!-- 加入任何一个战队后，不可加入其他战队 -->
     <block v-if="userStatusInfo.in_team">
       <button v-if="isNoSignUpEvent" class="main-btn" @click="goToSignEvent">立即报名</button>
-      <!-- 只在当前team 成员可退出 -->
-      <block v-if="userStatusInfo.team_info.id === teamID && !userStatusInfo.is_team_leader">
+      <!-- 只在当前team 成员可退出，活动进行中禁止退出 -->
+      <block v-if="userStatusInfo.team_info.id === teamID && !userStatusInfo.is_team_leader && !isEventActive">
         <button class="main-btn" style="background:#999" @click="leaveTeam(detailInfo)">退出战队</button>
       </block>
     </block>
@@ -123,8 +140,7 @@ const { mescrollInit, downCallback, getMescroll } = useMescroll(onPageScroll, on
 
 import request from "@/utils/request.js";
 import { useShare, buildPath } from "@/composables/useShare.js";
-
-import { getRealName } from "@/utils/util.js"
+import dayjs from "dayjs";
 
 import UserLogin from "@/components/UserLogin.vue";
 import { useStore } from "vuex";
@@ -148,6 +164,17 @@ function getDetailInfo() {
 }
 
 const eventID = ref("");
+const eventInfo = ref({});
+const isEventActive = computed(() => {
+  if (!eventInfo.value.start_time || !eventInfo.value.end_time) return false;
+  const now = dayjs();
+  return now.isAfter(dayjs(eventInfo.value.start_time)) && now.isBefore(dayjs(eventInfo.value.end_time));
+});
+function getEventInfo() {
+  request.get(`/event-api/online_events/${eventID.value}`).then((res) => {
+    eventInfo.value = res;
+  });
+}
 
 const isScroll = ref(false);
 let timer = null;
@@ -179,10 +206,7 @@ const getList = (mescroll) => {
   request
     .get(`/event-api/online_events_team/members`, data)
     .then((res) => {
-      const list = (res?.list || []).map(item => ({
-				...item,
-				real_name: getRealName(item.real_name)
-			}));
+      const list = res?.list || [];
       mescroll.endSuccess(list.length, list.length >= 10);
 
       if (mescroll.num == 1) {
@@ -256,8 +280,8 @@ const isShowShareBtn = computed(() => {
   } else {
     // 已加入战队：可能显示「立即报名」
     if (isNoSignUpEvent.value) otherButtons++;
-    // 只有当前队员且非队长时显示「退出战队」按钮
-    if (info.team_info && info.team_info.id === teamID.value && !info.is_team_leader) otherButtons++;
+    // 只有当前队员且非队长、活动未进行时显示「退出战队」按钮
+    if (info.team_info && info.team_info.id === teamID.value && !info.is_team_leader && !isEventActive.value) otherButtons++;
   }
 
   // 如果其他按钮 + 邀请按钮 总数 > 3，则隐藏邀请按钮
@@ -288,7 +312,8 @@ onShow(() => {
 
   getDetailInfo();
   getTeamRank();
-	
+  getEventInfo();
+
 	getUserData();
 });
 
@@ -350,6 +375,30 @@ useShare(() => ({
     eventId: eventID.value,
   }),
 }));
+
+const showPhone = ref(false);
+const phoneVisibleMap = ref({});
+const isLeader = computed(() => userStatusInfo.value?.is_team_leader);
+
+function toggleGlobalPhone() {
+  showPhone.value = !showPhone.value;
+  phoneVisibleMap.value = {};
+}
+
+function isPhoneVisible(item) {
+  const key = item.wechat_openid;
+  return key in phoneVisibleMap.value ? phoneVisibleMap.value[key] : true;
+}
+
+function togglePhoneVisible(item) {
+  const key = item.wechat_openid;
+  phoneVisibleMap.value[key] = !isPhoneVisible(item);
+}
+
+function maskPhone(phone) {
+  if (!phone || phone.length < 7) return phone;
+  return phone.slice(0, 3) + '****' + phone.slice(7);
+}
 
 const currentIndex = ref(0);
 const tabList = ref([
@@ -459,6 +508,35 @@ const handleEdit = () => {
 	position: relative;
 	z-index: 10;
 	box-shadow: 0rpx 8rpx 10rpx 0rpx rgba(0, 0, 0, 0.1);
+}
+
+.list-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 30rpx;
+}
+
+.toolbar-btn {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 10rpx 0;
+}
+
+.toolbar-text {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.phone-row {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.phone-text {
+  color: #1456f0;
+  padding: 10rpx 0;
 }
 
 .tab-item {
