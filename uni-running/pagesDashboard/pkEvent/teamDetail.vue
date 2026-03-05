@@ -63,7 +63,7 @@
         <div class="user-avatar">
           <up-lazy-load height="110" borderRadius="14" :is-effect="false" :image="
               item.avatar_url ? item.avatar_url + '?x-oss-process=image/resize,w_110,h_110,m_fill' : '/static/images/user.png'
-            " mode="aspectFill" />
+            " mode="aspectFill" errorImg="/static/images/user.png" />
             <view class="gender">
 								<u-icon v-if="item.gender === '1'" color="#409eff" name="man" size="17"></u-icon>
 								<u-icon v-if="item.gender === '0'" color="#f5abb8" name="woman" size="17"></u-icon>

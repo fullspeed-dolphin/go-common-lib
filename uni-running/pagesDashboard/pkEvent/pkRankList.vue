@@ -63,7 +63,7 @@
           <div class="user-avatar">
             <up-lazy-load height="110" borderRadius="14" :is-effect="false" :image="
               (item.avatar_url)  + '?x-oss-process=image/resize,w_110,h_110,m_fill'
-            " mode="aspectFill" />
+            " mode="aspectFill" errorImg="/static/images/user.png" />
           </div>
           <view class="user-info">
             <view class="user-name">{{ item.real_name }}</view>

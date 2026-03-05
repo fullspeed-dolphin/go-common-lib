@@ -121,7 +121,7 @@
           <div class="user-avatar">
             <up-lazy-load height="120" borderRadius="16" :is-effect="false" :image="
               item.avatar_url ? item.avatar_url + '?x-oss-process=image/resize,w_120,h_120,m_fill' : '/static/images/user.png'
-            " mode="aspectFill" />
+            " mode="aspectFill" errorImg="/static/images/user.png" />
           </div>
           <!-- <view class="user-info">
             <view style="display:flex;align-items:center;">
