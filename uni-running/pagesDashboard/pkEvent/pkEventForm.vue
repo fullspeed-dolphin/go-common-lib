@@ -25,7 +25,7 @@
             </view>
           </up-form-item>
         </template>
-        <up-form-item v-if="!isFreePackage" label="收货地址" prop="shipping_address" required>
+        <up-form-item label="收货地址" prop="shipping_address" required>
           <view class="flex-start input-wrap">
             <up-input v-model="form.shipping_address" border="none" @change="validateField('shipping_address')" maxlength="100" placeholder="请输入您的收货地址">
               <template #suffix>
