@@ -37,7 +37,7 @@
 					</view>
 				</view>
 				<!-- 当天健康记录 -->
-					<!-- <section v-if="!selectedDevice.name" class="panel section">
+					<section v-if="!selectedDevice.name" class="panel section">
 						<view class="h1 b" style="padding: 20rpx 0 0 10rpx;font-size: 32rpx;margin-bottom: 20rpx;"> 今日运动总结 </view>
 						<view class="statics flex-row b">
 						<view class="flex-1">
@@ -57,7 +57,7 @@
 							<view class="value">{{todaySummaryData.total_calories}}</view>
 						</view>
 						</view>
-					</section> -->
+					</section>
 				<view class="section" @click="goToRunRecord">
 					<view class="section-header">
 						<view class="section-header-title">

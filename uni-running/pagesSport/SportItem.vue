@@ -43,7 +43,7 @@ const viewDetail = (item) => {
     page_size: 10,
   };
   request.get("/sport-api/api/healthdata/detail", params)
-  // uni.$u.route(`pagesSub/sportDetail?id=${item.id}`);
+  uni.$u.route(`pagesSub/sportDetail?id=${item.id}`);
 
 };
 </script>
