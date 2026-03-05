@@ -76,7 +76,7 @@
         </view>
       </view>
       <u-button type="primary" color="#ff5c5c" shape="circle" customStyle="width: 256rpx;height: 72rpx;margin:0;border-radius: 999rpx;" @click="submitForm()">
-        加入战队并报名
+				{{props.teamID ? '加入战队并报名' : '立即报名'}}
       </u-button>
     </view>
   </view>
@@ -99,11 +99,12 @@ const activetyId = ref("");
 
 const isAgree = ref(false);
 const props = defineProps({
-  currentID: {
+  teamID: {
     type: String,
     default: ""
   }
 });
+
 const form = ref({
   real_name: "",
   contact_number: "",
@@ -239,7 +240,7 @@ const getPackageList = () => {
 onLoad((options) => {
   console.log("option", options);
   // activetyId.value = options.id;
-  activetyId.value = options.eventId;
+  activetyId.value = options.eventId || options.id;
   // 套餐列表
   getPackageList();
 });
@@ -247,8 +248,16 @@ onLoad((options) => {
 const submitForm = () => {
   uForm.value.validate().then((res) => {
     if (!isAgree.value) return uni.$u.toast('请查阅并勾选免责声明~');
-
-    /* const data = {
+		
+		// 如果传入 teamID，说明先需要进入战队后报名活动
+		if (props.teamID) {
+			// 加入战队
+			joinTeamAPi()
+			return false
+		}
+		
+		// 报名活动
+    const data = {
       ...form.value,
       event_id: activetyId.value,
     };
@@ -265,9 +274,7 @@ const submitForm = () => {
       } else {
         payOrder(res.reg_no);
       }
-    }); */
-    // 加入战队
-    joinTeamAPi()
+    });
   });
 };
 
@@ -278,8 +285,7 @@ function joinTeamAPi(item) {
   request
     .post("/event-api/online_events_team/join", {
 			event_id: activetyId.value,
-			// team_id: item.id,
-			team_id: props.currentID,
+			team_id: props.teamID,
     })
     .then(() => {
 				getUserStatus();
