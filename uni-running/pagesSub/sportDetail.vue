@@ -91,9 +91,10 @@ import { ref, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { useStore } from "vuex";
 import { useShare, buildPath } from "@/composables/useShare.js";
-
+import request from "@/utils/request.js";
 // 使用store
 const store = useStore();
+// const userInfo = computed(() => store.state.userInfo);
 
 // 路由参数
 const routeOptions = ref({});
@@ -189,11 +190,40 @@ const pageHeight = computed(() => {
 
 // 页面加载
 onLoad((optionsParam) => {
+  console.log("optionsParam===",optionsParam,testTrackData)
   options.value = optionsParam;
   routeOptions.value = optionsParam;
 
-  polyline.value[0].points = testTrackData; // 假设trackPoints已在其他地方定义
+  // polyline.value[0].points = testTrackData; // 假设trackPoints已在其他地方定义
+  // 获取路径
+  getPolylinePoint()
 });
+
+const getPolylinePoint=(point) => { 
+  let params = { 
+    id: options.value.id,
+    Authorization : userInfo.value.token,
+  };
+  request.get("/sport-api/api/healthdata/track", params).then(res=>{
+    polyline.value[0].points = testTrackData;
+    // polyline.value[0].points =  res.points.map(item=>{
+    //   return {
+    //     longitude: +item.longitude,
+    //     latitude: +item.latitude,
+    //   }
+    // })
+    // covers.value = [
+    //   {
+    //     latitude: +res.points[0].latitude[0],
+    //     longitude: +res.points[0].longitude[0],
+    //     iconPath: "/static/location.png",
+    //   },
+    // ];
+    // centerLatitude.value = +res.points[0].latitude[0];
+    // centerLongitude.value = +res.points[0].longitude[0];
+    // console.log('res====',JSON.parse(JSON.stringify(polyline.value[0].points)),'==',polyline.value[0].points)
+  })
+}
 
 // 方法定义
 const successLogin = () => {

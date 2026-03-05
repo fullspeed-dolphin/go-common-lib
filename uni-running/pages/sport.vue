@@ -36,6 +36,28 @@
 							</view>
 					</view>
 				</view>
+				<!-- 当天健康记录 -->
+					<!-- <section v-if="!selectedDevice.name" class="panel section">
+						<view class="h1 b" style="padding: 20rpx 0 0 10rpx;font-size: 32rpx;margin-bottom: 20rpx;"> 今日运动总结 </view>
+						<view class="statics flex-row b">
+						<view class="flex-1">
+							<view class="label">运动步数</view>
+							<view class="value">{{todaySummaryData.total_steps}}</view>
+						</view>
+						<view class="flex-1">
+							<view class="label">里程长度</view>
+							<view class="value">{{ todaySummaryData.total_distance_meters }}</view>
+						</view>
+						<view class="flex-1">
+							<view class="label">时长</view>
+							<view class="value">{{ todaySummaryData.total_duration_seconds }}</view>
+						</view>
+						<view class="flex-1">
+							<view class="label">消耗大卡</view>
+							<view class="value">{{todaySummaryData.total_calories}}</view>
+						</view>
+						</view>
+					</section> -->
 				<view class="section" @click="goToRunRecord">
 					<view class="section-header">
 						<view class="section-header-title">
@@ -46,6 +68,7 @@
 						</view>
 						<view class="section-header-more">全部 <u-icon name="arrow-right" size="12" color="#999"></u-icon></view>
 					</view>
+					
 					<view class="section-content">
 						<view class="section-content-title" :class="{ empty: !totalDistance }">
 							<image class="section-content-title-icon" style="width: 50rpx; height: 54rpx"
@@ -98,6 +121,8 @@
 	import tabbar from "@/components/tabBar.vue";
 	import UserLogin from "@/components/UserLogin.vue";
 	import { useShare } from "@/composables/useShare.js";
+	import request from "@/utils/request.js";
+	import { formatDuration, formatDistance, formatPace, getTypeSum } from "./utils.js";
 
 	const store = useStore();
 
@@ -201,7 +226,18 @@
 			url: "/pagesSport/punchInRecords",
 		});
 	};
-
+	// ===================运动总结
+	const todaySummaryData = ref({})
+	const selectedDevice = ref({});
+	function getSoprtRecords() {
+		request.get("/sport-api/api/healthdata/summary").then((res) => {
+			// console.log("运动记录====>", res);
+			res.total_duration_seconds = formatDuration(res.total_duration_seconds);
+			res.total_distance_meters = formatDistance(res.total_distance_meters);
+			todaySummaryData.value = res;
+		});
+	}
+	getSoprtRecords()
 </script>
 
 <style lang="less" scoped>
@@ -388,5 +424,10 @@
 		border-radius: 16rpx;
 		overflow: hidden;
 	}
-
+	// 今日运动总结
+.statics {
+  font-size: 24rpx;
+  line-height: 48rpx;
+  padding-left: 12rpx;
+}
 </style>
