@@ -56,18 +56,19 @@
     </up-form>
 
 
-    <section class="section-bottom" style="width: 682rpx;margin: 48rpx auto;">
-				<view class="txt flex-start">
-					<up-checkbox shape="circle" activeColor="#8CC63E" v-model:checked="isAgree" :usedAlone="true"
-						:customStyle="{ marginRight: '-10rpx' }" size="32rpx" />
-					<text @click="isAgree = !isAgree">
-						<text class="u-ml-5">我已阅读并同意该</text>
-					</text>
-					<text style="color: #ff8c00" @click="$u.route('pagesDashboard/pkEvent/activeRule?type=disclaimer')">《免责声明》</text>
-				</view>
-			</section>
+    <section class="section-bottom" style="width: 682rpx;margin: 0rpx auto 40rpx;">
+      <view class="txt flex-start">
+        <up-checkbox shape="circle" activeColor="#8CC63E" v-model:checked="isAgree" :usedAlone="true"
+          :customStyle="{ marginRight: '-10rpx' }" size="32rpx" />
+        <text @click="isAgree = !isAgree">
+          <text class="u-ml-5">我已阅读并同意该</text>
+        </text>
+        <text style="color: #ff8c00" @click="$u.route('pagesDashboard/pkEvent/activeRule?type=disclaimer')">《免责声明》</text>
+      </view>
+    </section>
 
-    <view class="submit-wrapper flex-between-center bgf" style="padding: 34rpx 32rpx;">
+    <div style="height: 120rpx;"></div>
+    <view class="submit-wrapper flex-between-center bgf">
       <view class="" style="font-size: 24rpx;color: #6A7282;">
         应付金额
         <view class="u-mt-10" style="font-weight: bold;font-size: 40rpx;color: #ff5c5c;">
@@ -525,7 +526,6 @@ function wxPay(respay) {
 // 卡片通用样式
 .card-section {
   padding: 0 32rpx;
-  margin-bottom: 24rpx;
 }
 
 // Logo 卡片特殊样式
@@ -566,7 +566,11 @@ function wxPay(respay) {
 
 // 提交按钮
 .submit-wrapper {
-  padding: 60rpx 8rpx 30rpx;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  padding: 20rpx 32rpx;
+  box-shadow: 0 -2rpx 8rpx rgba(0, 0, 0, 0.1);
 }
 
 ::v-deep {

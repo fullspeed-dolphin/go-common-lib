@@ -123,15 +123,15 @@
     </block>
   </section>
 	
-	
 	<button v-if="!isShowShareBtn" class="share-btn flex-center" :class="{ active: isScroll }" open-type="share">
 		<u-icon name="share" color="#fff" size="18"></u-icon>
 	</button>
 	
 	<UserLogin ref="refUserLogin" @success="onLoginSuccess" />
   <!-- 套餐列表 -->
-  <up-popup :show="isShowModal" @close="close" overlayOpacity="0.9" bgColor="transparent" mode="bottom" closeable>
-    <view style="height: 100vh;width:100vw;overflow-y: auto;background: #fff;">
+  <up-popup :show="isShowModal" @close="close" overlayOpacity="1" :safeAreaInsetBottom="false" bgColor="#fff" mode="bottom" closeable>
+    <div class="flex-center b" style="height:90rpx;font-size:32rpx;">完善信息</div>
+    <view style="height: 90vh;width:100vw;overflow-y: auto;background: #fff;">
       <pkEventForm :currentID="teamID"/>
     </view>
   </up-popup>
