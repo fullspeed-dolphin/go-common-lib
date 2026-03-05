@@ -569,7 +569,7 @@ function wxPay(respay) {
   position: fixed;
   width: 100%;
   bottom: 0;
-  padding: 20rpx 32rpx;
+  padding: 20rpx 32rpx 40rpx;
   box-shadow: 0 -2rpx 8rpx rgba(0, 0, 0, 0.1);
 }
 

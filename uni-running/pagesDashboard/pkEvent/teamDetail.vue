@@ -131,9 +131,9 @@
   <!-- 套餐列表 -->
   <up-popup :show="isShowModal" @close="close" overlayOpacity="1" :safeAreaInsetBottom="false" bgColor="#fff" mode="bottom" closeable>
     <div class="flex-center b" style="height:90rpx;font-size:32rpx;">完善信息</div>
-    <view style="height: 90vh;width:100vw;overflow-y: auto;background: #fff;">
+    <scroll-view scroll-y style="height: 90vh;width:100vw;overflow-y: auto;background: #fff;">
       <pkEventForm :currentID="teamID"/>
-    </view>
+    </scroll-view>
   </up-popup>
 </template>
 
