@@ -51,7 +51,7 @@
     <view v-if="isLeader" class="list-toolbar">
       <view class="toolbar-btn" @click="toggleGlobalPhone">
         <u-icon :name="showPhone ? 'eye-fill' : 'eye-off'" size="16" :color="showPhone ? '#1456f0' : '#999'"></u-icon>
-        <text class="toolbar-text">{{ showPhone ? '隐藏' : '显示手机号' }}</text>
+        <text class="toolbar-text">{{ showPhone ? '隐藏' : '显示' }}</text>
       </view>
     </view>
 
