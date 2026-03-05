@@ -339,17 +339,22 @@
 			res.data.events?.forEach(e => { if (e.checkin_count != null) checkinCounts[e.id] = e.checkin_count })
 			res.data.results?.forEach(r => { if (r.checkin_count != null) checkinCounts[r.event_id] = r.checkin_count })
 
-			refSharePoster.value.open({
-				...userInfo.value,
-				distance: parseFloat(res.data.km),
-				duration: res.data.time,
-				pace: res.data.speed,
-				coinAmount: extractNumbers(res?.msg || ''),
-				coinAmountMsg: res?.msg,
-				checkinCounts,
-				checkinTime: dayjs().format("YYYY年MM月DD日 HH:mm"),
-				eventIds: options_events.value.filter(i => i.checked).map(i => i.value),
-			})
+			// 只为 results 中 success === true 的活动生成海报
+			const successEventIds = (res.data.results || []).filter(r => r.success).map(r => r.event_id)
+
+			if (successEventIds.length) {
+				refSharePoster.value.open({
+					...userInfo.value,
+					distance: parseFloat(res.data.km),
+					duration: res.data.time,
+					pace: res.data.speed,
+					coinAmount: extractNumbers(res?.msg || ''),
+					coinAmountMsg: res?.msg,
+					checkinCounts,
+					checkinTime: dayjs().format("YYYY年MM月DD日 HH:mm"),
+					eventIds: successEventIds,
+				})
+			}
 			
 			// 2秒后隐藏弹窗并跳转
 			// setTimeout(() => {
