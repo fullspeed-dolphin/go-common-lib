@@ -191,7 +191,7 @@ export const activeRule = `
 </div>
 
 <p style="font-size: 15px; font-weight: bold; margin: 14px 0 6px;">二、团队奖励</p>
-<p style="font-weight: bold; margin-bottom: 4px;">创团邀约奖励：</p>
+<p style="font-weight: bold; margin-bottom: 4px;">创团邀约奖励（完成率＞30%）：</p>
 <div style="background: #FAFAFA; border-radius: 8px; padding: 10px 14px; margin-bottom: 10px;">
   <p>· 战队人数≥50人，奖励6双斯凯奇运动袜</p>
   <p>· 战队人数≥100人，奖励6双斯凯奇运动袜 + 跑鞋1双</p>
