@@ -11,7 +11,6 @@ import { declareTerms } from "./utils.js"
 
 const ruleText = ref('')
 
-// 页面加载
 onLoad((options) => {
 	if (options.type === 'disclaimer') {
 		ruleText.value = declareTerms
