@@ -148,7 +148,7 @@ import { ref, computed, onMounted } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import store from "@/utils/store.js";
-import { createMarker } from "@/utils/utils.js";
+import { createMarker } from "./assets/utils.js";
 import { useShare, buildPath } from "@/composables/useShare.js";
 
 // 路由参数
