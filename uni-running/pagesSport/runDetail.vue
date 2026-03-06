@@ -20,19 +20,25 @@
             <view class="distance-label">总里程</view>
             <view class="distance-value">
               <text class="amount">{{
-                formatDistance(activityData.totalDistance)
+                // formatDistance(activityData.totalDistance)
+				dataInfo.distance_in_meters
               }}</text>
               <text class="unit">公里</text>
             </view>
           </view>
           <view class="user-info">
-            <image class="avatar" :src="
+			  
+			  <image class="avatar" :src="
+			      userInfo.avatar_url ||
+			      'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
+			    " mode="aspectFill"></image>
+            <!-- <image class="avatar" :src="
                 activityData.userAvatar ||
                 'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
-              " mode="aspectFill"></image>
+              " mode="aspectFill"></image> -->
             <view class="user-text">
               <view class="user-name">{{
-                activityData.userName || "用户"
+                userInfo.nickname || "用户"
               }}</view>
               <view class="activity-time">{{
                 activityData.dateTime || "--"
@@ -52,61 +58,69 @@
         <view class="stats-grid">
           <view class="stats-item">
             <view class="stats-value">{{
-              formatTime(activityData.duration)
+			  dataInfo.totalTime || "--"
             }}</view>
             <view class="stats-label">用时</view>
           </view>
           <view class="stats-item">
             <view class="stats-value">{{
-              formatPace(activityData.avgPace)
+              // formatPace(activityData.avgPace)
+			  dataInfo.averagePace || "--"
+			  
             }}</view>
             <view class="stats-label">平均配速</view>
           </view>
-          <!-- <view class="stats-item">
-            <view class="stats-value">{{
-              activityData.avgHeartRate || "--"
-            }}</view>
-            <view class="stats-label">平均心率(bpm)</view>
-          </view> -->
-          <!-- <view class="stats-item">
-            <view class="stats-value">{{
-              activityData.avgCadence || "--"
-            }}</view>
-            <view class="stats-label">平均步频</view>
-          </view> -->
-          <!-- <view class="stats-item">
-            <view class="stats-value">{{
-              activityData.avgStrideLength || "--"
-            }}</view>
-            <view class="stats-label">平均步幅(cm)</view>
-          </view> -->
-          <!-- <view class="stats-item">
-            <view class="stats-value">{{
-              activityData.elevationGain || "--"
-            }}</view>
-            <view class="stats-label">累计爬升(m)</view>
-          </view> -->
           <view class="stats-item">
             <view class="stats-value">{{
-              formatPace(activityData.fastestKm)
+              // activityData.avgHeartRate || "--"
+			  dataInfo.averageRate || "--"
+            }}</view>
+            <view class="stats-label">平均心率(bpm)</view>
+          </view>
+          <view class="stats-item">
+            <view class="stats-value">{{
+              // activityData.avgCadence || "--"
+			  dataInfo.averageCadence || "--"
+            }}</view>
+            <view class="stats-label">平均步频</view>
+          </view>
+          <view class="stats-item">
+            <view class="stats-value">{{
+              // activityData.avgStrideLength || "--"
+			  dataInfo.averageStride || "--"
+            }}</view>
+            <view class="stats-label">平均步幅(cm)</view>
+          </view>
+          <view class="stats-item">
+            <view class="stats-value">{{
+              // activityData.elevationGain || "--"
+			  dataInfo.totalClimb || "--"
+            }}</view>
+            <view class="stats-label">累计爬升(m)</view>
+          </view>
+          <view class="stats-item">
+            <view class="stats-value">{{
+              // formatPace(activityData.fastestKm)
+			  dataInfo.fastOne || "--"
             }}</view>
             <view class="stats-label">最快1公里</view>
           </view>
-          <!-- <view class="stats-item">
+          <view class="stats-item">
             <view class="stats-value">{{
-              activityData.totalSteps || "--"
+              // activityData.totalSteps || "--"
+			  dataInfo.totalStepNumber || "--"
             }}</view>
             <view class="stats-label">总步数</view>
-          </view> -->
-          <!-- <view class="stats-item">
+          </view>
+          <view class="stats-item">
             <view class="stats-value">{{ activityData.calories || "--" }}</view>
             <view class="stats-label">大卡</view>
-          </view> -->
+          </view>
         </view>
       </section>
 
       <!-- 3. 配速数据 -->
-      <section class="section-pace">
+      <!-- <section class="section-pace">
         <view class="pace-header">
           <view class="pace-title">配速</view>
           <view class="pace-summary">
@@ -138,19 +152,33 @@
             </view>
           </template>
         </view>
-      </section>
+      </section> -->
     </view>
   </view>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted,reactive } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
-import store from "@/utils/store.js";
+// import store from "@/utils/store.js";
+import { useStore } from "vuex";
 import { createMarker } from "./assets/utils.js";
 import { useShare, buildPath } from "@/composables/useShare.js";
-
+const store = useStore();
+const userInfo = computed(() => store.state.userInfo);
+const dataInfo = reactive({
+	totalTime:"", // 总用时
+	averagePace:"", // 平均配速
+	averageRate:"", // 平均心率
+	averageCadence:"", // 平均步频
+	averageStride:"", // 平均步幅
+	totalClimb:"", // 累计爬升
+	fastOne:"", // 最快1公里
+	totalStepNumber:"", // 总步数
+	distance_in_meters:"" // 距离
+});
+console.log('=====userInfo====',userInfo)
 // 路由参数
 const routeId = ref("");
 
@@ -333,13 +361,41 @@ const loadSportData = async (id) => {
     page: 1,
     page_size: 10,
   };
-  request.get("/sport-api/api/healthdata/detail", params)
+	  
+  request.get("/sport-api/api/healthdata/detail", params).then(res=>{
+	  console.log("res=============",res)
+	  	dataInfo.totalTime = getTime(res.duration_in_seconds) // 总用时
+	  	dataInfo.averagePace = res.average_pace.toFixed(2) // 平均配速
+	  	dataInfo.averageRate = res.average_heart_rate // 平均心率
+	  	dataInfo.averageCadence = res.average_run_cadence.toFixed(2) // 平均步频
+	  	dataInfo.averageStride = res.average_speed // 平均步幅
+	  	dataInfo.totalClimb = res.total_elevation_gain // 累计爬升
+	  	// dataInfo.fastOne = res.max_speed // 最快1公里
+	  	dataInfo.totalStepNumber = res.steps // 总步数
+		dataInfo.distance_in_meters = (res.distance_in_meters / 1000).toFixed(2) // 距离
+  })
 
   // 轨迹数据接口
   request.get(`/sport-api/api/healthdata/track?id=${routerParams.value.id}`).then((res) => {
     initMap(res.points);
+	dataInfo.averageRate = parseInt((res.points.map(item=>item.heart_rate).reduce((acc, curr) => acc + curr, 0)) / res.points.length) ;
   })
 };
+const getTime = (t) =>{
+    let h = parseInt ( t / 60 / 60 % 24 )
+    let m = parseInt ( t / 60 % 60 )
+    let s = parseInt ( t % 60 )
+    h < 10 ? ' 0 ' + h : h
+    m < 10 ? ' 0 ' + m : m
+    s < 10 ? ' 0 ' + s : s
+		
+	if(h) {
+		return `${h}:${m}:${s}`
+		
+	} else {
+		return `${m}:${s}`
+	}
+}	
 
 // 格式化距离
 const formatDistance = (distance) => {
