@@ -206,12 +206,14 @@ const getPolylinePoint=(point) => {
   };
   request.get("/sport-api/api/healthdata/track", params).then(res=>{
     polyline.value[0].points = testTrackData;
-    // polyline.value[0].points =  res.points.map(item=>{
-    //   return {
-    //     longitude: +item.longitude,
-    //     latitude: +item.latitude,
-    //   }
-    // })
+    polyline.value[0].points =  res.points.map(item=>{
+      return {
+        longitude: +item.longitude,
+        latitude: +item.latitude,
+      }
+    })
+    covers.value[0].latitude = +res.points[0].latitude[0]
+    covers.value[0].longitude = +res.points[0].longitude[0]
     // covers.value = [
     //   {
     //     latitude: +res.points[0].latitude[0],
@@ -219,8 +221,8 @@ const getPolylinePoint=(point) => {
     //     iconPath: "/static/location.png",
     //   },
     // ];
-    // centerLatitude.value = +res.points[0].latitude[0];
-    // centerLongitude.value = +res.points[0].longitude[0];
+    centerLatitude.value = +res.points[0].latitude[0];
+    centerLongitude.value = +res.points[0].longitude[0];
     // console.log('res====',JSON.parse(JSON.stringify(polyline.value[0].points)),'==',polyline.value[0].points)
   })
 }
