@@ -329,7 +329,7 @@ const loadSportData = async (id) => {
 
   // 用户运动数据，配速数据，
   const params = {
-    id: item.id,
+    id: routerParams.value.id,
     page: 1,
     page_size: 10,
   };
