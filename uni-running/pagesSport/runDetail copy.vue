@@ -148,7 +148,6 @@ import { ref, computed, onMounted } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import store from "@/utils/store.js";
-import { createMarker } from "@/utils/utils.js";
 import { useShare, buildPath } from "@/composables/useShare.js";
 
 // 路由参数
@@ -255,16 +254,34 @@ const isValidCoordinate = (latitude, longitude) => {
   );
 };
 
+// 创建标记
+const createMarker = (id, latitude, longitude, type) => {
+  const isStart = type === "start";
+  return {
+    id,
+    latitude,
+    longitude,
+    width: 40,
+    height: 40,
+    anchor: { x: 0.5, y: 0.5 },
+    iconPath: isStart
+      ? "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/go@2x.png"
+      : "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/end@2x.png",
+    title: isStart ? "起" : "终",
+  };
+};
+
 // 初始化地图
 const initMap = (tracks) => {
   if (!tracks || tracks.length === 0) {
     return;
   }
 
-  console.log("轨迹点数据:=====>", tracks);
-
   // 转换轨迹点格式
-  const trackPoints = tracks;
+  const trackPoints = tracks.map((track) => ({
+    latitude: track.lat,
+    longitude: track.lon,
+  }));
 
   if (trackPoints.length > 0) {
     // 设置地图中心为第一个点
@@ -319,26 +336,96 @@ const formatDateTime = (dateString) => {
   }
 };
 
+// 计算两个时间之间的秒数差
+const getSecondsBetween = (startTime, endTime) => {
+  if (!startTime || !endTime) return 0;
+  try {
+    const start = new Date(startTime).getTime();
+    const end = new Date(endTime).getTime();
+    return Math.floor((end - start) / 1000);
+  } catch (e) {
+    return 0;
+  }
+};
+
 // 加载运动数据
 const loadSportData = async (id) => {
+  if (!id) {
+    uni.$u.toast("缺少运动记录ID");
+    return;
+  }
+
   loading.value = true;
   uni.showLoading({
     title: "加载中...",
     mask: true,
   });
 
-  // 用户运动数据，配速数据，
-  const params = {
-    id: item.id,
-    page: 1,
-    page_size: 10,
-  };
-  request.get("/sport-api/api/healthdata/detail", params)
+  try {
+    const res = await request.get(`/sport-api/api/manual`, { id });
 
-  // 轨迹数据接口
-  request.get(`/sport-api/api/healthdata/track?id=${routerParams.value.id}`).then((res) => {
-    initMap(res.points);
-  })
+    // 处理活动数据
+    activityData.value = {
+      totalDistance: res.meters || 0,
+      duration: res.seconds || 0,
+      avgPace: res.seconds_per_km || 0,
+      fastestKm: 0, // 稍后从 km_splits 计算
+      userName: store.state.userInfo?.nickname || "用户",
+      dateTime: formatDateTime(res.sport_started_at),
+      userAvatar: store.state.userInfo?.avatar_url || "",
+    };
+
+    // 处理配速数据
+    if (res.geojson.km_splits && res.geojson.km_splits.length > 0) {
+      let cumulativeTime = 0;
+      let fastestPace = Infinity;
+      let fastestIndex = -1;
+
+      paceData.value = res.geojson.km_splits.map((split, index) => {
+        cumulativeTime += split.seconds || 0;
+        const pace = split.seconds_per_km || 0;
+
+        // 找到最快配速（只考虑有效的配速值）
+        if (pace > 0 && pace < fastestPace) {
+          fastestPace = pace;
+          fastestIndex = index;
+        }
+
+        return {
+          km: index + 1,
+          pace: pace,
+          cumulativeTime: cumulativeTime,
+          isFastest: false, // 稍后设置
+        };
+      });
+
+      // 标记最快配速
+      if (fastestIndex >= 0 && fastestPace !== Infinity) {
+        paceData.value[fastestIndex].isFastest = true;
+        activityData.value.fastestKm = fastestPace;
+      } else if (res.seconds_per_km > 0) {
+        // 如果没有分段数据，使用平均配速作为最快配速
+        activityData.value.fastestKm = res.seconds_per_km;
+      }
+    } else {
+      paceData.value = [];
+      // 如果没有分段数据，使用平均配速作为最快配速
+      if (res.seconds_per_km > 0) {
+        activityData.value.fastestKm = res.seconds_per_km;
+      }
+    }
+
+    // 处理地图轨迹
+    if (res.geojson && res.geojson.tracks && res.geojson.tracks.length > 0) {
+      initMap(res.geojson.tracks);
+    }
+  } catch (error) {
+    console.error("加载运动数据失败:", error);
+    uni.$u.toast("加载数据失败");
+  } finally {
+    loading.value = false;
+    uni.hideLoading();
+  }
 };
 
 // 格式化距离
@@ -384,9 +471,7 @@ const getPaceBarWidth = (pace) => {
   return 100 - ((pace - minPace) / (maxPace - minPace)) * 90;
 };
 
-const routerParams = ref({});
 onLoad((options) => {
-  routerParams.value = options;
   // 从路由参数获取活动ID
   const id = options.id;
   routeId.value = id || "";

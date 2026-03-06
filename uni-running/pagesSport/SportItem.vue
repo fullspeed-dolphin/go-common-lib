@@ -37,14 +37,7 @@ const props = defineProps({
 
 
 const viewDetail = (item) => {
-  const params = {
-    id: item.id,
-    page: 1,
-    page_size: 10,
-  };
-  request.get("/sport-api/api/healthdata/detail", params)
-  uni.$u.route(`pagesSub/sportDetail?id=${item.id}`);
-
+  uni.$u.route(`pagesSport/runDetail?id=${item.id}`);
 };
 </script>
 

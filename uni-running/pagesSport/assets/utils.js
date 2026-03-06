@@ -58,3 +58,20 @@ export function formatPace(pace) {
 export function getTypeSum(list, type) {
   return list.reduce((sum, i) => (sum + (parseFloat(i[type]) || 0) * 100), 0) / 100;
 }
+
+// 创建标记
+export const createMarker = (id, latitude, longitude, type) => {
+  const isStart = type === "start";
+  return {
+    id,
+    latitude,
+    longitude,
+    width: 40,
+    height: 40,
+    anchor: { x: 0.5, y: 0.5 },
+    iconPath: isStart
+      ? "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/go@2x.png"
+      : "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/end@2x.png",
+    title: isStart ? "起" : "终",
+  };
+};
