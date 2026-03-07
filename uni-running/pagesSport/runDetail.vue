@@ -41,7 +41,7 @@
                 userInfo.nickname || "用户"
               }}</view>
               <view class="activity-time">{{
-                activityData.dateTime || "--"
+                dataInfo.start_time || "--"
               }}</view>
             </view>
           </view>
@@ -66,7 +66,6 @@
             <view class="stats-value">{{
               // formatPace(activityData.avgPace)
 			  dataInfo.averagePace || "--"
-			  
             }}</view>
             <view class="stats-label">平均配速</view>
           </view>
@@ -113,7 +112,7 @@
             <view class="stats-label">总步数</view>
           </view>
           <view class="stats-item">
-            <view class="stats-value">{{ activityData.calories || "--" }}</view>
+            <view class="stats-value">{{ dataInfo.active_kilocalories || "--" }}</view>
             <view class="stats-label">大卡</view>
           </view>
         </view>
@@ -164,6 +163,7 @@ import request from "@/utils/request.js";
 // import store from "@/utils/store.js";
 import { useStore } from "vuex";
 import { createMarker } from "./assets/utils.js";
+// import { formatPace } from "./assets/utils.js";
 import { useShare, buildPath } from "@/composables/useShare.js";
 const store = useStore();
 const userInfo = computed(() => store.state.userInfo);
@@ -176,7 +176,9 @@ const dataInfo = reactive({
 	totalClimb:"", // 累计爬升
 	fastOne:"", // 最快1公里
 	totalStepNumber:"", // 总步数
-	distance_in_meters:"" // 距离
+	distance_in_meters:"", // 距离
+	active_kilocalories:"", // 大卡
+	start_time:"" // 跑步开始时间
 });
 console.log('=====userInfo====',userInfo)
 // 路由参数
@@ -300,22 +302,59 @@ const initMap = (tracks) => {
       latitude: trackPoints[0].latitude,
       longitude: trackPoints[0].longitude,
     };
-
-    // 创建起点和终点标记
-    markers.value = [
-      createMarker(
-        1,
-        trackPoints[0].latitude,
-        trackPoints[0].longitude,
-        "start"
-      ),
-      createMarker(
-        2,
-        trackPoints[trackPoints.length - 1].latitude,
-        trackPoints[trackPoints.length - 1].longitude,
-        "end"
-      ),
-    ];
+	// 创建标记
+	let tempArr = []
+	let tempIndex = 0	 
+	let tempAPoints = trackPoints.filter((item,index) =>{
+		if(!tempArr.includes(parseInt(item.total_distance / 500))) {
+			tempArr.push(parseInt(item.total_distance / 500))
+			tempIndex+=1
+			return item
+		}
+		// 终点的时候加一个标记
+		if(index === trackPoints.length - 1) {
+			return item
+		}
+		
+	})
+		console.log('=====tempAPoints====',tempAPoints)
+	markers.value = tempAPoints.map((item,index)=>{
+			
+		if(index === tempAPoints.length - 1) {
+			return createMarker(
+			  index+1,
+			  tempAPoints[index].latitude,
+			  tempAPoints[index].longitude,
+			  "start",
+			  (item.total_distance / 1000).toFixed(1)
+			)
+		} else {
+			return createMarker(
+			  index+1,
+			  tempAPoints[index].latitude,
+			  tempAPoints[index].longitude,
+			  "start",
+			  index * 0.5
+			)
+		}
+		 
+	})
+	// 创建起点和终点标记
+	console.log('==markers.value==',markers.value)
+ //    markers.value = [
+ //      createMarker(
+ //        1,
+ //        trackPoints[0].latitude,
+ //        trackPoints[0].longitude,
+ //        "start"
+ //      ),
+ //      createMarker(
+ //        2,
+ //        trackPoints[trackPoints.length - 1].latitude,
+ //        trackPoints[trackPoints.length - 1].longitude,
+ //        "end"
+ //      ),
+ //    ];
 
     // 创建轨迹线
     polylines.value = [
@@ -365,7 +404,7 @@ const loadSportData = async (id) => {
   request.get("/sport-api/api/healthdata/detail", params).then(res=>{
 	  console.log("res=============",res)
 	  	dataInfo.totalTime = getTime(res.duration_in_seconds) // 总用时
-	  	dataInfo.averagePace = res.average_pace.toFixed(2) // 平均配速
+	  	dataInfo.averagePace = res.average_pace.toFixed(2).replace(".","'")+"''" // 平均配速
 	  	dataInfo.averageRate = res.average_heart_rate // 平均心率
 	  	dataInfo.averageCadence = res.average_run_cadence.toFixed(2) // 平均步频
 	  	dataInfo.averageStride = res.average_speed // 平均步幅
@@ -373,6 +412,8 @@ const loadSportData = async (id) => {
 	  	// dataInfo.fastOne = res.max_speed // 最快1公里
 	  	dataInfo.totalStepNumber = res.steps // 总步数
 		dataInfo.distance_in_meters = (res.distance_in_meters / 1000).toFixed(2) // 距离
+		dataInfo.active_kilocalories = res.active_kilocalories // 大卡
+		dataInfo.start_time = formatDateTime(res.start_time)
   })
 
   // 轨迹数据接口
@@ -393,7 +434,7 @@ const getTime = (t) =>{
 		return `${h}:${m}:${s}`
 		
 	} else {
-		return `${m}:${s}`
+		return `00:${m}:${s}`
 	}
 }	
 

@@ -60,7 +60,7 @@ export function getTypeSum(list, type) {
 }
 
 // 创建标记
-export const createMarker = (id, latitude, longitude, type) => {
+export const createMarker = (id, latitude, longitude, type, strDistance) => {
   const isStart = type === "start";
   return {
     id,
@@ -69,9 +69,20 @@ export const createMarker = (id, latitude, longitude, type) => {
     width: 40,
     height: 40,
     anchor: { x: 0.5, y: 0.5 },
-    iconPath: isStart
-      ? "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/go@2x.png"
-      : "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/end@2x.png",
-    title: isStart ? "起" : "终",
+		
+	label:{
+		borderRadius:10,
+		borderWidth:1,
+		padding:2,
+		content:strDistance,
+		fontSize:10,
+		bgColor:"#000",
+		borderColor:"#fff",
+		color:"#fff"
+											},
+    // iconPath: isStart
+    //   ? "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/go@2x.png"
+    //   : "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/end@2x.png",
+    // title: isStart ? "起" : "终",
   };
 };
