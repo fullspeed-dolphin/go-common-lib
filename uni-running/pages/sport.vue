@@ -31,7 +31,7 @@
           </view>
         </view>
 
-        <view class="section" @click="goToRunRecord">
+        <view v-if="todaySummaryData.bindings" class="section" @click="goToRunRecord">
           <view class="section-header">
             <view class="section-header-title">
               <image class="section-header-title-icon" style="width: 32rpx; height: 46rpx" src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-device-black%402x.png" mode="aspectFill"></image>
@@ -41,7 +41,7 @@
           </view>
 
 					<!-- 当天健康记录 -->
-					<section v-if="!selectedDevice.name" class="panel section">
+					<section class="panel section">
 						<view class="h1 b" style="padding: 20rpx 0 0 10rpx;font-size: 32rpx;margin-bottom: 20rpx;"> 今日运动总结 </view>
 						<view class="statics flex-row b">
 							<view class="flex-1">
@@ -62,18 +62,13 @@
 							</view>
 						</view>
 					</section>
-
-          <!-- <view class="section-content">
-            <view class="section-content-title" :class="{ empty: !totalDistance }">
-              <image class="section-content-title-icon" style="width: 50rpx; height: 54rpx" src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-run@2x.png" mode="aspectFill">
-              </image>{{
-                totalDistance
-                  ? `累计里程：${totalDistance}公里`
-                  : "暂无运动记录"
-              }}
-            </view>
-          </view> -->
         </view>
+
+        <view v-if="!todaySummaryData.bindings" class="section-empty">
+          <view>暂无数据请</view>
+          <view class="link" @click="$u.route('/pagesSub/device/deviceList')">添加设备</view>
+        </view>
+
       </view>
       <!-- <map
         class="map"
@@ -103,7 +98,7 @@
 </template>
 <script setup>
 import { ref, onMounted, computed } from "vue";
-
+import { onShow } from "@dcloudio/uni-app";
 import { useStore } from "vuex";
 import Tabbar from "@/components/tabBar.vue";
 import UserLogin from "@/components/UserLogin.vue";
@@ -160,7 +155,6 @@ const isValidCoordinate = (latitude, longitude) => {
 
 // 计算属性
 const userInfo = computed(() => store.state.userInfo);
-const totalDistance = computed(() => userInfo.value.total_distance || 0);
 
 // 跳转到跑步轨迹页面
 const goToRunMap = () => {
@@ -221,7 +215,7 @@ const goToRunCheckIn = () => {
     url: "/pagesSport/punchInRecords",
   });
 };
-// ===================运动总结
+
 const todaySummaryData = ref({});
 const selectedDevice = ref({});
 function getSoprtRecords() {
@@ -232,10 +226,27 @@ function getSoprtRecords() {
     todaySummaryData.value = res;
   });
 }
-getSoprtRecords();
+onShow(() => {
+  getSoprtRecords();
+});
 </script>
 
 <style lang="less" scoped>
+.section-empty {
+  height: 20vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  font-size: 34rpx;
+  color: #707070;
+  line-height: 48rpx;
+  .link {
+    color: #ff8c00;
+  }
+}
+
 .page {
   background: #f5f5f5;
   min-height: 100vh;
