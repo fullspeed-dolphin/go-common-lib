@@ -26,8 +26,13 @@
   </view>
 </template>
 <script setup>
+import { computed } from "vue";
 import { formatPace } from "./assets/utils.js";
 import request from "@/utils/request.js";
+import { useStore } from "vuex";
+const store = useStore();
+const userInfo = computed(() => store.state.userInfo);
+
 const props = defineProps({
   item: {
     type: Object,
@@ -35,9 +40,11 @@ const props = defineProps({
   },
 });
 
-
 const viewDetail = (item) => {
-  uni.$u.route(`pagesSport/runDetail?id=${item.id}`);
+  uni.$u.route(`pagesSport/runDetail`, {
+    ...userInfo.value,
+    id: item.id,
+  });
 };
 </script>
 
