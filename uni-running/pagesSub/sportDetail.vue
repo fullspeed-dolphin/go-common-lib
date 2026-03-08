@@ -2,29 +2,16 @@
   <view class="">
     <u-navbar autoBack placeholder title="运动详情"></u-navbar>
     <view class="flex-col-center" :style="'height:' + pageHeight + 'px'">
-      <section
-        class="section-map flex-1 flex-col"
-        style="width: 100%; min-height: 600rpx"
-      >
-        <map
-          :latitude="centerLatitude"
-          :longitude="centerLongitude"
-          :markers="covers"
-          :polyline="polyline"
-          style="width: 100%; min-height: 600rpx; flex: 1"
-        >
+      <section class="section-map flex-1 flex-col" style="width: 100%; min-height: 600rpx">
+        <map :latitude="centerLatitude" :longitude="centerLongitude" :markers="covers" :polyline="polyline" style="width: 100%; min-height: 600rpx; flex: 1">
         </map>
       </section>
 
       <section class="section-sport">
-        <image
-          class="avatar"
-          :src="
+        <image class="avatar" :src="
             userInfo.avatar_url ||
             'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
-          "
-          mode="aspectFill"
-        ></image>
+          " mode="aspectFill"></image>
         <view class="flex-between-center">
           <view class="">
             <view class="" style="font-size: 30rpx">总里程:</view>
@@ -91,17 +78,18 @@ import { ref, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { useStore } from "vuex";
 import { useShare, buildPath } from "@/composables/useShare.js";
-
+import request from "@/utils/request.js";
 // 使用store
 const store = useStore();
+// const userInfo = computed(() => store.state.userInfo);
 
 // 路由参数
 const routeOptions = ref({});
 
 // 分享配置
 useShare(() => ({
-	title: `${userInfo.value.nickname || '用户'}的运动详情`,
-	path: buildPath('/pagesSub/sportDetail', { id: routeOptions.value.id })
+  title: `${userInfo.value.nickname || "用户"}的运动详情`,
+  path: buildPath("/pagesSub/sportDetail", { id: routeOptions.value.id }),
 }));
 
 // 生成轨迹数据的函数
@@ -161,7 +149,7 @@ const options = ref({});
 const userInfo = computed(() => store.state.userInfo);
 
 const pageHeight = computed(() => {
-	const WindowInfo = uni.getWindowInfo();
+  const WindowInfo = uni.getWindowInfo();
 
   // 状态栏高度（单位 px）
   statusBarHeight.value = WindowInfo.statusBarHeight || 0;
@@ -189,11 +177,42 @@ const pageHeight = computed(() => {
 
 // 页面加载
 onLoad((optionsParam) => {
+  console.log("optionsParam===", optionsParam, testTrackData);
   options.value = optionsParam;
   routeOptions.value = optionsParam;
 
-  polyline.value[0].points = testTrackData; // 假设trackPoints已在其他地方定义
+  // polyline.value[0].points = testTrackData; // 假设trackPoints已在其他地方定义
+  // 获取路径
+  getPolylinePoint();
 });
+
+const getPolylinePoint = (point) => {
+  let params = {
+    id: options.value.id,
+    Authorization: userInfo.value.token,
+  };
+  request.get("/sport-api/api/healthdata/track", params).then((res) => {
+    polyline.value[0].points = testTrackData;
+    polyline.value[0].points = res.points.map((item) => {
+      return {
+        longitude: +item.longitude,
+        latitude: +item.latitude,
+      };
+    });
+    covers.value[0].latitude = +res.points[0].latitude[0];
+    covers.value[0].longitude = +res.points[0].longitude[0];
+    // covers.value = [
+    //   {
+    //     latitude: +res.points[0].latitude[0],
+    //     longitude: +res.points[0].longitude[0],
+    //     iconPath: "/static/location.png",
+    //   },
+    // ];
+    centerLatitude.value = +res.points[0].latitude[0];
+    centerLongitude.value = +res.points[0].longitude[0];
+    // console.log('res====',JSON.parse(JSON.stringify(polyline.value[0].points)),'==',polyline.value[0].points)
+  });
+};
 
 // 方法定义
 const successLogin = () => {
