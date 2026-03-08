@@ -3,7 +3,7 @@
     <u-navbar title="" autoBack bgColor="transparent" />
     <section class="section-map">
       <view class="map-container">
-        <map v-if="isValidCoordinate(mapCenter.latitude, mapCenter.longitude)" id="runMap" :latitude="mapCenter.latitude" :longitude="mapCenter.longitude" :scale="16" :markers="markers" :polyline="polylines"
+        <map v-if="isValidCoordinate(mapCenter.latitude, mapCenter.longitude)" id="runMap" :latitude="latitude" :longitude="longitude" :scale="mapScale" :markers="markers" :polyline="polylines"
           :show-location="false" :enable-3D="false" :enable-overlooking="false" :enable-zoom="true" :enable-scroll="true" :enable-rotate="false" class="map"></map>
         <view v-else class="map-placeholder">
           <text>地图加载中...</text>
@@ -23,11 +23,11 @@
           </view>
           <view class="user-info">
             <image class="avatar" :src="
-			      userInfo.avatar_url ||
+			      routerParams?.avatar_url ||
 			      'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
 			    " mode="aspectFill"></image>
             <view class="user-text">
-              <view class="user-name">{{ userInfo.nickname || "用户" }}</view>
+              <view class="user-name">{{ routerParams?.nickname || "用户" }}</view>
               <view class="activity-time">{{ detail.start_time || "--" }}</view>
             </view>
           </view>
@@ -55,21 +55,20 @@
             <view class="stats-label">平均心率(bpm)</view>
           </view>
           <view class="stats-item">
-              <view class="stats-value">{{ detail.average_run_cadence || "--"
-              }}</view>
-            <view class="stats-label">平均步频</view>
+              <view class="stats-value">{{ detail.average_run_cadence || "--"}}</view>
+            <view class="stats-label">平均步频(步/分钟)</view>
           </view>
           <view class="stats-item">
-            <view class="stats-value">{{  detail.average_speed || "--" }}</view>
-            <view class="stats-label">平均步幅(cm)</view>
+            <view class="stats-value">{{ detail.average_speed || "--" }}</view>
+            <view class="stats-label">平均速度(m/s)</view>
           </view>
           <view class="stats-item">
             <view class="stats-value">{{ detail.total_elevation_gain || "--" }}</view>
             <view class="stats-label">累计爬升(m)</view>
           </view>
           <view class="stats-item">
-            <view class="stats-value">{{  detail.fastOne || "--" }}</view>
-            <view class="stats-label">最快1公里</view>
+            <view class="stats-value">{{  detail.max_speed || "--" }}</view>
+            <view class="stats-label">最大速度(m/s)</view>
           </view>
           <view class="stats-item">
             <view class="stats-value">{{  detail.steps || "--" }}</view>
@@ -121,44 +120,27 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, reactive } from "vue";
+import { ref, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
-import { useStore } from "vuex";
 import dayjs from "dayjs";
-import { createMarker, formatPace, getTime } from "./assets/utils.js";
+import { createMarker, formatPace, getTime, getPointsSpeed, getCenterScale } from "./assets/utils.js";
 
 import { useShare, buildPath } from "@/composables/useShare.js";
 
 useShare(() => ({
-  title: `${activityData.value.userName || "用户"}的运动详情`,
+  title: `${routerParams.userInfo?.nickname || "用户"}的运动详情`,
   path: buildPath("/pagesSport/runDetail", {
     id: routerParams.value.id,
   }),
 }));
 
-const store = useStore();
-const userInfo = computed(() => store.state.userInfo);
-const dataInfo = reactive({
-  totalTime: "", // 总用时
-  averagePace: "", // 平均配速
-  averageRate: "", // 平均心率
-  averageCadence: "", // 平均步频
-  averageStride: "", // 平均步幅
-  totalClimb: "", // 累计爬升
-  fastOne: "", // 最快1公里
-  totalStepNumber: "", // 总步数
-  distance_in_meters: "", // 距离
-  active_kilocalories: "", // 大卡
-  start_time: "", // 跑步开始时间
-});
-
-const mapCenter = ref({
-  latitude: 39.908823,
-  longitude: 116.39747,
-});
+const mapCenter = ref({});
 const markers = ref([]);
 const polylines = ref([]);
+const mapScale = ref(15);
+const latitude = ref(0);
+const longitude = ref(0);
 
 // 活动数据
 const activityData = ref({
@@ -258,11 +240,23 @@ const initMap = (tracks) => {
   const trackPoints = tracks;
 
   if (trackPoints.length > 0) {
-    // 设置地图中心为第一个点
-    mapCenter.value = {
-      latitude: trackPoints[0].latitude,
-      longitude: trackPoints[0].longitude,
-    };
+    // 设置地图中心点
+    mapCenter.value = trackPoints[Math.round(trackPoints.length / 2)]
+
+    const startPoint = trackPoints[0];
+    const endPoint = trackPoints[trackPoints.length - 1];
+
+    longitude.value = (startPoint.longitude + mapCenter.value.longitude + endPoint.longitude) / 3
+		latitude.value = (startPoint.latitude + mapCenter.value.latitude + endPoint.latitude) / 3
+
+    console.log("计算中心点坐标", startPoint, longitude.value, latitude.value)
+
+    mapScale.value = getCenterScale(
+      trackPoints[0],
+      trackPoints[trackPoints.length - 1],
+      mapCenter.value
+    );  
+
     // 创建标记
     let tempArr = [];
     let tempIndex = 0	
@@ -277,6 +271,7 @@ const initMap = (tracks) => {
         return item;
       }
     });
+    
     console.log("=====tempAPoints====", tempAPoints);
     markers.value = tempAPoints.map((item, index) => {
       if (index === tempAPoints.length - 1) {
@@ -301,16 +296,17 @@ const initMap = (tracks) => {
     console.log("==markers.value==", markers.value);
 
     // 创建轨迹线
-    polylines.value = [
-      {
-        points: trackPoints,
-        color: "#7fba3a", // 绿色
-        width: 8,
-        arrowLine: false,
-        borderColor: "#FFFFFF",
-        borderWidth: 2,
-      },
-    ];
+    polylines.value = getPointsSpeed(trackPoints);
+    // polylines.value = [
+    //   {
+    //     points: trackPoints,
+    //     color: "#7fba3a", // 绿色
+    //     width: 8,
+    //     arrowLine: false,
+    //     borderColor: "#FFFFFF",
+    //     borderWidth: 2,
+    //   },
+    // ];
   }
 };
 
@@ -382,6 +378,7 @@ const getPaceBarWidth = (pace) => {
 
 const routerParams = ref({});
 onLoad((options) => {
+  console.log('options======>', options)
   routerParams.value = options;
 
   loadSportData();
@@ -401,7 +398,6 @@ onLoad((options) => {
   bottom:0;
 }
 
-// 1. 地图部分
 .section-map {
   width: 100%;
   height: 100vh;
@@ -410,7 +406,7 @@ onLoad((options) => {
 
   .map-container {
     width: 100%;
-    height: 100%;
+    height: 70%;
     position: relative;
   }
 
