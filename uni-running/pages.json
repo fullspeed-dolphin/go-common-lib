@@ -36,177 +36,177 @@
 		    { "path": "punchInRule", "style": {  "navigationBarTitleText": "" } }
 			]
 		},
-		// {
-		//   "root": "pagesMine",
-		//   "pages": [
-		// 		{ "path": "toolkit/UserRole","style": { "navigationBarTitleText": "全速之家"} },
-		// 		{ "path": "toolkit/Toolkit","style": { "navigationBarTitleText": "全速之家"} },
-		// 		{ "path": "toolkit/ScanCode","style": { "navigationBarTitleText": "活动扫码"} },
-		// 		{ "path": "PunchEvent","style": { "navigationBarTitleText": "现场签到"} }
-		// 	]
-		// },
-		// {
-		//   "root": "pagesDashboard",
-		//   "pages": [
-		// 		{ "path": "angelForm","style": { "navigationBarTitleText": "全速天使招募"} },
-		// 		{ "path": "eventAlbum/albumList","style": { "navigationBarTitleText": "活动相册"} },
-		// 		{ "path": "eventAlbum/albumDetail","style": { "navigationBarTitleText": "详情", "navigationStyle": "custom"} },
-		// 		{ "path": "eventAlbum/contractForm","style": { "navigationBarTitleText": "入驻摄影师"} },
-		// 		{ "path": "eventAlbum/faceSearchResult","style": { "navigationBarTitleText": "搜索结果", "navigationStyle": "custom"} },
-		// 		{ "path": "pkEvent/pkEvent","style": { "navigationStyle": "custom", "navigationBarTitleText": "为爱奔跑520"} },
-		// 		{ "path": "pkEvent/pkEventForm","style": { "navigationBarTitleText": "活动报名"} },
-		// 		{ "path": "pkEvent/pkRankList","style": { "navigationBarTitleText": "排行榜"} },
-		// 		{ "path": "pkEvent/teamForm","style": { "navigationBarTitleText": "创建战队"} },
-		// 		{ "path": "pkEvent/teamList","style": { "navigationBarTitleText": "战队列表"} },
-		// 		{ "path": "pkEvent/activeRule","style": { "navigationBarTitleText": "活动规则"} },
-		// 		{ "path": "pkEvent/teamDetail","style": { "navigationBarTitleText": "战队详情"} }
-		// 	]
-		// },
+		{
+		  "root": "pagesMine",
+		  "pages": [
+				{ "path": "toolkit/UserRole","style": { "navigationBarTitleText": "全速之家"} },
+				{ "path": "toolkit/Toolkit","style": { "navigationBarTitleText": "全速之家"} },
+				{ "path": "toolkit/ScanCode","style": { "navigationBarTitleText": "活动扫码"} },
+				{ "path": "PunchEvent","style": { "navigationBarTitleText": "现场签到"} }
+			]
+		},
+		{
+		  "root": "pagesDashboard",
+		  "pages": [
+				{ "path": "angelForm","style": { "navigationBarTitleText": "全速天使招募"} },
+				{ "path": "eventAlbum/albumList","style": { "navigationBarTitleText": "活动相册"} },
+				{ "path": "eventAlbum/albumDetail","style": { "navigationBarTitleText": "详情", "navigationStyle": "custom"} },
+				{ "path": "eventAlbum/contractForm","style": { "navigationBarTitleText": "入驻摄影师"} },
+				{ "path": "eventAlbum/faceSearchResult","style": { "navigationBarTitleText": "搜索结果", "navigationStyle": "custom"} },
+				{ "path": "pkEvent/pkEvent","style": { "navigationStyle": "custom", "navigationBarTitleText": "为爱奔跑520"} },
+				{ "path": "pkEvent/pkEventForm","style": { "navigationBarTitleText": "活动报名"} },
+				{ "path": "pkEvent/pkRankList","style": { "navigationBarTitleText": "排行榜"} },
+				{ "path": "pkEvent/teamForm","style": { "navigationBarTitleText": "创建战队"} },
+				{ "path": "pkEvent/teamList","style": { "navigationBarTitleText": "战队列表"} },
+				{ "path": "pkEvent/activeRule","style": { "navigationBarTitleText": "活动规则"} },
+				{ "path": "pkEvent/teamDetail","style": { "navigationBarTitleText": "战队详情"} }
+			]
+		},
     {
       "root": "pagesSub",
       "pages": [
-        // { "path": "login", "style": { "navigationStyle": "custom", "navigationBarTitleText": "登录" } },
-        // { "path": "runCoin/myCoin", "style": { "navigationStyle": "custom", "navigationBarTitleText": "我的跑币" } },
-        // { "path": "runCoin/coinRanks", "style": { "navigationStyle": "custom", "navigationBarTitleText": "跑币排行榜" } },
-        // {
-        //   "path": "signerForm",
-        //   "style": {
-        //     "navigationStyle": "custom",
-        //     "navigationBarTitleText": "收集信息"
-        //   }
-        // },
-        // {
-        //   "path": "signUpStatus",
-        //   "style": {
-        //     "navigationStyle": "custom",
-        //     "navigationBarTitleText": ""
-        //   }
-        // },
-        // { "path": "offlineEvents", "style": { "navigationStyle": "custom", "navigationBarTitleText": "活动详情"}},
-        // { "path": "eventDetail", "style": { "navigationStyle": "custom", "navigationBarTitleText": "活动详情"}},
-        // { "path": "eventList", "style": { "navigationBarTitleText": "活动列表"}},
-        // {
-        //   "path": "orderIn",
-        //   "style": {
-        //     "navigationStyle": "custom",
-        //     "navigationBarTitleText": "活动报名"
-        //   }
-        // },
-        // {
-        //   "path": "orderDetail",
-        //   "style": {
-        //     "navigationStyle": "custom",
-        //     "navigationBarTitleText": ""
-        //   }
-        // },
-        // {
-        //   "path": "orderList",
-        //   "style": {
-        //     "navigationBarTitleText": "我的订单"
-        //   }
-        // },
-        // {"path": "runningTeam/teamList","style": { "navigationStyle": "custom","navigationBarTitleText": "跑团列表"}},
-        // {"path": "runningTeam/teamDetail", "style": { "navigationStyle": "custom", "navigationBarTitleText": "跑团详情"}},
-        // {"path": "runningTeam/teamForm","style": {"navigationStyle": "custom","navigationBarTitleText": "创建跑团"}},
-        // {"path": "runningTeam/teamMemberList","style": {"navigationBarTitleText": "跑团成员"}},
-        // {"path": "runningTeam/teamSetting","style": {"navigationStyle": "custom", "navigationBarTitleText": "Club管理工具"}},
-        // {"path": "runningTeam/teamEventList","style": {"navigationStyle": "custom", "navigationBarTitleText": "活动列表"}},
-        // {"path": "runningTeam/teamEventForm","style": {"navigationStyle": "custom","navigationBarTitleText": "提交活动申请"}},
-        // {"path": "runningTeam/teamSummary","style": {"navigationBarTitleText": "跑团数据"}},
-        // {"path": "runningTeam/teamMaps","style": {"navigationBarTitleText": "跑团地图库"}},
-        // {"path": "runningTeam/teamEventDetail","style": {"navigationBarTitleText": "详情", "navigationStyle": "custom"}},
-        // {
-        //   "path": "sportDetail",
-        //   "style": {
-        //     "navigationStyle": "custom",
-        //     "navigationBarTitleText": "运动详情"
-        //   }
-        // },
-        // { "path": "device/deviceList", "style": { "navigationStyle": "custom", "navigationBarTitleText": "" } },
-        // { "path": "device/deviceDetail", "style": { "navigationStyle": "custom", "navigationBarTitleText": "" } },
-        // { "path": "settings/aboutUs", "style": { "navigationStyle": "custom", "navigationBarTitleText": "关于我们" } },
-        // {
-        //   "path": "settings/agreement",
-        //   "style": {
-        //     "navigationBarTitleText": "用户协议"
-        //   }
-        // },
-        // {
-        //   "path": "settings/webView",
-        //   "style": {
-        //     "navigationBarTitleText": "详情"
-        //   }
-        // },
-        // {
-        //   "path": "runMap",
-        //   "style": {
-        //     "navigationStyle": "custom",
-        //     "navigationBarTitleText": "跑步轨迹"
-        //   }
-        // },
-        // {
-        //   "path": "runCoin",
-        //   "style": {
-        //     "navigationStyle": "custom",
-        //     "navigationBarTitleText": "我的跑币"
-        //   }
-        // },
-        // {
-        //   "path": "registrationCard/list",
-        //   "style": {
-        //     "navigationStyle": "custom",
-        //     "navigationBarTitleText": "报名卡"
-        //   }
-        // },
-        // {
-        //   "path": "registrationCard/create",
-        //   "style": {
-        //     "navigationStyle": "custom",
-        //     "navigationBarTitleText": "添加报名卡"
-        //   }
-        // },
-        // {
-        //   "path": "registrationCard/edit",
-        //   "style": {
-        //     "navigationStyle": "custom",
-        //     "navigationBarTitleText": "编辑报名卡"
-        //   }
-        // },
-        // {
-        //   "path": "orderFail",
-        //   "style": {
-        //     "navigationStyle": "custom",
-        //     "navigationBarTitleText": "报名失败"
-        //   }
-        // },
-        // {
-        //   "path": "orderRefund",
-        //   "style": {
-        //     "navigationStyle": "custom",
-        //     "navigationBarTitleText": "退赛申请"
-        //   }
-        // },
-        // {
-        //   "path": "orderSuccess",
-        //   "style": {
-        //     "navigationStyle": "custom",
-        //     "navigationBarTitleText": "报名成功"
-        //   }
-        // },
-        // {
-        //   "path": "address/list",
-        //   "style": {
-        //     "navigationStyle": "custom",
-        //     "navigationBarTitleText": "地址列表"
-        //   }
-        // },
-        // {
-        //   "path": "address/create",
-        //   "style": {
-        //     "navigationStyle": "custom",
-        //     "navigationBarTitleText": "添加地址"
-        //   }
-        // },
+        { "path": "login", "style": { "navigationStyle": "custom", "navigationBarTitleText": "登录" } },
+        { "path": "runCoin/myCoin", "style": { "navigationStyle": "custom", "navigationBarTitleText": "我的跑币" } },
+        { "path": "runCoin/coinRanks", "style": { "navigationStyle": "custom", "navigationBarTitleText": "跑币排行榜" } },
+        {
+          "path": "signerForm",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "收集信息"
+          }
+        },
+        {
+          "path": "signUpStatus",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": ""
+          }
+        },
+        { "path": "offlineEvents", "style": { "navigationStyle": "custom", "navigationBarTitleText": "活动详情"}},
+        { "path": "eventDetail", "style": { "navigationStyle": "custom", "navigationBarTitleText": "活动详情"}},
+        { "path": "eventList", "style": { "navigationBarTitleText": "活动列表"}},
+        {
+          "path": "orderIn",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "活动报名"
+          }
+        },
+        {
+          "path": "orderDetail",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": ""
+          }
+        },
+        {
+          "path": "orderList",
+          "style": {
+            "navigationBarTitleText": "我的订单"
+          }
+        },
+        {"path": "runningTeam/teamList","style": { "navigationStyle": "custom","navigationBarTitleText": "跑团列表"}},
+        {"path": "runningTeam/teamDetail", "style": { "navigationStyle": "custom", "navigationBarTitleText": "跑团详情"}},
+        {"path": "runningTeam/teamForm","style": {"navigationStyle": "custom","navigationBarTitleText": "创建跑团"}},
+        {"path": "runningTeam/teamMemberList","style": {"navigationBarTitleText": "跑团成员"}},
+        {"path": "runningTeam/teamSetting","style": {"navigationStyle": "custom", "navigationBarTitleText": "Club管理工具"}},
+        {"path": "runningTeam/teamEventList","style": {"navigationStyle": "custom", "navigationBarTitleText": "活动列表"}},
+        {"path": "runningTeam/teamEventForm","style": {"navigationStyle": "custom","navigationBarTitleText": "提交活动申请"}},
+        {"path": "runningTeam/teamSummary","style": {"navigationBarTitleText": "跑团数据"}},
+        {"path": "runningTeam/teamMaps","style": {"navigationBarTitleText": "跑团地图库"}},
+        {"path": "runningTeam/teamEventDetail","style": {"navigationBarTitleText": "详情", "navigationStyle": "custom"}},
+        {
+          "path": "sportDetail",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "运动详情"
+          }
+        },
+        { "path": "device/deviceList", "style": { "navigationStyle": "custom", "navigationBarTitleText": "" } },
+        { "path": "device/deviceDetail", "style": { "navigationStyle": "custom", "navigationBarTitleText": "" } },
+        { "path": "settings/aboutUs", "style": { "navigationStyle": "custom", "navigationBarTitleText": "关于我们" } },
+        {
+          "path": "settings/agreement",
+          "style": {
+            "navigationBarTitleText": "用户协议"
+          }
+        },
+        {
+          "path": "settings/webView",
+          "style": {
+            "navigationBarTitleText": "详情"
+          }
+        },
+        {
+          "path": "runMap",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "跑步轨迹"
+          }
+        },
+        {
+          "path": "runCoin",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "我的跑币"
+          }
+        },
+        {
+          "path": "registrationCard/list",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "报名卡"
+          }
+        },
+        {
+          "path": "registrationCard/create",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "添加报名卡"
+          }
+        },
+        {
+          "path": "registrationCard/edit",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "编辑报名卡"
+          }
+        },
+        {
+          "path": "orderFail",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "报名失败"
+          }
+        },
+        {
+          "path": "orderRefund",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "退赛申请"
+          }
+        },
+        {
+          "path": "orderSuccess",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "报名成功"
+          }
+        },
+        {
+          "path": "address/list",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "地址列表"
+          }
+        },
+        {
+          "path": "address/create",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "添加地址"
+          }
+        },
         {
           "path": "address/edit",
           "style": {

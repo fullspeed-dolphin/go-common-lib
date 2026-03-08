@@ -129,8 +129,9 @@ import { createMarker, formatPace, getTime, getPointsSpeed, getCenterScale } fro
 import { useShare, buildPath } from "@/composables/useShare.js";
 
 useShare(() => ({
-  title: `${routerParams.userInfo?.nickname || "用户"}的运动详情`,
+  title: `${routerParams.value?.nickname || "用户"}的运动详情`,
   path: buildPath("/pagesSport/runDetail", {
+    ...routerParams.value,
     id: routerParams.value.id,
   }),
 }));
