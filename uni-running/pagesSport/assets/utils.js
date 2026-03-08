@@ -66,23 +66,37 @@ export const createMarker = (id, latitude, longitude, type, strDistance) => {
     id,
     latitude,
     longitude,
-    width: 40,
-    height: 40,
-    anchor: { x: 0.5, y: 0.5 },
-		
-	label:{
-		borderRadius:10,
-		borderWidth:1,
-		padding:2,
-		content:strDistance,
-		fontSize:10,
-		bgColor:"#000",
-		borderColor:"#fff",
-		color:"#fff"
-											},
+    // width: 40,
+    // height: 40,
+    // anchor: { x: 0.5, y: 0.5 },
+    label:{
+      borderRadius:10,
+      borderWidth:1,
+      padding:2,
+      content: String(strDistance),
+      fontSize:10,
+      bgColor:"#000",
+      borderColor:"#fff",
+      color:"#fff"
+    },
     // iconPath: isStart
     //   ? "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/go@2x.png"
     //   : "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/end@2x.png",
     // title: isStart ? "起" : "终",
   };
+};
+
+export const getTime = (t) => {
+  let h = parseInt((t / 60 / 60) % 24);
+  let m = parseInt((t / 60) % 60);
+  let s = parseInt(t % 60);
+  h < 10 ? " 0 " + h : h;
+  m < 10 ? " 0 " + m : m;
+  s < 10 ? " 0 " + s : s;
+
+  if (h) {
+    return `${h}:${m}:${s}`;
+  } else {
+    return `00:${m}:${s}`;
+  }
 };

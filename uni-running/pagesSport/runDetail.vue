@@ -11,38 +11,24 @@
       </view>
     </section>
     <view class="container">
-      <!-- 1. 地图部分 - 跑步路线 -->
-
       <!-- 2. 运动详情数据 -->
       <section class="section-detail">
         <view class="detail-header">
           <view class="total-distance">
             <view class="distance-label">总里程</view>
             <view class="distance-value">
-              <text class="amount">{{
-                // formatDistance(activityData.totalDistance)
-				dataInfo.distance_in_meters
-              }}</text>
+              <text class="amount">{{ detail.distance_in_meters}}</text>
               <text class="unit">公里</text>
             </view>
           </view>
           <view class="user-info">
-			  
-			  <image class="avatar" :src="
+            <image class="avatar" :src="
 			      userInfo.avatar_url ||
 			      'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
 			    " mode="aspectFill"></image>
-            <!-- <image class="avatar" :src="
-                activityData.userAvatar ||
-                'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
-              " mode="aspectFill"></image> -->
             <view class="user-text">
-              <view class="user-name">{{
-                userInfo.nickname || "用户"
-              }}</view>
-              <view class="activity-time">{{
-                dataInfo.start_time || "--"
-              }}</view>
+              <view class="user-name">{{ userInfo.nickname || "用户" }}</view>
+              <view class="activity-time">{{ detail.start_time || "--" }}</view>
             </view>
           </view>
         </view>
@@ -57,62 +43,40 @@
 
         <view class="stats-grid">
           <view class="stats-item">
-            <view class="stats-value">{{
-			  dataInfo.totalTime || "--"
-            }}</view>
+            <view class="stats-value">{{ detail.duration_in_seconds || "--" }}</view>
             <view class="stats-label">用时</view>
           </view>
           <view class="stats-item">
-            <view class="stats-value">{{
-              // formatPace(activityData.avgPace)
-			  dataInfo.averagePace || "--"
-            }}</view>
+            <view class="stats-value">{{ detail.average_pace || "--" }}</view>
             <view class="stats-label">平均配速</view>
           </view>
-          <view class="stats-item">
-            <view class="stats-value">{{
-              // activityData.avgHeartRate || "--"
-			  dataInfo.averageRate || "--"
-            }}</view>
+            <view class="stats-item">
+              <view class="stats-value">{{ detail.average_heart_rate || "--" }}</view>
             <view class="stats-label">平均心率(bpm)</view>
           </view>
           <view class="stats-item">
-            <view class="stats-value">{{
-              // activityData.avgCadence || "--"
-			  dataInfo.averageCadence || "--"
-            }}</view>
+              <view class="stats-value">{{ detail.average_run_cadence || "--"
+              }}</view>
             <view class="stats-label">平均步频</view>
           </view>
           <view class="stats-item">
-            <view class="stats-value">{{
-              // activityData.avgStrideLength || "--"
-			  dataInfo.averageStride || "--"
-            }}</view>
+            <view class="stats-value">{{  detail.average_speed || "--" }}</view>
             <view class="stats-label">平均步幅(cm)</view>
           </view>
           <view class="stats-item">
-            <view class="stats-value">{{
-              // activityData.elevationGain || "--"
-			  dataInfo.totalClimb || "--"
-            }}</view>
+            <view class="stats-value">{{ detail.total_elevation_gain || "--" }}</view>
             <view class="stats-label">累计爬升(m)</view>
           </view>
           <view class="stats-item">
-            <view class="stats-value">{{
-              // formatPace(activityData.fastestKm)
-			  dataInfo.fastOne || "--"
-            }}</view>
+            <view class="stats-value">{{  detail.fastOne || "--" }}</view>
             <view class="stats-label">最快1公里</view>
           </view>
           <view class="stats-item">
-            <view class="stats-value">{{
-              // activityData.totalSteps || "--"
-			  dataInfo.totalStepNumber || "--"
-            }}</view>
+            <view class="stats-value">{{  detail.steps || "--" }}</view>
             <view class="stats-label">总步数</view>
           </view>
           <view class="stats-item">
-            <view class="stats-value">{{ dataInfo.active_kilocalories || "--" }}</view>
+            <view class="stats-value">{{ detail.active_kilocalories || "--" }}</view>
             <view class="stats-label">大卡</view>
           </view>
         </view>
@@ -157,38 +121,37 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted,reactive } from "vue";
+import { ref, computed, onMounted, reactive } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
-// import store from "@/utils/store.js";
 import { useStore } from "vuex";
-import { createMarker } from "./assets/utils.js";
-// import { formatPace } from "./assets/utils.js";
+import dayjs from "dayjs";
+import { createMarker, formatPace, getTime } from "./assets/utils.js";
+
 import { useShare, buildPath } from "@/composables/useShare.js";
+
+useShare(() => ({
+  title: `${activityData.value.userName || "用户"}的运动详情`,
+  path: buildPath("/pagesSport/runDetail", {
+    id: routerParams.value.id,
+  }),
+}));
+
 const store = useStore();
 const userInfo = computed(() => store.state.userInfo);
 const dataInfo = reactive({
-	totalTime:"", // 总用时
-	averagePace:"", // 平均配速
-	averageRate:"", // 平均心率
-	averageCadence:"", // 平均步频
-	averageStride:"", // 平均步幅
-	totalClimb:"", // 累计爬升
-	fastOne:"", // 最快1公里
-	totalStepNumber:"", // 总步数
-	distance_in_meters:"", // 距离
-	active_kilocalories:"", // 大卡
-	start_time:"" // 跑步开始时间
+  totalTime: "", // 总用时
+  averagePace: "", // 平均配速
+  averageRate: "", // 平均心率
+  averageCadence: "", // 平均步频
+  averageStride: "", // 平均步幅
+  totalClimb: "", // 累计爬升
+  fastOne: "", // 最快1公里
+  totalStepNumber: "", // 总步数
+  distance_in_meters: "", // 距离
+  active_kilocalories: "", // 大卡
+  start_time: "", // 跑步开始时间
 });
-console.log('=====userInfo====',userInfo)
-// 路由参数
-const routeId = ref("");
-
-// 分享配置
-useShare(() => ({
-  title: `${activityData.value.userName || "用户"}的运动详情`,
-  path: buildPath("/pagesSport/runDetail", { id: routeId.value }),
-}));
 
 const mapCenter = ref({
   latitude: 39.908823,
@@ -196,9 +159,6 @@ const mapCenter = ref({
 });
 const markers = ref([]);
 const polylines = ref([]);
-
-// 加载状态
-const loading = ref(false);
 
 // 活动数据
 const activityData = ref({
@@ -221,13 +181,19 @@ const paceSubtotals = computed(() => {
   const km15Time = paceData.value[14]?.cumulativeTime || 0;
 
   if (km5Time > 0) {
-    subtotals.push({ text: `5公里累计用时 ${formatTime(km5Time)}` });
+    subtotals.push({
+      text: `5公里累计用时 ${formatTime(km5Time)}`,
+    });
   }
   if (km10Time > 0) {
-    subtotals.push({ text: `10公里累计用时 ${formatTime(km10Time)}` });
+    subtotals.push({
+      text: `10公里累计用时 ${formatTime(km10Time)}`,
+    });
   }
   if (km15Time > 0) {
-    subtotals.push({ text: `15公里累计用时 ${formatTime(km15Time)}` });
+    subtotals.push({
+      text: `15公里累计用时 ${formatTime(km15Time)}`,
+    });
   }
   return subtotals;
 });
@@ -287,13 +253,8 @@ const isValidCoordinate = (latitude, longitude) => {
 
 // 初始化地图
 const initMap = (tracks) => {
-  if (!tracks || tracks.length === 0) {
-    return;
-  }
+  if (!tracks.length) return
 
-  console.log("轨迹点数据:=====>", tracks);
-
-  // 转换轨迹点格式
   const trackPoints = tracks;
 
   if (trackPoints.length > 0) {
@@ -302,65 +263,48 @@ const initMap = (tracks) => {
       latitude: trackPoints[0].latitude,
       longitude: trackPoints[0].longitude,
     };
-	// 创建标记
-	let tempArr = []
-	let tempIndex = 0	 
-	let tempAPoints = trackPoints.filter((item,index) =>{
-		if(!tempArr.includes(parseInt(item.total_distance / 500))) {
-			tempArr.push(parseInt(item.total_distance / 500))
-			tempIndex+=1
-			return item
-		}
-		// 终点的时候加一个标记
-		if(index === trackPoints.length - 1) {
-			return item
-		}
-		
-	})
-		console.log('=====tempAPoints====',tempAPoints)
-	markers.value = tempAPoints.map((item,index)=>{
-			
-		if(index === tempAPoints.length - 1) {
-			return createMarker(
-			  index+1,
-			  tempAPoints[index].latitude,
-			  tempAPoints[index].longitude,
-			  "start",
-			  (item.total_distance / 1000).toFixed(1)
-			)
-		} else {
-			return createMarker(
-			  index+1,
-			  tempAPoints[index].latitude,
-			  tempAPoints[index].longitude,
-			  "start",
-			  index * 0.5
-			)
-		}
-		 
-	})
-	// 创建起点和终点标记
-	console.log('==markers.value==',markers.value)
- //    markers.value = [
- //      createMarker(
- //        1,
- //        trackPoints[0].latitude,
- //        trackPoints[0].longitude,
- //        "start"
- //      ),
- //      createMarker(
- //        2,
- //        trackPoints[trackPoints.length - 1].latitude,
- //        trackPoints[trackPoints.length - 1].longitude,
- //        "end"
- //      ),
- //    ];
+    // 创建标记
+    let tempArr = [];
+    let tempIndex = 0	
+    let tempAPoints = trackPoints.filter((item, index) => {
+      if (!tempArr.includes(parseInt(item.total_distance / 500))) {
+        tempArr.push(parseInt(item.total_distance / 500));
+        tempIndex += 1;
+        return item;
+      }
+      // 终点的时候加一个标记
+      if (index === trackPoints.length - 1) {
+        return item;
+      }
+    });
+    console.log("=====tempAPoints====", tempAPoints);
+    markers.value = tempAPoints.map((item, index) => {
+      if (index === tempAPoints.length - 1) {
+        return createMarker(
+          index + 1,
+          tempAPoints[index].latitude,
+          tempAPoints[index].longitude,
+          "start",
+          (item.total_distance / 1000).toFixed(1)
+        );
+      } else {
+        return createMarker(
+          index + 1,
+          tempAPoints[index].latitude,
+          tempAPoints[index].longitude,
+          "start",
+          index * 0.5
+        );
+      }
+    });
+    // 创建起点和终点标记
+    console.log("==markers.value==", markers.value);
 
     // 创建轨迹线
     polylines.value = [
       {
         points: trackPoints,
-        color: "#00FF00", // 绿色
+        color: "#7fba3a", // 绿色
         width: 8,
         arrowLine: false,
         borderColor: "#FFFFFF",
@@ -370,25 +314,8 @@ const initMap = (tracks) => {
   }
 };
 
-// 格式化日期时间
-const formatDateTime = (dateString) => {
-  if (!dateString) return "--";
-  try {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    return `${year}-${month}-${day} ${hours}:${minutes}`;
-  } catch (e) {
-    return dateString;
-  }
-};
-
-// 加载运动数据
-const loadSportData = async (id) => {
-  loading.value = true;
+const detail = ref({})
+const loadSportData = async () => {
   uni.showLoading({
     title: "加载中...",
     mask: true,
@@ -400,49 +327,30 @@ const loadSportData = async (id) => {
     page: 1,
     page_size: 10,
   };
-	  
-  request.get("/sport-api/api/healthdata/detail", params).then(res=>{
-	  console.log("res=============",res)
-	  	dataInfo.totalTime = getTime(res.duration_in_seconds) // 总用时
-	  	dataInfo.averagePace = res.average_pace.toFixed(2).replace(".","'")+"''" // 平均配速
-	  	dataInfo.averageRate = res.average_heart_rate // 平均心率
-	  	dataInfo.averageCadence = res.average_run_cadence.toFixed(2) // 平均步频
-	  	dataInfo.averageStride = res.average_speed // 平均步幅
-	  	dataInfo.totalClimb = res.total_elevation_gain // 累计爬升
-	  	// dataInfo.fastOne = res.max_speed // 最快1公里
-	  	dataInfo.totalStepNumber = res.steps // 总步数
-		dataInfo.distance_in_meters = (res.distance_in_meters / 1000).toFixed(2) // 距离
-		dataInfo.active_kilocalories = res.active_kilocalories // 大卡
-		dataInfo.start_time = formatDateTime(res.start_time)
-  })
+  
+  request.get("/sport-api/api/healthdata/detail", params).then((res) => {
+    res.duration_in_seconds = getTime(res.duration_in_seconds);
+    res.average_pace = formatPace(res.average_pace);
+    res.average_run_cadence = res.average_run_cadence.toFixed(2);
+    res.average_speed = (res.average_speed * 100).toFixed(2);
+    res.distance_in_meters = (res.distance_in_meters / 1000).toFixed(2)
+    res.start_time = dayjs(res.start_time).format("YYYY-MM-DD HH:mm:ss");
+
+    detail.value = res;
+  });
 
   // 轨迹数据接口
-  request.get(`/sport-api/api/healthdata/track?id=${routerParams.value.id}`).then((res) => {
-    initMap(res.points);
-	dataInfo.averageRate = parseInt((res.points.map(item=>item.heart_rate).reduce((acc, curr) => acc + curr, 0)) / res.points.length) ;
-  })
-};
-const getTime = (t) =>{
-    let h = parseInt ( t / 60 / 60 % 24 )
-    let m = parseInt ( t / 60 % 60 )
-    let s = parseInt ( t % 60 )
-    h < 10 ? ' 0 ' + h : h
-    m < 10 ? ' 0 ' + m : m
-    s < 10 ? ' 0 ' + s : s
-		
-	if(h) {
-		return `${h}:${m}:${s}`
-		
-	} else {
-		return `00:${m}:${s}`
-	}
-}	
+  request.get(`/sport-api/api/healthdata/track?id=${routerParams.value.id}`)
+    .then((res) => {
 
-// 格式化距离
-const formatDistance = (distance) => {
-  if (!distance) return "0.00";
-  const km = distance / 1000;
-  return km.toFixed(2);
+      initMap(res.points || []);
+
+      detail.value.averageRate = parseInt(
+        res.points
+          .map((item) => item.heart_rate)
+          .reduce((acc, curr) => acc + curr, 0) / res.points.length
+      );
+    });
 };
 
 // 格式化时间 (秒 -> HH:MM:SS 或 MM:SS)
@@ -462,15 +370,6 @@ const formatTime = (seconds) => {
   }
 };
 
-// 格式化配速 (秒/公里 -> M'SS")
-const formatPace = (pace) => {
-  if (!pace || pace <= 0) return "--";
-  const totalSeconds = Math.round(pace);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${minutes}'${seconds.toString().padStart(2, "0")}"`;
-};
-
 // 获取配速条宽度 (用于可视化)
 const getPaceBarWidth = (pace) => {
   const minPace = 300; // 最快配速
@@ -484,14 +383,8 @@ const getPaceBarWidth = (pace) => {
 const routerParams = ref({});
 onLoad((options) => {
   routerParams.value = options;
-  // 从路由参数获取活动ID
-  const id = options.id;
-  routeId.value = id || "";
-  if (id) {
-    loadSportData(id);
-  } else {
-    uni.$u.toast("缺少运动记录ID");
-  }
+
+  loadSportData();
 });
 </script>
 
@@ -502,10 +395,10 @@ onLoad((options) => {
 }
 
 .container {
-  position: relative;
+  position: absolute;
   z-index: 10;
-  margin-top: -319rpx;
   padding-bottom: 40rpx;
+  bottom:0;
 }
 
 // 1. 地图部分
@@ -638,10 +531,12 @@ onLoad((options) => {
       flex-shrink: 0;
       background: #fff;
       padding: 0 4rpx;
+
       &.slow {
         color: #94d243;
         left: 56rpx;
       }
+
       &.fast {
         color: #ff8c00;
         position: absolute;
