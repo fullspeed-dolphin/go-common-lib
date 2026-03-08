@@ -243,7 +243,7 @@ function getDevicesList() {
         value: item.platform,
         created_at: created_at ? created_at + '绑定' : "",
       };
-    }).filter(item => item.bound);
+    }).filter(item => item.bound && item.platform !== 'honor');
   });
 }
 
