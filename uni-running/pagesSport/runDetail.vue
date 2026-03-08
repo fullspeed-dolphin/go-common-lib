@@ -131,7 +131,8 @@ import { useShare, buildPath } from "@/composables/useShare.js";
 useShare(() => ({
   title: `${routerParams.value?.nickname || "用户"}的运动详情`,
   path: buildPath("/pagesSport/runDetail", {
-    ...routerParams.value,
+    nickname: routerParams.value.nickname,
+    avatar_url: routerParams.value.avatar_url,
     id: routerParams.value.id,
   }),
 }));
@@ -379,8 +380,13 @@ const getPaceBarWidth = (pace) => {
 
 const routerParams = ref({});
 onLoad((options) => {
-  console.log('options======>', options)
-  routerParams.value = options;
+  routerParams.value = {
+    id: options.id,
+    nickname: decodeURIComponent(options.nickname || ""),
+    avatar_url: decodeURIComponent(options.avatar_url || ""),
+  };
+
+  console.log('options======>', options, routerParams.value)
 
   loadSportData();
 });
