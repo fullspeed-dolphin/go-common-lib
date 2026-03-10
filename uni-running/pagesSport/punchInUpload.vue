@@ -130,13 +130,18 @@
 			contentTextAlign="center"
 			cancelColor="rgb(41, 121, 255)" confirmColor="#ff8c00"
 			@confirm="() => uni.navigateBack()"  showCancelButton :asyncClose="true" />
+
+		<UserLogin ref="refUserLogin" @success="onLoginSuccess" />
+		<AccessUser ref="refAccessUser" />
 	</view>
 </template>
 <script setup>
-	import { ref, computed } from "vue";
+	import { ref, computed,onMounted} from "vue";
 	import { onLoad, onUnload } from "@dcloudio/uni-app";
 	import FileUpload from "@/components/common/FileUpload.vue";
 	import PickerCell from "@/components/common/PickerCell.vue";
+	import UserLogin from "@/components/UserLogin.vue";
+import AccessUser from "@/components/common/AccessUser.vue";
 	import SharePoster from "./SharePoster.vue"
 	import request from "../utils/request";
 	import { useShare } from "@/composables/useShare.js";
@@ -145,7 +150,29 @@
 	const store = useStore();
 	// 计算属性
 	const userInfo = computed(() => store.state.userInfo);
-	
+	// 模板引用
+	const refUserLogin = ref(null);
+	const refAccessUser = ref(null);
+	// 待执行的操作（登录成功后继续执行）
+	const pendingAction = ref(null);
+	const isOpenLogin = () =>{
+		if (!userInfo.value.id) {
+			// pendingAction.value = () => uni.$u.route(link);
+			// pendingAction.value = () => refAccessUser.value.open();
+			return refUserLogin.value.open();
+		}
+		// refAccessUser.value.open();
+	}
+	onMounted(()=>{
+		isOpenLogin();
+	})
+	// 登录成功回调
+	const onLoginSuccess = () => {
+	if (pendingAction.value) {
+		pendingAction.value();
+		pendingAction.value = null;
+	}
+	};
 	// 分享配置
 	useShare({
 		title: '运动截图打卡',
@@ -221,6 +248,7 @@
 	onLoad((options) => {
 		routerParams.value = options
 		getMyEvents()
+		
 	})
 
 	// 页面卸载时检查是否需要删除图片
@@ -469,11 +497,13 @@
 	}
 
 	::v-deep {
+		/*
+		因为需要登录才能添加所以注释了这段
 		.u-popup__content__close{
 			left: 50rpx!important;
 			top: 150rpx!important;
 			right: auto!important;
-		}
+		}*/
 		.uicon-arrow-right{
 			color: #FF8C00!important;
 		}
