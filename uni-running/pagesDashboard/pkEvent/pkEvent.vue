@@ -17,7 +17,7 @@
         </view>
       </view>
 
-      <div style="background: rgba(255,255,255,1); box-shadow: 0rpx 8rpx 10rpx 0rpx rgba(0, 0, 0, 0.02);border-radius: 24rpx;margin: 30rpx 30rpx 10rpx;padding: 30rpx;">
+      <div style="background: rgba(255,255,255,1); box-shadow: 0rpx 8rpx 10rpx 0rpx rgba(0, 0, 0, 0.02);border-radius: 24rpx;margin: 94rpx 30rpx 10rpx;padding: 30rpx;">
         <view class="title" style="color: #222">{{ detailInfo?.event_name }}</view>
         <view class="subtitle">{{ detailInfo?.event_subtitle }}</view>
 
