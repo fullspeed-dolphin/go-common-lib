@@ -76,7 +76,8 @@
 									创建时间:{{order.created_at}}
 								</view>
 								<view v-if="order.status == 'SUCC' && order.canRefund">
-									<u-button type="primary" @click="refundOrder(order)" color="#FF8C00" customStyle="height: 50rpx;"
+									<!-- 申请退款 修改为联系客服办理 -->
+									<u-button type="primary" click="refundOrder(order)" open-type="contact" color="#FF8C00" customStyle="height: 50rpx;"
 										size="small" plain shape="circle">
 										申请退款
 									</u-button>
