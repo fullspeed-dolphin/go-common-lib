@@ -90,15 +90,12 @@ export const getTime = (t) => {
   let h = parseInt((t / 60 / 60) % 24);
   let m = parseInt((t / 60) % 60);
   let s = parseInt(t % 60);
-  h < 10 ? " 0 " + h : h;
-  m < 10 ? " 0 " + m : m;
-  s < 10 ? " 0 " + s : s;
 
-  if (h) {
-    return `${h}:${m}:${s}`;
-  } else {
-    return `00:${m}:${s}`;
-  }
+  h = h < 10 ? "0" + h : h;
+  m = m < 10 ? "0" + m : m;
+  s = s < 10 ? "0" + s : s;
+
+  return `${h}:${m}:${s}`;
 };
 
 let maxSpeed = null

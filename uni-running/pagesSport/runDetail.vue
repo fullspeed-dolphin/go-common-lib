@@ -329,9 +329,9 @@ const loadSportData = async () => {
   request.get("/sport-api/api/healthdata/detail", params).then((res) => {
     res.duration_in_seconds = getTime(res.duration_in_seconds);
     res.average_pace = formatPace(res.average_pace);
-    res.average_run_cadence = res.average_run_cadence.toFixed(2);
-    res.average_speed = (res.average_speed * 100).toFixed(2);
-    res.distance_in_meters = (res.distance_in_meters / 1000).toFixed(2)
+    res.average_run_cadence = parseInt(res.average_run_cadence || 0);
+    res.average_speed = (res.average_speed * 100)?.toFixed(0);
+    res.distance_in_meters = (res.distance_in_meters / 1000)?.toFixed(2)
     res.start_time = dayjs(res.start_time).format("YYYY-MM-DD HH:mm:ss");
 
     detail.value = res;

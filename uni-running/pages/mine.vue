@@ -224,6 +224,7 @@ const logout = () => {
         // 		url: '/pagesSub/login'
         // 	})
         // }, 200)
+        uni.$u.toast("退出登录成功");
       } else if (res.cancel) {
         console.log("用户点击取消");
       }

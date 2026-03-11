@@ -34,8 +34,7 @@
             </view>
 
             <view class="join-btn flex-center">
-              <!-- {{!userStatusInfo.in_team ? '加入战队' : '查看'}} -->
-               查看
+              加入
             </view>
           </view>
         </view>
@@ -338,11 +337,11 @@ defineOptions({
   }
 
   .join-btn {
-    width: 140rpx;
-    height: 50rpx;
+    width: 180rpx;
+    height: 64rpx;
     color: #fff;
     font-weight: bold;
-    font-size: 20rpx;
+    font-size: 26rpx;
     color: #ffffff;
     background: #ff5c5c;
     border-radius: 999rpx;
