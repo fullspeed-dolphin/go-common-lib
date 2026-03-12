@@ -2,7 +2,7 @@
   <view class="">
     <up-form :model="form" ref="uForm" :rules="formRules" labelPosition="top" labelWidth="auto">
       <view class="card-section">
-        <up-form-item label="真实姓名" prop="real_name" required>
+        <!-- <up-form-item label="真实姓名" prop="real_name" required>
           <view class="flex-start input-wrap">
             <input v-model="form.real_name" class="u-input" @input="validateField('real_name')" maxlength="50" placeholder-style="color: #64748B;" placeholder="请输入您的真实姓名" />
           </view>
@@ -35,28 +35,37 @@
               </template>
             </up-input>
           </view>
-        </up-form-item>
+        </up-form-item> -->
 
         <up-form-item label="选择套餐" prop="package_id" required>
           <view class="u-pt-5">
-            <view class="package-item u-flex-row" v-for="item in packageList" :key="item.id" :class="{active: form.package_id === item.id}" @click="changePackage(item.id)">
+            <!-- <view class="package-item u-flex-row" v-for="item in packageList" :key="item.id" :class="{active: form.package_id === item.id}" @click="changePackage(item.id)"> -->
+            <view class="package-item u-flex-row" v-for="item in packageList" :key="item.id" @click="changePackage(item)">
               <view v-if="!item.package_image_url" class="package-image iconfont flex-center icon-shoppingbaggouwudai"></view>
               <image v-if="item.package_image_url" :src="item.package_image_url" class="package-image" mode="aspectFill" />
-              <view>
+              <view class="package-item_right">
                 <view class="real_name">{{ item.package_name }}</view>
-                <view class="target">{{ item.package_subtitle }}</view>
                 <view class="txt">{{ item.package_description }}</view>
+                <view class="target">
+                  <view>{{ item.package_subtitle }}</view>
+                  <u-button type="primary" color="#ff5c5c" shape="circle" customStyle="width: 126rpx;height: 52rpx;margin:0;border-radius: 999rpx;" @click="goSign(item)">
+                    去报名
+                  </u-button>
+                </view>
               </view>
 
-              <div v-if="item.is_recommended" class="recommended-tag">推荐</div>
+              <!-- <div v-if="item.is_recommended" class="recommended-tag">推荐</div> -->
             </view>
           </view>
         </up-form-item>
       </view>
     </up-form>
 
-
-    <section class="section-bottom" style="width: 682rpx;margin: 0rpx auto 40rpx;">
+    <up-popup :show="isShowModal" @close="close" overlayOpacity="0.3" :safeAreaInsetBottom="false" bgColor="#fff" mode="bottom" closeable>
+        <div class="flex-center b" style="height:90rpx;font-size:32rpx;">{{ comBoDetail.package_name }}</div>
+        <u-tabs :list="tabList" @click="tabClick"></u-tabs>
+      </up-popup>
+    <!-- <section class="section-bottom" style="width: 682rpx;margin: 0rpx auto 40rpx;">
       <view class="txt flex-start">
         <up-checkbox shape="circle" activeColor="#8CC63E" v-model:checked="isAgree" :usedAlone="true"
           :customStyle="{ marginRight: '-10rpx' }" size="32rpx" />
@@ -65,9 +74,9 @@
         </text>
         <text style="color: #ff8c00" @click="$u.route('pagesDashboard/pkEvent/activeRule?type=disclaimer')">《免责声明》</text>
       </view>
-    </section>
+    </section> -->
 
-    <div style="height: 120rpx;"></div>
+    <!-- <div style="height: 120rpx;"></div>
     <view class="submit-wrapper flex-between-center bgf">
       <view class="" style="font-size: 24rpx;color: #6A7282;">
         应付金额
@@ -76,9 +85,9 @@
         </view>
       </view>
       <u-button type="primary" color="#ff5c5c" shape="circle" customStyle="width: 256rpx;height: 72rpx;margin:0;border-radius: 999rpx;" @click="submitForm()">
-				{{props.teamID ? '加入战队并报名' : '立即报名'}}
+         立即支付
       </u-button>
-    </view>
+    </view> -->
   </view>
 </template>
 <script setup>
@@ -233,7 +242,7 @@ const getPackageList = () => {
   request.get(`/event-api/online_events_packages`, data).then((res) => {
     packageList.value = res;
     const package_id = res.find((i) => i.is_recommended)?.id || "";
-    changePackage(package_id);
+    // changePackage(package_id);
   });
 };
 // 页面加载
@@ -327,10 +336,26 @@ function getUserStatus() {
     });
 }
 
-function changePackage(id) {
-  form.value.package_id = id;
+// 查看套餐详情
+const comBoDetail = ref({})
+function changePackage(item) {
+  // form.value.package_id = id;
+  console.log("item-====",item)
+  isShowModal.value = true
+  comBoDetail.value = item
 }
 
+const tabList=ref([{
+                    name: '详情',
+                }, {
+                    name: '规格',
+                }, {
+                    name: '视频'
+                }]);
+// tab 点击
+const tabClick = (item) => {
+  console.log('item', item)
+}
 const isFreePackage = computed(() => {
   const pkg = packageList.value.find(i => i.id === form.value.package_id);
   return pkg?.price === 0;
@@ -430,6 +455,15 @@ function wxPay(respay) {
     },
   });
 }
+
+const goSign = (item) => { 
+  uni.$u.route("pagesDashboard/pkEvent/personalInfo?id=" + item.id+"&eventId=" + activetyId.value)
+};
+const isShowModal = ref(false);
+// 关闭弹框
+function close() {
+  isShowModal.value = false;
+}
 </script>
 
 <style lang="less" scoped>
@@ -459,6 +493,9 @@ function wxPay(respay) {
   border: 2rpx solid #e2e8f0;
   margin-bottom: 20rpx;
   position: relative;
+  &_right {
+    flex:1;
+  }
   .recommended-tag {
     position: absolute;
     top: 20rpx;
@@ -486,13 +523,17 @@ function wxPay(respay) {
     font-size: 32rpx;
     color: #101828;
   }
-
+  .txt {
+    padding: 10rpx 0;
+  }
   .target {
     line-height: 48rpx;
     font-size: 32rpx;
     color: #ff5c5c;
     font-weight: 500;
     margin-bottom: 10rpx;
+    display: flex;
+    justify-content: space-between;
   }
 
   &.active {

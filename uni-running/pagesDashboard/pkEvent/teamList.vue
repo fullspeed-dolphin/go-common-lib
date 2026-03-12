@@ -33,7 +33,7 @@
               <view class="leader">队长：{{ item.leader_nickname }}</view>
             </view>
 
-            <view class="join-btn flex-center">
+            <view class="join-btn flex-center" @click.stop="joinTeamToSign(item)">
               加入
             </view>
           </view>
@@ -134,7 +134,9 @@ function joinTeam(item) {
   } */
   uni.$u.route(`pagesDashboard/pkEvent/teamDetail?id=${item.id}&eventId=${activetyId.value}`);
 }
-
+function joinTeamToSign(item) {
+  uni.$u.route(`pagesDashboard/pkEvent/pkEventForm?id=${item.id}&eventId=${activetyId.value}`);
+}
 // Tab 配置
 const currentIndex = ref(0);
 const tabList = ref([
