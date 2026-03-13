@@ -947,12 +947,12 @@
 		}],
 		emergencyContact: [{
 			required: true,
-			message: "请填写进击联系人姓名",
+			message: "请填写紧急联系人姓名",
 			trigger: ["blur", "change"]
 		}],
 		emergencyPhone: [{
 			required: true,
-			message: "请填写进击联系人手机号码",
+			message: "请填写紧急联系人手机号码",
 			trigger: ["blur", "change"]
 		}],
 	};
