@@ -12,8 +12,14 @@
         <view class="title flex-center">欢迎登录 全速运动</view>
       </view>
       <view class="flex-col-center">
-        <view class="" style="font-size: 24rpx">
+        <!-- <view class="" style="font-size: 24rpx">
           登录后为你提供更好的服务
+        </view> -->
+        <view class="" style="font-size: 24rpx;line-height: 48rpx;">
+          当前功能需要登录授权以继续操作，
+        </view>
+        <view class="" style="font-size: 24rpx;line-height: 48rpx;">
+          您也可以选择"暂不登录"体验其他精彩内容。
         </view>
         <view style="margin-top: 60rpx; width: 440rpx">
           <u-button
@@ -47,7 +53,7 @@
               shape="circle"
               customStyle="color: #000000;"
             >
-              取消
+              暂不登录
             </u-button>
           </view>
         </view>
