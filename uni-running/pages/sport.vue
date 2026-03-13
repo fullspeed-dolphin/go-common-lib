@@ -158,11 +158,6 @@ const userInfo = computed(() => store.state.userInfo);
 
 // 跳转到跑步轨迹页面
 const goToRunMap = () => {
-  if (!userInfo.value.id) {
-    pendingAction.value = () => uni.navigateTo({ url: "/pagesSub/runMap" });
-    return refUserLogin.value?.open();
-  }
-
   uni.navigateTo({
     url: "/pagesSub/runMap",
   });
@@ -179,12 +174,6 @@ const userRouteTo = (link) => {
 
 // 跳转到排行榜页面
 const goToRanking = () => {
-  if (!userInfo.value.id) {
-    pendingAction.value = () =>
-      uni.navigateTo({ url: "/pagesSport/runRankList" });
-    return refUserLogin.value?.open();
-  }
-
   uni.navigateTo({
     url: "/pagesSport/runRankList",
   });
@@ -192,12 +181,6 @@ const goToRanking = () => {
 
 // 跳转到运动记录页面
 const goToRunRecord = () => {
-  if (!userInfo.value.id) {
-    pendingAction.value = () =>
-      uni.navigateTo({ url: "/pagesSport/runRecords" });
-    return refUserLogin.value?.open();
-  }
-
   uni.navigateTo({
     url: "/pagesSport/runRecords",
   });
@@ -205,12 +188,6 @@ const goToRunRecord = () => {
 
 // 跳转到运动打卡页面
 const goToRunCheckIn = () => {
-  if (!userInfo.value.id) {
-    pendingAction.value = () =>
-      uni.navigateTo({ url: "/pagesSport/punchInRecords" });
-    return refUserLogin.value?.open();
-  }
-
   uni.navigateTo({
     url: "/pagesSport/punchInRecords",
   });
