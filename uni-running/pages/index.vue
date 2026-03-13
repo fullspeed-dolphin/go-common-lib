@@ -139,7 +139,6 @@ const ensureLogin = (action = null) => {
 
 // 页面加载
 onLoad((options) => {
-  openUserLogin();
 });
 
 function openUserLogin() {
