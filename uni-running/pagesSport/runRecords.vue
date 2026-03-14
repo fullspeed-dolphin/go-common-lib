@@ -185,7 +185,8 @@ async function getRecords(range) {
   const params = {
     page: 1,
     page_size: 100,
-    data_type: "activityDetails",
+    data_type: "outdoor_walking",
+    activity_type: "outdoor_walking",
     platform: selectedDevice.value.platform || '',
     ...range,
   };
