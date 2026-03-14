@@ -222,7 +222,7 @@ const getList = (mescroll) => {
 
 	Promise.all([
 		request.get(`/event-api/fsc_swipers?status=ACT&visibility=public`),
-		request.get(`/event-api/getOfflineEventSwiper`)
+		request.get(`/event-api/getOnlineEventSwiper`)
 	]).then(res => {
 		uni.hideLoading();
 		res = res.flat();
