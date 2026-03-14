@@ -108,7 +108,7 @@
       <view v-if="tabIndex === 1" class="sort-switch u-mt-20">
         <view class="sort-btn" :class="{ active: teamSortBy === 'members' }" @click="switchTeamSort('members')">人数排行</view>
         <view class="sort-btn" :class="{ active: teamSortBy === 'distance' }" @click="switchTeamSort('distance')">跑量排行</view>
-        <view class="sort-btn" :class="{ active: teamSortBy === 'completion' }" @click="switchTeamSort('completion')">完成率</view>
+        <view class="sort-btn" :class="{ active: teamSortBy === 'completion' }" @click="switchTeamSort('completion')">完成率排行</view>
       </view>
     </view>
 		
@@ -413,9 +413,9 @@ const switchTeamSort = (sort) => {
 
 // 战队显示字符
 const teamRankValue = (item) => {
-  return teamSortBy.value === 'distance'
-    ? item.total_distance_km + 'km'
-    : item.current_members + '人';
+  if (teamSortBy.value === 'distance') return item.total_distance_km + 'km';
+  if (teamSortBy.value === 'completion') return item.team_completion_rate + '%';
+  return item.current_members + '人';
 };
 
 
