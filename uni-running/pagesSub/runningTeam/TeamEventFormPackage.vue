@@ -242,6 +242,6 @@ defineExpose({
 });
 </script>
 
-<style lang="less">
+<style lang="scss">
 
 </style>

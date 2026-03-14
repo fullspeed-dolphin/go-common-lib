@@ -258,7 +258,7 @@ const openOfficialAccount = () => {
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .img-box {
   position: relative;
 

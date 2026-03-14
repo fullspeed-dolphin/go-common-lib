@@ -178,7 +178,7 @@
 	};
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 	.section-card {
 		padding: 48rpx 0 30rpx 80rpx;
 

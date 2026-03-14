@@ -58,7 +58,7 @@ onShow(() => {
 });
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .brand-item {
   width: 682rpx;
   height: 120rpx;

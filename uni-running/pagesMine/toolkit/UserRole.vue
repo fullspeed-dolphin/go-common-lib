@@ -50,7 +50,7 @@ onLoad(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .card-item {
 	font-weight: bold;
 	font-size: 34rpx;

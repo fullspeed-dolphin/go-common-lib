@@ -392,7 +392,7 @@ onLoad((options) => {
 });
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .page {
   background: #fafafa;
   min-height: 100vh;

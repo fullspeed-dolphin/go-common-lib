@@ -409,7 +409,7 @@
 	})
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 	.panel {
 		border:0;
 		background: #fff;

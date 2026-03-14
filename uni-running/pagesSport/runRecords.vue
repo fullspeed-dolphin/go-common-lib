@@ -261,7 +261,7 @@ const toggleExpand = (index) => {
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 ::v-deep{
   .picker-cell{
     padding:0;

@@ -43,7 +43,7 @@ const successLogin = () => {
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .logo {
   width: 160rpx;
   height: 160rpx;

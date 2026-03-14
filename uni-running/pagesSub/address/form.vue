@@ -306,7 +306,7 @@ const handleSubmit = () => {
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .page {
   background: #fafafa;
   padding-bottom: 208rpx;

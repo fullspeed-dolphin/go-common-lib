@@ -432,7 +432,7 @@ function wxPay(respay) {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .input-wrap {
   height: 100rpx;
   padding-left: 30rpx;

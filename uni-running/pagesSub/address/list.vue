@@ -147,7 +147,7 @@ onShow(() => {
 });
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .page {
   min-height: 100vh;
   background: #fafafa;

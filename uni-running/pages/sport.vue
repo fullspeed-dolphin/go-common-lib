@@ -208,7 +208,7 @@ onShow(() => {
 });
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .section-empty {
   height: 20vh;
   display: flex;

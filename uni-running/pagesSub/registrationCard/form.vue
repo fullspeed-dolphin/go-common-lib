@@ -1286,7 +1286,7 @@
 	});
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 	.section {
 		padding: 0 34rpx;
 	}

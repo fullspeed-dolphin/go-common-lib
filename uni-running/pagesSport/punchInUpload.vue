@@ -415,7 +415,7 @@ function confirmToCheck() {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .event-item {
   padding: 15rpx 20rpx;
   border: 1px solid #ff8c00;

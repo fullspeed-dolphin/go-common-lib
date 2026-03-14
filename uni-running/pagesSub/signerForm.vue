@@ -384,7 +384,7 @@ const submit = () => {
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .submit-btn {
   width: 682rpx;
   height: 72rpx;

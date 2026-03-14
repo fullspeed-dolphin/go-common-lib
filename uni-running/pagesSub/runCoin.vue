@@ -178,7 +178,7 @@ const checkIns = ref([
 ]);
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .content {
   position: relative;
   padding: 0 34rpx;

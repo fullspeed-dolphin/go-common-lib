@@ -179,7 +179,7 @@ const unDevice = () => {
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .poster {
   width: 128rpx;
   height: 128rpx;

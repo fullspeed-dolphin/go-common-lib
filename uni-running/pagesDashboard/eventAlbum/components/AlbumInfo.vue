@@ -99,7 +99,7 @@ function addVistAmount() {
 }
 </script>
 
-<style lang="less">
+<style lang="scss">
 	.AlbumInfo{
 		.section-banner {
 			position: relative;
