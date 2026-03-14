@@ -108,6 +108,7 @@
       <view v-if="tabIndex === 1" class="sort-switch u-mt-20">
         <view class="sort-btn" :class="{ active: teamSortBy === 'members' }" @click="switchTeamSort('members')">人数排行</view>
         <view class="sort-btn" :class="{ active: teamSortBy === 'distance' }" @click="switchTeamSort('distance')">跑量排行</view>
+        <view class="sort-btn" :class="{ active: teamSortBy === 'completion' }" @click="switchTeamSort('completion')">完成率</view>
       </view>
     </view>
 		
