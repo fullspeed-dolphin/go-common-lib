@@ -25,8 +25,7 @@
             <view class="section-content-left">
               <view class="section-content-title">运动截图打卡</view>
             </view>
-            <view class="u-flex-xy-center" style="width:77rpx;height:77rpx;border-radius: 999px;background:#FF8C00">
-              <image class="section-content-icon" style="width: 42rpx; height: 42rpx" src="/pagesSport/assets/978@2x.png" mode="aspectFill"></image>
+            <view class="u-flex-xy-center iconfont icon-jietu" style="color: #fff; width:77rpx;height:77rpx;border-radius: 999px;background:#FF8C00">
             </view>
           </view>
         </view>

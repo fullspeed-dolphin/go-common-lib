@@ -206,8 +206,6 @@ defineOptions({
 </script>
 
 <style lang="scss" scoped>
-@import "@/styles/tab-animation.scss";
-
 .page {
   min-height: 100vh;
 }
@@ -217,8 +215,6 @@ defineOptions({
   z-index: 10;
   top: 0;
   padding: 16rpx 24rpx;
-}
-.tab-container {
 }
 
 .category-tags {
