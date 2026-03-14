@@ -11,11 +11,11 @@
       </view>
       <view class="flex-1 flex-col-center">
         <view class="b u-mb-20" style="font-size:34rpx;color:#1e2939;">{{ userCheckedInfo.total_qualified_sessions }}/{{ userCheckedInfo.required_checkins }}</view>
-        <text class="c6 fs24">完赛次数</text>
+        <text class="c6 fs24">打卡次数</text>
       </view>
       <view class="flex-1 flex-col-center">
         <view class="b u-mb-20" style="font-size:34rpx;color:#1e2939;">{{ userCheckedInfo.checkedPercent }}%</view>
-        <text class="c6 fs24">完赛率</text>
+        <text class="c6 fs24">打卡进度</text>
       </view>
     </div>
   </div>
