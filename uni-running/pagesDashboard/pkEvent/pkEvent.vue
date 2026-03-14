@@ -282,15 +282,23 @@ const init = () => {
 const userStatusInfo = ref({});
 function getUserStatus() {
   request.get("/event-api/online_events_team/user_status?event_id=" + activetyId.value).then((res) => {
-    console.log('userStatus', res)
+    // console.log('userStatus', res)
     userStatusInfo.value = res;
+  });
+}
+
+const userCheckedInfo = ref({});
+function getuserCheckedInfo() {
+  request.get("/user-api/user/getEventCheckins?event_id=" + activetyId.value).then((res) => {
+    console.log('userCheckedInfo', res)
+    userCheckedInfo.value = res;
   });
 }
 
 const myEvents = ref([]);
 function getMyEvents() {
   request.get("/event-api/online_events/my_events").then((res) => {
-    console.log('myEvents', res)
+    // console.log('myEvents', res)
     myEvents.value = res;
   });
 }
@@ -350,6 +358,7 @@ onShow(() => {
   init();
   getUserStatus();
   getMyEvents();
+  getuserCheckedInfo();
 });
 
 useShare(() => ({
@@ -657,7 +666,7 @@ const teamRankValue = (item) => {
     padding: 4rpx 10rpx;
     background: #eff6ff;
     border-radius: 12rpx;
-    max-width: 260rpx;
+    max-width: 280rpx;
     display: inline-block;
   }
   .rank-number {
@@ -705,8 +714,8 @@ const teamRankValue = (item) => {
     font-size: 30rpx;
     color: #ff5c5c;
     font-weight: bold;
-    margin-left: 20rpx;
-    padding-right: 20rpx;
+    margin-left: 10rpx;
+    padding-right: 10rpx;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
