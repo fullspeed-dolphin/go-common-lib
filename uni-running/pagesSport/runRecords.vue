@@ -108,7 +108,7 @@ import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import PickerCell from "@/components/common/PickerCell.vue";
 import dayjs from "dayjs";
-import { formatDuration, formatDistance, formatPace, getTypeSum } from "./assets/utils.js";
+import { formatDuration, formatDistance, calculatePaceFromMeters, getTypeSum } from "./assets/utils.js";
 import parse from "../uni_modules/uview-plus/components/u-parse/parse";
 // import { useShare } from "@/composables/useShare.js";
 
@@ -168,7 +168,7 @@ function getMonthlyRecords() {
 
   const mapList = monthRanges.map((range) => getRecords(range))
   Promise.all(mapList).then((res) => {
-    // console.log("每月数据====>", res, getTypeSum(res, "raw_list_listPace"), getTypeSum(res, "total_records") );
+    // console.log("每月数据====>", res, getTypeSum(res, "raw_list_listPace"), getTypeSum(res, "total_duration_seconds") );
     // 计算列表中距离之和
     const listMeters = (res || []).reduce((sum, i) => (sum + (parseFloat(i.raw_list_distance_meters) || 0)), 0);
 
@@ -178,7 +178,7 @@ function getMonthlyRecords() {
       total_active_kilocalories: getTypeSum(res, "total_active_kilocalories"),
       total_records: getTypeSum(res, "total_records"),
       total_duration_time: formatDuration(getTypeSum(res, "total_duration_seconds")),
-      total_listPace: getTypeSum(res, "raw_list_listPace") ? formatPace(getTypeSum(res, "raw_list_listPace") / getTypeSum(res, "total_records") / 100) : '--',
+      total_listPace: getTypeSum(res, "raw_list_distance_meters") ? calculatePaceFromMeters(getTypeSum(res, "raw_list_distance_meters") / 100, getTypeSum(res, "total_duration_seconds")) : '--',
     };
 
     monthlyRecords.value = res.sort((a, b) => dayjs(b.start_date).diff(dayjs(a.start_date))) // 按日期降序排序
@@ -223,6 +223,7 @@ async function getRecords(range) {
       ...item,
       distance_km: formatDistance(item.distance_in_meters),
       duration_in_time: formatDuration(item.duration_in_seconds),
+      paceData: '--',
     })),
   };
 }

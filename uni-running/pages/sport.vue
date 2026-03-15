@@ -109,12 +109,6 @@ import Tabbar from "@/components/tabBar.vue";
 import UserLogin from "@/components/UserLogin.vue";
 import { useShare } from "@/composables/useShare.js";
 import request from "@/utils/request.js";
-import {
-  formatDuration,
-  formatDistance,
-  formatPace,
-  getTypeSum,
-} from "./utils.js";
 
 const store = useStore();
 
@@ -211,6 +205,33 @@ function getSoprtRecords() {
 onShow(() => {
   getSoprtRecords();
 });
+
+function formatDuration(sec) {
+  const s = parseInt(sec, 10) || 0;
+  if (s === 0) return '--';
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const secRemain = s % 60;
+  const pad = (n) => String(n).padStart(2, '0');
+  if (h > 0) {
+    return `${pad(h)}:${pad(m)}:${pad(secRemain)}`;
+  }
+  return `${pad(m)}:${pad(secRemain)}`;
+}
+
+// 米数转为 km 显示，0km 则显示米数整数
+function formatDistance(meters) {
+  const m = parseFloat(meters) || 0;
+  const km = m / 1000;
+
+  if (km < 0.1) {
+    // less than 0.1 km show meters
+    return `${Math.round(m)} m`;
+  }
+  // display with one decimal if < 10km, else no decimal
+  const display = km.toFixed(2);
+  return `${display} km`;
+}
 </script>
 
 <style lang="scss" scoped>
