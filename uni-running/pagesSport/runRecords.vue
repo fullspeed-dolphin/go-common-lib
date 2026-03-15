@@ -164,7 +164,7 @@ function getMonthlyRecords() {
 
   const mapList = monthRanges.map((range) => getRecords(range))
   Promise.all(mapList).then((res) => {
-    console.log("每月数据====>", res, getTypeSum(res, "raw_list_listPace"), getTypeSum(res, "total_records") );
+    // console.log("每月数据====>", res, getTypeSum(res, "raw_list_listPace"), getTypeSum(res, "total_records") );
     // 计算列表中距离之和
     const listMeters = (res || []).reduce((sum, i) => (sum + (parseFloat(i.raw_list_distance_meters) || 0)), 0);
 
@@ -185,11 +185,21 @@ async function getRecords(range) {
   const params = {
     page: 1,
     page_size: 100,
-    data_type: "outdoor_walking",
-    activity_type: "outdoor_walking",
     platform: selectedDevice.value.platform || '',
     ...range,
   };
+
+  // console.log("请求参数====>", params.platform);
+
+  if (params.platform === 'huawei') {
+    params.data_type = 'outdoor_walking';
+    params.activity_type = 'outdoor_walking';
+  }
+
+  if (params.platform === 'garmin') {
+    params.data_type = 'activityDetails';
+  }
+
   const res =  await request.get("/sport-api/api/healthdata", params)
   const list = res.list || [];
   // 计算列表中距离之和
@@ -245,13 +255,16 @@ function getDevicesList() {
         created_at: created_at ? created_at + '绑定' : "",
       };
     }).filter(item => item.bound && item.platform !== 'honor');
+
+    if (deviceList.value.length > 0) {
+      selectDevice(deviceList.value[0]);
+    }
   });
 }
 
 onLoad(() => {
   getDevicesList();
   getSoprtRecords();
-  getMonthlyRecords(selectedYear.value);
 });
 
 const sports = ref([]);
