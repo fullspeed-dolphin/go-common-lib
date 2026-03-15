@@ -40,27 +40,33 @@
           </view>
 
 					<!-- 当天健康记录 -->
-					<section class="panel section">
-						<view class="h1 b" style="padding: 20rpx 0 0 10rpx;font-size: 32rpx;margin-bottom: 20rpx;"> 今日运动总结 </view>
-						<view class="statics flex-row b">
-							<view class="flex-1">
-								<view class="label">运动步数</view>
-								<view class="value">{{todaySummaryData.total_steps}}</view>
-							</view>
-							<view class="flex-1">
-								<view class="label">里程长度</view>
-								<view class="value">{{ todaySummaryData.total_distance_meters }}</view>
-							</view>
-							<view class="flex-1">
-								<view class="label">时长</view>
-								<view class="value">{{ todaySummaryData.total_duration_seconds }}</view>
-							</view>
-							<view class="flex-1">
-								<view class="label">消耗大卡</view>
-								<view class="value">{{todaySummaryData.total_calories}}</view>
-							</view>
-						</view>
-					</section>
+					<template v-if="todaySummaryData.bindings">
+            <section v-if="todaySummaryData.total_steps" class="panel section">
+              <view class="h1 b" style="padding: 20rpx 0 0 10rpx;font-size: 32rpx;margin-bottom: 20rpx;"> 今日运动总结 </view>
+              <view class="statics flex-row b">
+                <view class="flex-1">
+                  <view class="label">运动步数</view>
+                  <view class="value">{{todaySummaryData.total_steps}}</view>
+                </view>
+                <view class="flex-1">
+                  <view class="label">里程长度</view>
+                  <view class="value">{{ todaySummaryData.total_distance_meters }}</view>
+                </view>
+                <view class="flex-1">
+                  <view class="label">时长</view>
+                  <view class="value">{{ todaySummaryData.total_duration_seconds }}</view>
+                </view>
+                <view class="flex-1">
+                  <view class="label">消耗大卡</view>
+                  <view class="value">{{todaySummaryData.total_calories}}</view>
+                </view>
+              </view>
+            </section>
+
+            <div v-if="!todaySummaryData.total_steps" style="color:#888; padding: 20rpx 0 0 10rpx;font-size: 32rpx;margin-bottom: 20rpx;">
+              今天没有运动记录哦~快去运动吧！
+            </div>
+          </template>
         </view>
 
         <view v-if="!todaySummaryData.bindings" class="section-empty">

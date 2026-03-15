@@ -43,7 +43,7 @@
       </section>
 
       <!-- 当天健康记录 -->
-      <section v-if="!selectedDevice.name" class="panel">
+      <!-- <section v-if="!selectedDevice.name" class="panel">
         <view class="h1 b" style="padding: 20rpx 0 0 10rpx;font-size: 32rpx;margin-bottom: 20rpx;"> 今日运动总结 </view>
         <view class="statics flex-row b">
           <view class="flex-1">
@@ -64,6 +64,10 @@
           </view>
         </view>
       </section>
+
+      <div v-if="!todaySummaryData.total_steps" style="color:#888; padding: 20rpx 0 0 10rpx;font-size: 32rpx;margin-bottom: 20rpx;">
+        今天没有运动记录哦~快去运动吧！
+      </div> -->
 
       <section class="date-list">
         <view class="date-item" v-for="(item, index) in monthlyRecords" :key="'row-' + index" :class="{ 'last-item': index === monthlyRecords.length - 1 }">
@@ -265,7 +269,7 @@ function getDevicesList() {
 
 onLoad(() => {
   getDevicesList();
-  getSoprtRecords();
+  // getSoprtRecords();
 });
 
 const sports = ref([]);
