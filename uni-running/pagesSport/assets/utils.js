@@ -34,7 +34,7 @@ export function formatDistance(meters) {
  * @returns {string} 配速字符串，格式为 "mm:ss" (分:秒/公里)
  */
 export function calculatePaceFromMeters(meters, totalSeconds) {
-  if (meters <= 0 || totalSeconds <= 0) {
+  if (meters <= 0 || totalSeconds <= 0 || isNaN(meters) || isNaN(totalSeconds)) {
     return "0:00"; // 或者抛出错误
   }
 
