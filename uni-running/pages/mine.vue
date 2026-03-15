@@ -205,7 +205,7 @@ const routeTo = (link) => {
 
 const handleUserClick = () => {
   if (!userInfo.value.id) {
-    pendingAction.value = () => refAccessUser.value.open();
+    // pendingAction.value = () => refAccessUser.value.open();
     return refUserLogin.value.open();
   }
 
