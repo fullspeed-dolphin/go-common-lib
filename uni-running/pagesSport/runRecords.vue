@@ -198,6 +198,7 @@ async function getRecords(range) {
 
   if (params.platform === 'garmin') {
     params.data_type = 'activityDetails';
+    params.activity_type = 'RUNNING';
   }
 
   const res =  await request.get("/sport-api/api/healthdata", params)
