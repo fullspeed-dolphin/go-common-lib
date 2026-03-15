@@ -23,7 +23,7 @@ export function formatDistance(meters) {
     return `${Math.round(m)} m`;
   }
   // display with one decimal if < 10km, else no decimal
-  const display = km.toFixed(1);
+  const display = km.toFixed(2);
   return `${display} km`;
 }
 
