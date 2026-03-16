@@ -79,31 +79,12 @@
 							src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-mine-coin@2x.png"></image>
 					</template>
 				</u-cell> -->
-        <!-- 微信客服 -->
-         <!-- <view class="service-cell u-cell u-cell__body" @click="showLoading()">
-          <button class="u-reset-button" open-type="contact">
-            <view class="flex-row" style="width: 100%">
-              <view class="u-flex-y-center flex-1 service-content">
-                <view class="icon">
-									<view class="nav-icon iconfont icon-lianxikefu"></view>
-                </view>
-                <text class="service-text">联系客服</text>
-              </view>
-              <u-icon name="arrow-right" color="#909399" size="26rpx"></u-icon>
-            </view>
-          </button>
-        </view> -->
-        <view class="service-cell u-cell u-cell__body">
-          <view class="flex-row" style="width: 100%" @click="openWeComChat">
-            <view class="u-flex-y-center flex-1 service-content">
-              <view class="icon">
-                <view class="nav-icon iconfont icon-lianxikefu"></view>
-              </view>
-              <text class="service-text">联系客服</text>
-            </view>
-            <u-icon name="arrow-right" color="#909399" size="26rpx"></u-icon>
-          </view>
-        </view>
+
+        <u-cell title="联系客服" class="nav-cell" @click="openWeComChat()" :border="false" isLink>
+          <template #icon>
+            <view class="nav-icon iconfont icon-lianxikefu"></view>
+          </template>
+        </u-cell>
 
         <u-cell title="现场签到" class="nav-cell" @click="routeTo('/pagesMine/PunchEvent')" :border="false" isLink>
           <template #icon>
@@ -273,15 +254,11 @@ const openWeComChat = () => {
     uni.hideLoading();
   }, 300);
   // #ifdef MP-WEIXIN
-  const corpId = 'wwaac238486eb8781e'; // 建议放在 config 文件或环境变量中
-  console.log("text====")
   wx.openCustomerServiceChat({
     extInfo: {
-      // url: "https://work.weixin.qq.com/kfid/kfcb41efa532f58830b", // 客服链接 https://work.weixin.qq.com/xxxxxxxx
-      url: "https://work.weixin.qq.com/kfid/kfce377cc5aa4e44e3a"
+      url: "https://work.weixin.qq.com/kfid/kfcb41efa532f58830b"
     },
-    corpId: corpId,
-    // kfOpenKfId: 'wkXXXXXXXXXXXXXX', // 如需指定客服则开启
+    corpId: 'wwaac238486eb8781e',
     onOpen: (res) => {
       console.log('success', res);
     },
@@ -293,10 +270,6 @@ const openWeComChat = () => {
       });
     }
   });
-  // #endif
-
-  // #ifndef MP-WEIXIN
-  uni.showToast({ title: '仅限小程序使用', icon: 'none' });
   // #endif
 };
 </script>
