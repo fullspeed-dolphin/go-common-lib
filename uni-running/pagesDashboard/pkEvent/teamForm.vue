@@ -181,7 +181,7 @@ const getPackageData = () => {
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .category-item {
   width: 310rpx;
   height: 266rpx;

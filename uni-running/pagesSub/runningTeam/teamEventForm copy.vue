@@ -340,7 +340,7 @@
 	};
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 	::v-deep{
 		.u-form-item__body{
 			flex-direction: column!important;

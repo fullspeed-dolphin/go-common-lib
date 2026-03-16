@@ -22,7 +22,7 @@
 
     <HomeNavigator />
 
-    <u-cell title="线下活动" customClass="section-title" :border="false" isLink url="pagesSub/eventList" value="查看更多" />
+    <u-cell title="线下活动" customClass="section-title" :border="false" isLink url="pagesSub/eventList?type=offline" value="查看更多" />
 
     <swiper class="event-swiper" circular indicator-active-color="#FF8C00" :autoplay="true" :interval="3000" :display-multiple-items="1.2">
       <view class=""  v-for="(item, index) in offlineEventList" :key="index">
@@ -35,7 +35,7 @@
     </swiper>
 
     <block v-if="onlineEventList && onlineEventList.length > 0">
-      <u-cell title="线上赛事" customClass="section-title" :border="false" isLink url="pagesSub/eventList" value="查看更多" />
+      <u-cell title="线上赛事" customClass="section-title" :border="false" isLink url="pagesSub/eventList?type=online" value="查看更多" />
       <swiper class="event-swiper" circular indicator-active-color="#FF8C00" :autoplay="true" :interval="3000" :display-multiple-items="1.2">
         <view v-for="(item, index) in onlineEventList" :key="index">
 					<swiper-item >
@@ -261,7 +261,7 @@ const getGroupList = () => {
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .header {
   .search-box {
     position: fixed;

@@ -15,7 +15,7 @@
         </view>
         <view class="statics">
           <text class="u-mr-10">用时 {{ item.duration_in_time }}</text>
-          <text>配速 {{ formatPace(item.average_pace) }}</text>
+          <text>配速 {{ calculatePaceFromMeters(item.distance_in_meters, item.duration_in_seconds) }}</text>
         </view>
       </view>
     </view>
@@ -27,7 +27,7 @@
 </template>
 <script setup>
 import { computed } from "vue";
-import { formatPace } from "./assets/utils.js";
+import { calculatePaceFromMeters } from "./assets/utils.js";
 import request from "@/utils/request.js";
 import { useStore } from "vuex";
 const store = useStore();

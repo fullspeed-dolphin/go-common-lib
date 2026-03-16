@@ -23,8 +23,41 @@ export function formatDistance(meters) {
     return `${Math.round(m)} m`;
   }
   // display with one decimal if < 10km, else no decimal
-  const display = km.toFixed(1);
+  const display = km.toFixed(2);
   return `${display} km`;
+}
+
+/**
+ * 根据米数和秒数计算配速
+ * @param {number} meters - 跑步距离（米）
+ * @param {number} totalSeconds - 跑步总用时（秒）
+ * @returns {string} 配速字符串，格式为 "mm:ss" (分:秒/公里)
+ */
+export function calculatePaceFromMeters(meters, totalSeconds) {
+  if (meters <= 0 || totalSeconds <= 0 || isNaN(meters) || isNaN(totalSeconds)) {
+    return "0:00"; // 或者抛出错误
+  }
+
+  // 1. 将米转换为公里
+  const kilometers = meters / 1000;
+
+  // 2. 计算每公里需要的秒数 (Pace in seconds per km)
+  // 公式：总秒数 / 公里数
+  const secondsPerKm = totalSeconds / kilometers;
+
+  // 3. 将秒数转换为 "分:秒" 格式
+  const minutes = Math.floor(secondsPerKm / 60);
+  const seconds = Math.round(secondsPerKm % 60);
+
+  // 处理秒数进位问题 (例如 59.9 秒 进位为 60 秒 -> 1 分 00 秒)
+  if (seconds === 60) {
+    return `${minutes + 1}’00”`;
+  }
+
+  // 格式化秒数，确保是两位数 (例如 5 变成 "05")
+  const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
+
+  return `${minutes}’${formattedSeconds}”`;
 }
 
 // 将 average_pace（例如 7.29 或字符串）格式化为 7’29” 样式

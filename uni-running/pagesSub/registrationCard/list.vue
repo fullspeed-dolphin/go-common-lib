@@ -211,7 +211,7 @@
 	});
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 	.section-empty {
 		min-height: 80vh;
 		font-size: 34rpx;

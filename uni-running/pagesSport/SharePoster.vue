@@ -915,7 +915,7 @@ defineExpose({
 });
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 	.point{
 		width: 8rpx;
 		height: 8rpx;

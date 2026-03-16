@@ -288,7 +288,7 @@
 	};
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 	::v-deep {
 		.u-form {
 			padding: 0rpx 34rpx;

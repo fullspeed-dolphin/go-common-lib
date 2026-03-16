@@ -275,7 +275,7 @@
 	};
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 	// 页面整体样式
 	.form-page {
 		min-height: 100vh;

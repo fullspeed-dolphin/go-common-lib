@@ -95,7 +95,7 @@ const rightClick = () => {
 }
 </script>
 
-<style lang="less">
+<style lang="scss">
 	.h1{
 		font-weight: 500;
 		font-size: 34rpx;

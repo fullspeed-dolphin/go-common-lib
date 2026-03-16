@@ -89,6 +89,8 @@
     	<view class="iconfont flex-center icon-lijidaka u-mr-10" style="color:#fff;font-size:42rpx;"></view>
     	立即打卡
     </view>
+
+    <PersonalRecord v-if="userStatusInfo.in_team" :activetyId="activetyId" />
 		
     <!-- 排行榜 -->
     <view class="tab-container">
@@ -155,7 +157,7 @@
       </template>
       <!-- 战队排行榜 -->
       <template v-else>
-        <view v-for="(item, index) in rankList" :key="item.id" class="rank-item" @click="goto('pagesDashboard/pkEvent/teamDetail?teamId=' + item.id)">
+        <view v-for="(item, index) in rankList" :key="item.id || index" class="rank-item" @click="goto('pagesDashboard/pkEvent/teamDetail?teamId=' + item.id)">
           <view class="rank-number flex-center">
             {{ item.rank <= 3 ? 'NO.' + item.rank : item.rank }}
           </view>
@@ -194,7 +196,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, computed } from "vue";
 import { onLoad, onShow, onReachBottom, onPageScroll } from "@dcloudio/uni-app";
 
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
@@ -205,6 +207,7 @@ import request from "@/utils/request.js";
 import dayjs from "dayjs";
 
 import UserLogin from "@/components/UserLogin.vue";
+import PersonalRecord from "./personalRecord.vue";
 import { useStore } from "vuex";
 
 const store = useStore();
@@ -282,7 +285,7 @@ const init = () => {
 const userStatusInfo = ref({});
 function getUserStatus() {
   request.get("/event-api/online_events_team/user_status?event_id=" + activetyId.value).then((res) => {
-    console.log('userStatus', res)
+    // console.log('userStatus', res)
     userStatusInfo.value = res;
   });
 }
@@ -290,7 +293,7 @@ function getUserStatus() {
 const myEvents = ref([]);
 function getMyEvents() {
   request.get("/event-api/online_events/my_events").then((res) => {
-    console.log('myEvents', res)
+    // console.log('myEvents', res)
     myEvents.value = res;
   });
 }
@@ -417,8 +420,6 @@ const teamRankValue = (item) => {
   if (teamSortBy.value === 'completion') return item.team_completion_rate + '%';
   return item.current_members + '人';
 };
-
-
 </script>
 
 <style lang="scss" scoped>
@@ -573,7 +574,7 @@ const teamRankValue = (item) => {
 /* 功能按钮组 */
 .section-func-buttons {
   display: flex;
-  padding: 40rpx 30rpx;
+  padding: 20rpx 30rpx;
   background-color: white;
   border-radius: 24rpx;
   margin: 0 30rpx 30rpx;
@@ -657,7 +658,7 @@ const teamRankValue = (item) => {
     padding: 4rpx 10rpx;
     background: #eff6ff;
     border-radius: 12rpx;
-    max-width: 260rpx;
+    max-width: 280rpx;
     display: inline-block;
   }
   .rank-number {
@@ -705,8 +706,8 @@ const teamRankValue = (item) => {
     font-size: 30rpx;
     color: #ff5c5c;
     font-weight: bold;
-    margin-left: 20rpx;
-    padding-right: 20rpx;
+    margin-left: 10rpx;
+    padding-right: 10rpx;
     display: flex;
     flex-direction: column;
     align-items: flex-end;

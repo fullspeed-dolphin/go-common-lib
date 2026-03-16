@@ -124,7 +124,7 @@ import { ref, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
-import { createMarker, formatPace, getTime, getPointsSpeed, getCenterScale } from "./assets/utils.js";
+import { createMarker, formatPace, calculatePaceFromMeters, getTime, getPointsSpeed, getCenterScale } from "./assets/utils.js";
 
 import { useShare, buildPath } from "@/composables/useShare.js";
 
@@ -251,7 +251,7 @@ const initMap = (tracks) => {
     longitude.value = (startPoint.longitude + mapCenter.value.longitude + endPoint.longitude) / 3
 		latitude.value = (startPoint.latitude + mapCenter.value.latitude + endPoint.latitude) / 3
 
-    console.log("计算中心点坐标", startPoint, longitude.value, latitude.value)
+    // console.log("计算中心点坐标", startPoint, longitude.value, latitude.value)
 
     mapScale.value = getCenterScale(
       trackPoints[0],
@@ -274,7 +274,7 @@ const initMap = (tracks) => {
       }
     });
     
-    console.log("=====tempAPoints====", tempAPoints);
+    // console.log("=====tempAPoints====", tempAPoints);
     markers.value = tempAPoints.map((item, index) => {
       if (index === tempAPoints.length - 1) {
         return createMarker(
@@ -295,7 +295,7 @@ const initMap = (tracks) => {
       }
     });
     // 创建起点和终点标记
-    console.log("==markers.value==", markers.value);
+    // console.log("==markers.value==", markers.value);
 
     // 创建轨迹线
     polylines.value = getPointsSpeed(trackPoints);
@@ -327,8 +327,8 @@ const loadSportData = async () => {
   };
   
   request.get("/sport-api/api/healthdata/detail", params).then((res) => {
+    res.average_pace = calculatePaceFromMeters(res.distance_in_meters, res.duration_in_seconds);
     res.duration_in_seconds = getTime(res.duration_in_seconds);
-    res.average_pace = formatPace(res.average_pace);
     res.average_run_cadence = parseInt(res.average_run_cadence || 0);
     res.average_speed = (res.average_speed * 100)?.toFixed(0);
     res.distance_in_meters = (res.distance_in_meters / 1000)?.toFixed(2)
@@ -386,13 +386,13 @@ onLoad((options) => {
     avatar_url: decodeURIComponent(options.avatar_url || ""),
   };
 
-  console.log('options======>', options, routerParams.value)
+  // console.log('options======>', options, routerParams.value)
 
   loadSportData();
 });
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .page {
   background: #fafafa;
   min-height: 100vh;

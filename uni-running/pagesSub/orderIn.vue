@@ -838,7 +838,7 @@ defineOptions({
 });
 </script>
 
-<style lang="less">
+<style lang="scss">
 .page {
   background: #fafafa;
 }

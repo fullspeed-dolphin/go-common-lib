@@ -43,7 +43,7 @@
       </section>
 
       <!-- 当天健康记录 -->
-      <section v-if="!selectedDevice.name" class="panel">
+      <!-- <section v-if="!selectedDevice.name" class="panel">
         <view class="h1 b" style="padding: 20rpx 0 0 10rpx;font-size: 32rpx;margin-bottom: 20rpx;"> 今日运动总结 </view>
         <view class="statics flex-row b">
           <view class="flex-1">
@@ -64,6 +64,10 @@
           </view>
         </view>
       </section>
+
+      <div v-if="!todaySummaryData.total_steps" style="color:#888; padding: 20rpx 0 0 10rpx;font-size: 32rpx;margin-bottom: 20rpx;">
+        今天没有运动记录哦~快去运动吧！
+      </div> -->
 
       <section class="date-list">
         <view class="date-item" v-for="(item, index) in monthlyRecords" :key="'row-' + index" :class="{ 'last-item': index === monthlyRecords.length - 1 }">
@@ -104,7 +108,7 @@ import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import PickerCell from "@/components/common/PickerCell.vue";
 import dayjs from "dayjs";
-import { formatDuration, formatDistance, formatPace, getTypeSum } from "./assets/utils.js";
+import { formatDuration, formatDistance, calculatePaceFromMeters, getTypeSum } from "./assets/utils.js";
 import parse from "../uni_modules/uview-plus/components/u-parse/parse";
 // import { useShare } from "@/composables/useShare.js";
 
@@ -164,7 +168,7 @@ function getMonthlyRecords() {
 
   const mapList = monthRanges.map((range) => getRecords(range))
   Promise.all(mapList).then((res) => {
-    console.log("每月数据====>", res, getTypeSum(res, "raw_list_listPace"), getTypeSum(res, "total_records") );
+    // console.log("每月数据====>", res, getTypeSum(res, "raw_list_listPace"), getTypeSum(res, "total_duration_seconds") );
     // 计算列表中距离之和
     const listMeters = (res || []).reduce((sum, i) => (sum + (parseFloat(i.raw_list_distance_meters) || 0)), 0);
 
@@ -174,7 +178,7 @@ function getMonthlyRecords() {
       total_active_kilocalories: getTypeSum(res, "total_active_kilocalories"),
       total_records: getTypeSum(res, "total_records"),
       total_duration_time: formatDuration(getTypeSum(res, "total_duration_seconds")),
-      total_listPace: getTypeSum(res, "raw_list_listPace") ? formatPace(getTypeSum(res, "raw_list_listPace") / getTypeSum(res, "total_records") / 100) : '--',
+      total_listPace: getTypeSum(res, "raw_list_distance_meters") ? calculatePaceFromMeters(getTypeSum(res, "raw_list_distance_meters") / 100, getTypeSum(res, "total_duration_seconds")) : '--',
     };
 
     monthlyRecords.value = res.sort((a, b) => dayjs(b.start_date).diff(dayjs(a.start_date))) // 按日期降序排序
@@ -185,10 +189,22 @@ async function getRecords(range) {
   const params = {
     page: 1,
     page_size: 100,
-    data_type: "activityDetails",
     platform: selectedDevice.value.platform || '',
     ...range,
   };
+
+  // console.log("请求参数====>", params.platform);
+
+  if (params.platform === 'huawei') {
+    params.data_type = 'outdoor_walking';
+    params.activity_type = 'outdoor_walking';
+  }
+
+  if (params.platform === 'garmin') {
+    params.data_type = 'activityDetails';
+    params.activity_type = 'RUNNING';
+  }
+
   const res =  await request.get("/sport-api/api/healthdata", params)
   const list = res.list || [];
   // 计算列表中距离之和
@@ -207,6 +223,7 @@ async function getRecords(range) {
       ...item,
       distance_km: formatDistance(item.distance_in_meters),
       duration_in_time: formatDuration(item.duration_in_seconds),
+      paceData: '--',
     })),
   };
 }
@@ -244,13 +261,16 @@ function getDevicesList() {
         created_at: created_at ? created_at + '绑定' : "",
       };
     }).filter(item => item.bound && item.platform !== 'honor');
+
+    if (deviceList.value.length > 0) {
+      selectDevice(deviceList.value[0]);
+    }
   });
 }
 
 onLoad(() => {
   getDevicesList();
-  getSoprtRecords();
-  getMonthlyRecords(selectedYear.value);
+  // getSoprtRecords();
 });
 
 const sports = ref([]);
@@ -261,7 +281,7 @@ const toggleExpand = (index) => {
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 ::v-deep{
   .picker-cell{
     padding:0;

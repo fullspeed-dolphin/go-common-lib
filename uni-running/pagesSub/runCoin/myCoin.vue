@@ -114,7 +114,7 @@ onLoad(() => {
 
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .panel1{
 	width: 690rpx;
 	overflow: hidden;

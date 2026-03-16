@@ -133,7 +133,7 @@ const goHome = () => {
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .page {
   background: #fafafa;
   padding-bottom: env(safe-area-inset-bottom);

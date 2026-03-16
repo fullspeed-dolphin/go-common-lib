@@ -205,7 +205,7 @@ const routeTo = (link) => {
 
 const handleUserClick = () => {
   if (!userInfo.value.id) {
-    pendingAction.value = () => refAccessUser.value.open();
+    // pendingAction.value = () => refAccessUser.value.open();
     return refUserLogin.value.open();
   }
 
@@ -219,11 +219,6 @@ const logout = () => {
     success: (res) => {
       if (res.confirm) {
         clearUserInfo();
-        // setTimeout(() => {
-        // 	uni.redirectTo({
-        // 		url: '/pagesSub/login'
-        // 	})
-        // }, 200)
         uni.$u.toast("退出登录成功");
       } else if (res.cancel) {
         console.log("用户点击取消");
@@ -258,7 +253,7 @@ const openOfficialAccount = () => {
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .img-box {
   position: relative;
 

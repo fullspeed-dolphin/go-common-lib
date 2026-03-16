@@ -231,7 +231,7 @@ const successLogin = () => {
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .section-sport {
   position: relative;
   color: #999;

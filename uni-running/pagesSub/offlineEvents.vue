@@ -256,7 +256,7 @@
 	};
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 	.share-btn {
 		position: fixed;
 		right: 20rpx;

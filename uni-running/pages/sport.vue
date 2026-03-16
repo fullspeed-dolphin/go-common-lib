@@ -25,8 +25,7 @@
             <view class="section-content-left">
               <view class="section-content-title">运动截图打卡</view>
             </view>
-            <view class="u-flex-xy-center" style="width:77rpx;height:77rpx;border-radius: 999px;background:#FF8C00">
-              <image class="section-content-icon" style="width: 42rpx; height: 42rpx" src="/pagesSport/assets/978@2x.png" mode="aspectFill"></image>
+            <view class="u-flex-xy-center iconfont icon-jietu" style="color: #fff; width:77rpx;height:77rpx;border-radius: 999px;background:#FF8C00">
             </view>
           </view>
         </view>
@@ -41,27 +40,33 @@
           </view>
 
 					<!-- 当天健康记录 -->
-					<section class="panel section">
-						<view class="h1 b" style="padding: 20rpx 0 0 10rpx;font-size: 32rpx;margin-bottom: 20rpx;"> 今日运动总结 </view>
-						<view class="statics flex-row b">
-							<view class="flex-1">
-								<view class="label">运动步数</view>
-								<view class="value">{{todaySummaryData.total_steps}}</view>
-							</view>
-							<view class="flex-1">
-								<view class="label">里程长度</view>
-								<view class="value">{{ todaySummaryData.total_distance_meters }}</view>
-							</view>
-							<view class="flex-1">
-								<view class="label">时长</view>
-								<view class="value">{{ todaySummaryData.total_duration_seconds }}</view>
-							</view>
-							<view class="flex-1">
-								<view class="label">消耗大卡</view>
-								<view class="value">{{todaySummaryData.total_calories}}</view>
-							</view>
-						</view>
-					</section>
+					<template v-if="todaySummaryData.bindings">
+            <section v-if="todaySummaryData.total_steps" class="panel section">
+              <view class="h1 b" style="padding: 20rpx 0 0 10rpx;font-size: 32rpx;margin-bottom: 20rpx;"> 今日运动总结 </view>
+              <view class="statics flex-row b">
+                <view class="flex-1">
+                  <view class="label">运动步数</view>
+                  <view class="value">{{todaySummaryData.total_steps}}</view>
+                </view>
+                <view class="flex-1">
+                  <view class="label">里程长度</view>
+                  <view class="value">{{ todaySummaryData.total_distance_meters }}</view>
+                </view>
+                <view class="flex-1">
+                  <view class="label">时长</view>
+                  <view class="value">{{ todaySummaryData.total_duration_seconds }}</view>
+                </view>
+                <view class="flex-1">
+                  <view class="label">消耗大卡</view>
+                  <view class="value">{{todaySummaryData.total_calories}}</view>
+                </view>
+              </view>
+            </section>
+
+            <div v-if="!todaySummaryData.total_steps" style="color:#888; padding: 20rpx 0 0 10rpx;font-size: 32rpx;margin-bottom: 20rpx;">
+              今天没有运动记录哦~快去运动吧！
+            </div>
+          </template>
         </view>
 
         <view v-if="!todaySummaryData.bindings" class="section-empty">
@@ -104,12 +109,6 @@ import Tabbar from "@/components/tabBar.vue";
 import UserLogin from "@/components/UserLogin.vue";
 import { useShare } from "@/composables/useShare.js";
 import request from "@/utils/request.js";
-import {
-  formatDuration,
-  formatDistance,
-  formatPace,
-  getTypeSum,
-} from "./utils.js";
 
 const store = useStore();
 
@@ -206,9 +205,36 @@ function getSoprtRecords() {
 onShow(() => {
   getSoprtRecords();
 });
+
+function formatDuration(sec) {
+  const s = parseInt(sec, 10) || 0;
+  if (s === 0) return '--';
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const secRemain = s % 60;
+  const pad = (n) => String(n).padStart(2, '0');
+  if (h > 0) {
+    return `${pad(h)}:${pad(m)}:${pad(secRemain)}`;
+  }
+  return `${pad(m)}:${pad(secRemain)}`;
+}
+
+// 米数转为 km 显示，0km 则显示米数整数
+function formatDistance(meters) {
+  const m = parseFloat(meters) || 0;
+  const km = m / 1000;
+
+  if (km < 0.1) {
+    // less than 0.1 km show meters
+    return `${Math.round(m)} m`;
+  }
+  // display with one decimal if < 10km, else no decimal
+  const display = km.toFixed(2);
+  return `${display} km`;
+}
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .section-empty {
   height: 20vh;
   display: flex;
