@@ -101,9 +101,7 @@
         },
         {
           "path": "orderList",
-          "style": {
-            "navigationBarTitleText": "我的订单"
-          }
+          "style": { "navigationStyle": "custom","navigationBarTitleText": "我的订单"}
         },
         {"path": "runningTeam/teamList","style": { "navigationStyle": "custom","navigationBarTitleText": "跑团列表"}},
         {"path": "runningTeam/teamDetail", "style": { "navigationStyle": "custom", "navigationBarTitleText": "跑团详情"}},
