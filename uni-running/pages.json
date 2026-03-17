@@ -11,6 +11,10 @@
       "style": { "navigationStyle": "custom", "navigationBarTitleText": "全速运动" }
     },
     {
+      "path": "pages/runClub",
+      "style": { "navigationStyle": "custom", "navigationBarTitleText": "跑团" }
+    },
+    {
       "path": "pages/event",
       "style": { "navigationBarTitleText": "全速俱乐部活动" }
     },
@@ -225,7 +229,7 @@
       },
       {
         "text": "",
-        "pagePath": "pages/event"
+        "pagePath": "pages/runClub"
       },
       {
         "text": "",
