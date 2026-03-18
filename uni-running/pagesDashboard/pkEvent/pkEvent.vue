@@ -169,7 +169,7 @@
           <view class="user-info">
             <view class="user-name">{{ item.team_name }}</view>
             <view class="user-time">组别：{{ item.team_goal_km }}KM</view>
-            <view class="user-time">{{ item.current_members }}人 | 完成率 {{ item.team_completion_rate }}%</view>
+            <view class="user-time">{{ item.current_members }}人 | 完成率 {{ Number(item.team_completion_rate).toFixed(2) }}%</view>
           </view>
           <view class="progress">
             <text class="progress-percent">
@@ -417,7 +417,7 @@ const switchTeamSort = (sort) => {
 // 战队显示字符
 const teamRankValue = (item) => {
   if (teamSortBy.value === 'distance') return item.total_distance_km + 'km';
-  if (teamSortBy.value === 'completion') return item.team_completion_rate + '%';
+  if (teamSortBy.value === 'completion') return Number(item.team_completion_rate).toFixed(2) + '%';
   return item.current_members + '人';
 };
 </script>
