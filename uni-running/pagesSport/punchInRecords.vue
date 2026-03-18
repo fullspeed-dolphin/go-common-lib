@@ -427,7 +427,7 @@ onMounted(() => {
 
 .calendar-day {
   position: relative;
-  width: calc(100% / 7 - 12rpx);
+  width: calc(100% / 7 - 14rpx);
   aspect-ratio: 1;
   display: flex;
   flex-direction: column;
