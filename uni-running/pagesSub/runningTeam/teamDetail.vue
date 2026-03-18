@@ -139,9 +139,10 @@
 			<view class="" style="height: 120rpx"></view>
 
 			<section class="section-bottom flex-center">
-				<button v-if="!isEmpty" class="share-btn flex-center" open-type="share">
+				<!-- <button v-if="!isEmpty" class="share-btn flex-center" open-type="share">
 					分享{{clubTypeName}}
-				</button>
+				</button> -->
+				<view v-if="!isEmpty" class="share-btn flex-center" @click="showShareBtn">分享{{clubTypeName}}</view>
 				<!-- 未加入，才可加入 -->
 				<block v-if="!userInfo.running_group && detail.user_role === 'guest'">
 					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;"
@@ -161,13 +162,48 @@
 		<MemberDetail ref="refMemberDetail" />
 
 		<UserLogin ref="refUserLogin" @success="onLoginSuccess"/>
+		<up-popup :show="isShowModal" zIndex="11" @close="close" overlayOpacity="0.3" :safeAreaInsetBottom="false" bgColor="#fff" mode="bottom" closeable>
+			<view class="iconList">
+				<view class="item" @click="wechatShare">
+					<!-- <u-icon name="weixin-fill" color="#2979ff" size="28"></u-icon> -->
+					 <view class="iconfont icon-weixin" style="font-size:40rpx"></view>
+					<view class="txt">微信分享</view>
+					<button class="wechatBtn" open-type="share">
+					分享{{clubTypeName}}
+				</button>
+				</view>
+				<view class="item" @click="sharePoster">
+					<!-- <u-icon name="photo" color="#2979ff" size="28"></u-icon> -->
+					 <view class="iconfont icon-haibaofenxiang" style="font-size:40rpx"></view>
+					<view class="txt">海报分享</view>
+				</view>
+				<view class="item" @click="shareQRCode">
+					<!-- <u-icon name="scan" color="#2979ff" size="28"></u-icon> -->
+					 <view class="iconfont icon-erweima1688" style="font-size:40rpx"></view>
+					<view class="txt">小程序码分享</view>
+				</view>
+			</view>
+		</up-popup>
+		<!-- 海报分享 -->
+		 <view class="qrcode">
+			 <SharePoster ref="refSharePoster"/>
+		 </view>
+		<!-- 二维码分享 -->
+		
+		<up-popup :show="qrCodeShow" zIndex="11" @close="closeQrcode" overlayOpacity="0.3" :safeAreaInsetBottom="false" bgColor="#fff" mode="bottom" closeable>
+			<view style="text-align: center;margin-top:30rpx;">
+				<image :src="qrCodeSrc" style="width:350rpx;height:350rpx;"></image>
+				<view style="margin:20rpx 0;">长按二维码下载</view>
+			</view>
+		</up-popup>
 	</view>
 </template>
 <script setup>
 	import {
 		ref,
 		computed,
-		nextTick
+		nextTick,
+		onMounted,
 	} from "vue";
 	import {
 		onLoad,
@@ -182,6 +218,7 @@
 	import UserLogin from "@/components/UserLogin.vue";
 	import EventItem from "@/components/EventItem.vue";
 	import MemberDetail from "./memberDetail.vue";
+	import SharePoster from "./SharePoster.vue"
 	import request from "@/utils/request.js"
 	import { useShare, buildPath } from "@/composables/useShare.js";
 
@@ -236,7 +273,8 @@
 
 	// 页面加载
 	onLoad((options) => {
-		console.log("option", options);
+		console.log("option===", options);
+		// console.log("refSharePoster.value====",refSharePoster.value)
 		routeParams.value = options;
 
 		if (!options.group_id || options.group_id === "null") {
@@ -407,6 +445,59 @@
 		  navBarBg.value = 'transparent';
 		}
 	})
+
+	// 弹出分享按钮
+	const isShowModal = ref(false);
+	const showShareBtn = () =>{
+		isShowModal.value = true;
+	}
+	function close() {
+	isShowModal.value = false;
+	}
+	const wechatShare = () => { 
+		uni.share({
+			provider: "weixin",
+			scene: "WXSceneSession",
+			type: 1,
+			summary: detail.value.name,
+			success: function (res) {
+				console.log("success:" + JSON.stringify(res));
+			},
+			fail: function (err) {
+				console.log("fail:" + JSON.stringify(err));
+			}
+		});
+	}
+	// 二维码分享
+	const qrCodeSrc = ref('');
+	const qrCodeShow = ref(false);
+	const shareQRCode = () => { 
+		// qrCodeImg()
+		let data = {
+			path: `pagesSub/runningTeam/teamDetail?group_id=${routeParams.value.group_id}`
+		}
+		request.post(
+				`/image-service/wxacode`,data
+			)
+			.then((res) => {
+				qrCodeShow.value = true;
+				nextTick(() => {
+					// console.log("res==base64", res)
+					qrCodeSrc.value = res.image
+				})
+			});
+	}
+	const refSharePoster = ref(null)
+	const closeQrcode=() => { 
+		qrCodeShow.value = false;
+	}
+	// 海报分享
+	const sharePoster = () => { 
+		// qrCodeImg('poster')
+		refSharePoster.value.open({imgUrl:detail.value.avatar_url,title:detail.value.name,time:detail.value.establish_time})
+	}	
+	
+
 </script>
 
 <style lang="scss" scoped>
@@ -623,5 +714,48 @@
 		flex-direction: column;
 		justify-content: center;
 		padding-bottom: 160rpx;
+	}
+	.iconList {
+		display: flex;
+		justify-content: center;
+		justify-items: center;
+		align-items: center;
+		padding: 80rpx 75rpx 40rpx;
+		.item {
+			position:relative;
+			flex:1;
+			width:200rpx;
+			align-items: center;
+			justify-items: center;
+			text-align: center;
+			.txt {
+				margin-top:20rpx;
+			}
+			.wechatBtn {
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				z-index: 1;
+				opacity:0;
+			}
+		}
+	}
+	.qrcode {
+		::v-deep .u-popup__content__close {
+			top: 300rpx !important;
+			width: 36px !important;
+			height: 36px !important;
+			background: rgba(34, 34, 34, 0.8) !important;
+			border-radius: 999px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+	
+			.u-icon__icon {
+				color: #fff !important;
+			}
+		}
 	}
 </style>
