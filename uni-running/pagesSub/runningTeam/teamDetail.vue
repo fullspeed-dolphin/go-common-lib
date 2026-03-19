@@ -497,7 +497,7 @@
 	// 海报分享
 	const sharePoster = () => { 
 		// qrCodeImg('poster')
-		refSharePoster.value.open({imgUrl:detail.value.avatar_url,title:detail.value.name,time:detail.value.establish_time})
+		refSharePoster.value.open({imgUrl:detail.value.avatar_url,title:detail.value.name,time: userInfo.value.nickname+'邀请你加入团队' })
 	}	
 	
 
