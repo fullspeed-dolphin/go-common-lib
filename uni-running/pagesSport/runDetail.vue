@@ -261,13 +261,25 @@ const initMap = (tracks) => {
 
     // 创建标记
     let tempArr = [];
-    let tempIndex = 0	
+    let tempIndex = 0;
+    let flag = false; // 标记是否超过5公里	
     let tempAPoints = trackPoints.filter((item, index) => {
-      if (!tempArr.includes(parseInt(item.total_distance / 500))) {
-        tempArr.push(parseInt(item.total_distance / 500));
-        tempIndex += 1;
-        return item;
+      // 判断跑动距离是否超过5公里
+      if(trackPoints[trackPoints.length - 1].total_distance > 5000) {
+        flag = true;
+        if (!tempArr.includes(parseInt(item.total_distance / 1000))) {
+          tempArr.push(parseInt(item.total_distance / 1000));
+          tempIndex += 1;
+          return item;
+        }
+      } else {
+        if (!tempArr.includes(parseInt(item.total_distance / 500))) {
+          tempArr.push(parseInt(item.total_distance / 500));
+          tempIndex += 1;
+          return item;
+        }
       }
+      
       // 终点的时候加一个标记
       if (index === trackPoints.length - 1) {
         return item;
@@ -285,13 +297,23 @@ const initMap = (tracks) => {
           (item.total_distance / 1000).toFixed(1)
         );
       } else {
-        return createMarker(
-          index + 1,
-          tempAPoints[index].latitude,
-          tempAPoints[index].longitude,
-          "start",
-          index * 0.5
-        );
+        if(flag) {
+          return createMarker(
+            index + 1,
+            tempAPoints[index].latitude,
+            tempAPoints[index].longitude,
+            "start",
+            index * 1
+          );
+        } else {
+          return createMarker(
+            index + 1,
+            tempAPoints[index].latitude,
+            tempAPoints[index].longitude,
+            "start",
+            index * 0.5
+          );
+        }
       }
     });
     // 创建起点和终点标记
