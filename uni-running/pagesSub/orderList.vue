@@ -1,6 +1,6 @@
 <template>
 	<view class="page">
-		<u-navbar :title="null" bgColor="transparent"></u-navbar>
+		<u-navbar :title="null" bgColor="#fff"></u-navbar>
 		<!-- 分类标签 -->
 		<view class="tab-container" :style="`top:${statusBarHeight+50}px;`">
 			<view class="category-tags">
