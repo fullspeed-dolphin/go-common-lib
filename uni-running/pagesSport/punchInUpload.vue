@@ -1,6 +1,6 @@
 <template>
   <view class="">
-    <u-navbar autoBack bgColor="transparent" placeholder title="运动截图打卡"></u-navbar>
+    <u-navbar autoBack placeholder title="运动截图打卡"></u-navbar>
 
     <block v-if="pageIndex === 0 || !ruleForm.picture">
       <section class="u-pl-30 u-pt-40" style="margin-bottom: 140rpx;">
