@@ -247,18 +247,17 @@
 	.group-item-simple {
 		overflow: hidden;
 		display: flex;
-		align-items: stretch;
+		align-items: center;
 		background: #fff;
-		padding: 24rpx;
-		border-radius: 16rpx;
-		box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+		padding: 32rpx;
+		border-radius: 24rpx;
 
 		.poster {
-			width: 160rpx;
-			height: 160rpx;
+			width: 120rpx;
+			height: 120rpx;
 			background: #f5f5f5;
-			margin-right: 24rpx;
-			border-radius: 12rpx;
+			margin-right: 28rpx;
+			border-radius: 24rpx;
 			flex-shrink: 0;
 			flex-grow: 0;
 		}
@@ -268,6 +267,7 @@
 			display: flex;
 			flex-direction: column;
 			justify-content: space-between;
+			gap: 14rpx;
 			min-width: 0;
 		}
 
@@ -281,16 +281,16 @@
 		}
 
 		.name {
-			font-weight: bold;
-			font-size: 32rpx;
-			color: #000000;
+			font-weight: 600;
+			font-size: 34rpx;
+			color: #1A1A1A;
 			line-height: 44rpx;
 		}
 
 		.total {
-			font-weight: bold;
-			font-size: 24rpx;
-			color: #979797;
+			font-weight: 600;
+			font-size: 28rpx;
+			color: #FF8C00;
 		}
 
 		.justify-start {
@@ -299,20 +299,20 @@
 
 		.location {
 			font-size: 28rpx;
-			color: #979797;
+			color: #6B7280;
 			line-height: 40rpx;
 			margin-left: 10rpx;
 		}
 
 		.desc {
 			font-size: 26rpx;
-			color: #979797;
+			color: #9CA3AF;
 			line-height: 36rpx;
 			margin-left: 10rpx;
 		}
 
 		.gray {
-			color: #979797;
+			color: #6B7280;
 		}
 	}
 </style>

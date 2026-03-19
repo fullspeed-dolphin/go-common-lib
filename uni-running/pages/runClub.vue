@@ -9,9 +9,12 @@
         <text class="tab__text tab__text--active">跑团</text>
         <view class="tab__line"></view>
       </view>
-      <view class="tab tab--inactive" @click="onClickTrain">
-        <text class="tab__text tab__text--inactive">训练</text>
+      <!-- TODO: 训练 tab 暂时隐藏，等接口对接后打开
+      <view :class="['tab', tabIndex === 1 ? 'tab--active' : 'tab--inactive']" @click="tabIndex = 1">
+        <text :class="['tab__text', tabIndex === 1 ? 'tab__text--active' : 'tab__text--inactive']">训练</text>
+        <view v-if="tabIndex === 1" class="tab__line"></view>
       </view>
+      -->
     </view>
 
     <!-- 占位高度 -->
@@ -82,13 +85,18 @@
 
         <!-- 已加入跑团 -->
         <view v-if="myClubDetail" class="club-card" @click="onClickMyClub">
+          <!-- 排名标签（右上角悬挂） -->
+          <view class="club-card__rank-tag">
+            <text class="club-card__rank-val">- -</text>
+            <text class="club-card__rank-label">排名</text>
+          </view>
           <view class="club-card__top">
             <view class="club-card__info">
               <image
                 v-if="myClubDetail.avatar_url"
                 class="club-card__avatar-img"
-                :src="myClubDetail.avatar_url + '?x-oss-process=image/resize,w_120,h_120,m_fill'"
-                mode="aspectFill"
+                :src="myClubDetail.avatar_url + '?x-oss-process=image/resize,w_120,h_120,m_lfit'"
+                mode="aspectFit"
               />
               <view v-else class="club-card__avatar">
                 <u-icon name="account-fill" size="28" color="#6B7280"></u-icon>
@@ -97,10 +105,6 @@
                 <text class="club-card__name">{{ myClubDetail.name }}</text>
                 <text class="club-card__members">{{ myClubDetail.total_members }}名成员</text>
               </view>
-            </view>
-            <view class="club-card__rank">
-              <text class="club-card__rank-val">- -</text>
-              <text class="club-card__rank-label">排名</text>
             </view>
           </view>
 
@@ -136,7 +140,6 @@
         <view
           v-for="(club, i) in sortedClubList" :key="club.group_id"
           class="nearby-item"
-          :class="{ 'nearby-item--border': i < sortedClubList.length - 1 }"
           @click="onClickClubItem(club)"
         >
           <image
@@ -175,6 +178,8 @@ import { useStore } from 'vuex';
 import { useShare } from '@/composables/useShare.js';
 import request from '@/utils/request.js';
 import tabbar from '@/components/tabBar.vue';
+// TODO: 训练模块暂时隐藏，等接口对接后打开
+// import TrainingContent from '@/components/TrainingContent.vue';
 
 useShare({ title: '全速运动 - 跑团', path: '/pages/runClub' });
 
@@ -187,6 +192,12 @@ const menuBtn = uni?.getMenuButtonBoundingClientRect?.() || {};
 const navTop = menuBtn.top || (statusBarHeight + 6);
 const navHeight = menuBtn.height || 32;
 const navSpacerHeight = navTop + navHeight + 8;
+
+// TODO: Swiper 切换（训练模块暂时隐藏）
+// const tabIndex = ref(0);
+// const windowHeight = uni.getSystemInfoSync().windowHeight;
+// const swiperHeight = windowHeight - navSpacerHeight;
+// const onSwiperChange = (e) => { tabIndex.value = e.detail.current; };
 
 // ===== Banner 描述文本 =====
 const bannerDesc = '跑团活动 / 联动共享\n跑团贡献 / Siri捷径';
@@ -287,7 +298,6 @@ onReachBottom(() => {
 });
 
 // ===== 路由 =====
-const onClickTrain = () => uni.showToast({ title: '敬请期待', icon: 'none' });
 const onClickActivity = () => {
   uni.$u.route('/pages/event');
 };
@@ -322,7 +332,7 @@ $border-subtle: #F3F4F6;
 
 .run-club-page {
   min-height: 100vh;
-  background: #fff;
+  background: $bg-gray;
 }
 
 // ========== 导航栏 ==========
@@ -331,7 +341,7 @@ $border-subtle: #F3F4F6;
   top: 0;
   left: 0;
   right: 0;
-  background: #fff;
+  background: $bg-gray;
   z-index: 90;
 }
 
@@ -475,17 +485,17 @@ $border-subtle: #F3F4F6;
   &__text {
     display: flex;
     flex-direction: column;
-    gap: 4rpx;
+    gap: 16rpx;
   }
 
   &__title {
-    font-size: 30rpx;
+    font-size: 34rpx;
     font-weight: 700;
     color: $c1;
   }
 
   &__sub {
-    font-size: 24rpx;
+    font-size: 28rpx;
     font-weight: 500;
     color: $c2;
   }
@@ -550,12 +560,14 @@ $border-subtle: #F3F4F6;
 }
 
 .club-card {
-  background: $bg-gray;
+  position: relative;
+  background: #fff;
   border-radius: 24rpx;
   padding: 32rpx;
   display: flex;
   flex-direction: column;
   gap: 32rpx;
+  overflow: hidden;
 
   &__top {
     display: flex;
@@ -583,6 +595,7 @@ $border-subtle: #F3F4F6;
     width: 100rpx;
     height: 100rpx;
     border-radius: 24rpx;
+    background: #F6F7F8;
   }
 
   &--empty {
@@ -615,11 +628,11 @@ $border-subtle: #F3F4F6;
   &__meta {
     display: flex;
     flex-direction: column;
-    gap: 4rpx;
+    gap: 24rpx;
   }
 
   &__name {
-    font-size: 32rpx;
+    font-size: 34rpx;
     font-weight: 700;
     color: $c1;
   }
@@ -630,28 +643,29 @@ $border-subtle: #F3F4F6;
     color: $c2;
   }
 
-  &__rank {
-    width: 104rpx;
-    height: 104rpx;
-    border-radius: 20rpx;
-    background: $primary-light;
+  &__rank-tag {
+    position: absolute;
+    top: 0;
+    right: 24rpx;
+    background: #FF9F33;
+    border-radius: 0 0 16rpx 16rpx;
+    padding: 20rpx 20rpx 24rpx;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     gap: 4rpx;
   }
 
   &__rank-val {
-    font-size: 32rpx;
+    font-size: 28rpx;
     font-weight: 700;
-    color: $primary;
+    color: #fff;
   }
 
   &__rank-label {
     font-size: 20rpx;
     font-weight: 600;
-    color: $primary;
+    color: rgba(255, 255, 255, 0.85);
   }
 
   &__stats {
@@ -683,7 +697,7 @@ $border-subtle: #F3F4F6;
 .section-nearby {
   display: flex;
   flex-direction: column;
-  gap: 24rpx;
+  gap: 12rpx;
 
   &__tabs {
     display: flex;
@@ -697,11 +711,11 @@ $border-subtle: #F3F4F6;
 
   &--active {
     border: 2rpx solid $primary;
-    background: transparent;
+    background: #fff;
   }
 
   &--inactive {
-    background: $bg-gray;
+    background: #fff;
     border: 2rpx solid transparent;
   }
 
@@ -717,16 +731,14 @@ $border-subtle: #F3F4F6;
 .nearby-item {
   display: flex;
   align-items: center;
-  gap: 24rpx;
-  padding: 28rpx 0;
-
-  &--border {
-    border-bottom: 2rpx solid $border-subtle;
-  }
+  gap: 28rpx;
+  padding: 32rpx;
+  background: #fff;
+  border-radius: 24rpx;
 
   &__avatar {
-    width: 112rpx;
-    height: 112rpx;
+    width: 120rpx;
+    height: 120rpx;
     border-radius: 24rpx;
     background: #E0E0E0;
     display: flex;
@@ -736,8 +748,8 @@ $border-subtle: #F3F4F6;
   }
 
   &__avatar-img {
-    width: 112rpx;
-    height: 112rpx;
+    width: 120rpx;
+    height: 120rpx;
     border-radius: 24rpx;
     flex-shrink: 0;
   }
@@ -746,12 +758,12 @@ $border-subtle: #F3F4F6;
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 8rpx;
+    gap: 14rpx;
     min-width: 0;
   }
 
   &__name {
-    font-size: 30rpx;
+    font-size: 34rpx;
     font-weight: 600;
     color: $c1;
     overflow: hidden;
@@ -760,19 +772,22 @@ $border-subtle: #F3F4F6;
   }
 
   &__detail {
-    font-size: 24rpx;
+    font-size: 28rpx;
     font-weight: 500;
     color: $c2;
   }
 
   &__location {
-    font-size: 22rpx;
+    font-size: 26rpx;
     font-weight: 500;
     color: $c3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   &__stat {
-    font-size: 24rpx;
+    font-size: 28rpx;
     font-weight: 600;
     color: $primary;
     flex-shrink: 0;

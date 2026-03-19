@@ -353,7 +353,7 @@ const getGroupList = () => {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 20rpx;
+  gap: 12rpx;
   min-height: 900rpx;
   padding: 0 34rpx;
 }

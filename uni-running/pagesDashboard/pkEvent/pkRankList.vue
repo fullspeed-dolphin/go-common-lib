@@ -99,7 +99,7 @@
               组别 {{ item.team_goal_km }}KM
               <view class="flex-center group-tag">{{ item.current_members }}人</view>
             </view>
-            <view class="user-time">完成率 {{ item.team_completion_rate }}%</view>
+            <view class="user-time">完成率 {{ Number(item.team_completion_rate).toFixed(2) }}%</view>
           </view>
           <view class="progress">
             <text class="progress-percent"><text style="font-size:36rpx;">{{ teamRankValue(item) }}</text></text>
@@ -174,7 +174,7 @@ const personalRankValue = (item) => {
 // 战队排行榜显示值：按人数排显示人数，按跑量排显示跑量
 const teamRankValue = (item) => {
   if (teamSortBy.value === 'distance') return item.total_distance_km + 'km';
-  if (teamSortBy.value === 'completion') return item.team_completion_rate + '%';
+  if (teamSortBy.value === 'completion') return Number(item.team_completion_rate).toFixed(2) + '%';
   return item.current_members + '人';
 };
 

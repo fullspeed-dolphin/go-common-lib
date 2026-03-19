@@ -15,6 +15,10 @@
       "style": { "navigationStyle": "custom", "navigationBarTitleText": "跑团" }
     },
     {
+      "path": "pages/training",
+      "style": { "navigationStyle": "custom", "navigationBarTitleText": "训练" }
+    },
+    {
       "path": "pages/event",
       "style": { "navigationBarTitleText": "全速俱乐部活动" }
     },
