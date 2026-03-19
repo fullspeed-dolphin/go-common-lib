@@ -138,10 +138,13 @@
   </up-popup>
 
   <up-popup :show="isShowShareModal" zIndex="11" @close="closeShare" overlayOpacity="0.3" :safeAreaInsetBottom="false" bgColor="#fff" mode="bottom" closeable>
-			<view class="iconList">
+			<view style="text-align: center;margin-top:30rpx;">分享到</view>
+      <view class="iconList">
 				<view class="item" @click="wechatShare">
 					<!-- <u-icon name="weixin-fill" color="#2979ff" size="28"></u-icon> -->
-					 <view class="iconfont icon-weixin" style="font-size:40rpx"></view>
+					<view class="img">
+						<view class="iconfont icon-weixin" style="font-size:40rpx"></view>
+					</view>
 					<view class="txt">微信分享</view>
 					<button class="wechatBtn" open-type="share">
 					分享{{clubTypeName}}
@@ -149,12 +152,12 @@
 				</view>
 				<view class="item" @click="sharePoster">
 					<!-- <u-icon name="photo" color="#2979ff" size="28"></u-icon> -->
-					 <view class="iconfont icon-haibaofenxiang" style="font-size:40rpx"></view>
+					 <view class="img"><view class="iconfont icon-haibaofenxiang" style="font-size:40rpx"></view></view>
 					<view class="txt">海报分享</view>
 				</view>
 				<view class="item" @click="shareQRCode">
 					<!-- <u-icon name="scan" color="#2979ff" size="28"></u-icon> -->
-					 <view class="iconfont icon-erweima1688" style="font-size:40rpx"></view>
+					<view class="img"><view class="iconfont icon-erweima1688" style="font-size:40rpx"></view></view>
 					<view class="txt">小程序码分享</view>
 				</view>
 			</view>
@@ -513,7 +516,7 @@ const handleEdit = () => {
 	// 海报分享
 	const sharePoster = () => { 
 		// qrCodeImg('poster')
-		refSharePoster.value.open({imgUrl:detailInfo.value.team_avatar_url,title:detailInfo.value.team_name,time:'--'})
+		refSharePoster.value.open({imgUrl:detailInfo.value.team_avatar_url,title:detailInfo.value.team_name,time:userInfo.value.nickname+'邀请你加入团队'})
 	}
 </script>
 
@@ -876,14 +879,41 @@ const handleEdit = () => {
 		justify-content: center;
 		justify-items: center;
 		align-items: center;
-		padding: 80rpx 75rpx 40rpx;
+		padding: 40rpx 75rpx 40rpx;
+		
 		.item {
 			position:relative;
-			flex:1;
 			width:200rpx;
-			align-items: center;
-			justify-items: center;
 			text-align: center;
+			display: flex;
+			align-items: center;
+			flex-direction: column;
+			&:nth-child(1) {
+				.img {
+					background:#07C160;
+				}
+			}
+			&:nth-child(2) {
+				.img {
+					color:#fff;
+					background:#999;
+				}
+			}
+			&:nth-child(3) {
+				.img {
+					background:#A0522D;
+				}
+			}
+			.img {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				width: 80rpx;
+				height:80rpx;
+				border-radius: 50%;
+				color:#fff;
+				
+			}
 			.txt {
 				margin-top:20rpx;
 			}
