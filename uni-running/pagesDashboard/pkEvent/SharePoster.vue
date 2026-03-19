@@ -137,12 +137,6 @@ function open(imageUrl) {
 function close() {
   show.value = false;
 }
-onLoad(()=>{
-  console.log("是否渲染了")
-})
-onMounted(()=>{
-  console.log('初始化')
-})
 defineExpose({
   open,
 });

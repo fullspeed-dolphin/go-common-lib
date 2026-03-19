@@ -219,6 +219,7 @@ const isEventActive = computed(() => {
   return now.isAfter(dayjs(eventInfo.value.start_time)) && now.isBefore(dayjs(eventInfo.value.end_time));
 });
 function getEventInfo() {
+  console.log('=====eventID====',eventID)
   request.get(`/event-api/online_events/${eventID.value}`).then((res) => {
     eventInfo.value = res;
   });
@@ -337,10 +338,10 @@ const isShowShareBtn = computed(() => {
 });
 
 onLoad((options) => {
-  console.log("options", options);
+  console.log("======options=======", options);
   
   teamID.value = options.teamId || options.id;
-  eventID.value = options.eventId;
+  eventID.value = options.eventId || options.id;
 
 	if (!userInfo.value.id) {
 		nextTick(() => {
@@ -355,6 +356,7 @@ function getUserData() {
 }
 
 onShow(() => {
+  console.log("=======页面显示了===")
   if (!teamID.value) return;
 
   getDetailInfo();
