@@ -411,13 +411,15 @@ const loadSportData = async () => {
   //     );
   //   });
   // 查询活动每公里配速分段数据
-  request.get(`/sport-api/api/healthdata/pace-splits?id=${routerParams.value.id}`)
-  .then((res) => {
-    activeHuawei.value = true
-    paceData.value = res
-    paceData.value.avg_pace = myTime(res.avg_pace,'.')   //(res.avg_pace / 60).toFixed(2)
-    paceData.value.best_pace = myTime(res.best_pace,'.') //(res.best_pace / 60).toFixed(2)
-  });
+  if(routerParams.value.device === '1') {
+    request.get(`/sport-api/api/healthdata/pace-splits?id=${routerParams.value.id}`)
+    .then((res) => {
+      activeHuawei.value = true
+      paceData.value = res
+      paceData.value.avg_pace = myTime(res.avg_pace,'.')   //(res.avg_pace / 60).toFixed(2)
+      paceData.value.best_pace = myTime(res.best_pace,'.') //(res.best_pace / 60).toFixed(2)
+    });
+  }
 };
 
 // 格式化时间 (秒 -> HH:MM:SS 或 MM:SS)
@@ -470,6 +472,7 @@ onLoad((options) => {
     id: options.id,
     nickname: decodeURIComponent(options.nickname || ""),
     avatar_url: decodeURIComponent(options.avatar_url || ""),
+    device: options.device,
   };
 
   // console.log('options======>', options, routerParams.value)
