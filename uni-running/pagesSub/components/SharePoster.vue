@@ -99,7 +99,7 @@ const renderPoster = (imageUrl) => {
                 },
               },
               {
-								src: "/static/images/qrcode.min.jpeg",
+								src: imageUrl.codeImg,
 								type: "image",
                 css: {
 									marginTop: "-10rpx",
@@ -142,5 +142,19 @@ defineExpose({
 });
 </script>
 
-<style >
+<style lang="scss" scoped>
+::v-deep .u-popup__content__close {
+			top: 300rpx !important;
+			width: 36px !important;
+			height: 36px !important;
+			background: rgba(34, 34, 34, 0.8) !important;
+			border-radius: 999px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+	
+			.u-icon__icon {
+				color: #fff !important;
+			}
+		}
 </style>
