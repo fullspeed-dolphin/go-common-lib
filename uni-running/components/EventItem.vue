@@ -18,7 +18,7 @@
 						活动日期: {{ dayjs(item.event_time).format("YYYY-MM-DD") }}
 					</view>
 				</view>
-				<view class="event-item-button" :style="item.status === 'REJ'? 'background: #999;' : ''">
+				<view class="event-item-button" :style="buttonStyle">
 					<block v-if="item.status === 'ACT'">立即报名</block>
 					<block v-if="item.status === 'PND'">{{from === 'team' ? "审核中" : "暂未开始"}}</block>
 					<block v-if="item.status === 'EXP'">{{from === 'team' ? "已过期" : "查看详情"}}</block>
@@ -29,6 +29,7 @@
 	</view>
 </template>
 <script setup>
+	import { computed } from "vue";
 	import dayjs from "dayjs";
 	const props = defineProps({
 		width: {
@@ -59,6 +60,15 @@
 			type: String,
 			default: "",
 		},
+	});
+
+	const buttonStyle = computed(() => {
+		if (props.item.status === 'REJ') return 'background: #999;';
+		const g = props.item.color_config?.gradient;
+		if (props.item.status === 'ACT' && g?.length === 2) {
+			return `background: linear-gradient(90deg, ${g[0]}, ${g[1]});`;
+		}
+		return '';
 	});
 
 	const joinEvent = () => {
