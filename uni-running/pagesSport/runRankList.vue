@@ -35,7 +35,7 @@
 							<view class="title-row">
 								<view class="name ellipsis">{{ item.nickname || "用户" }}</view>
 								<view class="distance-tag">
-									<text class="distance-value">{{ formatDistance(item.total_km) }}</text>
+									<text class="distance-value">{{ item.total_km }}</text>
 									<text class="distance-unit">km</text>
 								</view>
 							</view>

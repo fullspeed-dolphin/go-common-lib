@@ -376,7 +376,7 @@ const loadSportData = async () => {
     res[0].average_pace = calculatePaceFromMeters(res[0].distance_in_meters, res[0].duration_in_seconds);
     res[0].duration_in_seconds = getTime(res[0].duration_in_seconds);
     res[0].average_run_cadence = parseInt(res[0].average_run_cadence || 0);
-    res[0].average_speed = (res[0].average_speed * 100)?.toFixed(0);
+    res[0].average_speed = (res[0].average_speed)?.toFixed(2);
     res[0].distance_in_meters = (res[0].distance_in_meters / 1000)?.toFixed(2)
     res[0].start_time = dayjs(res[0].start_time).format("YYYY-MM-DD HH:mm:ss");
     detail.value = res[0];
