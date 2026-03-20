@@ -323,8 +323,17 @@ const SignUpEvent = () => {
     uni.$u.route("pagesDashboard/pkEvent/teamList", { id: activetyId.value });
     return;
   }
-  uni.$u.route("pagesDashboard/pkEvent/pkEventForm", { id: activetyId.value });
+  
+  goToSignEvent()
 };
+
+function goToSignEvent(item) {
+	uni.$u.route("pagesDashboard/pkEvent/packageList", { 
+    id: activetyId.value,
+    eventId: activetyId.value,
+    teamId: item?.id || "",
+  });
+}
 
 // 跳转
 const goto = (url) => {

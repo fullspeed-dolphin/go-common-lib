@@ -34,7 +34,7 @@
               <view class="leader">队长：{{ item.leader_nickname }}</view>
             </view>
 
-            <view class="join-btn flex-center" @click.stop="joinTeamToSign(item)">
+            <view class="join-btn flex-center" @click.stop="goToSignEvent(item)">
               加入
             </view>
           </view>
@@ -54,7 +54,7 @@
       <u-button class="create-team-btn"
         color="#ff5c5c"
         customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;font-size: 34rpx;letter-spacing: 1px;"
-        @click="$u.route('pagesDashboard/pkEvent/pkEventForm', { id: activetyId })">
+        @click="goToSignEvent()">
         立即报名参赛
       </u-button>
     </view>
@@ -114,10 +114,6 @@ function joinTeamAPi(item) {
     }); */
 }
 
-function goToSignEvent() {
-	uni.$u.route("pagesDashboard/pkEvent/pkEventForm", { id: activetyId.value });
-}
-
 function joinTeam(item) {
   /* if (!userStatusInfo.value.in_team) {
     uni.showModal({
@@ -138,6 +134,15 @@ function joinTeam(item) {
 function joinTeamToSign(item) {
   uni.$u.route(`pagesDashboard/pkEvent/pkEventForm?id=${item.id}&eventId=${activetyId.value}`);
 }
+
+function goToSignEvent(item) {
+	uni.$u.route("pagesDashboard/pkEvent/packageList", { 
+    id: activetyId.value,
+    eventId: activetyId.value,
+    teamId: item?.id || "",
+  });
+}
+
 // Tab 配置
 const currentIndex = ref(0);
 const tabList = ref([

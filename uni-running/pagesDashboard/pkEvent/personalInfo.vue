@@ -82,9 +82,7 @@
           ￥{{packageList.find((item) => item.id === form.package_id)?.price || "0.00"}}
         </view>
       </view> -->
-      <u-button type="primary" color="#ff5c5c" shape="circle" customStyle="width: 686rpx;height: 72rpx;margin:0;border-radius: 999rpx;" 
-				:class="{ 'btn-disabled': !currentSku.id }"
-			@click="submitForm()">
+      <u-button type="primary" color="#ff5c5c" shape="circle" customStyle="width: 686rpx;height: 72rpx;margin:0;border-radius: 999rpx;" :class="{ 'btn-disabled': !currentSku.id }" @click="submitForm()">
         <!-- {{props.teamID ? '加入战队并报名' : '立即报名'}} -->
         立即报名
       </u-button>
@@ -280,36 +278,38 @@ const submitForm = () => {
       return false;
     }
 
-		signUpEvent()
-
-	});
+    signUpEvent();
+  });
 };
 
-function signUpEvent(){
-	// 报名活动
-    const data = {
-      ...form.value,
-			package_id: routerParams.value.packageId,
-      event_id: routerParams.value.eventId,
-      sku_id: currentSku.value?.id || "",
-    };
+  // 报名活动
+function signUpEvent() {
+	uni.showLoading({
+    mask: true,
+  });
 
-    uni.showLoading({
-      mask: true,
+  const data = {
+    ...form.value,
+    package_id: routerParams.value.packageId,
+    event_id: routerParams.value.eventId,
+    sku_id: currentSku.value?.id || "",
+  };
+
+  uni.showLoading({
+    mask: true,
+  });
+
+  request
+    .post("/booking-api/online_events/registration", data)
+    .then(async (res) => {
+      // 检测到package的price为0的情况下，调用此接口，不要走支付接口
+      const isFree = currentSku.value.price === 0;
+      if (isFree) {
+        freeToPay(res.reg_no);
+      } else {
+        payOrder(res.reg_no);
+      }
     });
-
-    request
-      .post("/booking-api/online_events/registration", data)
-      .then(async (res) => {
-        // 检测到package的price为0的情况下，调用此接口，不要走支付接口
-        const isFree = currentSku.value.price === 0;
-        if (isFree) {
-          freeToPay(res.reg_no);
-        } else {
-          payOrder(res.reg_no);
-        }
-      });
-  
 }
 
 //加入战队
@@ -322,48 +322,13 @@ function joinTeamAPi(item) {
   request
     .post("/event-api/online_events_team/join", {
       event_id: activetyId.value,
-      team_id: props.teamID,
+      team_id: props.teamID || routerParams.value.teamID,
     })
     .then(() => {
-      getUserStatus();
-      // uni.$u.toast("成功加入战队, 准备跳转到活动报名页...", 2000, function success() {
-      // 	goToSignEvent();
-      // });
-      const data = {
-        ...form.value,
-        event_id: activetyId.value,
-      };
-
-      uni.showLoading({
-        mask: true,
-      });
-
-      request
-        .post("/booking-api/online_events/registration", data)
-        .then(async (res) => {
-          // 检测到某个package的price为0的情况下，调用此接口，不要走支付接口
-          const isFree = true;
-          if (isFree) {
-            freeToPay(res.reg_no);
-          } else {
-            payOrder(res.reg_no);
-          }
-        });
+			signUpEvent();      
     })
     .catch((e) => {
       console.log("e", e);
-    });
-}
-const userStatusInfo = ref({});
-
-function getUserStatus() {
-  request
-    .get(
-      "/event-api/online_events_team/user_status?event_id=" + activetyId.value
-    )
-    .then((res) => {
-      console.log("userStatus", res);
-      userStatusInfo.value = res;
     });
 }
 

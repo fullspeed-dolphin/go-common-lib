@@ -369,7 +369,7 @@ function close() {
   isShowModal.value = false;
 }
 function goToSignEvent() {
-	uni.$u.route("pagesDashboard/pkEvent/pkEventForm", { 
+	uni.$u.route("pagesDashboard/pkEvent/packageList", { 
     id: eventID.value,
     eventId: eventID.value,
     teamId: teamID.value,

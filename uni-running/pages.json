@@ -63,6 +63,7 @@
 				{ "path": "eventAlbum/faceSearchResult","style": { "navigationBarTitleText": "搜索结果", "navigationStyle": "custom"} },
 				{ "path": "pkEvent/pkEvent","style": { "navigationStyle": "custom", "navigationBarTitleText": "为爱奔跑520"} },
 				{ "path": "pkEvent/pkEventForm","style": { "navigationBarTitleText": "活动报名"} },
+				{ "path": "pkEvent/packageList","style": { "navigationBarTitleText": "选择套餐"} },
 				{ "path": "pkEvent/pkRankList","style": { "navigationBarTitleText": "排行榜"} },
 				{ "path": "pkEvent/teamForm","style": { "navigationBarTitleText": "创建战队"} },
 				{ "path": "pkEvent/teamList","style": { "navigationBarTitleText": "战队列表"} },
