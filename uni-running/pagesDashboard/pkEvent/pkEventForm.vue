@@ -37,34 +37,24 @@
             </up-input>
           </view>
         </up-form-item> -->
-
-        <up-form-item label="选择套餐" prop="package_id" required>
-          <view class="u-pt-5">
-            <!-- <view class="package-item u-flex-row" v-for="item in packageList" :key="item.id" :class="{active: form.package_id === item.id}" @click="changePackage(item.id)"> -->
-            <view class="package-item u-flex-row" v-for="item in packageList" :key="item.id" @click="changePackage(item)">
-              <!-- <view v-if="!item.package_image_url" class="package-image iconfont flex-center icon-shoppingbaggouwudai">
-                <image src="../assets/package.png" mode="aspectFill"></image>
-              </view> -->
-              <image v-if="!item.package_image_url" src="../assets/package.png" mode="aspectFill" class="package-image"></image>
-              <image v-if="item.package_image_url" :src="item.package_image_url" class="package-image" mode="aspectFill" />
-              <view class="package-item_right">
-                <view class="real_name">{{ item.package_name }}</view>
-                <view class="txt">{{ item.package_description }}</view>
-                <view class="target">
-                  <view>{{ item.package_subtitle }}</view>
-                  <view class="join-btn flex-center" @click.stop="goSign(item)">
-                    加入
-                  </view>
-                  <!-- <u-button type="primary" color="#ff5c5c" shape="circle" customStyle="width: 126rpx;height: 52rpx;margin:0;border-radius: 999rpx;" @click.stop="goSign(item)">
-                    去报名
-                  </u-button> -->
-                </view>
-              </view>
-
-              <!-- <div v-if="item.is_recommended" class="recommended-tag">推荐</div> -->
-            </view>
-          </view>
-        </up-form-item>
+				<view style="font-weight: 800;font-size: 34rpx;color: #0F172A;padding:32rpx;">选择套餐</view>
+				<view class="package-item u-flex-row" v-for="item in packageList" :key="item.id" @click="changePackage(item)">
+					<view class="package-image">
+						<up-lazy-load height="110" :image="item.package_image_url + '?x-oss-process=image/resize,w_110,h_110,m_fill'" errorImg="/static/images/user.png" />
+					</view>
+				  <view class="package-item_right">
+				    <view class="real_name b" style="font-size:32rpx;">{{ item.package_name }}</view>
+				    <view class="txt">{{ item.package_description }}</view>
+				    <view class="target">
+				      <view>{{ item.package_subtitle }}</view>
+				      <view class="join-btn flex-center" @click.stop="goSign(item)">
+				        去报名
+				      </view>
+				    </view>
+				  </view>
+				
+				  <div v-if="item.is_recommended" class="recommended-tag">推荐</div>
+				</view>
       </view>
     </up-form>
 
@@ -76,28 +66,27 @@
               {{ item.name }}
             </view>
           </view>
-          <view class="content">
+          <view class="content" style="height:686rpx;">
             <view v-if="currentItemIndex==0">
               <view v-if="!comBoDetail.detail">
                 <view class="nodata"  text="暂无详情">暂无详情</view>
               </view>
-              <view v-else>
-                <image v-for="item in comBoDetail.detail" :src="item"></image>
-              </view>
+              <scroll-view scroll-y style="height:686rpx;width:686rpx;" v-else>
+                <image v-for="item in comBoDetail.detail" style="width:686rpx;" :src="item + '?x-oss-process=image/resize,w_750,m_fill'" mode="widthFix"></image>
+              </scroll-view>
             </view>
             <view v-if="currentItemIndex==1">
-              <view v-if="!comBoDetail.spec">
-                <view class="nodata" text="暂无规格">暂无规格</view>
-              </view>
-              <view v-else>
-                <image :src="comBoDetail.spec"></image>
-              </view>
+              <scroll-view v-if="comBoDetail.spec" scroll-y style="height:686rpx;">
+                <rich-text :nodes="comBoDetail.spec"></rich-text>
+              </scroll-view scroll-y>
+							<view  v-else>
+								<view class="nodata" text="暂无规格">暂无规格</view>
+							</view>
             </view>
             <view v-if="currentItemIndex==2">
-              <view v-if="comBoDetail.video">
-                <video id="myVideo" :src="comBoDetail.video"
-                     enable-danmu danmu-btn controls></video>
-              </view>
+              <scroll-view scroll-y v-if="comBoDetail.video" style="height:686rpx;">
+								<rich-text :nodes="comBoDetail.spec"></rich-text>
+              </scroll-view scroll-y>
               <view v-else>
                 <view class="nodata" text="暂无视频">暂无视频</view>
               </view>
@@ -138,6 +127,7 @@ import FileUpload from "@/components/common/FileUpload.vue";
 import PickerTime from "@/components/common/PickerTime.vue";
 import PickerCell from "@/components/common/PickerCell.vue";
 import request from "@/utils/request.js";
+import { formatRichText } from "@/utils/util.js";
 
 import { useStore } from "vuex";
 const store = useStore();
@@ -280,8 +270,14 @@ const getPackageList = () => {
     event_id: activetyId.value,
   };
   request.get(`/event-api/online_events_packages`, data).then((res) => {
-    packageList.value = res;
-    const package_id = res.find((i) => i.is_recommended)?.id || "";
+    packageList.value = res.map(item => {
+			return {
+				...item,
+				spec: formatRichText(item.spec || ''),
+				video: formatRichText(item.video || ''),
+			}
+		});
+    // const package_id = res.find((i) => i.is_recommended)?.id || "";
     // changePackage(package_id);
   });
 };
@@ -537,12 +533,11 @@ function itemClick(item,index) {
   margin-right: 10rpx;
 }
 .package-item {
-  width: 686rpx;
   min-height: 222rpx;
   padding: 42rpx 20rpx 32rpx 34rpx;
   background: #ffffff;
-  border-radius: 32rpx 32rpx 32rpx 32rpx;
-  border: 2rpx solid #e2e8f0;
+  border-top: 2rpx solid #e2e8f0;
+  border-bottom: 2rpx solid #e2e8f0;
   margin-bottom: 20rpx;
   position: relative;
   &_right {
@@ -574,9 +569,6 @@ function itemClick(item,index) {
     line-height: 48rpx;
     font-size: 32rpx;
     color: #101828;
-  }
-  .txt {
-    padding: 10rpx 0;
   }
   .target {
     line-height: 48rpx;
@@ -610,8 +602,9 @@ function itemClick(item,index) {
 
   .txt {
     color: #929dae;
+		min-height: 90rpx;
     font-size: 24rpx;
-    line-height: 1.2;
+    line-height: 30rpx;
   }
 }
 
@@ -634,7 +627,7 @@ function itemClick(item,index) {
 
 // 卡片通用样式
 .card-section {
-  padding: 0 32rpx;
+  // padding: 0 32rpx;
 }
 
 // Logo 卡片特殊样式
@@ -713,6 +706,7 @@ function itemClick(item,index) {
   .packHead {
     display:flex;
     align-items: center;
+		margin-bottom: 32rpx;
     .item {
       flex:1;
       text-align: center;
@@ -720,7 +714,7 @@ function itemClick(item,index) {
       line-height: 60rpx;
       margin: 0 50rpx;
       &.active{
-        border-bottom:2rpx solid #FF5D5B;
+        border-bottom:4rpx solid #FF5D5B;
       }
     }
   }
@@ -730,10 +724,8 @@ function itemClick(item,index) {
     align-items: center;
     justify-content: center;
     padding: 40rpx 0;
-    height:460rpx;
+    height:686rpx;
     color: #999;
-
   }
-
 }
 </style>

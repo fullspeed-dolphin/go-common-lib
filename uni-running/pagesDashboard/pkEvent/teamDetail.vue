@@ -1,6 +1,6 @@
 <template>
   <view>
-    <u-navbar title="战队详情"></u-navbar>
+   <u-navbar title="战队详情" placeholder></u-navbar>
 	<mescroll-body ref="mescrollRef" @init="mescrollInit" :down="{ use: false }" @down="downCallback" @up="getList" :top="0">
   <view class="">
     <section class="team-header">
@@ -114,7 +114,7 @@
       <!-- <button class="main-btn" style="background:#07C160" open-type="share">邀请好友加入</button> -->
     </block>
     
-    <button v-if="!userStatusInfo.in_team" class="main-btn" @click="joinTeam()">加入战队</button>
+    <button v-if="!userStatusInfo.in_team" class="main-btn" @click="joinTeam()">加入战队并报名</button>
 
     <!-- 加入任何一个战队后，不可加入其他战队 -->
     <block v-if="userStatusInfo.in_team">
@@ -129,17 +129,17 @@
 	<button v-if="!isShowShareBtn" class="share-btn flex-center" :class="{ active: isScroll }" open-type="share">
 		<u-icon name="share" color="#fff" size="18"></u-icon>
 	</button>
-	
-	<UserLogin ref="refUserLogin" @success="onLoginSuccess" />
+
   <!-- 套餐列表 -->
   <up-popup :show="isShowModal" @close="close" overlayOpacity="1" :safeAreaInsetBottom="false" bgColor="#fff" mode="bottom" closeable>
-    <div class="flex-center b" style="height:90rpx;font-size:32rpx;">完善信息</div>
+    <div class="flex-center b" style="height:90rpx;font-size:32rpx;">选择套餐</div>
     <scroll-view scroll-y style="height: 90vh;width:100vw;overflow-y: auto;background: #fff;">
       <pkEventForm :teamID="teamID"/>
     </scroll-view>
   </up-popup>
 
   <Share ref="refShare" class="qrcode"/>
+  <UserLogin ref="refUserLogin" @success="onLoginSuccess" />
   </view>
 </template>
 
@@ -369,7 +369,11 @@ function close() {
   isShowModal.value = false;
 }
 function goToSignEvent() {
-	uni.$u.route("pagesDashboard/pkEvent/pkEventForm", { id: eventID.value });
+	uni.$u.route("pagesDashboard/pkEvent/pkEventForm", { 
+    id: eventID.value,
+    eventId: eventID.value,
+    teamId: teamID.value,
+  });
 }
 
 function joinTeam() {

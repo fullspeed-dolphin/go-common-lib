@@ -56,3 +56,22 @@ export function isReleaseVersion() {
 	// shouldShow = envVersion === 'release';
 	return envVersion === 'trial' || envVersion === 'release' || envVersion === 'develop';
 }
+
+// utils/html.js
+export function formatRichText(html) {
+  // 匹配所有 <img> 标签，并添加 style
+  let newHtml = html.replace(/<img[^>]*>/g, (match) => {
+    // 如果已存在 style，先提取
+    if (match.includes(' style=')) {
+      // 在原有 style 后追加 max-width（更安全）
+      return match.replace(/style\s*=\s*["']([^"']*)["']/, (styleMatch, styleContent) => {
+        const newStyle = styleContent + ';max-width:100%;height:auto;display:block;';
+        return `style="${newStyle}"`;
+      });
+    } else {
+      // 无 style，直接添加
+      return match.replace(/<img/i, '<img style="max-width:100%;height:auto;display:block;"');
+    }
+  });
+  return newHtml;
+}
