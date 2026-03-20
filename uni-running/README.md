@@ -27,3 +27,6 @@ HUAWEI 设备
 
 
 [guide 企业微信客服接入](https://work.weixin.qq.com/nl/act/p/a733314375294bdd)
+
+
+[bug list](https://fcnyx7eni183.feishu.cn/wiki/EQMXwawuQi3MgMkQ9wvc4b0anIc?table=tblagoeDMvRtoLF2&view=vewANWaII9)

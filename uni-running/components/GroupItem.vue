@@ -23,7 +23,7 @@
 			</view>
 			<view class="group-info-row">
 				<text class="label">总跑量</text>
-				<text class="value highlight">{{formatDistance(item.total_km)}}km</text>
+				<text class="value highlight">{{item.total_km}}km</text>
 			</view>
 			<!-- <view class="group-info-row">
 				<text class="label">周人均跑</text>
