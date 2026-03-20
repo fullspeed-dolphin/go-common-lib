@@ -616,4 +616,10 @@
 			opacity: 1;
 		}
 	}
+	
+	::v-deep{
+		.total_km{
+			display: none!important;
+		}
+	}
 </style>

@@ -102,7 +102,15 @@
             "minified" : true,
             "es6" : true,
             "ignoreUploadUnusedFiles" : false,
-            "postcss" : true
+            "postcss" : true,
+            "ignore": [
+                "node_modules", 
+                ".git", 
+                "dist", 
+                "uni_modules", 
+                "temp",
+                "*.log"
+            ]
         },
         "lazyCodeLoading" : "requiredComponents",
         "usingComponents" : true,
