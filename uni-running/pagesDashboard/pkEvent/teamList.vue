@@ -1,7 +1,7 @@
 <template>
   <view class="page">
     <section class="section-header flex-col-center ">
-      <view class="section-search u-mb-30" style="width:686rpx;">
+      <view class="section-search u-mb-20" style="width:686rpx;">
         <u-search v-model="searchTxt" @search="refreshList" placeholder="输入战队名称" shape="round" bgColor="#f5f5f5" borderColor="#f5f5f5" :showAction="false"></u-search>
       </view>
       <!-- 分类标签 -->
@@ -18,7 +18,7 @@
 
     <!-- 内容区域 -->
     <view class="content-wrapper">
-      <mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" :top="100">
+      <mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" :top="80">
         <view class="order-list">
           <view class="team-card" v-for="(item, index) in dataList" :key="index" @click="joinTeam(item)">
             <!-- <image :src="item.team_avatar_url" class="avatar" /> -->
@@ -215,6 +215,7 @@ defineOptions({
   z-index: 10;
   top: 0;
   padding: 16rpx 24rpx;
+  background: #fff;
 }
 
 .category-tags {
