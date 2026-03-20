@@ -1,5 +1,6 @@
 <template>
   <view class="form-page">
+    <u-navbar autoBack placeholder  title="创建战队" />
     <up-form :model="form" ref="uForm" :rules="rules" labelPosition="top" labelWidth="auto">
       <view class="card-section logo-card">
         <view class="flex-center">

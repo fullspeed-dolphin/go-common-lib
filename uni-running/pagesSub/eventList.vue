@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <u-navbar autoBack placeholder title="活动列表" />
     <!-- 分类标签 -->
     <view class="section-filter">
       <view class="category-tags">

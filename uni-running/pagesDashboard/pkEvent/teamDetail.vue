@@ -1,6 +1,6 @@
 <template>
   <view>
-    <u-navbar :title="null" bgColor="transparent"></u-navbar>
+    <u-navbar title="战队详情"></u-navbar>
 	<mescroll-body ref="mescrollRef" @init="mescrollInit" :down="{ use: false }" @down="downCallback" @up="getList" :top="0">
   <view class="">
     <section class="team-header">
@@ -481,7 +481,7 @@ const handleEdit = () => {
 .header-content {
   position: relative;
   z-index: 1;
-  padding: 86rpx 50rpx 30rpx;
+  padding: 70px 50rpx 30rpx;
   background: linear-gradient(to bottom, rgba(255,255,255,.7) 60%, #f5f5f5);
   .team-avatar {
     width: 120rpx;

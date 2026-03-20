@@ -1,5 +1,6 @@
 <template>
   <view class="">
+    <u-navbar autoBack placeholder  title="活动报名" />
     <up-form :model="form" ref="uForm" :rules="formRules" labelPosition="top" labelWidth="auto">
       <view class="card-section">
         <up-form-item label="真实姓名" prop="real_name" required>

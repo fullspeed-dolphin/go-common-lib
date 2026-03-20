@@ -1,5 +1,6 @@
 <template>
   <view class="u-p-20">
+	<u-navbar autoBack placeholder  title="活动规则" />
 		<rich-text class="richText" :nodes="ruleText"></rich-text>
   </view>
 </template>

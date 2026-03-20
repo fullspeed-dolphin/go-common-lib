@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <u-navbar autoBack placeholder  title="战队列表" />
     <section class="section-header flex-col-center ">
       <view class="section-search u-mb-30" style="width:686rpx;">
         <u-search v-model="searchTxt" @search="refreshList" placeholder="输入战队名称" shape="round" bgColor="#f5f5f5" borderColor="#f5f5f5" :showAction="false"></u-search>
@@ -213,7 +214,7 @@ defineOptions({
   position: fixed;
   width: 100%;
   z-index: 10;
-  top: 0;
+  top: 50px;
   padding: 16rpx 24rpx;
 }
 

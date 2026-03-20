@@ -1,5 +1,6 @@
 <template>
   <view class="">
+    <u-navbar autoBack placeholder  title="排行榜" />
     <mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="loadRankList">
     <section class="honor-rank">
       <view class="title">荣誉榜单</view>
