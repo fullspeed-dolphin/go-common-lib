@@ -12,7 +12,7 @@
             <view class="txt">{{ item.package_description }}</view>
             <view class="target">
               <view>{{ item.package_subtitle }}</view>
-              <view class="join-btn flex-center" @click.stop="goSign(item)">
+              <view class="join-btn flex-center" :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }" @click.stop="goSign(item)">
                 去报名
               </view>
             </view>
@@ -73,6 +73,7 @@ import { formatRichText } from "@/utils/util.js";
 import { useStore } from "vuex";
 const store = useStore();
 const userInfo = computed(() => store.state.userInfo);
+const pkEventTheme = computed(() => store.state.pkEventTheme);
 
 const props = defineProps({
   teamID: {

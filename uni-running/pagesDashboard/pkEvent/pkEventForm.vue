@@ -82,7 +82,12 @@
           ￥{{packageList.find((item) => item.id === form.package_id)?.price || "0.00"}}
         </view>
       </view> -->
-      <u-button type="primary" color="#ff5c5c" shape="circle" customStyle="width: 686rpx;height: 72rpx;margin:0;border-radius: 999rpx;" :class="{ 'btn-disabled': !currentSku.id }" @click="submitForm()">
+      <u-button type="primary" 
+        :color="`linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})`" 
+        :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }" shape="circle" 
+        customStyle="width: 686rpx;height: 72rpx;margin:0;border-radius: 999rpx;"
+        :class="{ 'btn-disabled': !currentSku.id }" 
+        @click="submitForm()">
         <!-- {{props.teamID ? '加入战队并报名' : '立即报名'}} -->
         立即报名
       </u-button>
@@ -101,6 +106,7 @@ import SkuForm from "./SkuForm.vue";
 import { useStore } from "vuex";
 const store = useStore();
 const userInfo = computed(() => store.state.userInfo);
+const pkEventTheme = computed(() => store.state.pkEventTheme);
 
 const uForm = ref(null);
 const activetyId = ref("");

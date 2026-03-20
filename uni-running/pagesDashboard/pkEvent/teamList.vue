@@ -34,7 +34,7 @@
               <view class="leader">队长：{{ item.leader_nickname }}</view>
             </view>
 
-            <view class="join-btn flex-center" @click.stop="goToSignEvent(item)">
+            <view class="join-btn flex-center" :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }" @click.stop="goToSignEvent(item)">
               加入
             </view>
           </view>
@@ -52,7 +52,8 @@
     </view>
     <view v-else-if="!hasSignedUp" class="create-team-wrapper flex-center">
       <u-button class="create-team-btn"
-        color="#ff5c5c"
+        color1="#ff5c5c"
+        :color="`linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})`"
         customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;font-size: 34rpx;letter-spacing: 1px;"
         @click="goToSignEvent()">
         立即报名参赛
@@ -66,12 +67,19 @@ import { ref, computed, watch } from "vue";
 import { onLoad, onShow, onPageScroll, onReachBottom } from "@dcloudio/uni-app";
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 import request from "@/utils/request.js";
-const activetyId = ref(""); // 活动ID
-const searchTxt = ref("");
+
 const { mescrollInit, downCallback, getMescroll } = useMescroll(
   onPageScroll,
   onReachBottom
 );
+
+import { useStore } from "vuex";
+const store = useStore();
+const userInfo = computed(() => store.state.userInfo);
+const pkEventTheme = computed(() => store.state.pkEventTheme);
+
+const activetyId = ref(""); // 活动ID
+const searchTxt = ref("");
 
 const userStatusInfo = ref({});
 function getUserStatus() {

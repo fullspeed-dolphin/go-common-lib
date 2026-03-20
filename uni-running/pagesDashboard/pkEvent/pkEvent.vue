@@ -22,11 +22,11 @@
         <view class="subtitle">{{ detailInfo?.event_subtitle }}</view>
 
         <view style="display:flex;align-items:center;justify-content:space-between;font-size:24rpx;">
-          <view v-if="detailInfo?.event_description" class="start-time flex-center" style="margin:0;width:auto;padding: 0 24rpx;">
+          <view v-if="detailInfo?.event_description" class="start-time flex-center" :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }" style="margin:0;width:auto;padding: 0 24rpx;">
             <text style="margin-right:8rpx;">🔥</text>
             <text class="time-text">{{detailInfo?.event_description}}</text>
           </view>
-          <view class="start-time flex-center" style="margin:0;">
+          <view class="start-time flex-center" style="margin:0;" :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }">
             <view class="iconfont icon-riqi u-mr-10"></view>
             <text class="time-text">{{detailInfo?.start_time}} 开跑</text>
           </view>
@@ -185,7 +185,7 @@
 		
 		<div class="hr100" style="height:120rpx;"></div>
     <view v-if="isSignUpEvent" class="join-btn-wrapper flex-center">
-      <u-button class="join-btn" color="#ff5c5c" color1="linear-gradient(64deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%)"
+      <u-button class="join-btn" :color="`linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})`"
         customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;letter-spacing: 1px;font-size: 34rpx;" :disabled="detailInfo?.status !== 'act'" @click="SignUpEvent()">
         立即报名参赛
       </u-button>
@@ -212,6 +212,7 @@ import { useStore } from "vuex";
 
 const store = useStore();
 const userInfo = computed(() => store.state.userInfo);
+const pkEventTheme = computed(() => store.state.pkEventTheme);
 
 const refUserLogin = ref(null);
 
@@ -261,7 +262,7 @@ function changeTab(index) {
   refreshList();
 }
 
-const init = () => {
+const getEventData = () => {
   request
     .get(`/event-api/online_events/${activetyId.value}`)
     .then((res) => {
@@ -279,6 +280,11 @@ const init = () => {
       }
 
       detailInfo.value = res;
+
+      store.commit('set', {
+        type: 'pkEventTheme',
+        data: res.color_config
+      })
     });
 };
 
@@ -359,7 +365,7 @@ onLoad((options) => {
 });
 
 onShow(() => {
-  init();
+  getEventData();
   getUserStatus();
   getMyEvents();
 });
