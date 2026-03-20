@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="userCheckedInfo.required_checkins">
     <div class='section-panel' style="padding-bottom:40rpx;">
       <u-cell title="我的战绩" customClass="section-title" :border="false" isLink value="查看全部" @click="popupVisible = true" />
 

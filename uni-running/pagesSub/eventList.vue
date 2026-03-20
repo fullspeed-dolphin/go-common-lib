@@ -254,7 +254,7 @@ onShow(() => {
 
 .section-filter {
   position: fixed;
-  top: 0;
+  top: 88px;
   width: 100%;
   z-index: 10;
   background: #f5f5f5;

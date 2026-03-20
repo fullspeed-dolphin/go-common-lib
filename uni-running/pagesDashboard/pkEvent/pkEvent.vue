@@ -208,8 +208,8 @@ import dayjs from "dayjs";
 
 import UserLogin from "@/components/UserLogin.vue";
 import PersonalRecord from "./personalRecord.vue";
-import { useStore } from "vuex";
 
+import { useStore } from "vuex";
 const store = useStore();
 const userInfo = computed(() => store.state.userInfo);
 const pkEventTheme = computed(() => store.state.pkEventTheme);
