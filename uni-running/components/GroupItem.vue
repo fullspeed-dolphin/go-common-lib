@@ -21,9 +21,9 @@
             item.total_members || item.member_count || item.members || 0
           }}人</text>
 			</view>
-			<view class="group-info-row">
+			<view class="group-info-row total_km">
 				<text class="label">总跑量</text>
-				<text class="value highlight">{{item.total_km}}km</text>
+				<text class="value highlight">{{formatDistance(item.total_km)}}km</text>
 			</view>
 			<!-- <view class="group-info-row">
 				<text class="label">周人均跑</text>
@@ -133,8 +133,7 @@
 	const formatDistance = (distance) => {
 		if (!distance) return "0.00";
 		// 如果已经是公里，直接返回；如果是米，转换为公里
-		const km = distance > 10000 ? distance / 1000 : distance;
-		return parseFloat(km).toFixed(2);
+		return parseFloat(distance).toFixed(2);
 	};
 </script>
 
