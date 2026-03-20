@@ -1,5 +1,5 @@
 <template>
-  <view class="info">
+  <view class="info" :style="themeStyle">
     <up-form :model="form" ref="uForm" :rules="formRules" labelPosition="left" labelWidth="80">
       <view class="card-section">
         <view class="title">参赛者信息</view>
@@ -9,33 +9,30 @@
               <input v-model="form.real_name" @input="validateField('real_name')" maxlength="50" placeholder-style="color: #C8C9CD;" placeholder="请输入您的真实姓名" />
             </view>
           </up-form-item>
-          <up-form-item label="性别" prop="sex" required>
-            <view class="flex-start">
-              <input v-model="form.sex" @input="validateField('real_name')" maxlength="50" placeholder-style="color: #C8C9CD;" placeholder="请输入您的性别" />
-            </view>
-          </up-form-item>
           <up-form-item label="联系电话" prop="contact_number" required>
             <view class="flex-start">
               <input v-model="form.contact_number" @input="validateField('contact_number')" maxlength="11" placeholder-style="color: #C8C9CD;" placeholder="请输入您的联系电话" />
             </view>
           </up-form-item>
-          <up-form-item label="证件类型" prop="cert_type" required>
-            <view class="flex-start">
-              <PickerCell v-model="form.cert_type" :border="false" @change="validateField('cert_type')" :columns="cert_typeOptions" />
-            </view>
-          </up-form-item>
+          <template v-if="requireCert">
+            <up-form-item label="证件类型" prop="cert_type" required>
+              <view class="flex-start">
+                <PickerCell v-model="form.cert_type" :border="false" @change="validateField('cert_type')" :columns="cert_typeOptions" />
+              </view>
+            </up-form-item>
 
-          <up-form-item label="证件号码" prop="cert_number" required>
-            <view class="flex-start">
-              <input v-model="form.cert_number" class="u-input" @input="validateField('cert_number')" maxlength="18" placeholder-style="color: #C8C9CD;" placeholder="请输入您的证件号码" />
-            </view>
-          </up-form-item>
+            <up-form-item label="证件号码" prop="cert_number" required>
+              <view class="flex-start">
+                <input v-model="form.cert_number" class="u-input" @input="validateField('cert_number')" maxlength="18" placeholder-style="color: #C8C9CD;" placeholder="请输入您的证件号码" />
+              </view>
+            </up-form-item>
+          </template>
           <up-form-item label="收货地址" prop="shipping_address" required>
             <view class="flex-start">
               <up-input v-model="form.shipping_address" border="none" @change="validateField('shipping_address')" maxlength="100" placeholder="请输入您的收货地址">
                 <template #suffix>
                   <view class="map-btn" @click="chooseAddress">
-                    <up-icon name="map-fill" size="36rpx" color="#ff5c5c" />
+                    <up-icon name="map-fill" size="36rpx" :color="pkEventTheme?.solid || '#ff5c5c'" />
                   </view>
                 </template>
               </up-input>
@@ -43,7 +40,7 @@
           </up-form-item>
         </view>
       </view>
-      <view class="card-section ">
+      <!-- <view class="card-section ">
         <view class="content">
           <view style="margin:0 32rpx">
             <view class="tips">参赛项目（提交后不能修改）</view>
@@ -53,7 +50,7 @@
             </u-radio-group>
           </view>
         </view>
-      </view>
+      </view> -->
     </up-form>
 
     <view class="card-section">
@@ -82,7 +79,7 @@
           ￥{{packageList.find((item) => item.id === form.package_id)?.price || "0.00"}}
         </view>
       </view> -->
-      <u-button type="primary" color="#ff5c5c" shape="circle" customStyle="width: 686rpx;height: 72rpx;margin:0;border-radius: 999rpx;" :class="{ 'btn-disabled': !currentSku.id }" @click="submitForm()">
+      <u-button type="primary" :color="`linear-gradient(90deg, ${pkEventTheme?.gradient?.[0] || '#ff5c5c'}, ${pkEventTheme?.gradient?.[1] || '#ff5c5c'})`" shape="circle" customStyle="width: 686rpx;height: 72rpx;margin:0;border-radius: 999rpx;" :class="{ 'btn-disabled': !currentSku.id }" @click="submitForm()">
         <!-- {{props.teamID ? '加入战队并报名' : '立即报名'}} -->
         立即报名
       </u-button>
@@ -101,6 +98,11 @@ import SkuForm from "./SkuForm.vue";
 import { useStore } from "vuex";
 const store = useStore();
 const userInfo = computed(() => store.state.userInfo);
+const pkEventTheme = computed(() => store.state.pkEventTheme);
+const themeStyle = computed(() => ({
+  '--theme-color': pkEventTheme.value?.solid || '#ff5c5c',
+  '--theme-gradient': `linear-gradient(90deg, ${pkEventTheme.value?.gradient?.[0] || '#ff5c5c'}, ${pkEventTheme.value?.gradient?.[1] || '#ff5c5c'})`,
+}));
 
 const uForm = ref(null);
 const activetyId = ref("");
@@ -117,13 +119,14 @@ const currentSku = ref({});
 
 const form = ref({
   real_name: "",
-  sex: "",
   contact_number: "",
   shipping_address: "",
   package_id: "",
   cert_type: "",
   cert_number: "",
 });
+
+const requireCert = computed(() => routerParams.value.requireCert == 1);
 
 function validateField(propName) {
   uForm.value.validateField(propName, () => {}, "change");
@@ -168,13 +171,6 @@ const formRules = ref({
       trigger: ["blur", "change"],
     },
   ],
-  sex: [
-    {
-      required: true,
-      message: "必填项",
-      trigger: ["blur", "change"],
-    },
-  ],
   contact_number: [
     {
       required: true,
@@ -196,14 +192,14 @@ const formRules = ref({
   ],
   cert_type: [
     {
-      required: true,
+      required: false,
       message: "必填项",
       trigger: ["blur", "change"],
     },
   ],
   cert_number: [
     {
-      required: true,
+      required: false,
       message: "必填项",
       trigger: ["blur", "change"],
     },
@@ -222,12 +218,17 @@ const formRules = ref({
   ],
 });
 
+watch(requireCert, (val) => {
+  formRules.value.cert_type[0].required = val;
+  formRules.value.cert_number[0].required = val;
+}, { immediate: true });
+
 watch(
   () => form.value.cert_type,
   () => {
     formRules.value.cert_number = [
       {
-        required: true,
+        required: requireCert.value,
         message: "必填项",
         trigger: ["blur", "change"],
       },
@@ -482,7 +483,7 @@ function wxPay(respay) {
     position: absolute;
     top: 20rpx;
     right: 20rpx;
-    background: #ff5c5c;
+    background: var(--theme-gradient, #ff5c5c);
     color: #fff;
     font-size: 24rpx;
     padding: 4rpx 16rpx;
@@ -510,18 +511,18 @@ function wxPay(respay) {
   .target {
     line-height: 48rpx;
     font-size: 32rpx;
-    color: #ff5c5c;
+    color: var(--theme-color, #ff5c5c);
     font-weight: 500;
     margin-bottom: 10rpx;
   }
 
   &.active {
     background: #fff1f2;
-    border: 2rpx solid #ff5c5c;
+    border: 2rpx solid var(--theme-color, #ff5c5c);
 
     .iconfont {
       background: #fff;
-      color: #ff5c5c;
+      color: var(--theme-color, #ff5c5c);
     }
   }
 
@@ -615,7 +616,7 @@ function wxPay(respay) {
     text-align: center;
     font-style: normal;
     text-transform: none;
-    background: #ff5d5b;
+    background: var(--theme-gradient, #ff5c5c);
 
     &.u-tag--warning--plain {
       background: #fff;
@@ -651,11 +652,11 @@ function wxPay(respay) {
       width: 210rpx;
       height: 44rpx;
       border-radius: 8rpx 8rpx 8rpx 8rpx;
-      border: 1rpx solid #ff5d5b;
+      border: 1rpx solid var(--theme-color, #ff5c5c);
       font-family: PingFang SC, PingFang SC;
       font-weight: bold;
       font-size: 24rpx;
-      color: #ff5d5b;
+      color: var(--theme-color, #ff5c5c);
       line-height: 36rpx;
       text-align: center;
       font-style: normal;
@@ -683,7 +684,7 @@ function wxPay(respay) {
       top: 50%;
       width: 6rpx;
       height: 30rpx;
-      background: #ff5d5b;
+      background: var(--theme-color, #ff5c5c);
       border-radius: 3rpx;
       margin-top: -15rpx;
     }
@@ -731,7 +732,7 @@ function wxPay(respay) {
       font-family: PingFang SC, PingFang SC;
       font-weight: 500;
       font-size: 24rpx;
-      color: #ff5d5b;
+      color: var(--theme-color, #ff5c5c);
       line-height: 36rpx;
       text-align: left;
       font-style: normal;

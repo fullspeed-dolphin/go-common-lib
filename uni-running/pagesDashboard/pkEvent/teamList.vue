@@ -1,5 +1,5 @@
 <template>
-  <view class="page">
+  <view class="page" :style="themeStyle">
     <u-navbar autoBack placeholder  title="战队列表" />
     <section class="section-header flex-col-center ">
       <view class="section-search u-mb-20" style="width:686rpx;">
@@ -78,6 +78,9 @@ import { useStore } from "vuex";
 const store = useStore();
 const userInfo = computed(() => store.state.userInfo);
 const pkEventTheme = computed(() => store.state.pkEventTheme);
+const themeStyle = computed(() => ({
+  '--theme-gradient': `linear-gradient(90deg, ${pkEventTheme.value?.gradient?.[0] || '#ff5c5c'}, ${pkEventTheme.value?.gradient?.[1] || '#ff5c5c'})`,
+}));
 
 const activetyId = ref(""); // 活动ID
 const searchTxt = ref("");
@@ -280,7 +283,7 @@ defineOptions({
     border-radius: 999rpx;
     &.active {
       color: #fff;
-      background: #ff5c5c;
+      background: var(--theme-gradient, #ff5c5c);
     }
   }
 }
