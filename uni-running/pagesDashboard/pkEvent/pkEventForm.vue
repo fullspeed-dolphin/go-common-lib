@@ -1,5 +1,6 @@
 <template>
   <view class="info">
+    <u-navbar autoBack placeholder title="活动报名"></u-navbar>
     <up-form :model="form" ref="uForm" :rules="formRules" labelPosition="left" labelWidth="80">
       <view class="card-section">
         <view class="title">参赛者信息</view>
