@@ -1,6 +1,6 @@
 <template>
+	<u-navbar title="全速之家" placeholder></u-navbar>
 	<section class="u-flex-row u-flex-wrap u-pl-34" style="gap: 22rpx;padding-top: 70px;">
-		<u-navbar autoBack placeholder title="全速之家" />
 		<view v-if="isStaff" class="card-item u-flex-y-center" 
 			@click="$u.route('pagesMine/toolkit/Toolkit?role=全速员工')">
 			全速员工

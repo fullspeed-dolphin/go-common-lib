@@ -63,17 +63,16 @@
       </view>
       <SkuForm v-model="currentSku" :packageData="routerParams" />
     </view>
-    <!-- <section class="section-bottom" style="width: 682rpx;margin: 0rpx auto 40rpx;">
-            <view class="txt flex-start">
-                <up-checkbox shape="circle" activeColor="#8CC63E" v-model:checked="isAgree" :usedAlone="true"
-                    :customStyle="{ marginRight: '-10rpx' }" size="32rpx" />
-                <text @click="isAgree = !isAgree">
-                    <text class="u-ml-5">我已阅读并同意该</text>
-                </text>
-                <text style="color: #ff8c00"
-                    @click="$u.route('pagesDashboard/pkEvent/activeRule?type=disclaimer')">《免责声明》</text>
-            </view>
-        </section> -->
+
+    <section class="section-bottom" style="width: 682rpx;margin: 20rpx auto 40rpx;">
+      <view class="txt flex-start">
+        <up-checkbox shape="circle" activeColor="#8CC63E" v-model:checked="isAgree" :usedAlone="true" :customStyle="{ marginRight: '-10rpx' }" size="32rpx" />
+        <text @click="isAgree = !isAgree">
+          <text class="u-ml-5">我已阅读并同意该</text>
+        </text>
+        <text style="color: #ff8c00" @click="$u.route('pagesDashboard/pkEvent/activeRule?type=disclaimer')">《免责声明》</text>
+      </view>
+    </section>
 
     <div style="height: 120rpx;"></div>
     <view class="submit-wrapper flex-between-center">
@@ -83,12 +82,9 @@
           ￥{{packageList.find((item) => item.id === form.package_id)?.price || "0.00"}}
         </view>
       </view> -->
-      <u-button type="primary" 
-        :color="`linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})`" 
-        :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }" shape="circle" 
-        customStyle="width: 686rpx;height: 72rpx;margin:0;border-radius: 999rpx;"
-        :class="{ 'btn-disabled': !currentSku.id }" 
-        @click="submitForm()">
+      <u-button type="primary" :color="`linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})`"
+        :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }" shape="circle" customStyle="width: 686rpx;height: 72rpx;margin:0;border-radius: 999rpx;"
+        :class="{ 'btn-disabled': !currentSku.id }" @click="submitForm()">
         <!-- {{props.teamID ? '加入战队并报名' : '立即报名'}} -->
         立即报名
       </u-button>
@@ -287,7 +283,7 @@ function getUserStatus() {
 
 const submitForm = () => {
   uForm.value.validate().then((res) => {
-    // if (!isAgree.value) return uni.$u.toast("请查阅并勾选免责声明~");
+    if (!isAgree.value) return uni.$u.toast("请查阅并勾选免责声明~");
     if (!currentSku.value?.id) return uni.$u.toast("请选择套餐款式~");
 
     // 未加入战队需要先加入战队
@@ -300,9 +296,9 @@ const submitForm = () => {
   });
 };
 
-  // 报名活动
+// 报名活动
 function signUpEvent() {
-	uni.showLoading({
+  uni.showLoading({
     mask: true,
   });
 
@@ -343,7 +339,7 @@ function joinTeamAPi(item) {
       team_id: props.teamID || routerParams.value.teamId,
     })
     .then(() => {
-			signUpEvent();      
+      signUpEvent();
     })
     .catch((e) => {
       console.log("e", e);

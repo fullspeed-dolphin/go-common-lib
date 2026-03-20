@@ -1,59 +1,57 @@
 <template>
-	<view>
-		<u-navbar :title="null" bgColor="transparent"></u-navbar>
+  <view>
+    <u-navbar :title="null" bgColor="transparent"></u-navbar>
 
-		<view v-if="isEmpty" class="empty-container">
-			<mescroll-empty mode="data" :option="{ tip: '您还没有加入或创建俱乐部' }" />
-			<!-- 底部固定按钮 -->
-			<view class="section-bottom">
-				<u-button type="primary" color="#FF8C00" shape="circle"
-					customStyle="height: 84rpx; width: 100%;"
-					@click="$u.route(`pagesSub/runningTeam/teamForm?from=mine`)">创建俱乐部
-				</u-button>
-			</view>
-		</view>
+    <view v-if="isEmpty" class="empty-container">
+      <mescroll-empty mode="data" :option="{ tip: '您还没有加入或创建俱乐部' }" />
+      <!-- 底部固定按钮 -->
+      <view class="section-bottom">
+        <u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 84rpx; width: 100%;" @click="$u.route(`pagesSub/runningTeam/teamForm?from=mine`)">创建俱乐部
+        </u-button>
+      </view>
+    </view>
 
-		<block v-if="!isEmpty">
-			<section class="flex-center" style="height: 432rpx;filter: blur(50px);">
-				<image class="img" style="width:750rpx;height:432rpx;" :src="
+    <block v-if="!isEmpty">
+      <section class="flex-center" style="height: 432rpx;filter: blur(50px);">
+        <image class="img" style="width:750rpx;height:432rpx;" :src="
 				    (detail.avatar_url ||
 				    'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_120,h_120,m_fill'
 				  " mode="aspectFill"></image>
-					
-			</section>
-			<section class="section-card flex-col-center" style="margin-top: -160rpx;">
-				<image class="img" :src="
+
+      </section>
+      <section class="section-card flex-col-center" style="margin-top: -160rpx;">
+        <image class="img" :src="
             (detail.avatar_url ||
             'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_120,h_120,m_fill'
           " mode="aspectFill"></image>
-				<view class="name ellipsis2">{{ detail.name }}</view>
-				<view class="flex-between-center c3">
-					<view class="cell-item">{{ detail.establish_time }} 成立</view>
-					<view class="cell-item">{{clubTypeName}}ID {{ detail.group_id }}</view>
-				</view>
-				<view class="cell-item flex-row c3">
-					<u-icon name="map" size="12" color="#333"></u-icon>
-					<view class="flex-1">
-						{{ detail.establish_location }}
-					</view>
-				</view>
-			</section>
+        <view class="name ellipsis2">{{ detail.name }}</view>
+        <view class="flex-between-center c3">
+          <view class="cell-item">{{ detail.establish_time }} 成立</view>
+          <view class="cell-item">{{clubTypeName}}ID {{ detail.group_id }}</view>
+        </view>
+        <view class="cell-item flex-row c3">
+          <u-icon name="map" size="12" color="#333"></u-icon>
+          <view class="flex-1">
+            {{ detail.establish_location }}
+          </view>
+        </view>
+      </section>
 
-			<section class="section-summary panel flex-row">
-				<view class="flex-1 flex-col-center">
-					<view class="number">
-						{{ detail.total_members }}
-					</view>
-					成员人数
-				</view>
-				<view class="divider"></view>
-				<view class="flex-1 flex-col-center">
-					<view class="number">
-						{{ detail.gender_ratio }}
-					</view>
-					男女比例
-				</view>
-				<!-- <view class="divider"></view>
+      <section class="section-summary panel flex-row">
+        <view class="flex-1 flex-col-center">
+          <view class="number">
+            {{ detail.total_members }}
+          </view>
+          成员人数
+        </view>
+        <view class="divider"></view>
+        <view class="flex-1 flex-col-center">
+          <view class="number">
+            {{ detail.gender_ratio }}
+          </view>
+          男女比例
+        </view>
+        <!-- <view class="divider"></view>
 				<view class="flex-1 flex-col-center">
 					<view class="number">
 						{{ detail.total_members }}
@@ -67,585 +65,566 @@
 					</view>
 					周人均跑量
 				</view> -->
-			</section>
+      </section>
 
-			<section class="panel">
-				<view class="h4">{{clubTypeName}}宣言</view>
-				<view style="line-height: 40rpx; padding-left: 18rpx;">
-					{{ detail.introduction }}
-				</view>
-			</section>
+      <section class="panel">
+        <view class="h4">{{clubTypeName}}宣言</view>
+        <view style="line-height: 40rpx; padding-left: 18rpx;">
+          {{ detail.introduction }}
+        </view>
+      </section>
 
-			<section class="panel">
-				<view class="h4">团长</view>
-				<view class="flex-between-center">
-					<view class="leader-item flex-start" @click="openMemberDetail(memberLeader)">
-						<view class="img-box">
-							<up-lazy-load height="120" borderRadius="200" class="img" 
-								error-img="/static/images/user.png"
-								:image="memberLeader.avatar_url + '?x-oss-process=image/resize,w_110,h_110,m_fill'" mode="aspectFill" />
-						</view>
-						<view class="">
-							<view class="ellipsis" style="width: 300rpx;line-height: 44rpx;">
-								{{memberLeader.nickname || "成员"}}
-							</view>
-						</view>
-					</view>
-					<view style="width: 184rpx">
-						<u-button type="primary" plain color="#FF8C00" size="small" shape="circle"
-							@click="callPhone(detail.creator_phone)">
-							联系团长
-						</u-button>
-					</view>
-				</view>
-			</section>
+      <section class="panel">
+        <view class="h4">团长</view>
+        <view class="flex-between-center">
+          <view class="leader-item flex-start" @click="openMemberDetail(memberLeader)">
+            <view class="img-box">
+              <up-lazy-load height="120" borderRadius="200" class="img" error-img="/static/images/user.png" :image="memberLeader.avatar_url + '?x-oss-process=image/resize,w_110,h_110,m_fill'" mode="aspectFill" />
+            </view>
+            <view class="">
+              <view class="ellipsis" style="width: 300rpx;line-height: 44rpx;">
+                {{memberLeader.nickname || "成员"}}
+              </view>
+            </view>
+          </view>
+          <view style="width: 184rpx">
+            <u-button v-if="detail.creator_phone" type="primary" plain color="#FF8C00" size="small" shape="circle" @click="callPhone(detail.creator_phone)">
+              联系团长
+            </u-button>
+          </view>
+        </view>
+      </section>
 
-			<section class="panel" style="padding-right:0;">
-				<view class="h4">成员</view>
-				<view class="flex-row flex-wrap">
-					<view class="member-item flex-col-center" v-for="(item, index) in memberList" @click="openMemberDetail(item)" :key="index">
-						<view class="img">
-							<up-lazy-load height="120" 
-							error-img="/static/images/user.png"
-							:image="item.avatar_url+ '?x-oss-process=image/resize,w_150,h_150,m_fill'" />
-						</view>
-						<view class="">
-							<view class="u-mb-10 ellipsis tac u-ml-10" style="width: 120rpx;margin-top: 16rpx;line-height: 44rpx;">
-								{{ item.nickname}}
-							</view>
-						</view>
-					</view>
-				</view>
-				<mescroll-empty v-if="!memberList.length" :option="{ tip: `暂无${clubTypeName}成员~` }" />
-				<view class="flex-center u-mt-15">
-					<u-button type="text"
-						v-if="memberList.length >= 8"
-						customStyle="width: 236rpx;height: 84rpx;" shape="circle"
-						@click="viewMoreMembers()">
-						<text style="color:#409eff;">查看更多</text>
-						<u-icon name="arrow-right" color="#409eff" size="14"></u-icon>
-					</u-button>
-				</view>
-			</section>
+      <section class="panel" style="padding-right:0;">
+        <view class="h4">成员</view>
+        <view class="flex-row flex-wrap">
+          <view class="member-item flex-col-center" v-for="(item, index) in memberList" @click="openMemberDetail(item)" :key="index">
+            <view class="img">
+              <up-lazy-load height="120" error-img="/static/images/user.png" :image="item.avatar_url+ '?x-oss-process=image/resize,w_150,h_150,m_fill'" />
+            </view>
+            <view class="">
+              <view class="u-mb-10 ellipsis tac u-ml-10" style="width: 120rpx;margin-top: 16rpx;line-height: 44rpx;">
+                {{ item.nickname}}
+              </view>
+            </view>
+          </view>
+        </view>
+        <mescroll-empty v-if="!memberList.length" :option="{ tip: `暂无${clubTypeName}成员~` }" />
+        <view class="flex-center u-mt-15">
+          <u-button type="text" v-if="memberList.length >= 8" customStyle="width: 236rpx;height: 84rpx;" shape="circle" @click="viewMoreMembers()">
+            <text style="color:#409eff;">查看更多</text>
+            <u-icon name="arrow-right" color="#409eff" size="14"></u-icon>
+          </u-button>
+        </view>
+      </section>
 
-			<section class="panel" style="box-shadow: none;">
-				<view class="h4">{{clubTypeName}}活动</view>
-				<view v-for="(item, index) in eventList" :key="index">
-					<EventItem :item="item" :key="index" height="474rpx" from="team" />
-				</view>
-				<mescroll-empty v-if="!eventList.length" :option="{ tip: `暂无${clubTypeName}活动~` }" />
-			</section>
+      <section class="panel" style="box-shadow: none;">
+        <view class="h4">{{clubTypeName}}活动</view>
+        <view v-for="(item, index) in eventList" :key="index">
+          <EventItem :item="item" :key="index" height="474rpx" from="team" />
+        </view>
+        <mescroll-empty v-if="!eventList.length" :option="{ tip: `暂无${clubTypeName}活动~` }" />
+      </section>
 
-			<view class="" style="height: 120rpx"></view>
+      <view class="" style="height: 120rpx"></view>
 
-			<section class="section-bottom flex-center">
-				<!-- <button v-if="!isEmpty" class="share-btn flex-center" open-type="share">
+      <section class="section-bottom flex-center">
+        <!-- <button v-if="!isEmpty" class="share-btn flex-center" open-type="share">
 					分享{{clubTypeName}}
 				</button> -->
-				<view v-if="!isEmpty" class="share-btn flex-center" @click="showShareBtn">分享{{clubTypeName}}</view>
-				<!-- 未加入，才可加入 -->
-				<block v-if="!userInfo.running_group && detail.user_role === 'guest'">
-					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;"
-						@click="joinGroup()">加入{{clubTypeName}}</u-button>
-				</block>
-				<block v-if="detail.user_role === 'creator'">
-					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;"
-						@click="$u.route(`pagesSub/runningTeam/teamSetting?group_id=${detail.group_id}`)">Club管理工具</u-button>
-				</block>
-				<block v-if="detail.user_role === 'member'">
-					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;"
-						@click="leaveGroup()">退出{{clubTypeName}}</u-button>
-				</block>
-			</section>
-		</block>
-		
-		<MemberDetail ref="refMemberDetail" />
+        <view v-if="!isEmpty" class="share-btn flex-center" @click="showShareBtn">分享{{clubTypeName}}</view>
+        <!-- 未加入，才可加入 -->
+        <block v-if="!userInfo.running_group && detail.user_role === 'guest'">
+          <u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;" @click="joinGroup()">加入{{clubTypeName}}</u-button>
+        </block>
+        <block v-if="detail.user_role === 'creator'">
+          <u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;" @click="$u.route(`pagesSub/runningTeam/teamSetting?group_id=${detail.group_id}`)">Club管理工具</u-button>
+        </block>
+        <block v-if="detail.user_role === 'member'">
+          <u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;" @click="leaveGroup()">退出{{clubTypeName}}</u-button>
+        </block>
+      </section>
+    </block>
 
-		<UserLogin ref="refUserLogin" @success="onLoginSuccess"/>
-		<Share ref="refShare"/>
-	</view>
+    <MemberDetail ref="refMemberDetail" />
+
+    <UserLogin ref="refUserLogin" @success="onLoginSuccess" />
+    <Share ref="refShare" />
+  </view>
 </template>
 <script setup>
-	import {
-		ref,
-		computed,
-		nextTick,
-		onMounted,
-	} from "vue";
-	import {
-		onLoad,
-		onUnload,
-		onShow,
-		onPageScroll,
-	} from "@dcloudio/uni-app";
+import { ref, computed, nextTick, onMounted } from "vue";
+import { onLoad, onUnload, onShow, onPageScroll } from "@dcloudio/uni-app";
 
-	import {
-		useStore
-	} from "vuex";
-	import UserLogin from "@/components/UserLogin.vue";
-	import EventItem from "@/components/EventItem.vue";
-	import MemberDetail from "./memberDetail.vue";
-	// import SharePoster from "./SharePoster.vue"
-	import Share from "../components/Share.vue"
-	import request from "@/utils/request.js"
-	import { useShare, buildPath } from "@/composables/useShare.js";
+import { useStore } from "vuex";
+import UserLogin from "@/components/UserLogin.vue";
+import EventItem from "@/components/EventItem.vue";
+import MemberDetail from "./memberDetail.vue";
+// import SharePoster from "./SharePoster.vue"
+import Share from "../components/Share.vue";
+import request from "@/utils/request.js";
+import { useShare, buildPath } from "@/composables/useShare.js";
 
-	// 使用store
-	const store = useStore();
+// 使用store
+const store = useStore();
 
-	// 分享配置
-	useShare(() => ({
-		title: '全速运动 - ' + (detail.value.name || ''),
-		path: buildPath('/pagesSub/runningTeam/teamDetail', { group_id: routeParams.value.group_id }),
-		imageUrl: detail.value.avatar_url || ''
-	}));
+// 分享配置
+useShare(() => ({
+  title: "全速运动 - " + (detail.value.name || ""),
+  path: buildPath("/pagesSub/runningTeam/teamDetail", {
+    group_id: routeParams.value.group_id,
+  }),
+  imageUrl: detail.value.avatar_url || "",
+}));
 
-	const refUserLogin = ref(null);
+const refUserLogin = ref(null);
 
-	// 待执行的操作（登录成功后继续执行）
-	const pendingAction = ref(null);
+// 待执行的操作（登录成功后继续执行）
+const pendingAction = ref(null);
 
-	// 登录成功回调
-	const onLoginSuccess = () => {
-		getMemberList();
-		if (pendingAction.value) {
-			pendingAction.value();
-			pendingAction.value = null;
-		}
-	};
+// 登录成功回调
+const onLoginSuccess = () => {
+  getMemberList();
+  if (pendingAction.value) {
+    pendingAction.value();
+    pendingAction.value = null;
+  }
+};
 
-	// 响应式数据
-	const isEmpty = ref(false);
-	const detail = ref({});
-	const routeParams = ref({});
-	const eventList = ref([]);
-	const memberList = ref([]);
-	const memberLeader = ref({});
+// 响应式数据
+const isEmpty = ref(false);
+const detail = ref({});
+const routeParams = ref({});
+const eventList = ref([]);
+const memberList = ref([]);
+const memberLeader = ref({});
 
-	// 计算属性
-	// 根据 club_type 返回对应文字：running=跑团，cycling=车队
-	const clubTypeName = computed(() => {
-		return detail.value.club_type === 'cycling' ? '车队' : '跑团';
-	});
+// 计算属性
+// 根据 club_type 返回对应文字：running=跑团，cycling=车队
+const clubTypeName = computed(() => {
+  return detail.value.club_type === "cycling" ? "车队" : "跑团";
+});
 
-	const pageTitle = computed(() => {
-		return routeParams.value.from === "mine" ? `我的${clubTypeName.value}` : `${clubTypeName.value}详情`;
-	});
+const pageTitle = computed(() => {
+  return routeParams.value.from === "mine"
+    ? `我的${clubTypeName.value}`
+    : `${clubTypeName.value}详情`;
+});
 
-	const userInfo = computed(() => store.state.userInfo);
-	
-	const refMemberDetail = ref(null);
-	function openMemberDetail(item) {
-		refMemberDetail.value.open(item)
-	}
+const userInfo = computed(() => store.state.userInfo);
 
-	// 页面加载
-	onLoad((options) => {
-		console.log("option===", options);
-		routeParams.value = options;
+const refMemberDetail = ref(null);
+function openMemberDetail(item) {
+  refMemberDetail.value.open(item);
+}
 
-		if (!options.group_id || options.group_id === "null") {
-			isEmpty.value = true;
-			return;
-		}
+// 页面加载
+onLoad((options) => {
+  console.log("option===", options);
+  routeParams.value = options;
 
-		getDetail();
-		
-		// #ifdef MP-WEIXIN
-		wx.showShareMenu({
-			withShareTicket: true,
-			menus: ['shareAppMessage', 'shareTimeline'] // 开启分享给朋友和分享到朋友圈
-		});
-		// #endif
-		
-		// nextTick(() => {
-		// 	if (!store.state.userInfo.id) {
-		// 		return refUserLogin.value.open();
-		// 	}
-		// })
-	});
-	
-	const getEvents = () => {
-		// /event-api/fsc_swipers?fsc_id=1004 
-		request.get(`/event-api/fsc_swipers?fsc_id=${routeParams.value.group_id}`).then(res => {
-			eventList.value = res.map(item => {
-				return {
-					...item,
-					event_time: isNaN(item.event_time) ? item.event_time :  Number(item.event_time),
-				}
-			});
-		});
-	};
-	
-	// 页面卸载
-	onUnload(() => {
-		uni.removeStorageSync("groupDetail");
-	});
+  if (!options.group_id || options.group_id === "null") {
+    isEmpty.value = true;
+    return;
+  }
 
-	// 页面显示
-	onShow(() => {
-		// 移除全局自定义事件监听器
-		uni.$off("updateList");
+  getDetail();
 
-		// 监听全局的自定义事件
-		uni.$once("updateList", (data) => {
-			// 判断从我的俱乐部创建，返回没有俱乐部 ID，页面空白的问题
-			if (data.from === "mine" && data.group_id) {
-				routeParams.value.group_id = data.group_id;
-				getDetail();
-			}
-		});
+  // #ifdef MP-WEIXIN
+  wx.showShareMenu({
+    withShareTicket: true,
+    menus: ["shareAppMessage", "shareTimeline"], // 开启分享给朋友和分享到朋友圈
+  });
+  // #endif
 
-		getEvents();
-	});
+  // nextTick(() => {
+  // 	if (!store.state.userInfo.id) {
+  // 		return refUserLogin.value.open();
+  // 	}
+  // })
+});
 
-	// 方法定义
-	const viewMoreMembers = () => {
-		uni.$u.route(
-			`pagesSub/runningTeam/teamMemberList?group_id=${routeParams.value.group_id}`
-		);
-	};
+const getEvents = () => {
+  // /event-api/fsc_swipers?fsc_id=1004
+  request
+    .get(`/event-api/fsc_swipers?fsc_id=${routeParams.value.group_id}`)
+    .then((res) => {
+      eventList.value = res.map((item) => {
+        return {
+          ...item,
+          event_time: isNaN(item.event_time)
+            ? item.event_time
+            : Number(item.event_time),
+        };
+      });
+    });
+};
 
-	const getDetail = (page) => {
-		const groupDetail = uni.getStorageSync("groupDetail");
-		if (groupDetail) {
-			detail.value = groupDetail;
-		}
+// 页面卸载
+onUnload(() => {
+  uni.removeStorageSync("groupDetail");
+});
 
-		uni.showLoading({
-			mask: true
-		});
+// 页面显示
+onShow(() => {
+  // 移除全局自定义事件监听器
+  uni.$off("updateList");
 
-		request.get(
-				`/running-group/api/v1/groups/info?group_id=${routeParams.value.group_id}`
-			)
-			.then((res) => {
-				res.establish_time = res.establish_time.slice(0, 10);
-				detail.value = res;
+  // 监听全局的自定义事件
+  uni.$once("updateList", (data) => {
+    // 判断从我的俱乐部创建，返回没有俱乐部 ID，页面空白的问题
+    if (data.from === "mine" && data.group_id) {
+      routeParams.value.group_id = data.group_id;
+      getDetail();
+    }
+  });
 
-				isEmpty.value = false;
+  getEvents();
+});
 
-				getMemberList();
-			});
-	};
+// 方法定义
+const viewMoreMembers = () => {
+  uni.$u.route(
+    `pagesSub/runningTeam/teamMemberList?group_id=${routeParams.value.group_id}`
+  );
+};
 
-	const getMemberList = () => {
-		const data = {
-			pageIndex: 0,
-			pageSize: 9,
-			groupId: Number(detail.value.group_id),
-		};
-		request.post(`/running-group/api/v1/groups/members`, data)
-			.then((res) => {
-				res = res.memberships || []
-				memberLeader.value = res.find((i) => i.role === "creator") || {};
-				memberList.value = res.filter((i) => i.role !== "creator");
-			});
-	};
+const getDetail = (page) => {
+  const groupDetail = uni.getStorageSync("groupDetail");
+  if (groupDetail) {
+    detail.value = groupDetail;
+  }
 
-	const joinGroup = () => {
-		if (!store.state.userInfo.id) {
-			pendingAction.value = () => joinGroup();
-			return refUserLogin.value.open();
-		}
-		uni.showModal({
-			title: "提示",
-			content: `是否确认加入该${clubTypeName.value}？`,
-			success: (res) => {
-				if (res.confirm) {
-					const data = {
-						running_group: Number(detail.value.group_id),
-					};
+  uni.showLoading({
+    mask: true,
+  });
 
-					uni.showLoading({
-						mask: true
-					});
-					request.post(`/user-api/user/joinRunningGroup`, data)
-						.then((res) => {
-							uni.hideLoading();
-							getDetail();
-							uni.$u.toast("加入成功！");
-						});
-				} else if (res.cancel) {
-					console.log("用户点击取消");
-				}
-			},
-		});
-	};
+  request
+    .get(
+      `/running-group/api/v1/groups/info?group_id=${routeParams.value.group_id}`
+    )
+    .then((res) => {
+      res.establish_time = res.establish_time.slice(0, 10);
+      detail.value = res;
 
-	const leaveGroup = () => {
-		uni.showModal({
-			title: "提示",
-			content: `是否确认退出该${clubTypeName.value}？`,
-			success: (res) => {
-				if (res.confirm) {
-					uni.showLoading({
-						mask: true
-					});
-					request.post(`/user-api/user/quitRunningGroup`).then((res) => {
-						uni.$u.toast("操作成功！");
+      isEmpty.value = false;
 
-						// 调用用户数据，检查参加或创建俱乐部标记
-						store.dispatch("getUserInfo");
+      getMemberList();
+    });
+};
 
-						getDetail();
-					});
-				} else if (res.cancel) {
-					console.log("用户点击取消");
-				}
-			},
-		});
-	};
+const getMemberList = () => {
+  const data = {
+    pageIndex: 0,
+    pageSize: 9,
+    groupId: Number(detail.value.group_id),
+  };
+  request.post(`/running-group/api/v1/groups/members`, data).then((res) => {
+    res = res.memberships || [];
+    memberLeader.value = res.find((i) => i.role === "creator") || {};
+    memberList.value = res.filter((i) => i.role !== "creator");
+  });
+};
 
-	const callPhone = (phoneNumber) => {
-		uni.makePhoneCall({
-			phoneNumber,
-		});
-	};
+const joinGroup = () => {
+  if (!store.state.userInfo.id) {
+    pendingAction.value = () => joinGroup();
+    return refUserLogin.value.open();
+  }
+  uni.showModal({
+    title: "提示",
+    content: `是否确认加入该${clubTypeName.value}？`,
+    success: (res) => {
+      if (res.confirm) {
+        const data = {
+          running_group: Number(detail.value.group_id),
+        };
 
-	const navBarBg = ref('transparent');
-	onPageScroll((e) => {
-		const scrollTop = e.scrollTop || 0;
-		if (scrollTop >= 5) {
-		  navBarBg.value = "#ffffff";
-		} else {
-		  navBarBg.value = 'transparent';
-		}
-	})
+        uni.showLoading({
+          mask: true,
+        });
+        request.post(`/user-api/user/joinRunningGroup`, data).then((res) => {
+          uni.hideLoading();
+          getDetail();
+          uni.$u.toast("加入成功！");
+        });
+      } else if (res.cancel) {
+        console.log("用户点击取消");
+      }
+    },
+  });
+};
 
-	// 弹出分享按钮
-	// const isShowModal = ref(false);
-	const refShare = ref(null);
-	const showShareBtn = () =>{
-		
-		refShare.value.open(
-			{
-			avatar_url:detail.value.avatar_url,
-			name:detail.value.name,
-			establish_time:detail.value.establish_time,
-			}
-			// detail.value
-		,
-		`pagesSub/runningTeam/teamDetail?group_id=${routeParams.value.group_id}`)
-	}
-	
+const leaveGroup = () => {
+  uni.showModal({
+    title: "提示",
+    content: `是否确认退出该${clubTypeName.value}？`,
+    success: (res) => {
+      if (res.confirm) {
+        uni.showLoading({
+          mask: true,
+        });
+        request.post(`/user-api/user/quitRunningGroup`).then((res) => {
+          uni.$u.toast("操作成功！");
 
+          // 调用用户数据，检查参加或创建俱乐部标记
+          store.dispatch("getUserInfo");
+
+          getDetail();
+        });
+      } else if (res.cancel) {
+        console.log("用户点击取消");
+      }
+    },
+  });
+};
+
+const callPhone = (phoneNumber) => {
+	console.log("callPhone", phoneNumber);
+  uni.makePhoneCall({
+    phoneNumber,
+  });
+};
+
+const navBarBg = ref("transparent");
+onPageScroll((e) => {
+  const scrollTop = e.scrollTop || 0;
+  if (scrollTop >= 5) {
+    navBarBg.value = "#ffffff";
+  } else {
+    navBarBg.value = "transparent";
+  }
+});
+
+// 弹出分享按钮
+// const isShowModal = ref(false);
+const refShare = ref(null);
+const showShareBtn = () => {
+  refShare.value.open(
+    {
+      avatar_url: detail.value.avatar_url,
+      name: detail.value.name,
+      establish_time: detail.value.establish_time,
+    },
+    // detail.value
+    `pagesSub/runningTeam/teamDetail?group_id=${routeParams.value.group_id}`
+  );
+};
 </script>
 
 <style lang="scss" scoped>
-	.panel {
-		border:0;
-		background: #fff;
-		padding: 30rpx 20rpx;
-	}
-	
-	::v-deep{
-		.event-item{
-			box-shadow: 0rpx 6rpx 12rpx 2rpx rgba(255,140,0,0.16);
-			margin-bottom: 30rpx;
-		}
-	}
+.panel {
+  border: 0;
+  background: #fff;
+  padding: 30rpx 20rpx;
+}
 
-	.share-btn {
-		margin: 0;
-		height: 80rpx;
-		width: 312rpx;
-		border-radius: 200rpx;
-		color: #fff;
-		border: 1px solid #07C160;
-		background-color: #07C160 !important;
-		padding: 0 20rpx;
-		font-size: 28rpx;
-		font-weight: bold;
+::v-deep {
+  .event-item {
+    box-shadow: 0rpx 6rpx 12rpx 2rpx rgba(255, 140, 0, 0.16);
+    margin-bottom: 30rpx;
+  }
+}
 
-		&:after {
-			display: none;
-		}
-	}
+.share-btn {
+  margin: 0;
+  height: 80rpx;
+  width: 312rpx;
+  border-radius: 200rpx;
+  color: #fff;
+  border: 1px solid #07c160;
+  background-color: #07c160 !important;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+  font-weight: bold;
 
-	.section-summary {
-		height: 126rpx;
-		color: #999999;
+  &:after {
+    display: none;
+  }
+}
 
-		.number {
-			font-weight: bold;
-			font-size: 30rpx;
-			color: #000;
-			line-height: 50rpx;
-			margin-bottom: 10rpx;
-		}
+.section-summary {
+  height: 126rpx;
+  color: #999999;
 
-		.divider {
-			width: 1rpx;
-			height: 58rpx;
-			background-color: #f3f3f3;
-			align-self: center;
-		}
-	}
+  .number {
+    font-weight: bold;
+    font-size: 30rpx;
+    color: #000;
+    line-height: 50rpx;
+    margin-bottom: 10rpx;
+  }
 
-	.bar {
-		height: 48rpx;
-		padding: 0 14rpx;
-		background: #f3f3f3;
-		font-size: 28rpx;
-		color: #000;
-		font-weight: bold;
-		border-radius: 8rpx 8rpx 8rpx 8rpx;
-	}
+  .divider {
+    width: 1rpx;
+    height: 58rpx;
+    background-color: #f3f3f3;
+    align-self: center;
+  }
+}
 
-	.h4 {
-		display: flex;
-		align-items: center;
-		gap: 20rpx;
-		position: relative;
-		font-weight: 800;
-		font-size: 36rpx;
-		color: #000000;
-		line-height: 50rpx;
-		padding-left: 18rpx;
-		margin-bottom: 22rpx;
+.bar {
+  height: 48rpx;
+  padding: 0 14rpx;
+  background: #f3f3f3;
+  font-size: 28rpx;
+  color: #000;
+  font-weight: bold;
+  border-radius: 8rpx 8rpx 8rpx 8rpx;
+}
 
-		&:before {
-			position: absolute;
-			content: "";
-			width: 8rpx;
-			left: 0;
-			height: 32rpx;
-			background: #ff8c00;
-			border-radius: 4rpx 4rpx 4rpx 4rpx;
-		}
-	}
+.h4 {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  position: relative;
+  font-weight: 800;
+  font-size: 36rpx;
+  color: #000000;
+  line-height: 50rpx;
+  padding-left: 18rpx;
+  margin-bottom: 22rpx;
 
-	.cell-item {
-		min-width: 120rpx;
-		padding: 6rpx 10rpx 10rpx 0;
-		font-size: 24rpx;
-	}
+  &:before {
+    position: absolute;
+    content: "";
+    width: 8rpx;
+    left: 0;
+    height: 32rpx;
+    background: #ff8c00;
+    border-radius: 4rpx 4rpx 4rpx 4rpx;
+  }
+}
 
-	.leader-item {
-		font-size: 32rpx;
+.cell-item {
+  min-width: 120rpx;
+  padding: 6rpx 10rpx 10rpx 0;
+  font-size: 24rpx;
+}
 
-		.img-box {
-			border-radius: 999px;
-			background: #ffffff;
-			margin-right: 30rpx;
-			overflow: hidden;
-		}
+.leader-item {
+  font-size: 32rpx;
 
-		.img {
-			display: block;
-			width: 120rpx;
-			height: 120rpx;
-			background: #f5f5f5;
-		}
-	}
+  .img-box {
+    border-radius: 999px;
+    background: #ffffff;
+    margin-right: 30rpx;
+    overflow: hidden;
+  }
 
-	.member-item {
-		// font-size: 32rpx;
-		margin: 0 36rpx 16rpx 0;
-		&:nth-child(4n){
-			margin-right: 0;
-		}
-		.number {
-			font-weight: bold;
-			font-size: 30rpx;
-			color: #12012070;
-			margin-right: 20rpx;
-		}
+  .img {
+    display: block;
+    width: 120rpx;
+    height: 120rpx;
+    background: #f5f5f5;
+  }
+}
 
-		.name {
-			text-align: left;
-			margin-left: 30rpx;
-		}
+.member-item {
+  // font-size: 32rpx;
+  margin: 0 36rpx 16rpx 0;
+  &:nth-child(4n) {
+    margin-right: 0;
+  }
+  .number {
+    font-weight: bold;
+    font-size: 30rpx;
+    color: #12012070;
+    margin-right: 20rpx;
+  }
 
-		.score {
-			font-weight: bold;
-			font-size: 24rpx;
-			color: #000000;
-		}
+  .name {
+    text-align: left;
+    margin-left: 30rpx;
+  }
 
-		.img {
-			border-radius: 999px;
-			display: block;
-			width: 120rpx;
-			height: 120rpx;
-			background: #f5f5f5;
-		}
-	}
+  .score {
+    font-weight: bold;
+    font-size: 24rpx;
+    color: #000000;
+  }
 
-	.section-card {
-		position: relative;
-		z-index: 1;
-		padding: 34rpx 34rpx 0;
-		.img {
-			display: block;
-			width: 200rpx;
-			height: 200rpx;
-			background: #f5f5f5;
-			border-radius: 16rpx 16rpx 16rpx 16rpx;
-		}
+  .img {
+    border-radius: 999px;
+    display: block;
+    width: 120rpx;
+    height: 120rpx;
+    background: #f5f5f5;
+  }
+}
 
-		.name {
-			font-weight: 800;
-			font-size: 36rpx;
-			color: #000000;
-			line-height: 50rpx;
-			margin-top: 16rpx;
-			margin-bottom: 18rpx;
-		}
+.section-card {
+  position: relative;
+  z-index: 1;
+  padding: 34rpx 34rpx 0;
+  .img {
+    display: block;
+    width: 200rpx;
+    height: 200rpx;
+    background: #f5f5f5;
+    border-radius: 16rpx 16rpx 16rpx 16rpx;
+  }
 
-		.text {
-			font-weight: 500;
-			font-size: 24rpx;
-			line-height: 32rpx;
-		}
-	}
+  .name {
+    font-weight: 800;
+    font-size: 36rpx;
+    color: #000000;
+    line-height: 50rpx;
+    margin-top: 16rpx;
+    margin-bottom: 18rpx;
+  }
 
-	.h2 {
-		font-size: 32rpx;
-		font-weight: 600;
-	}
+  .text {
+    font-weight: 500;
+    font-size: 24rpx;
+    line-height: 32rpx;
+  }
+}
 
-	.cell {
-		line-height: 47rpx;
+.h2 {
+  font-size: 32rpx;
+  font-weight: 600;
+}
 
-		.label {
-			width: 174rpx;
-			color: #66768a;
-		}
+.cell {
+  line-height: 47rpx;
 
-		.value {
-			color: #212121;
-			line-height: 36rpx;
-			width: 450rpx;
-		}
-	}
+  .label {
+    width: 174rpx;
+    color: #66768a;
+  }
 
-	.section-bottom {
-		position: fixed;
-		bottom: 30rpx;
-		width: 100%;
-		z-index: 10;
-		padding: 0 30rpx 20rpx;
-		gap: 25px;
+  .value {
+    color: #212121;
+    line-height: 36rpx;
+    width: 450rpx;
+  }
+}
 
-		::v-deep {
-			.u-button {
-				margin: 0;
-			}
-		}
-	}
+.section-bottom {
+  position: fixed;
+  bottom: 30rpx;
+  width: 100%;
+  z-index: 10;
+  padding: 0 30rpx 20rpx;
+  gap: 25px;
 
-	.u-border-left {
-		border-color: #f3f3f3;
-	}
+  ::v-deep {
+    .u-button {
+      margin: 0;
+    }
+  }
+}
 
-	.empty-container {
-		min-height: 100vh;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		padding-bottom: 160rpx;
-	}
-	
+.u-border-left {
+  border-color: #f3f3f3;
+}
+
+.empty-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-bottom: 160rpx;
+}
 </style>

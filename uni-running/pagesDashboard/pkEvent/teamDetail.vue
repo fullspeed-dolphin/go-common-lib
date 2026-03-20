@@ -191,6 +191,11 @@ function getEventInfo() {
   console.log('=====eventID====',eventID)
   request.get(`/event-api/online_events/${eventID.value}`).then((res) => {
     eventInfo.value = res;
+
+    store.commit('set', {
+      type: 'pkEventTheme',
+      data: res.color_config
+    })
   });
 }
 
