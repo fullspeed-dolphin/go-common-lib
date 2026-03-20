@@ -70,7 +70,7 @@
 			<button class="join-btn" @click="goJoinClub">加入俱乐部</button>
 		</view>
 
-		<tabbar type="event" />
+		<!-- <tabbar type="event" /> -->
 	</view>
 </template>
 
@@ -81,7 +81,7 @@ import { useStore } from "vuex";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
-import tabbar from "@/components/tabBar.vue";
+// import tabbar from "@/components/tabBar.vue";
 import { useShare } from "@/composables/useShare.js";
 
 // Vuex store

@@ -11,7 +11,9 @@ export default createStore({
 			album_pageSize: 60,
 			album_data: [],
 			album_total: 0,
-			album_info: {}
+			album_info: {},
+			// 战队活动主题
+			pkEventTheme: {}
 		}
 	},
 	mutations: {
@@ -64,6 +66,5 @@ export default createStore({
 				throw error
 			}
 		},
-		
 	}
 })

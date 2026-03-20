@@ -1,5 +1,6 @@
 <template>
 	<view>
+		<u-navbar autoBack placeholder  title="活动相册" />
 		<section class="section-search u-flex">
 			<u-search v-model="searchTxt" @search="refreshList" placeholder="请输入赛事名称" shape="round" bgColor="#fff"
 				borderColor="#FF8C00" :showAction="false"></u-search>

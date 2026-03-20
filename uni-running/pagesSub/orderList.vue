@@ -1,7 +1,8 @@
 <template>
 	<view class="page">
+		<u-navbar title="我的订单" bgColor="#fff"></u-navbar>
 		<!-- 分类标签 -->
-		<view class="tab-container">
+		<view class="tab-container" :style="`top:${statusBarHeight+50}px;`">
 			<view class="category-tags">
 				<view class="tags-inner">
 					<view class="tag-slider" :style="sliderStyle" :class="sliderAnimClass"></view>
@@ -312,7 +313,7 @@ const payOrder = (item) => {
 		},
 	});
 };
-
+const statusBarHeight = ref(uni.getSystemInfoSync().statusBarHeight)
 onLoad(() => {
 	initTabRects();
 });
@@ -392,7 +393,7 @@ defineOptions({
 }
 
 .content-wrapper {
-	padding-top: 100rpx;
+	padding-top: 260rpx;
 }
 
 .order-list {

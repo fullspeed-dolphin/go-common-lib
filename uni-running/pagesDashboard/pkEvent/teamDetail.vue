@@ -1,4 +1,6 @@
 <template>
+  <view>
+   <u-navbar title="战队详情" placeholder></u-navbar>
 	<mescroll-body ref="mescrollRef" @init="mescrollInit" :down="{ use: false }" @down="downCallback" @up="getList" :top="0">
   <view class="">
     <section class="team-header">
@@ -108,14 +110,15 @@
   <div class="hr100" style="height:120rpx;"></div>
   <section v-if="isLoadedPage" class="share-btn-wrapper">
     <block v-if="isShowShareBtn">
-      <button class="main-btn" style="background:#07C160" open-type="share">邀请好友加入</button>
+      <view @click="showShareBtn" class="main-btn" style="background:#07C160;text-align: center;">邀请好友加入</view>
+      <!-- <button class="main-btn" style="background:#07C160" open-type="share">邀请好友加入</button> -->
     </block>
     
-    <button v-if="!userStatusInfo.in_team" class="main-btn" @click="joinTeam()">加入战队</button>
+    <button v-if="!userStatusInfo.in_team" class="main-btn" :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }" @click="joinTeam()">加入战队并报名</button>
 
     <!-- 加入任何一个战队后，不可加入其他战队 -->
     <block v-if="userStatusInfo.in_team">
-      <button v-if="isNoSignUpEvent" class="main-btn" @click="goToSignEvent">立即报名</button>
+      <button v-if="isNoSignUpEvent" class="main-btn" :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }" @click="goToSignEvent">立即报名</button>
       <!-- 只在当前team 成员可退出，活动进行中禁止退出 -->
       <block v-if="userStatusInfo.team_info.id === teamID && !userStatusInfo.is_team_leader && !isEventActive">
         <button class="main-btn" style="background:#999" @click="leaveTeam(detailInfo)">退出战队</button>
@@ -126,15 +129,18 @@
 	<button v-if="!isShowShareBtn" class="share-btn flex-center" :class="{ active: isScroll }" open-type="share">
 		<u-icon name="share" color="#fff" size="18"></u-icon>
 	</button>
-	
-	<UserLogin ref="refUserLogin" @success="onLoginSuccess" />
+
   <!-- 套餐列表 -->
   <up-popup :show="isShowModal" @close="close" overlayOpacity="1" :safeAreaInsetBottom="false" bgColor="#fff" mode="bottom" closeable>
-    <div class="flex-center b" style="height:90rpx;font-size:32rpx;">完善信息</div>
+    <div class="flex-center b" style="height:90rpx;font-size:32rpx;">选择套餐</div>
     <scroll-view scroll-y style="height: 90vh;width:100vw;overflow-y: auto;background: #fff;">
       <pkEventForm :teamID="teamID"/>
     </scroll-view>
   </up-popup>
+
+  <Share ref="refShare" class="qrcode"/>
+  <UserLogin ref="refUserLogin" @success="onLoginSuccess" />
+  </view>
 </template>
 
 <script setup>
@@ -150,10 +156,13 @@ import dayjs from "dayjs";
 
 import UserLogin from "@/components/UserLogin.vue";
 import pkEventForm from "@/pagesDashboard/pkEvent/pkEventForm.vue";
+// import SharePoster from "./SharePoster.vue"
+import Share from "./Share.vue"
 import { useStore } from "vuex";
 
 const store = useStore();
 const userInfo = computed(() => store.state.userInfo);
+const pkEventTheme = computed(() => store.state.pkEventTheme);
 
 const refUserLogin = ref(null);
 
@@ -179,8 +188,14 @@ const isEventActive = computed(() => {
   return now.isAfter(dayjs(eventInfo.value.start_time)) && now.isBefore(dayjs(eventInfo.value.end_time));
 });
 function getEventInfo() {
+  console.log('=====eventID====',eventID)
   request.get(`/event-api/online_events/${eventID.value}`).then((res) => {
     eventInfo.value = res;
+
+    store.commit('set', {
+      type: 'pkEventTheme',
+      data: res.color_config
+    })
   });
 }
 
@@ -297,10 +312,10 @@ const isShowShareBtn = computed(() => {
 });
 
 onLoad((options) => {
-  console.log("options", options);
+  console.log("======options=======", options);
   
   teamID.value = options.teamId || options.id;
-  eventID.value = options.eventId;
+  eventID.value = options.eventId || options.id;
 
 	if (!userInfo.value.id) {
 		nextTick(() => {
@@ -315,6 +330,7 @@ function getUserData() {
 }
 
 onShow(() => {
+  console.log("=======页面显示了===")
   if (!teamID.value) return;
 
   getDetailInfo();
@@ -359,7 +375,11 @@ function close() {
   isShowModal.value = false;
 }
 function goToSignEvent() {
-	uni.$u.route("pagesDashboard/pkEvent/pkEventForm", { id: eventID.value });
+	uni.$u.route("pagesDashboard/pkEvent/packageList", { 
+    id: eventID.value,
+    eventId: eventID.value,
+    teamId: teamID.value,
+  });
 }
 
 function joinTeam() {
@@ -426,6 +446,25 @@ const handleTabChange = (index) => {
 const handleEdit = () => {
   uni.$u.route("pagesDashboard/pkEvent/teamForm");
 };
+
+
+// 弹出分享按钮
+	const refShare = ref(null);
+  
+	const showShareBtn = () =>{
+		refShare.value.open(
+    //   {
+    //   imgUrl:detailInfo.value.team_avatar_url,
+    //   title:detailInfo.value.team_name,
+    //   time:userInfo.value.nickname+'邀请你加入团队',
+    // },
+    {
+			avatar_url:detailInfo.value.team_avatar_url,
+			name:detailInfo.value.team_name,
+			establish_time:userInfo.value.nickname+'邀请你加入团队',
+			},
+    `pagesDashboard/pkEvent/teamDetail?id=${teamID.value}&eventId=${eventID.value}`)
+	}
 </script>
 
 <style lang="scss" scoped>
@@ -452,7 +491,7 @@ const handleEdit = () => {
 .header-content {
   position: relative;
   z-index: 1;
-  padding: 86rpx 50rpx 30rpx;
+  padding: 70px 50rpx 30rpx;
   background: linear-gradient(to bottom, rgba(255,255,255,.7) 60%, #f5f5f5);
   .team-avatar {
     width: 120rpx;
@@ -782,4 +821,5 @@ const handleEdit = () => {
 			transform: translate(100rpx);
 		}
 	}
+ 
 </style>

@@ -1,5 +1,6 @@
 <template>
 	<view style="padding-bottom: 100rpx;padding-top:20rpx;">
+		<u-navbar autoBack placeholder  title="入驻摄影师" />
 		<view v-if="submitSuccessfully" class="flex-col-center" style="padding-top:200rpx;">
 			<image style="width:300rpx;height:400rpx;" src="/static/images/wechat_2025-11-29_151550_391.min.png" mode="aspectFill"></image>
 			<view class="" style="font-weight: 500;

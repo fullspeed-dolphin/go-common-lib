@@ -1,6 +1,6 @@
 <template>
   <view class="">
-    <u-navbar autoBack bgColor="transparent" placeholder title="运动截图打卡"></u-navbar>
+    <u-navbar autoBack placeholder title="运动截图打卡"></u-navbar>
 
     <block v-if="pageIndex === 0 || !ruleForm.picture">
       <section class="u-pl-30 u-pt-40" style="margin-bottom: 140rpx;">
@@ -40,11 +40,12 @@
         class="rule-link flex-center">
         打卡规则
       </view>
-      <view class="" style="font-size: 24rpx;color: #C9CCD1;margin-top: 90rpx;padding-left:34rpx; line-height: 34rpx;text-align: left;">
+      <view class="" style="font-size: 24rpx;color: #E53935;margin-top: 90rpx;padding-left:34rpx; line-height: 34rpx;text-align: left;">
         <view>1. 每日打卡即可获跑币，每日上限 100 个跑币(1km=10 跑币)。</view>
         <view>2. 截图需清晰显示时间+类型+数据(跑步/健走≥1km)。 </view>
         <view>3. 当日运动当日23:59前通过小程序上传，逾期无效。 </view>
         <view>4. 盗用/篡改截图将取消权益并记录违规。</view>
+        <view>5. 不提供非技术原因补录历史数据的服务。</view>
       </view>
       <view class="tac" style="font-size: 16rpx;color: #99A1AF;margin-top: 40rpx;">
         <text style="color: #E53935;">安全提示：</text> 身体健康者参与，不适即停，风险自担； 选安全场地，避恶劣天气。

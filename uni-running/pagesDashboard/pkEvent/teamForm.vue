@@ -1,5 +1,6 @@
 <template>
   <view class="form-page">
+    <u-navbar autoBack placeholder  title="创建战队" />
     <up-form :model="form" ref="uForm" :rules="rules" labelPosition="top" labelWidth="auto">
       <view class="card-section logo-card">
         <view class="flex-center">
@@ -51,7 +52,8 @@ border: 2rpx solid #E2E8F0;">
     </up-form>
 
     <view class="submit-wrapper">
-      <u-button type="primary" color="#ff5c5c" shape="circle" customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;"
+      <u-button type="primary" :color="`linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})`"
+         shape="circle" customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;"
         @click="submitForm()">
         立即创建战队
       </u-button>
@@ -67,6 +69,11 @@ import PickerMap from "@/components/common/PickerMap.vue";
 import PickerTime from "@/components/common/PickerTime.vue";
 import PickerCell from "@/components/common/PickerCell.vue";
 import request from "@/utils/request.js";
+
+import { useStore } from "vuex";
+const store = useStore();
+const userInfo = computed(() => store.state.userInfo);
+const pkEventTheme = computed(() => store.state.pkEventTheme);
 
 const uForm = ref(null);
 const activetyId = ref(""); // 活动ID

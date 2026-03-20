@@ -5,9 +5,8 @@
         <view class="user-box">
           <view class="u-flex-y-center">
             <view class="img-box" @click="handleUserClick">
-              <image class="avatar" :src="
-                  userInfo.avatar_url ||
-                  'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
+              <image class="avatar" :src="userInfo.avatar_url ||
+                'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
                 " mode="aspectFill"></image>
               <view class="gender flex-center">
                 <u-icon v-if="userInfo.gender === 1" color="#409eff" name="man" size="20"></u-icon>
@@ -28,7 +27,7 @@
                 <view @click="routeTo('/pagesSub/runCoin/myCoin')" class="coin-pill">
                   <image class="coin-icon" src="/static/images/coin.png" mode="aspectFill"></image>
                   <text class="coin-label">我的跑币:</text>
-                  <text class="coin-value">{{coinInfo.fscoin}}</text>
+                  <text class="coin-value">{{ coinInfo.fscoin }}</text>
                   <u-icon name="arrow-right" color="#e65100" size="12"></u-icon>
                 </view>
               </block>
@@ -44,7 +43,7 @@
       <view class="section-box">
         <u-cell title="我的订单" class="nav-cell" @click="routeTo(`pagesSub/orderList`)" :border="false" isLink>
           <template #icon>
-						<view class="nav-icon iconfont icon-dingdan"></view>
+            <view class="nav-icon iconfont icon-dingdan"></view>
           </template>
         </u-cell>
         <!-- <u-cell title="我的跑币" class="nav-cell" @click="routeTo('/pagesSub/runCoin/myCoin')" :border="false" isLink>
@@ -54,23 +53,23 @@
 					</template>
 				</u-cell> -->
         <u-cell title="全速俱乐部" class="nav-cell" @click="
-            routeTo(
-              `pagesSub/runningTeam/teamDetail?from=mine&group_id=${userInfo.running_group}`
-            )
+          routeTo(
+            `pagesSub/runningTeam/teamDetail?from=mine&group_id=${userInfo.running_group}`
+          )
           " :border="false" isLink>
           <template #icon>
-						<view class="nav-icon iconfont icon-baomingmingdan"></view>
+            <view class="nav-icon iconfont icon-baomingmingdan"></view>
           </template>
         </u-cell>
         <u-cell title="报名卡" class="nav-cell" @click="routeTo('/pagesSub/registrationCard/list')" :border="false" isLink>
           <template #icon>
-						<view class="nav-icon iconfont icon-baomingka1"></view>
+            <view class="nav-icon iconfont icon-baomingka1"></view>
           </template>
         </u-cell>
 
         <u-cell title="智能设备" class="nav-cell" @click="routeTo('/pagesSub/device/deviceList')" :border="false" isLink>
           <template #icon>
-						<view class="nav-icon iconfont icon-zhinengshoubiao"></view>
+            <view class="nav-icon iconfont icon-zhinengshoubiao"></view>
           </template>
         </u-cell>
 
@@ -81,41 +80,34 @@
 					</template>
 				</u-cell> -->
 
-        <view class="service-cell u-cell u-cell__body" @click="showLoading()">
-          <button class="u-reset-button" open-type="contact">
-            <view class="flex-row" style="width: 100%">
-              <view class="u-flex-y-center flex-1 service-content">
-                <view class="icon">
-									<view class="nav-icon iconfont icon-lianxikefu"></view>
-                </view>
-                <text class="service-text">联系客服</text>
-              </view>
-              <u-icon name="arrow-right" color="#909399" size="26rpx"></u-icon>
-            </view>
-          </button>
-        </view>
+        <u-cell title="联系客服" class="nav-cell" @click="openWeComChat()" :border="false" isLink>
+          <template #icon>
+            <view class="nav-icon iconfont icon-lianxikefu"></view>
+          </template>
+        </u-cell>
 
         <u-cell title="现场签到" class="nav-cell" @click="routeTo('/pagesMine/PunchEvent')" :border="false" isLink>
           <template #icon>
-						<view class="nav-icon iconfont icon-qiandao_daka"></view>
+            <view class="nav-icon iconfont icon-qiandao_daka"></view>
           </template>
         </u-cell>
 
         <u-cell title="全速之家" class="nav-cell" @click="routeTo('/pagesMine/toolkit/UserRole')" :border="false" isLink>
           <template #icon>
-						<view class="nav-icon iconfont icon-zhuye"></view>
+            <view class="nav-icon iconfont icon-zhuye"></view>
           </template>
         </u-cell>
 
-        <u-cell v-if="isReleaseVersion()" title="关注全速体育" class="nav-cell" @click="openOfficialAccount" :border="false" isLink>
+        <u-cell v-if="isReleaseVersion()" title="关注全速体育" class="nav-cell" @click="openOfficialAccount" :border="false"
+          isLink>
           <template #icon>
-						<view class="nav-icon iconfont icon-weixin"></view>
+            <view class="nav-icon iconfont icon-weixin"></view>
           </template>
         </u-cell>
 
-				<u-cell title="关于我们" class="nav-cell" @click="routeTo('/pagesSub/settings/aboutUs')" :border="false" isLink>
+        <u-cell title="关于我们" class="nav-cell" @click="routeTo('/pagesSub/settings/aboutUs')" :border="false" isLink>
           <template #icon>
-						<view class="nav-icon iconfont icon-guanyuwomen"></view>
+            <view class="nav-icon iconfont icon-guanyuwomen"></view>
           </template>
         </u-cell>
       </view>
@@ -205,7 +197,7 @@ const routeTo = (link) => {
 
 const handleUserClick = () => {
   if (!userInfo.value.id) {
-    pendingAction.value = () => refAccessUser.value.open();
+    // pendingAction.value = () => refAccessUser.value.open();
     return refUserLogin.value.open();
   }
 
@@ -219,11 +211,6 @@ const logout = () => {
     success: (res) => {
       if (res.confirm) {
         clearUserInfo();
-        // setTimeout(() => {
-        // 	uni.redirectTo({
-        // 		url: '/pagesSub/login'
-        // 	})
-        // }, 200)
         uni.$u.toast("退出登录成功");
       } else if (res.cancel) {
         console.log("用户点击取消");
@@ -253,6 +240,35 @@ const openOfficialAccount = () => {
   uni.showToast({
     title: "仅支持微信小程序",
     icon: "none",
+  });
+  // #endif
+};
+
+// 联系客服
+const openWeComChat = () => {
+  uni.showLoading({
+    mask: true,
+  });
+
+  setTimeout(() => {
+    uni.hideLoading();
+  }, 300);
+  // #ifdef MP-WEIXIN
+  wx.openCustomerServiceChat({
+    extInfo: {
+      url: "https://work.weixin.qq.com/kfid/kfcb41efa532f58830b"
+    },
+    corpId: 'wwaac238486eb8781e',
+    onOpen: (res) => {
+      console.log('success', res);
+    },
+    onError: (err) => {
+      console.error('fail', err);
+      uni.showModal({
+        content: '客服系统繁忙，请稍后重试或拨打热线电话',
+        showCancel: false
+      });
+    }
   });
   // #endif
 };
@@ -363,8 +379,11 @@ const openOfficialAccount = () => {
   height: 34rpx;
   display: block;
   flex-shrink: 0;
-	font-weight: 600;
-	width: 43rpx; height: 34rpx;font-size:38rpx;color:#FF8C00;
+  font-weight: 600;
+  width: 43rpx;
+  height: 34rpx;
+  font-size: 38rpx;
+  color: #FF8C00;
 }
 
 .user-box {

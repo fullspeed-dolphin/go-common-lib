@@ -22,11 +22,11 @@
         <view class="subtitle">{{ detailInfo?.event_subtitle }}</view>
 
         <view style="display:flex;align-items:center;justify-content:space-between;font-size:24rpx;">
-          <view v-if="detailInfo?.event_description" class="start-time flex-center" style="margin:0;width:auto;padding: 0 24rpx;">
+          <view v-if="detailInfo?.event_description" class="start-time flex-center" :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }" style="margin:0;width:auto;padding: 0 24rpx;">
             <text style="margin-right:8rpx;">🔥</text>
             <text class="time-text">{{detailInfo?.event_description}}</text>
           </view>
-          <view class="start-time flex-center" style="margin:0;">
+          <view class="start-time flex-center" style="margin:0;" :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }">
             <view class="iconfont icon-riqi u-mr-10"></view>
             <text class="time-text">{{detailInfo?.start_time}} 开跑</text>
           </view>
@@ -89,6 +89,8 @@
     	<view class="iconfont flex-center icon-lijidaka u-mr-10" style="color:#fff;font-size:42rpx;"></view>
     	立即打卡
     </view>
+
+    <PersonalRecord v-if="userStatusInfo.in_team" :activetyId="activetyId" />
 		
     <!-- 排行榜 -->
     <view class="tab-container">
@@ -155,7 +157,7 @@
       </template>
       <!-- 战队排行榜 -->
       <template v-else>
-        <view v-for="(item, index) in rankList" :key="item.id" class="rank-item" @click="goto('pagesDashboard/pkEvent/teamDetail?teamId=' + item.id)">
+        <view v-for="(item, index) in rankList" :key="item.id || index" class="rank-item" @click="goto('pagesDashboard/pkEvent/teamDetail?teamId=' + item.id)">
           <view class="rank-number flex-center">
             {{ item.rank <= 3 ? 'NO.' + item.rank : item.rank }}
           </view>
@@ -167,7 +169,7 @@
           <view class="user-info">
             <view class="user-name">{{ item.team_name }}</view>
             <view class="user-time">组别：{{ item.team_goal_km }}KM</view>
-            <view class="user-time">{{ item.current_members }}人 | 完成率 {{ item.team_completion_rate }}%</view>
+            <view class="user-time">{{ item.current_members }}人 | 完成率 {{ Number(item.team_completion_rate).toFixed(2) }}%</view>
           </view>
           <view class="progress">
             <text class="progress-percent">
@@ -183,7 +185,7 @@
 		
 		<div class="hr100" style="height:120rpx;"></div>
     <view v-if="isSignUpEvent" class="join-btn-wrapper flex-center">
-      <u-button class="join-btn" color="#ff5c5c" color1="linear-gradient(64deg, #C70036 0%, #D2003C 20%, #DD0043 40%, #E90249 60%, #F41450 80%, #FF2056 100%)"
+      <u-button class="join-btn" :color="`linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})`"
         customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;letter-spacing: 1px;font-size: 34rpx;" :disabled="detailInfo?.status !== 'act'" @click="SignUpEvent()">
         立即报名参赛
       </u-button>
@@ -194,7 +196,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, computed } from "vue";
 import { onLoad, onShow, onReachBottom, onPageScroll } from "@dcloudio/uni-app";
 
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
@@ -205,10 +207,12 @@ import request from "@/utils/request.js";
 import dayjs from "dayjs";
 
 import UserLogin from "@/components/UserLogin.vue";
-import { useStore } from "vuex";
+import PersonalRecord from "./personalRecord.vue";
 
+import { useStore } from "vuex";
 const store = useStore();
 const userInfo = computed(() => store.state.userInfo);
+const pkEventTheme = computed(() => store.state.pkEventTheme);
 
 const refUserLogin = ref(null);
 
@@ -258,7 +262,7 @@ function changeTab(index) {
   refreshList();
 }
 
-const init = () => {
+const getEventData = () => {
   request
     .get(`/event-api/online_events/${activetyId.value}`)
     .then((res) => {
@@ -276,6 +280,11 @@ const init = () => {
       }
 
       detailInfo.value = res;
+
+      store.commit('set', {
+        type: 'pkEventTheme',
+        data: res.color_config
+      })
     });
 };
 
@@ -328,8 +337,17 @@ const SignUpEvent = () => {
     uni.$u.route("pagesDashboard/pkEvent/teamList", { id: activetyId.value });
     return;
   }
-  uni.$u.route("pagesDashboard/pkEvent/pkEventForm", { id: activetyId.value });
+  
+  goToSignEvent()
 };
+
+function goToSignEvent(item) {
+	uni.$u.route("pagesDashboard/pkEvent/packageList", { 
+    id: activetyId.value,
+    eventId: activetyId.value,
+    teamId: item?.id || "",
+  });
+}
 
 // 跳转
 const goto = (url) => {
@@ -355,7 +373,7 @@ onLoad((options) => {
 });
 
 onShow(() => {
-  init();
+  getEventData();
   getUserStatus();
   getMyEvents();
   getuserCheckedInfo();
@@ -423,11 +441,9 @@ const switchTeamSort = (sort) => {
 // 战队显示字符
 const teamRankValue = (item) => {
   if (teamSortBy.value === 'distance') return item.total_distance_km + 'km';
-  if (teamSortBy.value === 'completion') return item.team_completion_rate + '%';
+  if (teamSortBy.value === 'completion') return Number(item.team_completion_rate).toFixed(2) + '%';
   return item.current_members + '人';
 };
-
-
 </script>
 
 <style lang="scss" scoped>
@@ -582,7 +598,7 @@ const teamRankValue = (item) => {
 /* 功能按钮组 */
 .section-func-buttons {
   display: flex;
-  padding: 40rpx 30rpx;
+  padding: 20rpx 30rpx;
   background-color: white;
   border-radius: 24rpx;
   margin: 0 30rpx 30rpx;

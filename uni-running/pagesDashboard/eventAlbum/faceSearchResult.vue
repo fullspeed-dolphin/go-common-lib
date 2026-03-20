@@ -18,7 +18,6 @@
 		</view>
 		<!-- 轮播图 -->
 		<PreviewMedia ref="refPreviewImage"/>
-		<!-- <qPreviewImage ref="refPreviewImage" :urls="image750List" :originalUrls="imageList"></qPreviewImage> -->
 	</view>
 </template>
 
@@ -27,7 +26,6 @@ import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { useShare } from "@/composables/useShare.js";
 import PreviewMedia from "./components/PreviewMedia.vue"
-import qPreviewImage from "./components/q-previewImage/components/q-previewImage/q-previewImage.vue"
 import store from '../../utils/store';
 
 // 分享配置

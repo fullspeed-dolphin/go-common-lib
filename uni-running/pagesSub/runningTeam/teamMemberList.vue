@@ -1,5 +1,6 @@
 <template>
   <view class="">
+    <u-navbar autoBack placeholder title="跑团成员" />
     <mescroll-body @init="mescrollInit" @down="downCallback" @up="getList" top="0">
       <view class="member-item flex-start panel" v-for="(item, index) in dataList" @click="openMemberDetail(item)" :key="index">
         <view class="img-box">

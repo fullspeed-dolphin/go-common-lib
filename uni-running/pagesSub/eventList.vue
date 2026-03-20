@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <u-navbar autoBack placeholder title="活动列表" />
     <!-- 分类标签 -->
     <view class="section-filter">
       <view class="category-tags">
@@ -253,7 +254,7 @@ onShow(() => {
 
 .section-filter {
   position: fixed;
-  top: 0;
+  top: 88px;
   width: 100%;
   z-index: 10;
   background: #f5f5f5;

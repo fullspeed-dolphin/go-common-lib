@@ -23,8 +23,41 @@ export function formatDistance(meters) {
     return `${Math.round(m)} m`;
   }
   // display with one decimal if < 10km, else no decimal
-  const display = km.toFixed(1);
+  const display = km.toFixed(2);
   return `${display} km`;
+}
+
+/**
+ * 根据米数和秒数计算配速
+ * @param {number} meters - 跑步距离（米）
+ * @param {number} totalSeconds - 跑步总用时（秒）
+ * @returns {string} 配速字符串，格式为 "mm:ss" (分:秒/公里)
+ */
+export function calculatePaceFromMeters(meters, totalSeconds) {
+  if (meters <= 0 || totalSeconds <= 0 || isNaN(meters) || isNaN(totalSeconds)) {
+    return "0:00"; // 或者抛出错误
+  }
+
+  // 1. 将米转换为公里
+  const kilometers = meters / 1000;
+
+  // 2. 计算每公里需要的秒数 (Pace in seconds per km)
+  // 公式：总秒数 / 公里数
+  const secondsPerKm = totalSeconds / kilometers;
+
+  // 3. 将秒数转换为 "分:秒" 格式
+  const minutes = Math.floor(secondsPerKm / 60);
+  const seconds = Math.round(secondsPerKm % 60);
+
+  // 处理秒数进位问题 (例如 59.9 秒 进位为 60 秒 -> 1 分 00 秒)
+  if (seconds === 60) {
+    return `${minutes + 1}’00”`;
+  }
+
+  // 格式化秒数，确保是两位数 (例如 5 变成 "05")
+  const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
+
+  return `${minutes}’${formattedSeconds}”`;
 }
 
 // 将 average_pace（例如 7.29 或字符串）格式化为 7’29” 样式
@@ -108,7 +141,6 @@ export function getPointsSpeed(points) {
   }
 
   let lastArr = []
-  let lastSpeed = 0
   for (let i = 0; i < points.length; i++) {
     let speed = covertSpeed(points[i].speed)
     if (!maxSpeed) {
@@ -127,7 +159,6 @@ export function getPointsSpeed(points) {
     if (!nextSpeed) {
       continue
     }
-    lastSpeed = speed
     if (!lastArr.length) {
       lastArr.push(points[i], nextPoint)
     } else {
@@ -246,6 +277,62 @@ function covertSpeed(ms) {
   }
   const kmh = ms * (60 * 60)
   return parseFloat(String(kmh / 1000)).toFixed(2)
+}
+
+/**
+ * 根据速度生成多段彩色轨迹
+ * @param {Array} points - 原始轨迹点 [{longitude, latitude, speed}, ...] speed 单位 km/h
+ * @returns {Array} - uni-app map 组件需要的 polyline 数组
+ */
+export function generateSpeedPolylines(points) {
+  if (!points || points.length < 2) return [];
+
+  const polylines = [];
+  
+  const speedConfig = [
+    { max: 1.1, color: '#7fba3a' },   // 灰色：<= 1.1 m/s (约 4 km/h)
+    { max: 2.2, color: '#8dc645' },   // 橙色：<= 2.2 m/s (约 8 km/h)
+    { max: 3.3, color: '#9bbd3e' },   // 黄色：<= 3.3 m/s (约 12 km/h)
+    { max: 4.4, color: '#aeb33e' },   // 绿色：<= 4.4 m/s (约 16 km/h)
+    { max: 99,  color: '#c6a636' }    // 蓝色：> 4.4 m/s (冲刺)
+  ];
+
+  // 辅助函数：获取颜色
+  const getColorBySpeed = (speed) => {
+    const covertSpeedVal = covertSpeed(speed);
+    for (let config of speedConfig) {
+      if (covertSpeedVal <= config.max) {
+        return config.color;
+      }
+    }
+    return speedConfig[speedConfig.length - 1].color || '#9bbd3e'; // 默认颜色
+  };
+
+  // 遍历点，每两个点生成一段线
+  for (let i = 0; i < points.length - 1; i++) {
+    const p1 = points[i];
+    const p2 = points[i + 1];
+
+    // 计算这段路的平均速度 (避免单点抖动)
+    // 如果数据源没有速度，这里需要根据 (距离/时间) 自行计算
+    const avgSpeed = (p1.speed + p2.speed) / 2;
+
+    // 过滤掉异常静止点 (例如两个点距离极近但时间差很大，导致速度为0，可选)
+    // if (avgSpeed < 0.5) continue; 
+
+    polylines.push({
+      points: [
+        { longitude: p1.longitude, latitude: p1.latitude },
+        { longitude: p2.longitude, latitude: p2.latitude }
+      ],
+      color: getColorBySpeed(avgSpeed),
+      width: 6,
+      borderColor: '#FFFFFF', // 关键：白色描边，提升对比度
+      borderWidth: 1
+    });
+  }
+
+  return polylines;
 }
 
 // 获取计算地图缩放级别

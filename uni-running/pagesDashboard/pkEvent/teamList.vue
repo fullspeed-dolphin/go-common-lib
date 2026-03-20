@@ -1,7 +1,8 @@
 <template>
   <view class="page">
+    <u-navbar autoBack placeholder  title="战队列表" />
     <section class="section-header flex-col-center ">
-      <view class="section-search u-mb-30" style="width:686rpx;">
+      <view class="section-search u-mb-20" style="width:686rpx;">
         <u-search v-model="searchTxt" @search="refreshList" placeholder="输入战队名称" shape="round" bgColor="#f5f5f5" borderColor="#f5f5f5" :showAction="false"></u-search>
       </view>
       <!-- 分类标签 -->
@@ -18,7 +19,7 @@
 
     <!-- 内容区域 -->
     <view class="content-wrapper">
-      <mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" :top="100">
+      <mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" :top="80">
         <view class="order-list">
           <view class="team-card" v-for="(item, index) in dataList" :key="index" @click="joinTeam(item)">
             <!-- <image :src="item.team_avatar_url" class="avatar" /> -->
@@ -33,7 +34,7 @@
               <view class="leader">队长：{{ item.leader_nickname }}</view>
             </view>
 
-            <view class="join-btn flex-center">
+            <view class="join-btn flex-center" :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }" @click.stop="goToSignEvent(item)">
               加入
             </view>
           </view>
@@ -43,7 +44,8 @@
 
     <view v-if="!userStatusInfo.in_team" class="create-team-wrapper flex-center">
       <u-button class="create-team-btn"
-        color="#ff5c5c"
+        color1="#ff5c5c"
+        :color="`linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})`"
         customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;font-size: 34rpx;letter-spacing: 1px;"
         @click="$u.route('pagesDashboard/pkEvent/teamForm', { id: activetyId })">
         创建战队
@@ -51,9 +53,10 @@
     </view>
     <view v-else-if="!hasSignedUp" class="create-team-wrapper flex-center">
       <u-button class="create-team-btn"
-        color="#ff5c5c"
+        color1="#ff5c5c"
+        :color="`linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})`"
         customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;font-size: 34rpx;letter-spacing: 1px;"
-        @click="$u.route('pagesDashboard/pkEvent/pkEventForm', { id: activetyId })">
+        @click="goToSignEvent()">
         立即报名参赛
       </u-button>
     </view>
@@ -65,12 +68,19 @@ import { ref, computed, watch } from "vue";
 import { onLoad, onShow, onPageScroll, onReachBottom } from "@dcloudio/uni-app";
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 import request from "@/utils/request.js";
-const activetyId = ref(""); // 活动ID
-const searchTxt = ref("");
+
 const { mescrollInit, downCallback, getMescroll } = useMescroll(
   onPageScroll,
   onReachBottom
 );
+
+import { useStore } from "vuex";
+const store = useStore();
+const userInfo = computed(() => store.state.userInfo);
+const pkEventTheme = computed(() => store.state.pkEventTheme);
+
+const activetyId = ref(""); // 活动ID
+const searchTxt = ref("");
 
 const userStatusInfo = ref({});
 function getUserStatus() {
@@ -113,10 +123,6 @@ function joinTeamAPi(item) {
     }); */
 }
 
-function goToSignEvent() {
-	uni.$u.route("pagesDashboard/pkEvent/pkEventForm", { id: activetyId.value });
-}
-
 function joinTeam(item) {
   /* if (!userStatusInfo.value.in_team) {
     uni.showModal({
@@ -133,6 +139,17 @@ function joinTeam(item) {
     return;
   } */
   uni.$u.route(`pagesDashboard/pkEvent/teamDetail?id=${item.id}&eventId=${activetyId.value}`);
+}
+function joinTeamToSign(item) {
+  uni.$u.route(`pagesDashboard/pkEvent/pkEventForm?id=${item.id}&eventId=${activetyId.value}`);
+}
+
+function goToSignEvent(item) {
+	uni.$u.route("pagesDashboard/pkEvent/packageList", { 
+    id: activetyId.value,
+    eventId: activetyId.value,
+    teamId: item?.id || "",
+  });
 }
 
 // Tab 配置
@@ -206,8 +223,6 @@ defineOptions({
 </script>
 
 <style lang="scss" scoped>
-@import "@/styles/tab-animation.scss";
-
 .page {
   min-height: 100vh;
 }
@@ -215,10 +230,9 @@ defineOptions({
   position: fixed;
   width: 100%;
   z-index: 10;
-  top: 0;
+  top: 50px;
   padding: 16rpx 24rpx;
-}
-.tab-container {
+  background: #fff;
 }
 
 .category-tags {

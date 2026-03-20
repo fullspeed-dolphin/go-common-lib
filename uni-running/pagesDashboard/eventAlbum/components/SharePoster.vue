@@ -1,6 +1,6 @@
 
 <template>
-  <up-popup v-if="show" :show="show" @close="close" closeable custom-style="background:rgba(0,0,0,.8);top:0;">
+  <up-popup  :show="show" @close="close" closeable custom-style="background:rgba(0,0,0,.8);top:0;">
     <view class="flex-col-center" style="height:100vh;">
 			<image :src="pictureImage" v-if="pictureImage" show-menu-by-longpress mode="widthFix" style="width: 600rpx"></image>
 			<u-button v-if="pictureImage" type="primary" block shape="circle" @click="$u.toast('长按图片保存到相册')" custom-style="width:500rpx;margin: 40rpx auto 0">

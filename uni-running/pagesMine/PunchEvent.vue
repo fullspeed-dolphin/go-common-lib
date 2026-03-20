@@ -1,5 +1,6 @@
 <template>
   <view class="sign-in-page">
+	<u-navbar autoBack placeholder  title="现场签到" />
     <!-- 活动卡片 -->
     <view v-if="selectedEvent.id" class="panel-info">
       <view class="activity-header" @click="isShowEventModal = true">

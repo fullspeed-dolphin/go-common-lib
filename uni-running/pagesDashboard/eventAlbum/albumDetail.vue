@@ -1,6 +1,7 @@
 <!-- UI 参考 https://m.alltuu.com/album/3102256506/?menu=live -->
 <template>
-	<view class="albumDetail-page" v-if="pageShow">
+	<view class="albumDetail-page" v-show="pageShow">
+		<u-navbar autoBack placeholder  title="详情" />
 		<zPaging ref="paging" use-virtual-list cell-height-mode="fixed" :virtual-list-col="4"
 			:inner-list-style="{'display':'flex','flex-wrap':'wrap'}" fixed-cell-height="180rpx" :default-page-size="60"
 			:force-close-inner-list="true" @virtualListChange="e => virtualList = e" @query="queryList" @scroll="onListScroll">
@@ -58,7 +59,6 @@
 	import {
 		ref,
 		computed,
-		onMounted
 	} from "vue";
 	import {
 		useStore
@@ -67,7 +67,6 @@
 		onLoad,
 		onHide,
 		onShow,
-		onUnload
 	} from "@dcloudio/uni-app";
 	import { useShare, buildPath } from "@/composables/useShare.js";
 	const store = useStore();
@@ -211,9 +210,6 @@
 		console.log("========",options)
 		currentEvent.value = options
 	})
-	onUnload(()=>{
-		console.log("========页面卸载了===")
-	}) 
 	onHide(()=>{
 		console.log("========页面隐藏了===")
 		pageShow.value = false

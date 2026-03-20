@@ -1,5 +1,6 @@
 <template>
   <view>
+	<u-navbar autoBack placeholder  title="活动扫码" />
 		<view class="b" style="font-size: 30rpx;padding: 34rpx 34rpx 0;">选择活动</view>
 		<view v-if="selectedEvent.id" class="panel-info">
 		  <view class="activity-header" @click="isShowEventModal = true">
