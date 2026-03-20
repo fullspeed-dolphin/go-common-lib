@@ -44,7 +44,8 @@
 
     <view v-if="!userStatusInfo.in_team" class="create-team-wrapper flex-center">
       <u-button class="create-team-btn"
-        color="#ff5c5c"
+        color1="#ff5c5c"
+        :color="`linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})`"
         customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;font-size: 34rpx;letter-spacing: 1px;"
         @click="$u.route('pagesDashboard/pkEvent/teamForm', { id: activetyId })">
         创建战队
