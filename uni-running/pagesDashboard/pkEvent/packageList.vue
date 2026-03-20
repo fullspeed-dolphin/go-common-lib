@@ -1,5 +1,5 @@
 <template>
-  <view class="">
+  <view class="" :style="themeStyle">
     <u-navbar autoBack placeholder title="选择套餐" />
       <view class="card-section">
         <view style="font-weight: 800;font-size: 34rpx;color: #0F172A;padding:32rpx;">选择套餐</view>
@@ -74,6 +74,10 @@ import { useStore } from "vuex";
 const store = useStore();
 const userInfo = computed(() => store.state.userInfo);
 const pkEventTheme = computed(() => store.state.pkEventTheme);
+const themeStyle = computed(() => ({
+  '--theme-color': pkEventTheme.value?.solid || '#ff5c5c',
+  '--theme-gradient': `linear-gradient(90deg, ${pkEventTheme.value?.gradient?.[0] || '#ff5c5c'}, ${pkEventTheme.value?.gradient?.[1] || '#ff5c5c'})`,
+}));
 
 const props = defineProps({
   teamID: {
@@ -150,6 +154,7 @@ const goSign = (item) => {
       packageId: item.id,
       eventId: routerParams.value.eventId || routerParams.value.id,
       teamId: routerParams.value.teamId || "",
+      requireCert: item.require_cert || 0,
     })
 };
 const isShowModal = ref(false);
@@ -197,7 +202,7 @@ function itemClick(item, index) {
     position: absolute;
     top: 20rpx;
     right: 20rpx;
-    background: #ff5c5c;
+    background: var(--theme-gradient, #ff5c5c);
     color: #fff;
     font-size: 24rpx;
     padding: 4rpx 16rpx;
@@ -223,7 +228,7 @@ function itemClick(item, index) {
   .target {
     line-height: 48rpx;
     font-size: 32rpx;
-    color: #ff5c5c;
+    color: var(--theme-color, #ff5c5c);
     font-weight: 500;
     margin-bottom: 10rpx;
     display: flex;
@@ -235,18 +240,18 @@ function itemClick(item, index) {
       font-weight: bold;
       font-size: 26rpx;
       color: #ffffff;
-      background: #ff5c5c;
+      background: var(--theme-gradient, #ff5c5c);
       border-radius: 999rpx;
     }
   }
 
   &.active {
     background: #fff1f2;
-    border: 2rpx solid #ff5c5c;
+    border: 2rpx solid var(--theme-color, #ff5c5c);
 
     .iconfont {
       background: #fff;
-      color: #ff5c5c;
+      color: var(--theme-color, #ff5c5c);
     }
   }
 
@@ -364,7 +369,7 @@ function itemClick(item, index) {
       line-height: 60rpx;
       margin: 0 50rpx;
       &.active {
-        border-bottom: 4rpx solid #ff5d5b;
+        border-bottom: 4rpx solid var(--theme-color, #ff5c5c);
       }
     }
   }

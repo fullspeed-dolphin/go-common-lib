@@ -1,5 +1,5 @@
 <template>
-  <view class="">
+  <view :style="themeStyle">
 		<mescroll-body ref="mescrollRef" @init="mescrollInit" :down="{ use: false }" @down="downCallback" @up="getList" :top="0">
     <u-navbar autoBack placeholder :title="detailInfo?.event_name || '活动详情'"></u-navbar>
     <section class="flex-center" style="height: 512rpx;filter1: blur(10px);">
@@ -213,6 +213,10 @@ import { useStore } from "vuex";
 const store = useStore();
 const userInfo = computed(() => store.state.userInfo);
 const pkEventTheme = computed(() => store.state.pkEventTheme);
+const themeStyle = computed(() => ({
+  '--theme-color': pkEventTheme.value?.solid || '#ff5c5c',
+  '--theme-gradient': `linear-gradient(90deg, ${pkEventTheme.value?.gradient?.[0] || '#ff5c5c'}, ${pkEventTheme.value?.gradient?.[1] || '#ff5c5c'})`,
+}));
 
 const refUserLogin = ref(null);
 
@@ -458,7 +462,7 @@ const teamRankValue = (item) => {
 		animation-duration: 1s;
 		 animation-iteration-count: infinite;
 		color: #fff;
-		background: #ff5c5c;
+		background: var(--theme-gradient, #ff5c5c);
 	}
 	@keyframes zoomIn {
 	    0% {
@@ -533,7 +537,7 @@ const teamRankValue = (item) => {
 
     &.active {
       color: #fff;
-      background: #ff5c5c;
+      background: var(--theme-gradient, #ff5c5c);
     }
   }
 }
@@ -557,7 +561,7 @@ const teamRankValue = (item) => {
     width: 242rpx;
     height: 62rpx;
     color: #fff;
-    background: #ff5c5c;
+    background: var(--theme-gradient, #ff5c5c);
     border-radius: 20rpx 20rpx 20rpx 20rpx;
   }
 }
@@ -641,7 +645,7 @@ const teamRankValue = (item) => {
 
 .tab-item.active {
   color: #fff;
-  background: #ff5c5c;
+  background: var(--theme-gradient, #ff5c5c);
 }
 
 .rank-list {
@@ -723,12 +727,12 @@ const teamRankValue = (item) => {
 
   .user-time {
     font-size: 24rpx;
-    color: #ff5c5c;
+    color: var(--theme-color, #ff5c5c);
   }
 
   .progress {
     font-size: 30rpx;
-    color: #ff5c5c;
+    color: var(--theme-color, #ff5c5c);
     font-weight: bold;
     margin-left: 10rpx;
     padding-right: 10rpx;
@@ -782,7 +786,7 @@ const teamRankValue = (item) => {
     border-radius: 999rpx;
     &.active {
       color: #fff;
-      background: #ff5c5c;
+      background: var(--theme-gradient, #ff5c5c);
     }
   }
 }

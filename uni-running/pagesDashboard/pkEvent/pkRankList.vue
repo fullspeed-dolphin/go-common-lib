@@ -1,5 +1,5 @@
 <template>
-  <view class="">
+  <view class="" :style="themeStyle">
     <u-navbar autoBack placeholder  title="排行榜" />
     <mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="loadRankList">
     <section class="honor-rank">
@@ -120,6 +120,14 @@ import { ref, computed } from "vue";
 import { onLoad, onPageScroll, onReachBottom } from "@dcloudio/uni-app";
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 import request from "@/utils/request.js";
+import { useStore } from "vuex";
+
+const store = useStore();
+const pkEventTheme = computed(() => store.state.pkEventTheme);
+const themeStyle = computed(() => ({
+  '--theme-color': pkEventTheme.value?.solid || '#ff5c5c',
+  '--theme-gradient': `linear-gradient(90deg, ${pkEventTheme.value?.gradient?.[0] || '#ff5c5c'}, ${pkEventTheme.value?.gradient?.[1] || '#ff5c5c'})`,
+}));
 
 const PAGE_SIZE = 100;
 const activetyId = ref("");
@@ -352,7 +360,7 @@ const loadRankList = (mescroll) => {
 
     &.active {
       color: #fff;
-      background: #ff5c5c;
+      background: var(--theme-gradient, #ff5c5c);
     }
   }
 }
@@ -367,8 +375,8 @@ const loadRankList = (mescroll) => {
 }
 
 .tab-item.active {
-  color: #ff5c5c;
-  border-bottom: 2rpx solid #ff5c5c;
+  color: var(--theme-color, #ff5c5c);
+  border-bottom: 2rpx solid var(--theme-color, #ff5c5c);
 }
 
 .rank-list {
@@ -448,12 +456,12 @@ const loadRankList = (mescroll) => {
 
   .user-time {
     font-size: 20rpx;
-    color: #ff5c5c;
+    color: var(--theme-color, #ff5c5c);
   }
 
   .progress {
     font-size: 28rpx;
-    color: #ff5c5c;
+    color: var(--theme-color, #ff5c5c);
     font-weight: bold;
     margin-left: 20rpx;
     padding-right: 20rpx;
@@ -503,7 +511,7 @@ const loadRankList = (mescroll) => {
     border-radius: 999rpx;
     &.active {
       color: #fff;
-      background: #ff5c5c;
+      background: var(--theme-gradient, #ff5c5c);
     }
   }
 }

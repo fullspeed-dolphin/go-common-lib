@@ -1,5 +1,5 @@
 <template>
-  <view>
+  <view :style="themeStyle">
    <u-navbar title="战队详情" placeholder></u-navbar>
 	<mescroll-body ref="mescrollRef" @init="mescrollInit" :down="{ use: false }" @down="downCallback" @up="getList" :top="0">
   <view class="">
@@ -163,6 +163,10 @@ import { useStore } from "vuex";
 const store = useStore();
 const userInfo = computed(() => store.state.userInfo);
 const pkEventTheme = computed(() => store.state.pkEventTheme);
+const themeStyle = computed(() => ({
+  '--theme-color': pkEventTheme.value?.solid || '#ff5c5c',
+  '--theme-gradient': `linear-gradient(90deg, ${pkEventTheme.value?.gradient?.[0] || '#ff5c5c'}, ${pkEventTheme.value?.gradient?.[1] || '#ff5c5c'})`,
+}));
 
 const refUserLogin = ref(null);
 
@@ -600,8 +604,8 @@ const handleEdit = () => {
 }
 
 .tab-item.active {
-  color: #ff5c5c;
-  border-bottom: 2rpx solid #ff5c5c;
+  color: var(--theme-color, #ff5c5c);
+  border-bottom: 2rpx solid var(--theme-color, #ff5c5c);
 }
 
 /* 排行榜列表 */
@@ -672,7 +676,7 @@ const handleEdit = () => {
   .leader-tag {
     font-size: 18rpx;
     font-weight: 500;
-    color: #ff5c5c;
+    color: var(--theme-color, #ff5c5c);
     background: #fff0f0;
     padding: 2rpx 10rpx;
     border-radius: 8rpx;
@@ -703,7 +707,7 @@ const handleEdit = () => {
 
   .progress {
     font-size: 28rpx;
-    color: #ff5c5c;
+    color: var(--theme-color, #ff5c5c);
     font-weight: bold;
     margin-left: 20rpx;
     padding-right: 20rpx;
@@ -763,7 +767,7 @@ const handleEdit = () => {
     border-radius: 999rpx;
     &.active {
       color: #fff;
-      background: #ff5c5c;
+      background: var(--theme-gradient, #ff5c5c);
     }
   }
 }
@@ -789,7 +793,7 @@ const handleEdit = () => {
   font-weight: bold;
   letter-spacing: 1px;
   color: #fff;
-  background: #ff5c5c;
+  background: var(--theme-gradient, #ff5c5c);
   border: none;
 
   &::after {
