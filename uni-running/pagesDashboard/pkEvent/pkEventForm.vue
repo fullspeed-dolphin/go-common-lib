@@ -48,9 +48,12 @@
                 <view class="txt">{{ item.package_description }}</view>
                 <view class="target">
                   <view>{{ item.package_subtitle }}</view>
-                  <u-button type="primary" color="#ff5c5c" shape="circle" customStyle="width: 126rpx;height: 52rpx;margin:0;border-radius: 999rpx;" @click="goSign(item)">
+                  <view class="join-btn flex-center" @click.stop="goSign(item)">
+                    加入
+                  </view>
+                  <!-- <u-button type="primary" color="#ff5c5c" shape="circle" customStyle="width: 126rpx;height: 52rpx;margin:0;border-radius: 999rpx;" @click.stop="goSign(item)">
                     去报名
-                  </u-button>
+                  </u-button> -->
                 </view>
               </view>
 
@@ -63,7 +66,40 @@
 
     <up-popup :show="isShowModal" @close="close" overlayOpacity="0.3" :safeAreaInsetBottom="false" bgColor="#fff" mode="bottom" closeable>
         <div class="flex-center b" style="height:90rpx;font-size:32rpx;">{{ comBoDetail.package_name }}</div>
-        <u-tabs :list="tabList" @click="tabClick"></u-tabs>
+        <view class="container">
+          <view class="packHead">
+            <view class="item" :class="currentItemIndex === index ? 'active':''" v-for="(item,index) in tabList" @click="itemClick(item,index)">
+              {{ item.name }}
+            </view>
+          </view>
+          <view class="content">
+            <view v-if="currentItemIndex==0">
+              <view v-if="!comBoDetail.detail">
+                <view class="nodata"  text="暂无详情">暂无详情</view>
+              </view>
+              <view v-else>
+                <image v-for="item in comBoDetail.detail" :src="item"></image>
+              </view>
+            </view>
+            <view v-if="currentItemIndex==1">
+              <view v-if="!comBoDetail.spec">
+                <view class="nodata" text="暂无规格">暂无规格</view>
+              </view>
+              <view v-else>
+                <image :src="comBoDetail.spec"></image>
+              </view>
+            </view>
+            <view v-if="currentItemIndex==2">
+              <view v-if="comBoDetail.video">
+                <video id="myVideo" :src="comBoDetail.video"
+                     enable-danmu danmu-btn controls></video>
+              </view>
+              <view v-else>
+                <view class="nodata" text="暂无视频">暂无视频</view>
+              </view>
+            </view>
+          </view>
+        </view>
       </up-popup>
     <!-- <section class="section-bottom" style="width: 682rpx;margin: 0rpx auto 40rpx;">
       <view class="txt flex-start">
@@ -337,9 +373,12 @@ function getUserStatus() {
 }
 
 // 查看套餐详情
-const comBoDetail = ref({})
+const comBoDetail = ref({
+  detail:"",
+  video:"",
+  spec:""
+})
 function changePackage(item) {
-  // form.value.package_id = id;
   console.log("item-====",item)
   isShowModal.value = true
   comBoDetail.value = item
@@ -352,10 +391,6 @@ const tabList=ref([{
                 }, {
                     name: '视频'
                 }]);
-// tab 点击
-const tabClick = (item) => {
-  console.log('item', item)
-}
 const isFreePackage = computed(() => {
   const pkg = packageList.value.find(i => i.id === form.value.package_id);
   return pkg?.price === 0;
@@ -456,13 +491,19 @@ function wxPay(respay) {
   });
 }
 
-const goSign = (item) => { 
+const goSign = (item) => {
   uni.$u.route("pagesDashboard/pkEvent/personalInfo?id=" + item.id+"&eventId=" + activetyId.value)
 };
 const isShowModal = ref(false);
 // 关闭弹框
 function close() {
   isShowModal.value = false;
+}
+// 
+const currentItemIndex = ref(0);
+function itemClick(item,index) {
+  currentItemIndex.value = index
+  console.log("item",item)
 }
 </script>
 
@@ -534,6 +575,16 @@ function close() {
     margin-bottom: 10rpx;
     display: flex;
     justify-content: space-between;
+    .join-btn {
+      width: 180rpx;
+      height: 64rpx;
+      color: #fff;
+      font-weight: bold;
+      font-size: 26rpx;
+      color: #ffffff;
+      background: #ff5c5c;
+      border-radius: 999rpx;
+    }
   }
 
   &.active {
@@ -646,5 +697,26 @@ function close() {
       }
     }
   }
+}
+.container {
+  .packHead {
+    display:flex;
+    align-items: center;
+    .item {
+      flex:1;
+      text-align: center;
+      margin: 0 50rpx;
+      &.active{
+        border-bottom:2rpx solid #FF5D5B;
+      }
+    }
+  }
+  .nodata {
+    text-align: center;
+    padding: 40rpx 0;
+    color: #999;
+
+  }
+
 }
 </style>
