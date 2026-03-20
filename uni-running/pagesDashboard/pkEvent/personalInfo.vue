@@ -7,21 +7,21 @@
                 <view class="content">
                     <up-form-item label="真实姓名" prop="real_name" required>
                         <view class="flex-start">
-                            <input v-model="form.real_name" class="u-input" @input="validateField('real_name')"
-                                maxlength="50" placeholder-style="color: #64748B;" placeholder="请输入您的真实姓名" />
+                            <input v-model="form.real_name" @input="validateField('real_name')"
+                                maxlength="50" placeholder-style="color: #C8C9CD;" placeholder="请输入您的真实姓名" />
                         </view>
                     </up-form-item>
                     <up-form-item label="性别" prop="sex" required>
                         <view class="flex-start">
-                            <input v-model="form.sex" class="u-input" @input="validateField('real_name')" maxlength="50"
-                                placeholder-style="color: #64748B;" placeholder="请输入您的真实姓名" />
+                            <input v-model="form.sex"  @input="validateField('real_name')" maxlength="50"
+                                placeholder-style="color: #C8C9CD;" placeholder="请输入您的性别" />
                         </view>
                     </up-form-item>
                     <up-form-item label="联系电话" prop="contact_number" required>
                         <view class="flex-start">
-                            <input v-model="form.contact_number" class="u-input"
+                            <input v-model="form.contact_number"
                                 @input="validateField('contact_number')" maxlength="11"
-                                placeholder-style="color: #64748B;" placeholder="请输入您的联系电话" />
+                                placeholder-style="color: #C8C9CD;" placeholder="请输入您的联系电话" />
                         </view>
                     </up-form-item>
                     <up-form-item label="证件类型" prop="cert_type" required>
@@ -34,7 +34,7 @@
                     <up-form-item label="证件号码" prop="cert_number" required>
                         <view class="flex-start">
                             <input v-model="form.cert_number" class="u-input" @input="validateField('cert_number')"
-                                maxlength="18" placeholder-style="color: #64748B;" placeholder="请输入您的证件号码" />
+                                maxlength="18" placeholder-style="color: #C8C9CD;" placeholder="请输入您的证件号码" />
                         </view>
                     </up-form-item>
                     <up-form-item label="收货地址" prop="shipping_address" required>
@@ -68,21 +68,28 @@
         <view class="combo">
             <view class="title">
                 <view>已选套餐：</view>
-                <view class="txt">{{ currentCombo }}</view>
+                <view class="txt">{{ routerParams.packageName }}</view>
             </view>
             <view class="combo-content">
                 <view class="combo-content_left">
                     <!-- <image></image> -->
                     <view class="img">
-                        <u-image
-                            :showLoading="true"
-                            :src="imageSrc"
+                        <image style="width:206rpx;height:206rpx;" v-if="!routerParams.packageUrl" src="../assets/package.png" mode="aspectFill" class="package-image"></image>
+                        <image v-if="routerParams.packageUrl" :src="routerParams.packageUrl" class="package-image" mode="aspectFill" />
+                        <!-- <image
+                            v-if="routerParams.packageUrl"
+                            :src="routerParams.packageUrl"
                             width="206rpx"
                             height="206rpx"
-                            :lazy-load="true"
-                        ></u-image>
+                        ></image>
+                        <image
+                            v-else
+                            src="../assets/package.png"
+                            width="206rpx"
+                            height="206rpx"
+                        ></image> -->
                     </view>
-                    <view class="name">套餐你懂东奥给你</view>
+                    <view class="name">{{ routerParams.packageName }}</view>
                     <view class="send">邮寄发放</view>
                 </view>
                 <view class="combo-content_right">
@@ -363,23 +370,26 @@ watch(
 );
 // 获取套餐列表
 const packageList = ref([]);
-const getPackageList = () => {
-    const data = {
-        event_id: activetyId.value,
-    };
-    request.get(`/event-api/online_events_packages`, data).then((res) => {
-        packageList.value = res;
-        const package_id = res.find((i) => i.is_recommended)?.id || "";
-        changePackage(package_id);
-    });
-};
+// const getPackageList = () => {
+//     const data = {
+//         event_id: activetyId.value,
+//     };
+//     request.get(`/event-api/online_events_packages`, data).then((res) => {
+//         packageList.value = res;
+//         const package_id = res.find((i) => i.is_recommended)?.id || "";
+//         changePackage(package_id);
+//     });
+// };
+const routerParams = ref({})
+// const blankUrl = ref('../assets/package.png')
 // 页面加载
 onLoad((options) => {
     console.log("option", options);
     // activetyId.value = options.id;
-    activetyId.value = options.eventId || options.id;
+    activetyId.value = options.eventId;
+    routerParams.value = options
     // 套餐列表
-    getPackageList();
+    // getPackageList();
 });
 
 const submitForm = () => {
@@ -959,7 +969,7 @@ text-align: center;
 
     .u-form-item__body__left__content__label {
         flex: none !important;
-        padding-left: 26rpx;
+        padding-left: 16rpx;
         font-size: 30rpx;
     }
 

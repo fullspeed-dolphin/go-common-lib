@@ -41,7 +41,10 @@
           <view class="u-pt-5">
             <!-- <view class="package-item u-flex-row" v-for="item in packageList" :key="item.id" :class="{active: form.package_id === item.id}" @click="changePackage(item.id)"> -->
             <view class="package-item u-flex-row" v-for="item in packageList" :key="item.id" @click="changePackage(item)">
-              <view v-if="!item.package_image_url" class="package-image iconfont flex-center icon-shoppingbaggouwudai"></view>
+              <!-- <view v-if="!item.package_image_url" class="package-image iconfont flex-center icon-shoppingbaggouwudai">
+                <image src="../assets/package.png" mode="aspectFill"></image>
+              </view> -->
+              <image v-if="!item.package_image_url" src="../assets/package.png" mode="aspectFill" class="package-image"></image>
               <image v-if="item.package_image_url" :src="item.package_image_url" class="package-image" mode="aspectFill" />
               <view class="package-item_right">
                 <view class="real_name">{{ item.package_name }}</view>
@@ -492,7 +495,14 @@ function wxPay(respay) {
 }
 
 const goSign = (item) => {
-  uni.$u.route("pagesDashboard/pkEvent/personalInfo?id=" + item.id+"&eventId=" + activetyId.value)
+  /*
+  *套餐名称
+  *套餐图片
+  id:套餐ID
+  *战队ID
+  eventID:战队ID
+  */ 
+  uni.$u.route(`pagesDashboard/pkEvent/personalInfo?packageName=${item.package_name}&packageUrl=${item.package_image_url || ''}&packageId=${item.id}&eventId=${activetyId.value}`)
 };
 const isShowModal = ref(false);
 // 关闭弹框
@@ -503,7 +513,7 @@ function close() {
 const currentItemIndex = ref(0);
 function itemClick(item,index) {
   currentItemIndex.value = index
-  console.log("item",item)
+  // console.log("item",item)
 }
 </script>
 
@@ -549,8 +559,8 @@ function itemClick(item,index) {
   }
   .package-image {
     flex-shrink: 0;
-    width: 80rpx;
-    height: 80rpx;
+    width: 168rpx;
+    height: 168rpx;
     background: #f3f4f6;
     border-radius: 32rpx 32rpx 32rpx 32rpx;
     margin-right: 26rpx;
@@ -705,6 +715,8 @@ function itemClick(item,index) {
     .item {
       flex:1;
       text-align: center;
+      height:60rpx;
+      line-height: 60rpx;
       margin: 0 50rpx;
       &.active{
         border-bottom:2rpx solid #FF5D5B;
@@ -713,7 +725,11 @@ function itemClick(item,index) {
   }
   .nodata {
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 40rpx 0;
+    height:460rpx;
     color: #999;
 
   }
