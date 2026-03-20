@@ -3,7 +3,7 @@
     <u-navbar autoBack placeholder  title="活动报名" />
     <up-form :model="form" ref="uForm" :rules="formRules" labelPosition="top" labelWidth="auto">
       <view class="card-section">
-        <up-form-item label="真实姓名" prop="real_name" required>
+        <!-- <up-form-item label="真实姓名" prop="real_name" required>
           <view class="flex-start input-wrap">
             <input v-model="form.real_name" class="u-input" @input="validateField('real_name')" maxlength="50" placeholder-style="color: #64748B;" placeholder="请输入您的真实姓名" />
           </view>
@@ -36,28 +36,76 @@
               </template>
             </up-input>
           </view>
-        </up-form-item>
+        </up-form-item> -->
 
         <up-form-item label="选择套餐" prop="package_id" required>
           <view class="u-pt-5">
-            <view class="package-item u-flex-row" v-for="item in packageList" :key="item.id" :class="{active: form.package_id === item.id}" @click="changePackage(item.id)">
-              <view v-if="!item.package_image_url" class="package-image iconfont flex-center icon-shoppingbaggouwudai"></view>
+            <!-- <view class="package-item u-flex-row" v-for="item in packageList" :key="item.id" :class="{active: form.package_id === item.id}" @click="changePackage(item.id)"> -->
+            <view class="package-item u-flex-row" v-for="item in packageList" :key="item.id" @click="changePackage(item)">
+              <!-- <view v-if="!item.package_image_url" class="package-image iconfont flex-center icon-shoppingbaggouwudai">
+                <image src="../assets/package.png" mode="aspectFill"></image>
+              </view> -->
+              <image v-if="!item.package_image_url" src="../assets/package.png" mode="aspectFill" class="package-image"></image>
               <image v-if="item.package_image_url" :src="item.package_image_url" class="package-image" mode="aspectFill" />
-              <view>
+              <view class="package-item_right">
                 <view class="real_name">{{ item.package_name }}</view>
-                <view class="target">{{ item.package_subtitle }}</view>
                 <view class="txt">{{ item.package_description }}</view>
+                <view class="target">
+                  <view>{{ item.package_subtitle }}</view>
+                  <view class="join-btn flex-center" @click.stop="goSign(item)">
+                    加入
+                  </view>
+                  <!-- <u-button type="primary" color="#ff5c5c" shape="circle" customStyle="width: 126rpx;height: 52rpx;margin:0;border-radius: 999rpx;" @click.stop="goSign(item)">
+                    去报名
+                  </u-button> -->
+                </view>
               </view>
 
-              <div v-if="item.is_recommended" class="recommended-tag">推荐</div>
+              <!-- <div v-if="item.is_recommended" class="recommended-tag">推荐</div> -->
             </view>
           </view>
         </up-form-item>
       </view>
     </up-form>
 
-
-    <section class="section-bottom" style="width: 682rpx;margin: 0rpx auto 40rpx;">
+    <up-popup :show="isShowModal" @close="close" overlayOpacity="0.3" :safeAreaInsetBottom="false" bgColor="#fff" mode="bottom" closeable>
+        <div class="flex-center b" style="height:90rpx;font-size:32rpx;">{{ comBoDetail.package_name }}</div>
+        <view class="container">
+          <view class="packHead">
+            <view class="item" :class="currentItemIndex === index ? 'active':''" v-for="(item,index) in tabList" @click="itemClick(item,index)">
+              {{ item.name }}
+            </view>
+          </view>
+          <view class="content">
+            <view v-if="currentItemIndex==0">
+              <view v-if="!comBoDetail.detail">
+                <view class="nodata"  text="暂无详情">暂无详情</view>
+              </view>
+              <view v-else>
+                <image v-for="item in comBoDetail.detail" :src="item"></image>
+              </view>
+            </view>
+            <view v-if="currentItemIndex==1">
+              <view v-if="!comBoDetail.spec">
+                <view class="nodata" text="暂无规格">暂无规格</view>
+              </view>
+              <view v-else>
+                <image :src="comBoDetail.spec"></image>
+              </view>
+            </view>
+            <view v-if="currentItemIndex==2">
+              <view v-if="comBoDetail.video">
+                <video id="myVideo" :src="comBoDetail.video"
+                     enable-danmu danmu-btn controls></video>
+              </view>
+              <view v-else>
+                <view class="nodata" text="暂无视频">暂无视频</view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </up-popup>
+    <!-- <section class="section-bottom" style="width: 682rpx;margin: 0rpx auto 40rpx;">
       <view class="txt flex-start">
         <up-checkbox shape="circle" activeColor="#8CC63E" v-model:checked="isAgree" :usedAlone="true"
           :customStyle="{ marginRight: '-10rpx' }" size="32rpx" />
@@ -66,9 +114,9 @@
         </text>
         <text style="color: #ff8c00" @click="$u.route('pagesDashboard/pkEvent/activeRule?type=disclaimer')">《免责声明》</text>
       </view>
-    </section>
+    </section> -->
 
-    <div style="height: 120rpx;"></div>
+    <!-- <div style="height: 120rpx;"></div>
     <view class="submit-wrapper flex-between-center bgf">
       <view class="" style="font-size: 24rpx;color: #6A7282;">
         应付金额
@@ -77,9 +125,9 @@
         </view>
       </view>
       <u-button type="primary" color="#ff5c5c" shape="circle" customStyle="width: 256rpx;height: 72rpx;margin:0;border-radius: 999rpx;" @click="submitForm()">
-				{{props.teamID ? '加入战队并报名' : '立即报名'}}
+         立即支付
       </u-button>
-    </view>
+    </view> -->
   </view>
 </template>
 <script setup>
@@ -234,7 +282,7 @@ const getPackageList = () => {
   request.get(`/event-api/online_events_packages`, data).then((res) => {
     packageList.value = res;
     const package_id = res.find((i) => i.is_recommended)?.id || "";
-    changePackage(package_id);
+    // changePackage(package_id);
   });
 };
 // 页面加载
@@ -328,10 +376,25 @@ function getUserStatus() {
     });
 }
 
-function changePackage(id) {
-  form.value.package_id = id;
+// 查看套餐详情
+const comBoDetail = ref({
+  detail:"",
+  video:"",
+  spec:""
+})
+function changePackage(item) {
+  console.log("item-====",item)
+  isShowModal.value = true
+  comBoDetail.value = item
 }
 
+const tabList=ref([{
+                    name: '详情',
+                }, {
+                    name: '规格',
+                }, {
+                    name: '视频'
+                }]);
 const isFreePackage = computed(() => {
   const pkg = packageList.value.find(i => i.id === form.value.package_id);
   return pkg?.price === 0;
@@ -431,6 +494,28 @@ function wxPay(respay) {
     },
   });
 }
+
+const goSign = (item) => {
+  /*
+  *套餐名称
+  *套餐图片
+  id:套餐ID
+  *战队ID
+  eventID:战队ID
+  */ 
+  uni.$u.route(`pagesDashboard/pkEvent/personalInfo?packageName=${item.package_name}&packageUrl=${item.package_image_url || ''}&packageId=${item.id}&eventId=${activetyId.value}`)
+};
+const isShowModal = ref(false);
+// 关闭弹框
+function close() {
+  isShowModal.value = false;
+}
+// 
+const currentItemIndex = ref(0);
+function itemClick(item,index) {
+  currentItemIndex.value = index
+  // console.log("item",item)
+}
 </script>
 
 <style lang="scss" scoped>
@@ -460,6 +545,9 @@ function wxPay(respay) {
   border: 2rpx solid #e2e8f0;
   margin-bottom: 20rpx;
   position: relative;
+  &_right {
+    flex:1;
+  }
   .recommended-tag {
     position: absolute;
     top: 20rpx;
@@ -472,8 +560,8 @@ function wxPay(respay) {
   }
   .package-image {
     flex-shrink: 0;
-    width: 80rpx;
-    height: 80rpx;
+    width: 168rpx;
+    height: 168rpx;
     background: #f3f4f6;
     border-radius: 32rpx 32rpx 32rpx 32rpx;
     margin-right: 26rpx;
@@ -487,13 +575,27 @@ function wxPay(respay) {
     font-size: 32rpx;
     color: #101828;
   }
-
+  .txt {
+    padding: 10rpx 0;
+  }
   .target {
     line-height: 48rpx;
     font-size: 32rpx;
     color: #ff5c5c;
     font-weight: 500;
     margin-bottom: 10rpx;
+    display: flex;
+    justify-content: space-between;
+    .join-btn {
+      width: 180rpx;
+      height: 64rpx;
+      color: #fff;
+      font-weight: bold;
+      font-size: 26rpx;
+      color: #ffffff;
+      background: #ff5c5c;
+      border-radius: 999rpx;
+    }
   }
 
   &.active {
@@ -606,5 +708,32 @@ function wxPay(respay) {
       }
     }
   }
+}
+.container {
+  .packHead {
+    display:flex;
+    align-items: center;
+    .item {
+      flex:1;
+      text-align: center;
+      height:60rpx;
+      line-height: 60rpx;
+      margin: 0 50rpx;
+      &.active{
+        border-bottom:2rpx solid #FF5D5B;
+      }
+    }
+  }
+  .nodata {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40rpx 0;
+    height:460rpx;
+    color: #999;
+
+  }
+
 }
 </style>

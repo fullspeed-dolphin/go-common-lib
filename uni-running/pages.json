@@ -62,14 +62,13 @@
 				{ "path": "eventAlbum/contractForm","style": { "navigationStyle": "custom","navigationBarTitleText": "入驻摄影师"} },
 				{ "path": "eventAlbum/faceSearchResult","style": { "navigationBarTitleText": "搜索结果", "navigationStyle": "custom"} },
 				{ "path": "pkEvent/pkEvent","style": { "navigationStyle": "custom", "navigationBarTitleText": "为爱奔跑520"} },
-				{ "path": "pkEvent/pkEventForm","style": { "navigationStyle": "custom","navigationBarTitleText": "活动报名"} },
-				{ "path": "pkEvent/pkRankList","style": { "navigationStyle": "custom","navigationBarTitleText": "排行榜"} },
-				{ "path": "pkEvent/teamForm","style": {"navigationStyle": "custom", "navigationBarTitleText": "创建战队"} },
-				{ "path": "pkEvent/teamList","style": { "navigationStyle": "custom","navigationBarTitleText": "战队列表"} },
-				{ "path": "pkEvent/activeRule","style": { "navigationStyle": "custom","navigationBarTitleText": "活动规则"} },
-				{ "path": "pkEvent/teamDetail","style": 
-         { "navigationStyle": "custom","navigationBarTitleText": "战队详情"} 
-      }
+				{ "path": "pkEvent/pkEventForm","style": { "navigationBarTitleText": "活动报名"} },
+				{ "path": "pkEvent/pkRankList","style": { "navigationBarTitleText": "排行榜"} },
+				{ "path": "pkEvent/teamForm","style": { "navigationBarTitleText": "创建战队"} },
+				{ "path": "pkEvent/teamList","style": { "navigationBarTitleText": "战队列表"} },
+				{ "path": "pkEvent/activeRule","style": { "navigationBarTitleText": "活动规则"} },
+				{ "path": "pkEvent/teamDetail","style": { "navigationBarTitleText": "战队详情"} },
+				{ "path": "pkEvent/personalInfo","style": { "navigationBarTitleText": "信息录入"} }
 			]
 		},
     {
