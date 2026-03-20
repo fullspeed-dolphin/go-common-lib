@@ -93,7 +93,7 @@
 					</view>
 					<view style="width: 184rpx">
 						<u-button type="primary" plain color="#FF8C00" size="small" shape="circle"
-							@click="callPhone(memberLeader.user_phone)">
+							@click="callPhone(detail.creator_phone)">
 							联系团长
 						</u-button>
 					</view>
@@ -105,9 +105,9 @@
 				<view class="flex-row flex-wrap">
 					<view class="member-item flex-col-center" v-for="(item, index) in memberList" @click="openMemberDetail(item)" :key="index">
 						<view class="img">
-							<up-lazy-load height="120" borderRadius="200" 
+							<up-lazy-load height="120" 
 							error-img="/static/images/user.png"
-							:image="item.avatar_url+ '?x-oss-process=image/resize,w_150,h_150,m_fill'" mode="aspectFill" />
+							:image="item.avatar_url+ '?x-oss-process=image/resize,w_150,h_150,m_fill'" />
 						</view>
 						<view class="">
 							<view class="u-mb-10 ellipsis tac u-ml-10" style="width: 120rpx;margin-top: 16rpx;line-height: 44rpx;">

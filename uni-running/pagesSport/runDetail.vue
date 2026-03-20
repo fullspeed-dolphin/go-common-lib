@@ -124,7 +124,7 @@ import { ref, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
-import { createMarker, formatPace, calculatePaceFromMeters, getTime, getPointsSpeed, getCenterScale } from "./assets/utils.js";
+import { createMarker, formatPace, calculatePaceFromMeters, getTime, getPointsSpeed, generateSpeedPolylines, getCenterScale } from "./assets/utils.js";
 
 import { useShare, buildPath } from "@/composables/useShare.js";
 
@@ -341,6 +341,9 @@ const initMap = (tracks) => {
 
     // 创建轨迹线
     polylines.value = getPointsSpeed(trackPoints);
+
+    console.log("==polylines.value==111", getPointsSpeed(trackPoints));
+    // console.log("==polylines.value==", generateSpeedPolylines(trackPoints));
     // polylines.value = [
     //   {
     //     points: trackPoints,

@@ -94,7 +94,7 @@
             // 圆角值
             borderRadius: {
                 type: [Number, String],
-                default: 0
+                default: 10
             },
             // 图片高度，单位rpx
             height: {

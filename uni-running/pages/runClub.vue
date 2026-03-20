@@ -96,7 +96,7 @@
                 v-if="myClubDetail.avatar_url"
                 class="club-card__avatar-img"
                 :src="myClubDetail.avatar_url + '?x-oss-process=image/resize,w_120,h_120,m_lfit'"
-                mode="aspectFit"
+                mode="aspectFill"
               />
               <view v-else class="club-card__avatar">
                 <u-icon name="account-fill" size="28" color="#6B7280"></u-icon>
