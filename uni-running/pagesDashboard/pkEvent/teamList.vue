@@ -1,7 +1,7 @@
 <template>
   <view class="page" :style="themeStyle">
     <u-navbar autoBack placeholder  title="战队列表" />
-    <section class="section-header flex-col-center ">
+    <section class="section-header flex-col-center" :style="{ top: getNavbarHeight() + 'px' }">
       <view class="section-search u-mb-20" style="width:686rpx;">
         <u-search v-model="searchTxt" @search="refreshList" placeholder="输入战队名称" shape="round" bgColor="#f5f5f5" borderColor="#e5e5e5" :showAction="false"></u-search>
       </view>
@@ -34,8 +34,11 @@
               <view class="leader">队长：{{ item.leader_nickname }}</view>
             </view>
 
-            <view class="join-btn flex-center" :class="{ 'btn-disabled': pkEventStatus !== 'act' }" :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }" @click.stop="goToSignEvent(item)">
-              加入
+            <view class="join-btn flex-center"
+              :class="{ 'btn-disabled': !userStatusInfo.in_team && pkEventStatus !== 'act' }"
+              :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }"
+              @click.stop="userStatusInfo.in_team ? joinTeam(item) : goToSignEvent(item)">
+              {{ userStatusInfo.in_team ? '查看' : '加入' }}
             </view>
           </view>
         </view>
@@ -69,6 +72,7 @@ import { ref, computed, watch } from "vue";
 import { onLoad, onShow, onPageScroll, onReachBottom } from "@dcloudio/uni-app";
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 import request from "@/utils/request.js";
+import { getNavbarHeight } from "@/utils/util.js";
 
 const { mescrollInit, downCallback, getMescroll } = useMescroll(
   onPageScroll,
@@ -235,7 +239,6 @@ defineOptions({
   position: fixed;
   width: 100%;
   z-index: 10;
-  top: 50px;
   padding: 16rpx 24rpx;
   background: #fff;
 }
