@@ -193,6 +193,10 @@ function getEventInfo() {
       type: 'pkEventTheme',
       data: res.color_config
     })
+    store.commit('set', {
+      type: 'pkEventStatus',
+      data: res.status.toLowerCase()
+    })
   });
 }
 

@@ -275,7 +275,7 @@ const getEventData = () => {
       
       res = {
         ...res,
-        diffDays: dayjs(date2 + "").diff(date1 + "", "day"),
+        diffDays: dayjs(date2 + "").diff(date1 + "", "day") + 1,
         registration_end_time: dayjs(res.registration_end_time).format("M月D日"),
         start_time: dayjs(res.start_time).format("M月D日"),
         total_registrations: formatNumber(res.total_registrations),
@@ -381,11 +381,16 @@ onLoad((options) => {
   activetyId.value = options.id || "01KH0WQX4H2C7Q4GJ217P8T922";
 });
 
+let isFirstShow = true;
 onShow(() => {
   getEventData();
   getUserStatus();
   getMyEvents();
   getuserCheckedInfo();
+  if (!isFirstShow) {
+    refreshList();
+  }
+  isFirstShow = false;
 });
 
 useShare(() => ({
