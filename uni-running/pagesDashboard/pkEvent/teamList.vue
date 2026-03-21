@@ -1,7 +1,7 @@
 <template>
   <view class="page" :style="themeStyle">
     <u-navbar autoBack placeholder  title="战队列表" />
-    <section class="section-header flex-col-center ">
+    <section class="section-header flex-col-center " :style="{top: statusHeight+'px;'}">
       <view class="section-search u-mb-20" style="width:686rpx;">
         <u-search v-model="searchTxt" @search="refreshList" placeholder="输入战队名称" shape="round" bgColor="#f5f5f5" borderColor="#e5e5e5" :showAction="false"></u-search>
       </view>
@@ -202,8 +202,9 @@ const getList = (mescroll) => {
     });
 };
 
-
+const statusHeight = ref(uni.getSystemInfoSync().statusBarHeight+44)
 onLoad((options) => {
+  // 获取状态栏高度
   activetyId.value = options.id;
   getUserStatus();
   getMyEvents();
