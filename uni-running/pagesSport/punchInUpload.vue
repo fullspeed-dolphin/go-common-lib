@@ -172,7 +172,7 @@ function getMyEvents() {
 		return
   }
 
-  request.get("/event-api/online_events/my_events").then((res) => {
+  request.get("/event-api/online_events/my_events", {}, { showError: false }).then((res) => {
     let activeEvents = (res || []).filter((i) => i.status === "ACT");
 
     options_events.value = [

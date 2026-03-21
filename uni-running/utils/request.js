@@ -86,11 +86,12 @@ function fetch(options) {
 }
 
 export default {
-	get(url, data) {
+	get(url, data, options = {}) {
 		return fetch({
 			method: "get",
 			data,
-			url
+			url,
+			...options
 		})
 	},
 	delete(url, data) {

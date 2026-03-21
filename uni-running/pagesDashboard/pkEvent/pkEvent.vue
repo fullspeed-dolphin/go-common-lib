@@ -289,31 +289,36 @@ const getEventData = () => {
         type: 'pkEventTheme',
         data: res.color_config
       })
+      store.commit('set', {
+        type: 'pkEventRule',
+        data: res.rule
+      })
+      store.commit('set', {
+        type: 'pkEventStatus',
+        data: res.status.toLowerCase()
+      })
     });
 };
 
 const userStatusInfo = ref({});
 function getUserStatus() {
-  request.get("/event-api/online_events_team/user_status?event_id=" + activetyId.value).then((res) => {
-    // console.log('userStatus', res)
+  request.get("/event-api/online_events_team/user_status?event_id=" + activetyId.value, {}, { showError: false }).then((res) => {
     userStatusInfo.value = res;
-  });
+  }).catch(() => {});
 }
 
 const userCheckedInfo = ref({});
 function getuserCheckedInfo() {
-  request.get("/user-api/user/getEventCheckins?event_id=" + activetyId.value).then((res) => {
-    console.log('userCheckedInfo', res)
+  request.get("/user-api/user/getEventCheckins?event_id=" + activetyId.value, {}, { showError: false }).then((res) => {
     userCheckedInfo.value = res;
-  });
+  }).catch(() => {});
 }
 
 const myEvents = ref([]);
 function getMyEvents() {
-  request.get("/event-api/online_events/my_events").then((res) => {
-    // console.log('myEvents', res)
+  request.get("/event-api/online_events/my_events", {}, { showError: false }).then((res) => {
     myEvents.value = res;
-  });
+  }).catch(() => {});
 }
 const isSignUpEvent = computed(() => {
   if (!myEvents.value) return true;

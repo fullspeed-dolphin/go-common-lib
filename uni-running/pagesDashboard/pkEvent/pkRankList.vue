@@ -2,7 +2,7 @@
   <view class="" :style="themeStyle">
     <u-navbar autoBack placeholder  title="排行榜" />
     <mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="loadRankList">
-    <section class="honor-rank">
+    <section class="honor-rank" :style="honorRankStyle">
       <view class="title">荣誉榜单</view>
       <view class="subtitle">实时排名</view>
 
@@ -128,6 +128,14 @@ const themeStyle = computed(() => ({
   '--theme-color': pkEventTheme.value?.solid || '#ff5c5c',
   '--theme-gradient': `linear-gradient(90deg, ${pkEventTheme.value?.gradient?.[0] || '#ff5c5c'}, ${pkEventTheme.value?.gradient?.[1] || '#ff5c5c'})`,
 }));
+
+const honorRankStyle = computed(() => {
+  const g = pkEventTheme.value?.gradient;
+  if (g?.length === 2) {
+    return { background: `linear-gradient(180deg, ${g[0]}, ${g[1]})` };
+  }
+  return {};
+});
 
 const PAGE_SIZE = 100;
 const activetyId = ref("");

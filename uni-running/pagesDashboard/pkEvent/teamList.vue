@@ -3,7 +3,7 @@
     <u-navbar autoBack placeholder  title="战队列表" />
     <section class="section-header flex-col-center ">
       <view class="section-search u-mb-20" style="width:686rpx;">
-        <u-search v-model="searchTxt" @search="refreshList" placeholder="输入战队名称" shape="round" bgColor="#f5f5f5" borderColor="#f5f5f5" :showAction="false"></u-search>
+        <u-search v-model="searchTxt" @search="refreshList" placeholder="输入战队名称" shape="round" bgColor="#f5f5f5" borderColor="#e5e5e5" :showAction="false"></u-search>
       </view>
       <!-- 分类标签 -->
       <view class="tab-container">
@@ -34,7 +34,7 @@
               <view class="leader">队长：{{ item.leader_nickname }}</view>
             </view>
 
-            <view class="join-btn flex-center" :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }" @click.stop="goToSignEvent(item)">
+            <view class="join-btn flex-center" :class="{ 'btn-disabled': pkEventStatus !== 'act' }" :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }" @click.stop="goToSignEvent(item)">
               加入
             </view>
           </view>
@@ -56,6 +56,7 @@
         color1="#ff5c5c"
         :color="`linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})`"
         customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;font-size: 34rpx;letter-spacing: 1px;"
+        :disabled="pkEventStatus !== 'act'"
         @click="goToSignEvent()">
         立即报名参赛
       </u-button>
@@ -78,6 +79,7 @@ import { useStore } from "vuex";
 const store = useStore();
 const userInfo = computed(() => store.state.userInfo);
 const pkEventTheme = computed(() => store.state.pkEventTheme);
+const pkEventStatus = computed(() => store.state.pkEventStatus);
 const themeStyle = computed(() => ({
   '--theme-gradient': `linear-gradient(90deg, ${pkEventTheme.value?.gradient?.[0] || '#ff5c5c'}, ${pkEventTheme.value?.gradient?.[1] || '#ff5c5c'})`,
 }));
@@ -89,12 +91,11 @@ const userStatusInfo = ref({});
 function getUserStatus() {
   request
     .get(
-      "/event-api/online_events_team/user_status?event_id=" + activetyId.value
+      "/event-api/online_events_team/user_status?event_id=" + activetyId.value, {}, { showError: false }
     )
     .then((res) => {
-      console.log("userStatus", res);
       userStatusInfo.value = res;
-    });
+    }).catch(() => {});
 }
 
 const myEvents = ref([]);
@@ -102,9 +103,9 @@ const hasSignedUp = computed(() => {
   return myEvents.value?.some((i) => i.event_id === activetyId.value);
 });
 function getMyEvents() {
-  request.get("/event-api/online_events/my_events").then((res) => {
+  request.get("/event-api/online_events/my_events", {}, { showError: false }).then((res) => {
     myEvents.value = res;
-  });
+  }).catch(() => {});
 }
 
 function joinTeamAPi(item) {
@@ -148,7 +149,8 @@ function joinTeamToSign(item) {
 }
 
 function goToSignEvent(item) {
-	uni.$u.route("pagesDashboard/pkEvent/packageList", { 
+	if (pkEventStatus.value !== 'act') return uni.$u.toast('活动暂未开放报名');
+	uni.$u.route("pagesDashboard/pkEvent/packageList", {
     id: activetyId.value,
     eventId: activetyId.value,
     teamId: item?.id || "",
@@ -362,6 +364,11 @@ defineOptions({
     color: #ffffff;
     background: #ff5c5c;
     border-radius: 999rpx;
+
+    &.btn-disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
   }
 }
 

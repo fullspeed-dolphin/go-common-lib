@@ -13,7 +13,9 @@ export default createStore({
 			album_total: 0,
 			album_info: {},
 			// 战队活动主题
-			pkEventTheme: {}
+			pkEventTheme: {},
+			pkEventRule: null,
+			pkEventStatus: ''
 		}
 	},
 	mutations: {

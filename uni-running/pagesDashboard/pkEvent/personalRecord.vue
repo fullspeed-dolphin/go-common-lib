@@ -81,11 +81,10 @@ const popupVisible = ref(false);
 
 const userCheckedInfo = ref({});
 function getuserCheckedInfo() {
-  request.get("/user-api/user/getEventCheckins?event_id=" + props.activetyId).then((res) => {
-    console.log('userCheckedInfo', res)
+  request.get("/user-api/user/getEventCheckins?event_id=" + props.activetyId, {}, { showError: false }).then((res) => {
     res.checkedPercent = res.required_checkins ? Math.round(res.total_qualified_sessions / res.required_checkins * 100) : 0
     userCheckedInfo.value = res;
-  });
+  }).catch(() => {});
 }
 
 function previewImage(url) {

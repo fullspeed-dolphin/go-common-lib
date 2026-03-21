@@ -130,13 +130,6 @@
 		<u-icon name="share" color="#fff" size="18"></u-icon>
 	</button>
 
-  <!-- 套餐列表 -->
-  <up-popup :show="isShowModal" @close="close" overlayOpacity="1" :safeAreaInsetBottom="false" bgColor="#fff" mode="bottom" closeable>
-    <div class="flex-center b" style="height:90rpx;font-size:32rpx;">选择套餐</div>
-    <scroll-view scroll-y style="height: 90vh;width:100vw;overflow-y: auto;background: #fff;">
-      <pkEventForm :teamID="teamID"/>
-    </scroll-view>
-  </up-popup>
 
   <Share ref="refShare" class="qrcode"/>
   <UserLogin ref="refUserLogin" @success="onLoginSuccess" />
@@ -155,7 +148,6 @@ import { useShare, buildPath } from "@/composables/useShare.js";
 import dayjs from "dayjs";
 
 import UserLogin from "@/components/UserLogin.vue";
-import pkEventForm from "@/pagesDashboard/pkEvent/pkEventForm.vue";
 // import SharePoster from "./SharePoster.vue"
 import Share from "./Share.vue"
 import { useStore } from "vuex";
@@ -163,6 +155,7 @@ import { useStore } from "vuex";
 const store = useStore();
 const userInfo = computed(() => store.state.userInfo);
 const pkEventTheme = computed(() => store.state.pkEventTheme);
+const pkEventStatus = computed(() => store.state.pkEventStatus);
 const themeStyle = computed(() => ({
   '--theme-color': pkEventTheme.value?.solid || '#ff5c5c',
   '--theme-gradient': `linear-gradient(90deg, ${pkEventTheme.value?.gradient?.[0] || '#ff5c5c'}, ${pkEventTheme.value?.gradient?.[1] || '#ff5c5c'})`,
@@ -280,17 +273,17 @@ function getTeamRank() {
 const userStatusInfo = ref({});
 const isLoadedPage = ref(false)
 function getUserStatus() {
-  request.get("/event-api/online_events_team/user_status?event_id=" + eventID.value).then((res) => {
+  request.get("/event-api/online_events_team/user_status?event_id=" + eventID.value, {}, { showError: false }).then((res) => {
     userStatusInfo.value = res;
 		isLoadedPage.value = true
-  });
+  }).catch(() => { isLoadedPage.value = true });
 }
 
 const myEvents = ref([]);
 function getMyEvents() {
-  request.get("/event-api/online_events/my_events").then((res) => {
+  request.get("/event-api/online_events/my_events", {}, { showError: false }).then((res) => {
     myEvents.value = res;
-  });
+  }).catch(() => {});
 }
 const isNoSignUpEvent = computed(() => {
   if (!myEvents.value) return true;
@@ -352,7 +345,7 @@ function callPhone(phone) {
 }
 
 function joinTeamAPi() {
-  isShowModal.value = true;
+	goToSignEvent();
 	/* const item = detailInfo.value
 	console.log("joinTeamAPi", item);
 	uni.showLoading({ mask: true });
@@ -379,7 +372,8 @@ function close() {
   isShowModal.value = false;
 }
 function goToSignEvent() {
-	uni.$u.route("pagesDashboard/pkEvent/packageList", { 
+	if (pkEventStatus.value !== 'act') return uni.$u.toast('活动暂未开始');
+	uni.$u.route("pagesDashboard/pkEvent/packageList", {
     id: eventID.value,
     eventId: eventID.value,
     teamId: teamID.value,
@@ -387,6 +381,7 @@ function goToSignEvent() {
 }
 
 function joinTeam() {
+	if (pkEventStatus.value !== 'act') return uni.$u.toast('活动暂未开始');
 	if (!userInfo.value.id) {
 		loginCallBack.value = joinTeam;
 
@@ -498,27 +493,27 @@ const handleEdit = () => {
   padding: 70px 50rpx 30rpx;
   background: linear-gradient(to bottom, rgba(255,255,255,.7) 60%, #f5f5f5);
   .team-avatar {
-    width: 120rpx;
-    height: 120rpx;
+    width: 180rpx;
+    height: 180rpx;
     flex-shrink: 0;
-    border-radius: 16rpx 16rpx 16rpx 16rpx;
-    border: 4rpx solid #ffb3b3;
+    border-radius: 24rpx;
+    border: 4rpx solid var(--theme-color, #ffb3b3);
     margin-right: 30rpx;
   }
   .team-meta {
     font-size: 26rpx;
-    color: #222;
+    color: var(--theme-color, #222);
     margin-bottom: 8rpx;
   }
   .welcome-text {
     font-size: 24rpx;
-    color: #666;
+    color: var(--theme-color, #666);
   }
   .team-name {
     line-height: 60rpx;
     font-weight: 800;
     font-size: 40rpx;
-    color: #101828;
+    color: var(--theme-color, #101828);
   }
   .edit-icon {
     width: 40rpx;
@@ -534,20 +529,20 @@ const handleEdit = () => {
   .stat-item {
     width: 206rpx;
     height: 144rpx;
-    background: #f9fafb;
+    background: var(--theme-gradient, #f9fafb);
     border-radius: 32rpx 32rpx 32rpx 32rpx;
   }
 
   .stat-value {
     font-weight: 800;
     font-size: 40rpx;
-    color: #101828;
+    color: #fff;
     line-height: 60rpx;
   }
 
   .stat-label {
     font-size: 24rpx;
-    color: #6a7282;
+    color: rgba(255, 255, 255, 0.85);
     line-height: 36rpx;
   }
 }
@@ -671,7 +666,7 @@ const handleEdit = () => {
     line-height: 42rpx;
     font-weight: bold;
     font-size: 28rpx;
-    color: #1e2939;
+    color: var(--theme-color, #1e2939);
   }
   .leader-tag {
     font-size: 18rpx;
@@ -696,13 +691,13 @@ const handleEdit = () => {
 
   .user-detail {
     font-size: 24rpx;
-    color: #5c626f;
+    color: var(--theme-color, #5c626f);
     margin-bottom: 8rpx;
   }
 
   .user-time {
     font-size: 20rpx;
-    color: #5c626f;
+    color: var(--theme-color, #5c626f);
   }
 
   .progress {

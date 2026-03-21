@@ -273,12 +273,11 @@ const userStatusInfo = ref({});
 function getUserStatus() {
   request
     .get(
-      "/event-api/online_events_team/user_status?event_id=" + activetyId.value
+      "/event-api/online_events_team/user_status?event_id=" + activetyId.value, {}, { showError: false }
     )
     .then((res) => {
-      console.log("userStatus", res);
       userStatusInfo.value = res;
-    });
+    }).catch(() => {});
 }
 
 const submitForm = () => {
