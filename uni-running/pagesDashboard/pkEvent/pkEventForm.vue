@@ -119,6 +119,18 @@ const props = defineProps({
 
 const currentSku = ref({});
 
+const routerParams = ref({});
+onLoad((options) => {
+  console.log("option", options);
+  if (options.packageUrl) {
+    options.packageUrl = decodeURIComponent(options.packageUrl);
+  }
+  activetyId.value = options.eventId;
+  routerParams.value = options;
+
+  getUserStatus();
+});
+
 const form = ref({
   real_name: "",
   contact_number: "",
@@ -260,14 +272,6 @@ watch(
 // 获取套餐列表
 const packageList = ref([]);
 
-const routerParams = ref({});
-onLoad((options) => {
-  console.log("option", options);
-  activetyId.value = options.eventId;
-  routerParams.value = options;
-
-  getUserStatus();
-});
 
 const userStatusInfo = ref({});
 function getUserStatus() {
@@ -308,10 +312,6 @@ function signUpEvent() {
     sku_id: currentSku.value?.id || "",
   };
 
-  uni.showLoading({
-    mask: true,
-  });
-
   request
     .post("/booking-api/online_events/registration", data)
     .then(async (res) => {
@@ -322,6 +322,9 @@ function signUpEvent() {
       } else {
         payOrder(res.reg_no);
       }
+    })
+    .catch(() => {
+      uni.hideLoading();
     });
 }
 
@@ -407,6 +410,8 @@ const payOrder = async (reg_no) => {
 
   request.post(`/pay/wechat/payment`, data).then((res) => {
     wxPay(res);
+  }).catch(() => {
+    uni.hideLoading();
   });
 };
 
@@ -424,6 +429,9 @@ function freeToPay(reg_no) {
       setTimeout(() => {
         uni.navigateBack();
       }, 300);
+    })
+    .catch(() => {
+      uni.hideLoading();
     });
 }
 

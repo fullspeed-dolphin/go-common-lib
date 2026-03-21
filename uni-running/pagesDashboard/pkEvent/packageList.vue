@@ -150,7 +150,7 @@ const goSign = (item) => {
   uni.$u.route(
     `pagesDashboard/pkEvent/pkEventForm`, {
       packageName: item.package_name,
-      packageUrl: item.package_image_url || "",
+      packageUrl: encodeURIComponent(item.package_image_url || ""),
       packageId: item.id,
       eventId: routerParams.value.eventId || routerParams.value.id,
       teamId: routerParams.value.teamId || "",
