@@ -114,11 +114,11 @@
       <!-- <button class="main-btn" style="background:#07C160" open-type="share">邀请好友加入</button> -->
     </block>
     
-    <button v-if="!userStatusInfo.in_team" class="main-btn" :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }" @click="joinTeam()">加入战队并报名</button>
+    <button v-if="!userStatusInfo.in_team && pkEventStatus === 'act'" class="main-btn" :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }" @click="joinTeam()">加入战队并报名</button>
 
     <!-- 加入任何一个战队后，不可加入其他战队 -->
     <block v-if="userStatusInfo.in_team">
-      <button v-if="isNoSignUpEvent" class="main-btn" :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }" @click="goToSignEvent">立即报名</button>
+      <button v-if="isNoSignUpEvent && pkEventStatus === 'act'" class="main-btn" :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }" @click="goToSignEvent">立即报名</button>
       <!-- 只在当前team 成员可退出，活动进行中禁止退出 -->
       <block v-if="userStatusInfo.team_info.id === teamID && !userStatusInfo.is_team_leader && !isEventActive">
         <button class="main-btn" style="background:#999" @click="leaveTeam(detailInfo)">退出战队</button>
@@ -375,7 +375,7 @@ function close() {
   isShowModal.value = false;
 }
 function goToSignEvent() {
-	if (pkEventStatus.value !== 'act') return uni.$u.toast('活动暂未开始');
+	if (pkEventStatus.value !== 'act') return uni.$u.toast('活动报名时间已过');
 	uni.$u.route("pagesDashboard/pkEvent/packageList", {
     id: eventID.value,
     eventId: eventID.value,
@@ -384,7 +384,7 @@ function goToSignEvent() {
 }
 
 function joinTeam() {
-	if (pkEventStatus.value !== 'act') return uni.$u.toast('活动暂未开始');
+	if (pkEventStatus.value !== 'act') return uni.$u.toast('活动报名时间已过');
 	if (!userInfo.value.id) {
 		loginCallBack.value = joinTeam;
 

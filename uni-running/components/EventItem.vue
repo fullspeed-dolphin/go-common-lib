@@ -65,7 +65,7 @@
 	const buttonStyle = computed(() => {
 		if (props.item.status === 'REJ') return 'background: #999;';
 		const g = props.item.color_config?.gradient;
-		if (props.item.status === 'ACT' && g?.length === 2) {
+		if (g?.length === 2) {
 			return `background: linear-gradient(90deg, ${g[0]}, ${g[1]});`;
 		}
 		return '';
