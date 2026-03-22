@@ -2,6 +2,8 @@
 prompt
 .DS_Store
 **/.DS_Store
-debug.png
+debug*
+*.jpg
+*.png
 活动列表设计/
 node_modules/
