@@ -51,7 +51,7 @@
   </up-popup>
 </template>
 <script setup>
-import lPainter from "./lime-painter/components/l-painter/l-painter.vue"
+import lPainter from "@/uni_modules/lime-painter/components/l-painter/l-painter.vue"
 import { ref, nextTick, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";

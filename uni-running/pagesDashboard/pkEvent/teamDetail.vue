@@ -131,7 +131,7 @@
 	</button>
 
 
-  <Share ref="refShare" class="qrcode"/>
+  <ShareSheet ref="refShare" class="qrcode"/>
   <UserLogin ref="refUserLogin" @success="onLoginSuccess" />
   </view>
 </template>
@@ -148,8 +148,7 @@ import { useShare, buildPath } from "@/composables/useShare.js";
 import dayjs from "dayjs";
 
 import UserLogin from "@/components/UserLogin.vue";
-// import SharePoster from "./SharePoster.vue"
-import Share from "./Share.vue"
+import ShareSheet from "@/components/common/ShareSheet.vue";
 import { useStore } from "vuex";
 
 const store = useStore();

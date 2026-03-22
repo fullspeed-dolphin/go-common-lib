@@ -26,7 +26,7 @@
         取消
       </view>
     </up-popup>
-		
+
     <!-- 海报分享 -->
     <view class="qrShare">
       <SharePoster ref="refSharePoster" />
@@ -34,16 +34,17 @@
 
     <!-- 二维码分享 -->
     <up-popup :show="qrCodeShow" zIndex="11" @close="closeQrcode" overlayOpacity="0.3" :safeAreaInsetBottom="false" bgColor="#fff" mode="bottom" closeable>
-      <view style="text-align: center;margin-top:30rpx;">
+      <view style="text-align: center;font-size:32rpx; margin-top:30rpx;font-weight:500;">小程序码</view>
+			<view style="text-align: center;margin-top:30rpx;">
         <image :src="qrCodeSrc" style="width:350rpx;height:350rpx;"></image>
-        <view style="margin:20rpx 0;">长按二维码下载</view>
+        <view style="margin:20rpx 0;">长按小程序码下载</view>
       </view>
     </up-popup>
   </view>
 </template>
 
 <script setup>
-import { ref, computed, nextTick, onMounted } from "vue";
+import { ref, nextTick } from "vue";
 import SharePoster from "./SharePoster.vue";
 import request from "@/utils/request.js";
 
@@ -77,6 +78,13 @@ const qrCodeImg = (type = "qrcode") => {
         time: detail.value.establish_time,
         codeImg: res.image,
       });
+
+			refSharePoster.value.open({
+        imgUrl: detail.value.avatar_url,
+        title: detail.value.name,
+        time: detail.value.establish_time,
+        codeImg: res.image,
+      });
       return;
     }
     qrCodeShow.value = true;
@@ -91,10 +99,12 @@ const refSharePoster = ref(null);
 const closeQrcode = () => {
   qrCodeShow.value = false;
 };
+
 // 海报分享
 const sharePoster = () => {
   qrCodeImg("poster");
 };
+
 const detail = ref({});
 function open(val, routeParamsUrl) {
   console.log("routeParams====", routeParamsUrl);
@@ -102,6 +112,7 @@ function open(val, routeParamsUrl) {
   detail.value = val;
   routeParams.value = routeParamsUrl;
 }
+
 defineExpose({
   open,
 });

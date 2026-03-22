@@ -149,7 +149,7 @@
     <MemberDetail ref="refMemberDetail" />
 
     <UserLogin ref="refUserLogin" @success="onLoginSuccess" />
-    <Share ref="refShare" />
+    <ShareSheet ref="refShare" />
   </view>
 </template>
 <script setup>
@@ -160,8 +160,7 @@ import { useStore } from "vuex";
 import UserLogin from "@/components/UserLogin.vue";
 import EventItem from "@/components/EventItem.vue";
 import MemberDetail from "./memberDetail.vue";
-// import SharePoster from "./SharePoster.vue"
-import Share from "../components/Share.vue";
+import ShareSheet from "@/components/common/ShareSheet.vue";
 import request from "@/utils/request.js";
 import { useShare, buildPath } from "@/composables/useShare.js";
 
@@ -397,9 +396,9 @@ onPageScroll((e) => {
 });
 
 // 弹出分享按钮
-// const isShowModal = ref(false);
 const refShare = ref(null);
 const showShareBtn = () => {
+  console.log('23456')
   refShare.value.open(
     {
       avatar_url: detail.value.avatar_url,
