@@ -35,10 +35,9 @@
             </view>
 
             <view class="join-btn flex-center"
-              :class="{ 'btn-disabled': !userStatusInfo.in_team && pkEventStatus !== 'act' }"
               :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }"
-              @click.stop="userStatusInfo.in_team ? joinTeam(item) : goToSignEvent(item)">
-              {{ userStatusInfo.in_team ? '查看' : '加入' }}
+              @click.stop="(userStatusInfo.in_team || pkEventStatus !== 'act') ? joinTeam(item) : goToSignEvent(item)">
+              {{ (userStatusInfo.in_team || pkEventStatus !== 'act') ? '查看' : '加入' }}
             </view>
           </view>
         </view>
@@ -50,16 +49,15 @@
         color1="#ff5c5c"
         :color="`linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})`"
         customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;font-size: 34rpx;letter-spacing: 1px;"
-        @click="$u.route('pagesDashboard/pkEvent/teamForm', { id: activetyId })">
+        @click="createTeam">
         创建战队
       </u-button>
     </view>
-    <view v-else-if="!hasSignedUp" class="create-team-wrapper flex-center">
+    <view v-else-if="!hasSignedUp && pkEventStatus === 'act'" class="create-team-wrapper flex-center">
       <u-button class="create-team-btn"
         color1="#ff5c5c"
         :color="`linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})`"
         customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;font-size: 34rpx;letter-spacing: 1px;"
-        :disabled="pkEventStatus !== 'act'"
         @click="goToSignEvent()">
         立即报名参赛
       </u-button>
@@ -152,8 +150,13 @@ function joinTeamToSign(item) {
   uni.$u.route(`pagesDashboard/pkEvent/pkEventForm?id=${item.id}&eventId=${activetyId.value}`);
 }
 
+function createTeam() {
+	if (pkEventStatus.value !== 'act') return uni.$u.toast('活动报名时间已过');
+	uni.$u.route('pagesDashboard/pkEvent/teamForm', { id: activetyId.value });
+}
+
 function goToSignEvent(item) {
-	if (pkEventStatus.value !== 'act') return uni.$u.toast('活动暂未开放报名');
+	if (pkEventStatus.value !== 'act') return uni.$u.toast('活动报名时间已过');
 	uni.$u.route("pagesDashboard/pkEvent/packageList", {
     id: activetyId.value,
     eventId: activetyId.value,
