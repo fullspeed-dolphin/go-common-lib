@@ -74,6 +74,7 @@ import { useStore } from "vuex";
 const store = useStore();
 const userInfo = computed(() => store.state.userInfo);
 const pkEventTheme = computed(() => store.state.pkEventTheme);
+const pkEventStatus = computed(() => store.state.pkEventStatus);
 
 const uForm = ref(null);
 const activetyId = ref(""); // 活动ID
@@ -122,6 +123,7 @@ onLoad((options) => {
 });
 
 const submitForm = () => {
+  if (pkEventStatus.value !== 'act') return uni.$u.toast('活动报名时间已过');
   uForm.value.validate().then((res) => {
     const data = {
 			"event_id": activetyId.value,
