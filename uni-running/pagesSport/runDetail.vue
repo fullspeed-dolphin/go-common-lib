@@ -465,7 +465,9 @@ const getPaceBarWidth = (pace) => {
   if (!pace || pace < minPace) return 100;
   if (pace > maxPace) return 10;
   // 配速越快，条越短；配速越慢，条越长
-  return 100 - ((pace - minPace) / (maxPace - minPace)) * 90;
+  console.log('1 - ((pace - minPace) / (maxPace - minPace))',(pace / 650) * 100)
+  return (pace / 650) * 100;
+  return 1 - ((pace - minPace) / (maxPace - minPace));
 };
 
 const routerParams = ref({});
