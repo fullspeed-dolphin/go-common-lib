@@ -11,7 +11,7 @@
         <view class="u-mt-20" style="color: #6A7282;">记录每一次汗水，赢取跑币奖励</view>
 
         <div class="u-flex-row u-flex-wrap">
-          <view class="event-item" :class="{ 'active': item.checked }" @click="selectEvent(item)" v-for="(item,index) in options_events" :key="index">
+          <view class="event-item" :class="{ 'active': item.checked }" :style="item.checked && item.gradient ? { background: `linear-gradient(90deg, ${item.gradient[0]}, ${item.gradient[1]})`, borderColor: item.gradient[0], color: '#fff' } : item.gradient ? { borderColor: item.gradient[0], color: item.gradient[0] } : {}" @click="selectEvent(item)" v-for="(item,index) in options_events" :key="index">
             {{item.label}}
           </view>
         </div>
@@ -173,12 +173,16 @@ function getMyEvents() {
   }
 
   request.get("/event-api/online_events/my_events", {}, { showError: false }).then((res) => {
-    let activeEvents = (res || []).filter((i) => i.status === "ACT");
+    const now = dayjs();
+    let activeEvents = (res || []).filter((i) => {
+      return now.isAfter(dayjs(i.start_time)) && now.isBefore(dayjs(i.end_time));
+    });
 
     options_events.value = [
       ...activeEvents.map((i) => ({
         label: i.event_name,
         value: i.event_id,
+        gradient: i.color_config?.gradient || null,
         checked: true,
       })),
       {
