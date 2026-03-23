@@ -383,6 +383,7 @@ const loadSportData = async () => {
     res[0].distance_in_meters = (res[0].distance_in_meters / 1000)?.toFixed(2)
     res[0].start_time = dayjs(res[0].start_time).format("YYYY-MM-DD HH:mm:ss");
     detail.value = res[0];
+    detail.value.max_speed = (res[0].max_speed)?.toFixed(2)
     // 轨迹数据接口
     initMap(res[1].points || []);
     // detail.value.averageRate = parseInt(
