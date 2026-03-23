@@ -131,208 +131,74 @@ export const getTime = (t) => {
   return `${h}:${m}:${s}`;
 };
 
-let maxSpeed = null
-export function getPointsSpeed(points) {
-  let lineColor = '#7fba3a'
-  let list = []
+const speedConfig = [
+  { max: 6, color: '#7fba3a' },   // 慢
+  { max: 8, color: '#8dc645' },   // 轻松
+  { max: 10, color: '#9bbd3e' },  // 中速
+  { max: 12, color: '#aeb33e' },  // 速度
+  { max: 14, color: '#c6a636' },  // 快
+  { max: 99, color: '#f58b2d' }   // 冲刺
+];
 
-  if (!points || !points.length) {
-    return list
-  }
-
-  let lastArr = []
-  for (let i = 0; i < points.length; i++) {
-    let speed = covertSpeed(points[i].speed)
-    if (!maxSpeed) {
-      maxSpeed = points[i]
-    } else {
-      if (points[i].speed > maxSpeed.speed) {
-        maxSpeed = points[i]
-      }
-    }
-    if (i === points.length - 1 || !speed) {
-      // 还剩最后一个不计入
-      continue
-    }
-    let nextPoint = points[i + 1]
-    let nextSpeed = covertSpeed(points[i + 1].speed)
-    if (!nextSpeed) {
-      continue
-    }
-    if (!lastArr.length) {
-      lastArr.push(points[i], nextPoint)
-    } else {
-      lastArr.push(nextPoint)
-    }
-    if (speed <= 20) {
-      lineColor = '#8dc645'
-      if (nextSpeed > 20) {
-        // 清空
-        list.push({
-          points: lastArr,
-          color: lineColor,
-          arrowLine: true, //带箭头的线
-          width: 8,
-        })
-        lastArr = []
-      }
-    }
-    if (speed > 20 && speed <= 40) {
-      lineColor = '#9bbd3e'
-      if (nextSpeed <= 20 || nextSpeed > 40) {
-        // 清空
-        list.push({
-          points: lastArr,
-          color: lineColor,
-          arrowLine: true, //带箭头的线
-          width: 8,
-        })
-        lastArr = []
-      }
-    }
-    if (speed > 40 && speed <= 60) {
-      lineColor = '#aeb33e'
-      if (nextSpeed <= 40 || nextSpeed > 60) {
-        // 清空
-        list.push({
-          points: lastArr,
-          color: lineColor,
-          arrowLine: true, //带箭头的线
-          width: 8,
-        })
-        lastArr = []
-      }
-
-    }
-    if (speed > 60 && speed <= 80) {
-      lineColor = '#c6a636'
-      if (nextSpeed <= 60 || nextSpeed > 80) {
-        // 清空
-        list.push({
-          points: lastArr,
-          color: lineColor,
-          arrowLine: true, //带箭头的线
-          width: 8,
-        })
-        lastArr = []
-      }
-    }
-    if (speed > 80 && speed <= 100) {
-      lineColor = '#d49a29'
-      if (nextSpeed <= 80 || nextSpeed > 100) {
-        // 清空
-        list.push({
-          points: lastArr,
-          color: lineColor,
-          arrowLine: true, //带箭头的线
-          width: 8,
-        })
-        lastArr = []
-      }
-    }
-    if (speed > 100 && speed <= 120) {
-      lineColor = '#e4a752'
-      if (nextSpeed <= 100 || nextSpeed > 120) {
-        // 清空
-        list.push({
-          points: lastArr,
-          color: lineColor,
-          arrowLine: true, //带箭头的线
-          width: 8,
-        })
-        lastArr = []
-      }
-    }
-    if (speed > 120) {
-      lineColor = '#f58b2d'
-      if (nextSpeed <= 120) {
-        // 清空
-        list.push({
-          points: lastArr,
-          color: lineColor,
-          arrowLine: true, //带箭头的线
-          width: 8,
-        })
-        lastArr = []
-      }
-    }
-  }
-  this.centerPoint = points[Math.round(points.length / 2)]
-  // console.log("centerPoint", this.centerPoint)
-  if (!list.length && lastArr.length) {
-    list.push({
-      points: lastArr,
-      color: lineColor,
-      arrowLine: true, //带箭头的线
-      width: 8,
-    })
-  }
-  return list
+function getColorBySpeed(kmh) {
+  if (kmh == null || isNaN(kmh) || kmh <= 0) return speedConfig[0].color;
+  return speedConfig.find((it) => kmh <= it.max)?.color || speedConfig[speedConfig.length - 1].color;
 }
 
 // 速度转换 m/s -> km/h
 function covertSpeed(ms) {
-  if (ms <= 0) {
-    return 0.00
-  }
-  const kmh = ms * (60 * 60)
-  return parseFloat(String(kmh / 1000)).toFixed(2)
+  if (ms == null || isNaN(ms) || ms <= 0) return 0;
+  const kmh = (ms * 3600) / 1000;
+  return Number(kmh.toFixed(2));
 }
 
-/**
- * 根据速度生成多段彩色轨迹
- * @param {Array} points - 原始轨迹点 [{longitude, latitude, speed}, ...] speed 单位 km/h
- * @returns {Array} - uni-app map 组件需要的 polyline 数组
- */
+// 根据速度生成多段彩色轨迹
 export function generateSpeedPolylines(points) {
-  if (!points || points.length < 2) return [];
+  const list = [];
+  if (!Array.isArray(points) || points.length < 2) return list;
 
-  const polylines = [];
-  
-  const speedConfig = [
-    { max: 1.1, color: '#7fba3a' },   // 灰色：<= 1.1 m/s (约 4 km/h)
-    { max: 2.2, color: '#8dc645' },   // 橙色：<= 2.2 m/s (约 8 km/h)
-    { max: 3.3, color: '#9bbd3e' },   // 黄色：<= 3.3 m/s (约 12 km/h)
-    { max: 4.4, color: '#aeb33e' },   // 绿色：<= 4.4 m/s (约 16 km/h)
-    { max: 99,  color: '#c6a636' }    // 蓝色：> 4.4 m/s (冲刺)
-  ];
+  let segment = [];
+  let segmentColor = null;
 
-  // 辅助函数：获取颜色
-  const getColorBySpeed = (speed) => {
-    const covertSpeedVal = covertSpeed(speed);
-    for (let config of speedConfig) {
-      if (covertSpeedVal <= config.max) {
-        return config.color;
-      }
-    }
-    return speedConfig[speedConfig.length - 1].color || '#9bbd3e'; // 默认颜色
-  };
-
-  // 遍历点，每两个点生成一段线
   for (let i = 0; i < points.length - 1; i++) {
     const p1 = points[i];
     const p2 = points[i + 1];
+    if (!p1 || !p2) continue;
 
-    // 计算这段路的平均速度 (避免单点抖动)
-    // 如果数据源没有速度，这里需要根据 (距离/时间) 自行计算
-    const avgSpeed = (p1.speed + p2.speed) / 2;
+    const s1 = covertSpeed(p1.speed);
+    const s2 = covertSpeed(p2.speed);
+    if (s1 <= 0 && s2 <= 0) continue;
 
-    // 过滤掉异常静止点 (例如两个点距离极近但时间差很大，导致速度为0，可选)
-    // if (avgSpeed < 0.5) continue; 
+    const avgSpeed = (s1 + s2) / 2;
+    const color = getColorBySpeed(avgSpeed);
 
-    polylines.push({
-      points: [
-        { longitude: p1.longitude, latitude: p1.latitude },
-        { longitude: p2.longitude, latitude: p2.latitude }
-      ],
-      color: getColorBySpeed(avgSpeed),
-      width: 6,
-      borderColor: '#FFFFFF', // 关键：白色描边，提升对比度
-      borderWidth: 1
+    if (!segment.length) {
+      segment = [{ latitude: p1.latitude, longitude: p1.longitude }, { latitude: p2.latitude, longitude: p2.longitude }];
+      segmentColor = color;
+    } else if (color === segmentColor) {
+      segment.push({ latitude: p2.latitude, longitude: p2.longitude });
+    } else {
+      list.push({
+        points: segment,
+        color: segmentColor,
+        arrowLine: true,
+        width: 8
+      });
+      segment = [{ latitude: p1.latitude, longitude: p1.longitude }, { latitude: p2.latitude, longitude: p2.longitude }];
+      segmentColor = color;
+    }
+  }
+
+  if (segment.length > 1) {
+    list.push({
+      points: segment,
+      color: segmentColor || speedConfig[0].color,
+      arrowLine: true,
+      width: 8
     });
   }
 
-  return polylines;
+  return list;
 }
 
 // 获取计算地图缩放级别

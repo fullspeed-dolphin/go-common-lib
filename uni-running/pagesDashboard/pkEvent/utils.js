@@ -13,7 +13,7 @@ export const declareTerms = `
     <span style="font-family: &quot;Helvetica Neue&quot;, sans-serif;">一、活动性质与参与者承诺</span>
 </h4>
 <p style="margin: 0 0 0 24px;font-family: Calibri;font-size: 14px;padding: 0;line-height: 18.2px">
-    <span style="font-family: &quot;Helvetica Neue&quot;, sans-serif;">1.&nbsp;&nbsp;&nbsp;本次活动为基于“全速运动”小程序的线上跑步打卡活动，参与者自愿报名参加，自行安排跑步时间、地点及路线。参与者应选择具备安全保障、符合法律法规要a求的跑步地点及路线，因地点或路线选择不当引发的任何风险及责任均由参与者自行承担。</span>
+    <span style="font-family: &quot;Helvetica Neue&quot;, sans-serif;">1.&nbsp;&nbsp;&nbsp;本次活动为基于“全速运动”小程序的线上跑步打卡活动，参与者自愿报名参加，自行安排跑步时间、地点及路线。参与者应选择具备安全保障、符合法律法规要求的跑步地点及路线，因地点或路线选择不当引发的任何风险及责任均由参与者自行承担。</span>
 </p>
 <p style="margin: 0 0 0 24px;font-family: Calibri;font-size: 14px;padding: 0;line-height: 18.2px" class="" data-tools-id="45697">
     <span style="font-family: &quot;Helvetica Neue&quot;, sans-serif;">2.&nbsp;&nbsp;&nbsp;参与者承诺已自行前往正规医疗机构完成健康检查，确认自身身体健康，无任何不适合跑步运动的疾病（包括但不限于心脏病、高血压、哮喘等），且已充分评估自身运动能力，确认能够完成本次活动对应月度里程的跑步挑战。</span>
@@ -58,7 +58,7 @@ export const declareTerms = `
     <span style="font-family: &quot;Helvetica Neue&quot;, sans-serif;">1.&nbsp;&nbsp;&nbsp;本免责声明的最终解释权归广州全速体育发展有限公司所有。因本声明或本次活动所引起的或与之相关的任何争议，双方应首先友好协商解决；协商不成的，任何一方均有权将争议提交至广州全速体育发展有限公司所在地有管辖权的人民法院诉讼解决。</span>
 </p>
 <p style="margin: 0 0 0 24px;font-family: Calibri;font-size: 14px;padding: 0;line-height: 18.2px">
-    <span style="font-family: &quot;Helvetica Neue&quot;, sans-serif;">2.&nbsp;如您对本声明有任何疑问，可在报名前联系活动主办方咨询。</span>
+    <span style="font-family: &quot;Helvetica Neue&quot;, sans-serif;">2.&nbsp;&nbsp;&nbsp;如您对本声明有任何疑问，可在报名前联系活动主办方咨询。</span>
 </p>
 <p style=";text-align: justify;font-family: Calibri;font-size: 14px" class="" data-tools-id="81788">
     <span style="font-family: &quot;Helvetica Neue&quot;, sans-serif;">&nbsp;</span>

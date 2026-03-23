@@ -12,7 +12,7 @@
   </up-popup>
 </template>
 <script setup>
-import lPainter from "../eventAlbum/components/lime-painter/components/l-painter/l-painter.vue"
+import lPainter from "@/uni_modules/lime-painter/components/l-painter/l-painter.vue"
 import { ref, nextTick, computed,onMounted } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 

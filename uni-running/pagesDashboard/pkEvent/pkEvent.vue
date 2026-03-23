@@ -10,7 +10,7 @@
 
     <section class="section-header header-bg" style="margin-top: -372rpx;">
       <view class="status-bar" style="display:flex;justify-content:flex-end;">
-        <view v-if="!isSignUpEvent"
+        <view v-if="hasSignedUp"
           style="color:#fff;font-size: 32rpx;font-weight: bold;background: rgba(25, 190, 107, .9);padding: 16rpx 32rpx; border-radius: 32rpx 0 0 32rpx;"
           class="rule-link flex-center">
           已报名
@@ -54,7 +54,7 @@
 
     <!-- 功能按钮组 -->
     <section class="section-func-buttons flex-wrap">
-      <view v-if="!userStatusInfo.in_team" class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/teamForm')">
+      <view v-if="!userStatusInfo.in_team" class="func-item flex-col-center" @click="createTeam">
         <view class="iconfont flex-center icon-zhandui1" style="color:#FCD515;background: #FEF9C2;"></view>
         <text class="func-text">创建战队</text>
       </view>
@@ -85,7 +85,7 @@
 			</view> -->
     </section>
 
-    <view v-if="userStatusInfo.in_team && !isSignUpEvent" class="section-btn flex-center" @click="goto('/pagesSport/punchInUpload')">
+    <view v-if="userStatusInfo.in_team && hasSignedUp" class="section-btn flex-center" @click="goto('/pagesSport/punchInUpload')">
     	<view class="iconfont flex-center icon-lijidaka u-mr-10" style="color:#fff;font-size:42rpx;"></view>
     	立即打卡
     </view>
@@ -184,9 +184,9 @@
 		
 		
 		<div class="hr100" style="height:120rpx;"></div>
-    <view v-if="isSignUpEvent" class="join-btn-wrapper flex-center">
+    <view v-if="showSignUpBtn" class="join-btn-wrapper flex-center">
       <u-button class="join-btn" :color="`linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})`"
-        customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;letter-spacing: 1px;font-size: 34rpx;" :disabled="detailInfo?.status !== 'act'" @click="SignUpEvent()">
+        customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;letter-spacing: 1px;font-size: 34rpx;" @click="SignUpEvent()">
         立即报名参赛
       </u-button>
     </view>
@@ -275,7 +275,7 @@ const getEventData = () => {
       
       res = {
         ...res,
-        diffDays: dayjs(date2 + "").diff(date1 + "", "day"),
+        diffDays: dayjs(date2 + "").diff(date1 + "", "day") + 1,
         registration_end_time: dayjs(res.registration_end_time).format("M月D日"),
         start_time: dayjs(res.start_time).format("M月D日"),
         total_registrations: formatNumber(res.total_registrations),
@@ -320,10 +320,17 @@ function getMyEvents() {
     myEvents.value = res;
   }).catch(() => {});
 }
-const isSignUpEvent = computed(() => {
-  if (!myEvents.value) return true;
-  return !myEvents.value.some((i) => i.event_id === activetyId.value);
-})
+// 活动是否进行中
+const isActive = computed(() => detailInfo.value?.status === 'act');
+
+// 用户是否已报名（纯粹判断，不混入活动状态）
+const hasSignedUp = computed(() => {
+  if (!myEvents.value) return false;
+  return myEvents.value.some((i) => i.event_id === activetyId.value);
+});
+
+// 是否显示报名按钮 = 活动进行中 + 用户未报名
+const showSignUpBtn = computed(() => isActive.value && !hasSignedUp.value);
 
 // 数字格式化
 const formatNumber = (num) => {
@@ -350,6 +357,11 @@ const SignUpEvent = () => {
   goToSignEvent()
 };
 
+function createTeam() {
+  if (detailInfo.value?.status !== 'act') return uni.$u.toast('活动报名时间已过');
+  goto('pagesDashboard/pkEvent/teamForm');
+}
+
 function goToSignEvent(item) {
 	uni.$u.route("pagesDashboard/pkEvent/packageList", { 
     id: activetyId.value,
@@ -360,10 +372,6 @@ function goToSignEvent(item) {
 
 // 跳转
 const goto = (url) => {
-  if (detailInfo?.status !== "act") {
-    // return uni.$u.toast('活动未开始');
-  }
-
   if (!userInfo.value.id) {
 		loginCallAction.value = 'routeTo' + url
 		loginCallBack.value = goto;
@@ -381,11 +389,16 @@ onLoad((options) => {
   activetyId.value = options.id || "01KH0WQX4H2C7Q4GJ217P8T922";
 });
 
+let isFirstShow = true;
 onShow(() => {
   getEventData();
   getUserStatus();
   getMyEvents();
   getuserCheckedInfo();
+  if (!isFirstShow) {
+    refreshList();
+  }
+  isFirstShow = false;
 });
 
 useShare(() => ({

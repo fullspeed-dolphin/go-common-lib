@@ -1,7 +1,7 @@
 <template>
   <view class="page" :style="themeStyle">
     <u-navbar autoBack placeholder  title="战队列表" />
-    <section class="section-header flex-col-center " :style="{top: statusHeight+'px;'}">
+    <section class="section-header flex-col-center" :style="{ top: getNavbarHeight() + 'px' }">
       <view class="section-search u-mb-20" style="width:686rpx;">
         <u-search v-model="searchTxt" @search="refreshList" placeholder="输入战队名称" shape="round" bgColor="#f5f5f5" borderColor="#e5e5e5" :showAction="false"></u-search>
       </view>
@@ -34,8 +34,10 @@
               <view class="leader">队长：{{ item.leader_nickname }}</view>
             </view>
 
-            <view class="join-btn flex-center" :class="{ 'btn-disabled': pkEventStatus !== 'act' }" :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }" @click.stop="goToSignEvent(item)">
-              加入
+            <view class="join-btn flex-center"
+              :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }"
+              @click.stop="(userStatusInfo.in_team || pkEventStatus !== 'act') ? joinTeam(item) : goToSignEvent(item)">
+              {{ (userStatusInfo.in_team || pkEventStatus !== 'act') ? '查看' : '加入' }}
             </view>
           </view>
         </view>
@@ -47,16 +49,15 @@
         color1="#ff5c5c"
         :color="`linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})`"
         customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;font-size: 34rpx;letter-spacing: 1px;"
-        @click="$u.route('pagesDashboard/pkEvent/teamForm', { id: activetyId })">
+        @click="createTeam">
         创建战队
       </u-button>
     </view>
-    <view v-else-if="!hasSignedUp" class="create-team-wrapper flex-center">
+    <view v-else-if="!hasSignedUp && pkEventStatus === 'act'" class="create-team-wrapper flex-center">
       <u-button class="create-team-btn"
         color1="#ff5c5c"
         :color="`linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})`"
         customStyle="width: 686rpx;height: 96rpx;border-radius: 999rpx;font-size: 34rpx;letter-spacing: 1px;"
-        :disabled="pkEventStatus !== 'act'"
         @click="goToSignEvent()">
         立即报名参赛
       </u-button>
@@ -69,6 +70,7 @@ import { ref, computed, watch } from "vue";
 import { onLoad, onShow, onPageScroll, onReachBottom } from "@dcloudio/uni-app";
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 import request from "@/utils/request.js";
+import { getNavbarHeight } from "@/utils/util.js";
 
 const { mescrollInit, downCallback, getMescroll } = useMescroll(
   onPageScroll,
@@ -148,8 +150,13 @@ function joinTeamToSign(item) {
   uni.$u.route(`pagesDashboard/pkEvent/pkEventForm?id=${item.id}&eventId=${activetyId.value}`);
 }
 
+function createTeam() {
+	if (pkEventStatus.value !== 'act') return uni.$u.toast('活动报名时间已过');
+	uni.$u.route('pagesDashboard/pkEvent/teamForm', { id: activetyId.value });
+}
+
 function goToSignEvent(item) {
-	if (pkEventStatus.value !== 'act') return uni.$u.toast('活动暂未开放报名');
+	if (pkEventStatus.value !== 'act') return uni.$u.toast('活动报名时间已过');
 	uni.$u.route("pagesDashboard/pkEvent/packageList", {
     id: activetyId.value,
     eventId: activetyId.value,
@@ -202,9 +209,7 @@ const getList = (mescroll) => {
     });
 };
 
-const statusHeight = ref(uni.getSystemInfoSync().statusBarHeight+44)
 onLoad((options) => {
-  // 获取状态栏高度
   activetyId.value = options.id;
   getUserStatus();
   getMyEvents();
@@ -236,7 +241,6 @@ defineOptions({
   position: fixed;
   width: 100%;
   z-index: 10;
-  top: 50px;
   padding: 16rpx 24rpx;
   background: #fff;
 }

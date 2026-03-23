@@ -109,6 +109,16 @@ const open = () => {
 };
 
 const confrimTime = (detail) => {
+  if (!detail.value) {
+    detail.value = dayjs().valueOf();
+    if (props.minDate) {
+      const minTime = dayjs(props.minDate).valueOf();
+      if (detail.value < minTime) {
+        detail.value = minTime;
+      }
+    }
+  }
+
   isShowPop.value = false;
   timeValue.value = detail.value;
   console.log("ti====>", detail, dayjs(detail.value).format("YYYY-MM-DD HH:mm"));

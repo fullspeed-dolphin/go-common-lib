@@ -109,6 +109,16 @@ const themeStyle = computed(() => ({
 const uForm = ref(null);
 const activetyId = ref("");
 
+function backToEventHome() {
+  const pages = getCurrentPages();
+  const idx = pages.findIndex(p => p.route?.endsWith('pkEvent/pkEvent'));
+  if (idx >= 0) {
+    uni.navigateBack({ delta: pages.length - 1 - idx });
+  } else {
+    uni.redirectTo({ url: `/pagesDashboard/pkEvent/pkEvent?id=${activetyId.value}` });
+  }
+}
+
 const isAgree = ref(false);
 const props = defineProps({
   teamID: {
@@ -284,11 +294,14 @@ function getUserStatus() {
     }).catch(() => {});
 }
 
+const isSubmitting = ref(false);
 const submitForm = () => {
+  if (isSubmitting.value) return;
   uForm.value.validate().then((res) => {
     if (!isAgree.value) return uni.$u.toast("请查阅并勾选免责声明~");
     if (!currentSku.value?.id) return uni.$u.toast("请选择套餐款式~");
 
+    isSubmitting.value = true;
     // 未加入战队需要先加入战队
     if (!userStatusInfo.value.in_team) {
       joinTeamAPi();
@@ -324,6 +337,7 @@ function signUpEvent() {
       }
     })
     .catch(() => {
+      isSubmitting.value = false;
       uni.hideLoading();
     });
 }
@@ -341,10 +355,14 @@ function joinTeamAPi(item) {
       team_id: props.teamID || routerParams.value.teamId,
     })
     .then(() => {
+      // 标记已加入，防止重试时重复调用 join 接口
+      userStatusInfo.value.in_team = true;
       signUpEvent();
     })
     .catch((e) => {
       console.log("e", e);
+      isSubmitting.value = false;
+      uni.hideLoading();
     });
 }
 
@@ -427,7 +445,7 @@ function freeToPay(reg_no) {
       uni.hideLoading();
       uni.$u.toast("报名成功");
       setTimeout(() => {
-        uni.navigateBack();
+        backToEventHome();
       }, 300);
     })
     .catch(() => {
@@ -447,8 +465,7 @@ function wxPay(respay) {
       uni.hideLoading();
       uni.$u.toast("支付成功");
       setTimeout(() => {
-        uni.navigateBack();
-        // uni.$u.route("pagesSub/orderSuccess?order_no=" + respay.order_no);
+        backToEventHome();
       }, 300);
     },
     fail: (res) => {

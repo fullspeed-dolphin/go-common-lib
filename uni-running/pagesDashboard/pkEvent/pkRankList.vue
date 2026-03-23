@@ -350,14 +350,15 @@ const loadRankList = (mescroll) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 20rpx 30rpx;
+  margin: 40rpx 30rpx 20rpx;
 }
 
 .sort-switch {
   display: flex;
   justify-content: center;
-  gap: 16rpx;
-  padding: 0 0 16rpx;
+  gap: 20rpx;
+  margin-top: 24rpx;
+  padding-bottom: 16rpx;
 
   .sort-btn {
     padding: 10rpx 32rpx;
