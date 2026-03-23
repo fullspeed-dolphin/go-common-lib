@@ -98,12 +98,12 @@
           </template>
         </u-cell>
 
-        <u-cell v-if="isReleaseVersion()" title="关注全速体育" class="nav-cell" @click="openOfficialAccount" :border="false"
+        <!-- <u-cell v-if="isReleaseVersion()" title="关注全速体育" class="nav-cell" @click="openOfficialAccount" :border="false"
           isLink>
           <template #icon>
             <view class="nav-icon iconfont icon-weixin"></view>
           </template>
-        </u-cell>
+        </u-cell> -->
 
         <u-cell title="关于我们" class="nav-cell" @click="routeTo('/pagesSub/settings/aboutUs')" :border="false" isLink>
           <template #icon>
