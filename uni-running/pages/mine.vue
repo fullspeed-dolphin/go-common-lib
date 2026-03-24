@@ -12,12 +12,12 @@
           <block v-if="userInfo.id">
             <view class="hero-name-row" @click="handleUserClick">
               <text class="hero-name">{{ userInfo.nickname || "微信用户" }}</text>
-              <u-icon name="edit-pen-fill" color="rgba(255,255,255,0.8)" size="16"></u-icon>
+              <u-icon name="edit-pen-fill" color="rgba(46,59,94,0.6)" size="16"></u-icon>
             </view>
             <view class="hero-coin-pill" @click="routeTo('/pagesSub/runCoin/myCoin')">
               <image class="coin-icon" src="/static/images/coin.png" mode="aspectFill"></image>
               <text class="coin-text">跑币 {{ coinInfo.fscoin || 0 }}</text>
-              <u-icon name="arrow-right" color="#FF8C00" size="12"></u-icon>
+              <u-icon name="arrow-right" color="#2E3B5E" size="12"></u-icon>
             </view>
           </block>
           <view class="hero-name-row" v-else @click="handleUserClick">
@@ -104,11 +104,23 @@
               <text class="menu-label">关于我们</text>
               <u-icon name="arrow-right" color="#B8C4D0" size="16"></u-icon>
             </view>
+            <template v-if="userInfo.id">
+              <view class="menu-divider"></view>
+              <view class="menu-row" @click="logout()">
+                <view class="menu-icon-wrap">
+                  <view class="menu-icon-svg icon-logout"></view>
+                </view>
+                <text class="menu-label">退出登录</text>
+                <u-icon name="arrow-right" color="#B8C4D0" size="16"></u-icon>
+              </view>
+            </template>
           </view>
         </view>
 
-        <view v-if="userInfo.id" class="logout">
-          <text @click="logout()">-- 退出登录 --</text>
+        <view class="footer-version">
+          <view class="footer-line"></view>
+          <text class="footer-text">全速科技{{ appVersion ? ' v' + appVersion : '' }}</text>
+          <view class="footer-line"></view>
         </view>
       </view>
     </view>
@@ -155,6 +167,15 @@ const onLoginSuccess = () => {
 
 // 计算属性
 const userInfo = computed(() => store.state.userInfo);
+
+// 小程序版本号
+const appVersion = (() => {
+  try {
+    return uni.getAccountInfoSync().miniProgram.version || '';
+  } catch (e) {
+    return '';
+  }
+})();
 
 // 页面显示
 onShow(() => {
@@ -272,7 +293,7 @@ const openWeComChat = () => {
 
 <style lang="scss" scoped>
 .hero-section {
-  background: linear-gradient(180deg, #4A7FB5 0%, #B2D6EB 100%);
+  background: linear-gradient(180deg, #FF8C00 0%, #FFD2A0 100%);
   padding: 0 32rpx 48rpx 32rpx;
 }
 
@@ -304,7 +325,7 @@ const openWeComChat = () => {
 .hero-name {
   font-size: 36rpx;
   font-weight: 700;
-  color: #fff;
+  color: #2E3B5E;
 }
 
 .hero-coin-pill {
@@ -312,7 +333,7 @@ const openWeComChat = () => {
   align-items: center;
   gap: 16rpx;
   padding: 20rpx 28rpx 20rpx 32rpx;
-  background: #FFFFFF;
+  background: rgba(255, 255, 255, 0.35);
   border-radius: 100rpx;
 
   .coin-icon {
@@ -323,13 +344,13 @@ const openWeComChat = () => {
   .coin-text {
     font-size: 32rpx;
     font-weight: 700;
-    color: #FF8C00;
+    color: #2E3B5E;
   }
 }
 
 .hero-transition {
   height: 80rpx;
-  background: linear-gradient(180deg, #B2D6EB 0%, #FAFAFA 100%);
+  background: linear-gradient(180deg, #FFD2A0 0%, #FAFAFA 100%);
 }
 
 .mine-content {
@@ -368,7 +389,6 @@ const openWeComChat = () => {
   width: 72rpx;
   height: 72rpx;
   border-radius: 50%;
-  background: #FDF0E6;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -379,6 +399,7 @@ const openWeComChat = () => {
   font-size: 36rpx;
   color: #FF8C00;
 }
+
 
 .menu-label {
   flex: 1;
@@ -393,11 +414,35 @@ const openWeComChat = () => {
   margin: 0 40rpx;
 }
 
-.logout {
+.menu-icon-svg {
+  width: 36rpx;
+  height: 36rpx;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.icon-logout {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNGRjhDMDAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNOSAyMUg1YTIgMiAwIDAgMS0yLTJWNWEyIDIgMCAwIDEgMi0yaDQiLz48cG9seWxpbmUgcG9pbnRzPSIxNiAxNyAyMSAxMiAxNiA3Ii8+PGxpbmUgeDE9IjIxIiB5MT0iMTIiIHgyPSI5IiB5Mj0iMTIiLz48L3N2Zz4K");
+}
+
+.footer-version {
   display: flex;
+  align-items: center;
   justify-content: center;
-  padding: 40rpx 0 60rpx;
-  color: #999;
-  font-size: 28rpx;
+  gap: 20rpx;
+  padding: 40rpx 48rpx 60rpx;
+}
+
+.footer-line {
+  flex: 1;
+  height: 1px;
+  background: #E0E0E0;
+}
+
+.footer-text {
+  color: #C0C0C0;
+  font-size: 24rpx;
+  white-space: nowrap;
 }
 </style>
