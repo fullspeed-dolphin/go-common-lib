@@ -47,7 +47,14 @@ function getDevicesList() {
     }).filter((item) => item.platform !== 'honor');
   });
 }
-
+onShow(() => {
+  // getDevicesList();
+  try {
+    const { code, error, state } = wx.getEnterOptionsSync().referrerInfo.extraData;
+  } catch (error) {
+    console.log(error);
+  }
+});
 function routeToDetail(item) {
   // uni.$u.route(`/pagesSub/device/deviceDetail?platform=${item.platform}`);
   wx.navigateToMiniProgram({
