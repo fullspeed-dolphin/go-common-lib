@@ -1,119 +1,115 @@
 <template>
   <view class="page">
     <view class="page-content">
-      <view class="rel section-user">
-        <view class="user-box">
-          <view class="u-flex-y-center">
-            <view class="img-box" @click="handleUserClick">
-              <image class="avatar" :src="userInfo.avatar_url ||
-                'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
-                " mode="aspectFill"></image>
-              <view class="gender flex-center">
-                <u-icon v-if="userInfo.gender === 1" color="#409eff" name="man" size="20"></u-icon>
-                <u-icon v-if="userInfo.gender === 0" color="#f5abb8" name="woman" size="20"></u-icon>
-              </view>
+      <!-- Hero 区域 -->
+      <view class="hero-section">
+        <view class="hero-content">
+          <view class="hero-avatar-wrap" @click="handleUserClick">
+            <image class="hero-avatar" :src="userInfo.avatar_url ||
+              'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
+              " mode="aspectFill"></image>
+          </view>
+          <block v-if="userInfo.id">
+            <view class="hero-name-row" @click="handleUserClick">
+              <text class="hero-name">{{ userInfo.nickname || "微信用户" }}</text>
+              <u-icon name="edit-pen-fill" color="rgba(255,255,255,0.8)" size="16"></u-icon>
             </view>
-            <view class="text">
-              <block v-if="userInfo.id">
-                <view class="name u-flex-y-center" @click="handleUserClick">
-                  {{ userInfo.nickname || "微信用户" }}
-                  <view class="u-ml-10">
-                    <u-icon name="edit-pen-fill" size="17"></u-icon>
-                  </view>
-                </view>
-                <!-- <view class="name" style="color: #666; margin-top: 20rpx">
-								{{ userInfo.phone || ""}}
-								</view> -->
-                <view @click="routeTo('/pagesSub/runCoin/myCoin')" class="coin-pill">
-                  <image class="coin-icon" src="/static/images/coin.png" mode="aspectFill"></image>
-                  <text class="coin-label">我的跑币:</text>
-                  <text class="coin-value">{{ coinInfo.fscoin }}</text>
-                  <u-icon name="arrow-right" color="#e65100" size="12"></u-icon>
-                </view>
-              </block>
-              <view class="name" v-else @click="handleUserClick">登录/注册</view>
+            <view class="hero-coin-pill" @click="routeTo('/pagesSub/runCoin/myCoin')">
+              <image class="coin-icon" src="/static/images/coin.png" mode="aspectFill"></image>
+              <text class="coin-text">跑币 {{ coinInfo.fscoin || 0 }}</text>
+              <u-icon name="arrow-right" color="#FF8C00" size="12"></u-icon>
+            </view>
+          </block>
+          <view class="hero-name-row" v-else @click="handleUserClick">
+            <text class="hero-name">登录/注册</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 过渡渐变 -->
+      <view class="hero-transition"></view>
+
+      <!-- 内容区域 -->
+      <view class="mine-content">
+        <!-- 我的服务 -->
+        <view class="mine-section">
+          <text class="section-title">我的服务</text>
+          <view class="section-card">
+            <view class="menu-row" @click="routeTo('pagesSub/orderList')">
+              <view class="menu-icon-wrap">
+                <view class="iconfont icon-dingdan menu-icon"></view>
+              </view>
+              <text class="menu-label">我的订单</text>
+              <u-icon name="arrow-right" color="#B8C4D0" size="16"></u-icon>
+            </view>
+            <view class="menu-divider"></view>
+            <view class="menu-row" @click="routeTo(`pagesSub/runningTeam/teamDetail?from=mine&group_id=${userInfo.running_group}`)">
+              <view class="menu-icon-wrap">
+                <view class="iconfont icon-baomingmingdan menu-icon"></view>
+              </view>
+              <text class="menu-label">全速俱乐部</text>
+              <u-icon name="arrow-right" color="#B8C4D0" size="16"></u-icon>
+            </view>
+            <view class="menu-divider"></view>
+            <view class="menu-row" @click="routeTo('/pagesSub/registrationCard/list')">
+              <view class="menu-icon-wrap">
+                <view class="iconfont icon-baomingka1 menu-icon"></view>
+              </view>
+              <text class="menu-label">报名卡</text>
+              <u-icon name="arrow-right" color="#B8C4D0" size="16"></u-icon>
+            </view>
+            <view class="menu-divider"></view>
+            <view class="menu-row" @click="routeTo('/pagesSub/device/deviceList')">
+              <view class="menu-icon-wrap">
+                <view class="iconfont icon-zhinengshoubiao menu-icon"></view>
+              </view>
+              <text class="menu-label">智能设备</text>
+              <u-icon name="arrow-right" color="#B8C4D0" size="16"></u-icon>
             </view>
           </view>
         </view>
 
-        <!-- <view class="setting" @click="routeTo('pagesSub/signerForm')">
-          <u-icon name="setting-fill" size="20"></u-icon>
-        </view> -->
-      </view>
-      <view class="section-box">
-        <u-cell title="我的订单" class="nav-cell" @click="routeTo(`pagesSub/orderList`)" :border="false" isLink>
-          <template #icon>
-            <view class="nav-icon iconfont icon-dingdan"></view>
-          </template>
-        </u-cell>
-        <!-- <u-cell title="我的跑币" class="nav-cell" @click="routeTo('/pagesSub/runCoin/myCoin')" :border="false" isLink>
-					<template #icon>
-						<image class="nav-icon" style="width: 40rpx; height: 40rpx"
-							src="/static/images/coin.png"></image>
-					</template>
-				</u-cell> -->
-        <u-cell title="全速俱乐部" class="nav-cell" @click="
-          routeTo(
-            `pagesSub/runningTeam/teamDetail?from=mine&group_id=${userInfo.running_group}`
-          )
-          " :border="false" isLink>
-          <template #icon>
-            <view class="nav-icon iconfont icon-baomingmingdan"></view>
-          </template>
-        </u-cell>
-        <u-cell title="报名卡" class="nav-cell" @click="routeTo('/pagesSub/registrationCard/list')" :border="false" isLink>
-          <template #icon>
-            <view class="nav-icon iconfont icon-baomingka1"></view>
-          </template>
-        </u-cell>
+        <!-- 更多 -->
+        <view class="mine-section">
+          <text class="section-title">更多</text>
+          <view class="section-card">
+            <view class="menu-row" @click="openWeComChat()">
+              <view class="menu-icon-wrap">
+                <view class="iconfont icon-lianxikefu menu-icon"></view>
+              </view>
+              <text class="menu-label">联系客服</text>
+              <u-icon name="arrow-right" color="#B8C4D0" size="16"></u-icon>
+            </view>
+            <view class="menu-divider"></view>
+            <view class="menu-row" @click="routeTo('/pagesMine/PunchEvent')">
+              <view class="menu-icon-wrap">
+                <view class="iconfont icon-qiandao_daka menu-icon"></view>
+              </view>
+              <text class="menu-label">现场签到</text>
+              <u-icon name="arrow-right" color="#B8C4D0" size="16"></u-icon>
+            </view>
+            <view class="menu-divider"></view>
+            <view class="menu-row" @click="routeTo('/pagesMine/toolkit/UserRole')">
+              <view class="menu-icon-wrap">
+                <view class="iconfont icon-zhuye menu-icon"></view>
+              </view>
+              <text class="menu-label">全速之家</text>
+              <u-icon name="arrow-right" color="#B8C4D0" size="16"></u-icon>
+            </view>
+            <view class="menu-divider"></view>
+            <view class="menu-row" @click="routeTo('/pagesSub/settings/aboutUs')">
+              <view class="menu-icon-wrap">
+                <view class="iconfont icon-guanyuwomen menu-icon"></view>
+              </view>
+              <text class="menu-label">关于我们</text>
+              <u-icon name="arrow-right" color="#B8C4D0" size="16"></u-icon>
+            </view>
+          </view>
+        </view>
 
-        <u-cell title="智能设备" class="nav-cell" @click="routeTo('/pagesSub/device/deviceList')" :border="false" isLink>
-          <template #icon>
-            <view class="nav-icon iconfont icon-zhinengshoubiao"></view>
-          </template>
-        </u-cell>
-
-        <!-- <u-cell title="我的跑币" class="nav-cell" @click="routeTo('/pagesSub/device/deviceList')" :border="false" isLink>
-					<template #icon>
-						<image class="nav-icon" style="width: 40rpx; height: 40rpx"
-							src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-mine-coin@2x.png"></image>
-					</template>
-				</u-cell> -->
-
-        <u-cell title="联系客服" class="nav-cell" @click="openWeComChat()" :border="false" isLink>
-          <template #icon>
-            <view class="nav-icon iconfont icon-lianxikefu"></view>
-          </template>
-        </u-cell>
-
-        <u-cell title="现场签到" class="nav-cell" @click="routeTo('/pagesMine/PunchEvent')" :border="false" isLink>
-          <template #icon>
-            <view class="nav-icon iconfont icon-qiandao_daka"></view>
-          </template>
-        </u-cell>
-
-        <u-cell title="全速之家" class="nav-cell" @click="routeTo('/pagesMine/toolkit/UserRole')" :border="false" isLink>
-          <template #icon>
-            <view class="nav-icon iconfont icon-zhuye"></view>
-          </template>
-        </u-cell>
-
-        <!-- <u-cell v-if="isReleaseVersion()" title="关注全速体育" class="nav-cell" @click="openOfficialAccount" :border="false"
-          isLink>
-          <template #icon>
-            <view class="nav-icon iconfont icon-weixin"></view>
-          </template>
-        </u-cell> -->
-
-        <u-cell title="关于我们" class="nav-cell" @click="routeTo('/pagesSub/settings/aboutUs')" :border="false" isLink>
-          <template #icon>
-            <view class="nav-icon iconfont icon-guanyuwomen"></view>
-          </template>
-        </u-cell>
-      </view>
-
-      <view v-if="userInfo.id" class="logout c9 flex-center" style="padding-bottom: 60rpx;">
-        <text class="u-pb-20" @click="logout()">-- 退出登录 --</text>
+        <view v-if="userInfo.id" class="logout">
+          <text @click="logout()">-- 退出登录 --</text>
+        </view>
       </view>
     </view>
     <tabbar type="mine" />
@@ -275,209 +271,133 @@ const openWeComChat = () => {
 </script>
 
 <style lang="scss" scoped>
-.img-box {
-  position: relative;
+.hero-section {
+  background: linear-gradient(180deg, #4A7FB5 0%, #B2D6EB 100%);
+  padding: 0 32rpx 48rpx 32rpx;
+}
 
-  .gender {
-    position: absolute;
-    background: #fff;
-    bottom: -2rpx;
-    right: 40rpx;
-    width: 36rpx;
-    border-radius: 40rpx;
+.hero-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32rpx;
+  padding-top: 80rpx;
+}
+
+.hero-avatar-wrap {
+  .hero-avatar {
+    display: block;
+    width: 144rpx;
+    height: 144rpx;
+    border-radius: 50%;
+    border: 6rpx solid rgba(255, 255, 255, 0.33);
+    background: #f5f5f5;
   }
 }
 
-::v-deep {
-  .u-cell__left-icon-wrap {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 26rpx;
-    height: 26rpx;
-    margin-right: 22rpx !important;
+.hero-name-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.hero-name {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #fff;
+}
+
+.hero-coin-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 20rpx 28rpx 20rpx 32rpx;
+  background: #FFFFFF;
+  border-radius: 100rpx;
+
+  .coin-icon {
+    width: 40rpx;
+    height: 40rpx;
   }
 
-  .u-cell__title-text {
-    font-weight: bold;
-    font-size: 30rpx !important;
-    color: rgba(0, 0, 0, 0.8);
-  }
-
-  .u-icon__icon {
-    font-size: 26rpx !important;
-  }
-
-  .service-cell {
-    .icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 26rpx;
-      height: 26rpx;
-      margin-right: 22rpx;
-    }
-
-    .service-content {
-      display: flex;
-      align-items: center;
-    }
-
-    .service-text {
-      font-weight: bold;
-      font-size: 30rpx;
-      color: rgba(0, 0, 0, 0.8);
-    }
-
-    .u-cell__body__content {
-      flex: unset;
-    }
-
-    .u-cell__value {
-      flex: 1;
-      text-align: left;
-      max-width: 100%;
-    }
-
-    .u-reset-button {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      border: none;
-      background: transparent;
-      text-align: left;
-      display: flex;
-      flex-direction: row;
-      box-sizing: border-box;
-      align-items: center;
-
-      &::after {
-        border: none;
-      }
-
-      .flex-row {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        padding: 0 15px;
-        box-sizing: border-box;
-      }
-    }
+  .coin-text {
+    font-size: 32rpx;
+    font-weight: 700;
+    color: #FF8C00;
   }
 }
 
-.setting {
-  position: absolute;
-  right: 20rpx;
-  top: 20rpx;
-  padding: 20rpx;
+.hero-transition {
+  height: 80rpx;
+  background: linear-gradient(180deg, #B2D6EB 0%, #FAFAFA 100%);
 }
 
-.nav-icon {
-  width: 34rpx;
-  height: 34rpx;
+.mine-content {
+  background: #FAFAFA;
+  padding: 48rpx 48rpx 32rpx;
+  min-height: 400rpx;
+}
+
+.mine-section {
+  margin-bottom: 32rpx;
+}
+
+.section-title {
   display: block;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #2E3B5E;
+  margin-bottom: 20rpx;
+}
+
+.section-card {
+  background: #FFFFFF;
+  border-radius: 32rpx;
+  padding: 8rpx 0;
+  overflow: hidden;
+}
+
+.menu-row {
+  display: flex;
+  align-items: center;
+  padding: 28rpx 40rpx;
+  gap: 28rpx;
+}
+
+.menu-icon-wrap {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: #FDF0E6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  font-weight: 600;
-  width: 43rpx;
-  height: 34rpx;
-  font-size: 38rpx;
+}
+
+.menu-icon {
+  font-size: 36rpx;
   color: #FF8C00;
 }
 
-.user-box {
-  height: 260rpx;
-  padding: 56rpx 0 0rpx 48rpx;
-  overflow: hidden;
-
-  .avatar {
-    display: block;
-    width: 140rpx;
-    height: 140rpx;
-    margin-right: 36rpx;
-    background: #f5f5f5;
-    border-radius: 140rpx;
-    text-align: center;
-    font-size: 60rpx;
-    color: #ccc;
-    border: 2rpx solid rgba(0, 0, 0, 0.06);
-  }
-
-  .name {
-    font-weight: 600;
-    font-size: 36rpx;
-  }
-
-  .coin-pill {
-    display: inline-flex;
-    align-items: center;
-    margin-top: 20rpx;
-    padding: 10rpx 24rpx;
-    background: linear-gradient(135deg, #fff8e1 0%, #ffe0b2 100%);
-    border-radius: 100rpx;
-    border: 2rpx solid #ffb74d;
-
-    .coin-icon {
-      width: 32rpx;
-      height: 34rpx;
-    }
-
-    .coin-label {
-      margin-left: 10rpx;
-      font-size: 26rpx;
-      color: #e65100;
-      font-weight: 500;
-    }
-
-    .coin-value {
-      margin-left: 8rpx;
-      margin-right: 8rpx;
-      font-size: 28rpx;
-      color: #e65100;
-      font-weight: 600;
-    }
-  }
+.menu-label {
+  flex: 1;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #2E3B5E;
 }
 
-::v-deep {
-  .u-cell {
-    margin-bottom: 8rpx;
-    border-radius: 10rpx;
-    width: 680rpx;
-    margin: 26rpx auto;
-    height: 110rpx;
-    border-radius: 24rpx 24rpx 24rpx 24rpx;
-    border: 2rpx solid rgba(0, 0, 0, 0.06);
-    background: #fff;
-
-    .u-cell__body {
-      height: 100%;
-    }
-  }
-
-  .van-cell__title {
-    font-size: 34rpx;
-    font-weight: 600;
-  }
-}
-
-.section-box {
-  position: relative;
+.menu-divider {
+  height: 1px;
+  background: #E8E8E8;
+  margin: 0 40rpx;
 }
 
 .logout {
-  margin-top: 50rpx;
-}
-
-.section-user {
-  overflow: hidden;
-  position: relative;
-
-  .user-bg {
-    width: 100%;
-    height: 286rpx;
-    display: block;
-  }
+  display: flex;
+  justify-content: center;
+  padding: 40rpx 0 60rpx;
+  color: #999;
+  font-size: 28rpx;
 }
 </style>
