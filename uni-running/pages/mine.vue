@@ -50,6 +50,16 @@
               <text class="menu-label">全速俱乐部</text>
               <u-icon name="arrow-right" color="#B8C4D0" size="16"></u-icon>
             </view>
+            <template v-if="isGroupCreator">
+              <view class="menu-divider"></view>
+              <view class="menu-row" @click="routeTo(`pagesSub/runningTeam/teamSetting?group_id=${userInfo.running_group}`)">
+                <view class="menu-icon-wrap">
+                  <u-icon name="setting" size="36rpx" color="#FF8C00"></u-icon>
+                </view>
+                <text class="menu-label">跑团管理工具</text>
+                <u-icon name="arrow-right" color="#B8C4D0" size="16"></u-icon>
+              </view>
+            </template>
             <view class="menu-divider"></view>
             <view class="menu-row" @click="routeTo('/pagesSub/registrationCard/list')">
               <view class="menu-icon-wrap">
@@ -168,6 +178,9 @@ const onLoginSuccess = () => {
 // 计算属性
 const userInfo = computed(() => store.state.userInfo);
 
+// 是否是团长
+const isGroupCreator = ref(false);
+
 // 小程序版本号
 const appVersion = (() => {
   try {
@@ -189,6 +202,20 @@ function getInfo() {
   if (!userInfo.value.id) return;
   request.get(`/wallet-api/wallet/balance`).then((res) => {
     coinInfo.value = res;
+  });
+  checkGroupRole();
+}
+
+function checkGroupRole() {
+  const groupId = userInfo.value.running_group;
+  if (!groupId) {
+    isGroupCreator.value = false;
+    return;
+  }
+  request.get(`/running-group/api/v1/groups/info?group_id=${groupId}`).then((res) => {
+    isGroupCreator.value = res.user_role === 'creator';
+  }).catch(() => {
+    isGroupCreator.value = false;
   });
 }
 
@@ -397,6 +424,7 @@ const openWeComChat = () => {
 
 .menu-icon {
   font-size: 36rpx;
+  font-weight: 600;
   color: #FF8C00;
 }
 
