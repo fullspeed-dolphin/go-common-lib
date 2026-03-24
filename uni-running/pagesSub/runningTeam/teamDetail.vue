@@ -138,7 +138,7 @@
           <u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;" @click="joinGroup()">加入{{clubTypeName}}</u-button>
         </block>
         <block v-if="detail.user_role === 'creator'">
-          <u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;" @click="$u.route(`pagesSub/runningTeam/teamSetting?group_id=${detail.group_id}`)">Club管理工具</u-button>
+          <u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;" @click="$u.route(`pagesSub/runningTeam/teamSetting?group_id=${detail.group_id}`)">管理工具</u-button>
         </block>
         <block v-if="detail.user_role === 'member'">
           <u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;" @click="leaveGroup()">退出{{clubTypeName}}</u-button>

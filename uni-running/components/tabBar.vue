@@ -129,15 +129,12 @@ const onChange = (detail) => {
   }
 
   &--active {
-    background-color: #FF8C00;
-    border-radius: 999rpx;
-
     .iconfont {
-      color: #fff;
+      color: #FF8C00;
     }
 
     .tabbar-text {
-      color: #fff;
+      color: #FF8C00;
     }
   }
 }
