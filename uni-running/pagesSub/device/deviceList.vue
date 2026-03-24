@@ -57,17 +57,17 @@ onShow(() => {
   }
 });
 function routeToDetail(item) {
-  // uni.$u.route(`/pagesSub/device/deviceDetail?platform=${item.platform}`);
-  wx.navigateToMiniProgram({
-    appId: "wxa6c04f899577d944",
-    path: "pages/authLogin/authLogin",
-    extraData: {
-      lang: "zh-CN",
-      client_id: "115644435",
-      scope: ["https://www.huawei.com/healthkit/step.read"],
-      state: 'xxxx'
-    }
-  })
+  uni.$u.route(`/pagesSub/device/deviceDetail?platform=${item.platform}`);
+  // wx.navigateToMiniProgram({
+  //   appId: "wxa6c04f899577d944",
+  //   path: "pages/authLogin/authLogin",
+  //   extraData: {
+  //     lang: "zh-CN",
+  //     client_id: "115644435",
+  //     scope: ["https://www.huawei.com/healthkit/step.read"],
+  //     state: 'xxxx'
+  //   }
+  // })
 }
 
 // 页面加载
