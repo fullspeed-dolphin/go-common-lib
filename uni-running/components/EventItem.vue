@@ -1,14 +1,15 @@
 <template>
 	<view class="event-item" @click="joinEvent">
-		<up-lazy-load class="poster"
-			:image="(item.image_url) + '?x-oss-process=image/resize,w_600,h_320,m_fill'"
-			mode="aspectFill" />
-		
-		<view class="event-tag" :class="item.fsc_id ? 'tag-fsc' : 'tag-self'">{{item.fsc_id ? '跑团活动' : '自营活动'}}</view>
-		
-		<view class="u-p-20">
+		<view class="poster">
+			<image class="poster-img"
+				:src="item.image_url + '?x-oss-process=image/resize,w_600,h_320,m_fill'"
+				mode="aspectFill" />
 			<view class="event-item-title ellipsis2">{{ item.description }}</view>
+		</view>
 
+		<view class="event-tag" :class="item.fsc_id ? 'tag-fsc' : 'tag-self'">{{item.fsc_id ? '跑团活动' : '自营活动'}}</view>
+
+		<view class="u-p-20">
 			<view class="event-item-meta flex-between-center" v-if="showButton">
 				<view class="u-flex-1 ofh">
 					<view v-if="item.event_location" class="event-item-meta b ellipsis u-mt-10">
@@ -116,16 +117,21 @@
 	}
 
 	.poster {
-		display: block;
+		position: relative;
 		width: 100%;
 		height: 320rpx;
-		border-radius: 16rpx 16rpx 0 0;
+
+		.poster-img {
+			display: block;
+			width: 100%;
+			height: 320rpx;
+		}
 	}
 
 	.event-item-title {
 		position: absolute;
 		width: 100%;
-		bottom: 118rpx;
+		bottom: 0;
 		left: 0;
 		font-weight: 500;
 		line-height: 44rpx;
