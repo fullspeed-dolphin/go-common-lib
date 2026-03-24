@@ -1,16 +1,20 @@
 <template>
   <view class="tabbar-box">
-    <u-tabbar :value="active" @change="onChange" activeColor="#FF8C00" inactiveColor="#000" fixed placeholder zIndex="100" :safeAreaInsetBottom="false" :border="false">
+    <u-tabbar :value="active" @change="onChange" activeColor="#EF7B31" inactiveColor="#8E9BB0" fixed placeholder zIndex="100" :safeAreaInsetBottom="false" :border="false">
       <block v-for="(item, index) in tabList" :key="index">
         <u-tabbar-item v-if="index === 2" :text="item.text" :name="item.name">
           <template #text>
-            <image src="/static/images/Frame 18@2x.png" :class="{ 'filter': active !== item.name }" mode="aspectFill" style="width:82rpx;height:82rpx;"/>
+            <view class="tab-pill" :class="{ 'tab-pill--active': active === item.name }">
+              <image src="/static/images/Frame 18@2x.png" :class="{ 'filter': active !== item.name }" mode="aspectFill" style="width:82rpx;height:82rpx;"/>
+            </view>
           </template>
         </u-tabbar-item>
         <u-tabbar-item v-else :text="item.text" :name="item.name">
           <template #text>
-						<view class="iconfont" :class="{ 'active': active === item.name, [item.icon]: true }"></view>
-            <text class="tabbar-text" :class="{ 'tabbar-text--active': active === item.name }">{{ item.text }}</text>
+            <view class="tab-pill" :class="{ 'tab-pill--active': active === item.name }">
+              <view class="iconfont" :class="[item.icon]"></view>
+              <text class="tabbar-text">{{ item.text }}</text>
+            </view>
           </template>
         </u-tabbar-item>
       </block>
@@ -101,27 +105,47 @@ const onChange = (detail) => {
   margin-bottom: env(safe-area-inset-bottom);
 }
 
-.tabbar-text {
-  font-size: 22rpx;
-  // font-weight: 500;
-  color:rgb(125, 126, 128);;
+.tab-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 52rpx;
+  gap: 8rpx;
+
+  .iconfont {
+    height: 42rpx;
+    width: 42rpx;
+    font-size: 46rpx;
+    margin-bottom: 6rpx;
+    color: #8E9BB0;
+  }
+
+  .tabbar-text {
+    font-size: 22rpx;
+    color: #8E9BB0;
+  }
+
+  &--active {
+    background-color: #FF8C00;
+    border-radius: 999rpx;
+
+    .iconfont {
+      color: #fff;
+    }
+
+    .tabbar-text {
+      color: #fff;
+    }
+  }
 }
 
-.tabbar-text--active {
-  color: #ff8c00;
-}
-
-.iconfont {
-	height: 42rpx;
-	width: 42rpx;
-  font-size: 46rpx;
-  margin-bottom: 6rpx;
-  color: rgb(125, 126, 128);
-}
 .filter {
   filter: grayscale(100%);
 }
-.active {
-  color: #ff8c00;
-}
+
+
+
 </style>

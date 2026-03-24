@@ -288,7 +288,8 @@ const getClubList = (isRefresh = true) => {
 };
 
 // ===== 生命周期 =====
-onShow(() => {
+onShow(async () => {
+  await store.dispatch('getUserInfo');
   getMyClubInfo();
   getClubList(true);
 });

@@ -104,7 +104,7 @@
       <!-- 个人排序开关(仅在个人榜时显示) -->
       <view v-if="tabIndex === 0" class="sort-switch u-mt-20">
         <view class="sort-btn" :class="{ active: personalSortBy === 'distance' }" @click="switchPersonalSort('distance')">跑量排行</view>
-        <view class="sort-btn" :class="{ active: personalSortBy === 'completion' }" @click="switchPersonalSort('completion')">完赛率排行</view>
+        <view class="sort-btn" :class="{ active: personalSortBy === 'completion' }" @click="switchPersonalSort('completion')">完成率排行</view>
       </view>
       <!-- 战队排序开关(仅在战队榜时显示) -->
       <view v-if="tabIndex === 1" class="sort-switch u-mt-20">
