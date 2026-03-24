@@ -51,6 +51,7 @@ onShow(() => {
   // getDevicesList();
   try {
     const { code, error, state } = wx.getEnterOptionsSync().referrerInfo.extraData;
+    console.log(code, error, state)
   } catch (error) {
     console.log(error);
   }
