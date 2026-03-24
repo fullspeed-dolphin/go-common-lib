@@ -56,7 +56,7 @@
                 <view class="menu-icon-wrap">
                   <u-icon name="setting" size="36rpx" color="#FF8C00"></u-icon>
                 </view>
-                <text class="menu-label">跑团管理工具</text>
+                <text class="menu-label">{{ clubType === 'cycling' ? '车队' : '跑团' }}管理工具</text>
                 <u-icon name="arrow-right" color="#B8C4D0" size="16"></u-icon>
               </view>
             </template>
@@ -178,8 +178,9 @@ const onLoginSuccess = () => {
 // 计算属性
 const userInfo = computed(() => store.state.userInfo);
 
-// 是否是团长
+// 是否是团长/队长
 const isGroupCreator = ref(false);
+const clubType = ref('');
 
 // 小程序版本号
 const appVersion = (() => {
@@ -214,8 +215,10 @@ function checkGroupRole() {
   }
   request.get(`/running-group/api/v1/groups/info?group_id=${groupId}`).then((res) => {
     isGroupCreator.value = res.user_role === 'creator';
+    clubType.value = res.club_type || '';
   }).catch(() => {
     isGroupCreator.value = false;
+    clubType.value = '';
   });
 }
 
