@@ -850,7 +850,7 @@ const showShareBtn = () => {
   z-index: 10;
   padding: 0 30rpx 20rpx;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   gap: 25px;
 
   ::v-deep {
