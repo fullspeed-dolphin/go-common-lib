@@ -10,8 +10,7 @@
 						<!-- Tab 项 -->
 						<view class="tag-item" id="tab-0" :class="{ active: sliderPosition === 0 }" @click="onTabChange('all', 0)">全部</view>
 						<view class="tag-item" id="tab-1" :class="{ active: sliderPosition === 1 }" @click="onTabChange('running', 1)">跑步</view>
-						<view class="tag-item" id="tab-2" :class="{ active: sliderPosition === 2 }" @click="onTabChange('cycling', 2)">骑行</view>
-						<view class="tag-item" id="tab-3" :class="{ active: sliderPosition === 3 }" @click="onTabChange('mine', 3)">我的跑团活动</view>
+						<view class="tag-item" id="tab-2" :class="{ active: sliderPosition === 2 }" @click="onTabChange('mine', 2)">我的跑团活动</view>
 					</view>
 				</view>
 			</view>
@@ -90,7 +89,7 @@ const store = useStore();
 
 // 分享配置
 useShare({
-	title: '全速俱乐部活动',
+	title: '跑团活动',
 	path: '/pages/event'
 });
 const userInfo = computed(() => store.state.userInfo);
@@ -219,7 +218,7 @@ const onTabChange = (type, index, direction = null, isLoop = false) => {
 // 滑动切换相关
 const touchStartX = ref(0);
 const touchStartY = ref(0);
-const tabTypes = ['all', 'running', 'cycling', 'mine'];
+const tabTypes = ['all', 'running', 'mine'];
 
 const onTouchStart = (e) => {
 	touchStartX.value = e.touches[0].clientX;
@@ -432,7 +431,7 @@ onShow(() => {
 		loadMyEvents();
 	}
 	// "全部"或具体分类 tab 自动刷新
-	if (['all', 'running', 'cycling'].includes(selectedType.value)) {
+	if (['all', 'running'].includes(selectedType.value)) {
 		getMescroll()?.resetUpScroll();
 	}
 
