@@ -214,7 +214,7 @@ const navSpacerHeight = navTop + navHeight + 8;
 // const onSwiperChange = (e) => { tabIndex.value = e.detail.current; };
 
 // ===== Banner 描述文本 =====
-const bannerDesc = '跑团活动 / 联动共享\n跑团贡献 / 运动保险';
+const bannerDesc = '跑团活动 / 联动共享\n运动保险 / 成员管理';
 
 // ===== 我的跑团 =====
 const myClubDetail = ref(null);
