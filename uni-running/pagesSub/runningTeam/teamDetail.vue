@@ -1,187 +1,208 @@
 <template>
-  <view>
-    <u-navbar :title="null" bgColor="transparent"></u-navbar>
+  <view class="page">
+    <u-navbar :title="null" bgColor="#fff" autoBack placeholder>
+      <template #right>
+        <u-icon v-if="detail.user_role === 'creator'" name="setting" size="22" color="#1A1A1A"
+          @click="$u.route(`pagesSub/runningTeam/teamSetting?group_id=${detail.group_id}`)"></u-icon>
+      </template>
+    </u-navbar>
 
+    <!-- 空状态 -->
     <view v-if="isEmpty" class="empty-container">
       <mescroll-empty mode="data" :option="{ tip: '您还没有加入或创建俱乐部' }" />
-      <!-- 底部固定按钮 -->
       <view class="section-bottom">
-        <u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 84rpx; width: 100%;" @click="$u.route(`pagesSub/runningTeam/teamForm?from=mine`)">创建俱乐部
-        </u-button>
+        <u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 84rpx; width: 100%;"
+          @click="$u.route(`pagesSub/runningTeam/teamForm?from=mine`)">创建俱乐部</u-button>
       </view>
     </view>
 
     <block v-if="!isEmpty">
-      <section class="flex-center" style="height: 432rpx;filter: blur(50px);">
-        <image class="img" style="width:750rpx;height:432rpx;" :src="
-				    (detail.avatar_url ||
-				    'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_120,h_120,m_fill'
-				  " mode="aspectFill"></image>
-
-      </section>
-      <section class="section-card flex-col-center" style="margin-top: -160rpx;">
-        <image class="img" :src="
-            (detail.avatar_url ||
-            'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_120,h_120,m_fill'
-          " mode="aspectFill"></image>
-        <view class="name ellipsis2">{{ detail.name }}</view>
-        <view class="flex-between-center c3">
-          <view class="cell-item">{{ detail.establish_time }} 成立</view>
-          <view class="cell-item">{{clubTypeName}}ID {{ detail.group_id }}</view>
+      <!-- 固定头部 -->
+      <view class="club-header">
+        <!-- 头像 -->
+        <image class="club-avatar"
+          :src="(detail.avatar_url || 'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png') + '?x-oss-process=image/resize,w_160,h_160,m_fill'"
+          mode="aspectFill" />
+        <!-- 名称 -->
+        <text class="club-name">{{ detail.name }}</text>
+        <!-- 标签行 -->
+        <view class="club-tags">
+          <view class="club-tag">
+            <text class="club-tag-text">{{ clubTypeName }}</text>
+          </view>
+          <text class="club-id">团号 {{ detail.group_id || '--' }}</text>
         </view>
-        <view class="cell-item flex-row c3">
-          <u-icon name="map" size="12" color="#333"></u-icon>
-          <view class="flex-1">
-            {{ detail.establish_location }}
+
+        <!-- 分隔线 -->
+        <view class="header-divider"></view>
+
+        <!-- 统计行 -->
+        <view class="stats-row">
+          <view class="stat-item">
+            <text class="stat-number">{{ formatKm(detail.total_km) }}</text>
+            <text class="stat-label">月跑Km</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-number">{{ detail.gender_ratio || '0%' }}</text>
+            <text class="stat-label">月跑/人</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-number">{{ detail.total_members || 0 }}</text>
+            <text class="stat-label">人均/Km</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-number">{{ 0 }}</text>
+            <text class="stat-label">今日跑/人</text>
           </view>
         </view>
-      </section>
 
-      <section class="section-summary panel flex-row">
-        <view class="flex-1 flex-col-center">
-          <view class="number">
-            {{ detail.total_members }}
-          </view>
-          成员人数
-        </view>
-        <view class="divider"></view>
-        <view class="flex-1 flex-col-center">
-          <view class="number">
-            {{ detail.gender_ratio }}
-          </view>
-          男女比例
-        </view>
-        <!-- <view class="divider"></view>
-				<view class="flex-1 flex-col-center">
-					<view class="number">
-						{{ detail.total_members }}
-					</view>
-					上月总跑量
-				</view>
-				<view class="divider"></view>
-				<view class="flex-1 flex-col-center">
-					<view class="number">
-						{{ detail.total_members }}
-					</view>
-					周人均跑量
-				</view> -->
-      </section>
-
-      <section class="panel">
-        <view class="h4">{{clubTypeName}}宣言</view>
-        <view style="line-height: 40rpx; padding-left: 18rpx;">
-          {{ detail.introduction }}
-        </view>
-      </section>
-
-      <section class="panel">
-        <view class="h4">团长</view>
-        <view class="flex-between-center">
-          <view class="leader-item flex-start" @click="openMemberDetail(memberLeader)">
-            <view class="img-box">
-              <up-lazy-load height="120" borderRadius="200" class="img" error-img="/static/images/user.png" :image="memberLeader.avatar_url + '?x-oss-process=image/resize,w_110,h_110,m_fill'" mode="aspectFill" />
+        <!-- Tab 栏 -->
+        <view class="tab-bar-wrap">
+          <view class="tab-bar">
+            <view class="tab-item" :class="{ active: activeTab === 'rank' }" @click="activeTab = 'rank'">
+              <text class="tab-text">排行榜</text>
             </view>
-            <view class="">
-              <view class="ellipsis" style="width: 300rpx;line-height: 44rpx;">
-                {{memberLeader.nickname || "成员"}}
-              </view>
+            <view class="tab-item" :class="{ active: activeTab === 'events' }" @click="activeTab = 'events'">
+              <text class="tab-text">跑团活动</text>
             </view>
-          </view>
-          <view style="width: 184rpx">
-            <u-button v-if="detail.creator_phone" type="primary" plain color="#FF8C00" size="small" shape="circle" @click="callPhone(detail.creator_phone)">
-              联系团长
-            </u-button>
-          </view>
-        </view>
-      </section>
-
-      <section class="panel" style="padding-right:0;">
-        <view class="h4">成员</view>
-        <view class="flex-row flex-wrap">
-          <view class="member-item flex-col-center" v-for="(item, index) in memberList" @click="openMemberDetail(item)" :key="index">
-            <view class="img">
-              <up-lazy-load height="120" error-img="/static/images/user.png" :image="item.avatar_url+ '?x-oss-process=image/resize,w_150,h_150,m_fill'" />
-            </view>
-            <view class="">
-              <view class="u-mb-10 ellipsis tac u-ml-10" style="width: 120rpx;margin-top: 16rpx;line-height: 44rpx;">
-                {{ item.nickname}}
-              </view>
+            <view class="tab-item" :class="{ active: activeTab === 'members' }" @click="activeTab = 'members'">
+              <text class="tab-text">成员</text>
             </view>
           </view>
         </view>
-        <mescroll-empty v-if="!memberList.length" :option="{ tip: `暂无${clubTypeName}成员~` }" />
-        <view class="flex-center u-mt-15">
-          <u-button type="text" v-if="memberList.length >= 8" customStyle="width: 236rpx;height: 84rpx;" shape="circle" @click="viewMoreMembers()">
-            <text style="color:#409eff;">查看更多</text>
-            <u-icon name="arrow-right" color="#409eff" size="14"></u-icon>
-          </u-button>
+      </view>
+
+      <!-- Tab 内容区 -->
+      <view class="tab-content">
+        <!-- 排行榜 -->
+        <view v-if="activeTab === 'rank'" class="rank-section">
+          <view class="rank-header">
+            <u-icon name="order" size="18" color="#FF8C00"></u-icon>
+            <text class="rank-title">个人月跑量榜</text>
+            <u-icon name="arrow-right" size="14" color="#D1D5DB"></u-icon>
+          </view>
+          <!-- 表头 -->
+          <view class="rank-table-header">
+            <text class="rank-col-no">排名</text>
+            <text class="rank-col-user">用户</text>
+            <text class="rank-col-km">累计 / 月折</text>
+          </view>
+          <!-- 排名行 -->
+          <view class="rank-row" :class="{ 'rank-row-self': item.openid === userOpenid }"
+            v-for="(item, idx) in rankedMembers" :key="idx" @click="openMemberDetail(item)">
+            <view class="rank-no" :class="'rank-no-' + (idx + 1)">
+              <text>{{ idx + 1 }}</text>
+            </view>
+            <image class="rank-avatar"
+              :src="item.avatar_url ? item.avatar_url + '?x-oss-process=image/resize,w_80,h_80,m_fill' : '/static/images/user.png'"
+              mode="aspectFill" />
+            <view class="rank-info">
+              <text class="rank-name">{{ item.nickname || '成员' }}</text>
+              <text class="rank-sub">{{ item.role === 'creator' ? '团长' : '成员' }}</text>
+            </view>
+            <text class="rank-km">{{ formatKm(item.total_distance || item.total_km || 0) }}</text>
+          </view>
+          <view v-if="!rankedMembers.length" class="empty-hint">
+            <text>暂无排行数据</text>
+          </view>
         </view>
-      </section>
 
-      <section class="panel" style="box-shadow: none;">
-        <view class="h4">{{clubTypeName}}活动</view>
-        <view v-for="(item, index) in eventList" :key="index">
-          <EventItem :item="item" :key="index" height="474rpx" from="team" />
+        <!-- 跑团活动 -->
+        <view v-if="activeTab === 'events'" class="events-section">
+          <view class="event-card" v-for="(item, idx) in eventList" :key="idx"
+            @click="$u.route(`pagesSub/runningTeam/teamEventDetail?id=${item.id || item.event_id}`)">
+            <image class="event-cover"
+              :src="getCoverUrl(item) + '?x-oss-process=image/resize,w_200,h_200,m_fill'"
+              mode="aspectFill" v-if="getCoverUrl(item)" />
+            <view class="event-cover-placeholder" v-else>
+              <u-icon name="photo" size="24" color="#D1D5DB"></u-icon>
+            </view>
+            <view class="event-info">
+              <text class="event-name">{{ item.name || item.description }}</text>
+              <text class="event-time">{{ formatEventTime(item.event_time) }}</text>
+            </view>
+          </view>
+          <view v-if="!eventList.length" class="empty-hint">
+            <text>暂无{{ clubTypeName }}活动</text>
+          </view>
         </view>
-        <mescroll-empty v-if="!eventList.length" :option="{ tip: `暂无${clubTypeName}活动~` }" />
-      </section>
 
-      <view class="" style="height: 120rpx"></view>
+        <!-- 成员 -->
+        <view v-if="activeTab === 'members'" class="members-section">
+          <!-- 团长 -->
+          <view class="member-row" v-if="memberLeader.openid" @click="openMemberDetail(memberLeader)">
+            <image class="member-avatar"
+              :src="memberLeader.avatar_url ? memberLeader.avatar_url + '?x-oss-process=image/resize,w_80,h_80,m_fill' : '/static/images/user.png'"
+              mode="aspectFill" />
+            <view class="member-info">
+              <text class="member-name">{{ memberLeader.nickname || '团长' }}</text>
+              <view class="member-role-tag">团长</view>
+            </view>
+            <u-icon name="arrow-right" size="14" color="#D1D5DB"></u-icon>
+          </view>
+          <!-- 成员列表 -->
+          <view class="member-row" v-for="(item, idx) in memberList" :key="idx" @click="openMemberDetail(item)">
+            <image class="member-avatar"
+              :src="item.avatar_url ? item.avatar_url + '?x-oss-process=image/resize,w_80,h_80,m_fill' : '/static/images/user.png'"
+              mode="aspectFill" />
+            <view class="member-info">
+              <text class="member-name">{{ item.nickname || '成员' }}</text>
+              <text class="member-sub">成员</text>
+            </view>
+            <u-icon name="arrow-right" size="14" color="#D1D5DB"></u-icon>
+          </view>
+          <view v-if="!memberList.length && !memberLeader.openid" class="empty-hint">
+            <text>暂无成员</text>
+          </view>
+        </view>
+      </view>
 
-      <section class="section-bottom flex-center">
-        <!-- <button v-if="!isEmpty" class="share-btn flex-center" open-type="share">
-					分享{{clubTypeName}}
-				</button> -->
-        <view v-if="!isEmpty" class="share-btn flex-center" @click="showShareBtn">分享{{clubTypeName}}</view>
-        <!-- 未加入，才可加入 -->
+      <!-- 底部按钮 -->
+      <view class="section-bottom">
+        <view class="share-btn" @click="showShareBtn">
+          <text>分享{{ clubTypeName }}</text>
+        </view>
         <block v-if="!userInfo.running_group && detail.user_role === 'guest'">
-          <u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;" @click="joinGroup()">加入{{clubTypeName}}</u-button>
+          <u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;" @click="joinGroup()">加入{{ clubTypeName }}</u-button>
         </block>
         <block v-if="detail.user_role === 'creator'">
           <u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;" @click="$u.route(`pagesSub/runningTeam/teamSetting?group_id=${detail.group_id}`)">管理工具</u-button>
         </block>
         <block v-if="detail.user_role === 'member'">
-          <u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;" @click="leaveGroup()">退出{{clubTypeName}}</u-button>
+          <u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;width: 312rpx;" @click="leaveGroup()">退出{{ clubTypeName }}</u-button>
         </block>
-      </section>
+      </view>
     </block>
 
     <MemberDetail ref="refMemberDetail" />
-
     <UserLogin ref="refUserLogin" @success="onLoginSuccess" />
     <ShareSheet ref="refShare" />
   </view>
 </template>
-<script setup>
-import { ref, computed, nextTick, onMounted } from "vue";
-import { onLoad, onUnload, onShow, onPageScroll } from "@dcloudio/uni-app";
 
+<script setup>
+import { ref, computed } from "vue";
+import { onLoad, onUnload, onShow } from "@dcloudio/uni-app";
 import { useStore } from "vuex";
 import UserLogin from "@/components/UserLogin.vue";
-import EventItem from "@/components/EventItem.vue";
 import MemberDetail from "./memberDetail.vue";
 import ShareSheet from "@/components/common/ShareSheet.vue";
 import request from "@/utils/request.js";
 import { useShare, buildPath } from "@/composables/useShare.js";
+import dayjs from "dayjs";
 
-// 使用store
 const store = useStore();
+const activeTab = ref('rank');
 
-// 分享配置
 useShare(() => ({
   title: "全速运动 - " + (detail.value.name || ""),
-  path: buildPath("/pagesSub/runningTeam/teamDetail", {
-    group_id: routeParams.value.group_id,
-  }),
+  path: buildPath("/pagesSub/runningTeam/teamDetail", { group_id: routeParams.value.group_id }),
   imageUrl: detail.value.avatar_url || "",
 }));
 
 const refUserLogin = ref(null);
-
-// 待执行的操作（登录成功后继续执行）
 const pendingAction = ref(null);
 
-// 登录成功回调
 const onLoginSuccess = () => {
   getMemberList();
   if (pendingAction.value) {
@@ -190,139 +211,109 @@ const onLoginSuccess = () => {
   }
 };
 
-// 响应式数据
 const isEmpty = ref(false);
 const detail = ref({});
 const routeParams = ref({});
 const eventList = ref([]);
 const memberList = ref([]);
 const memberLeader = ref({});
+const allMembers = ref([]);
 
-// 计算属性
-// 根据 club_type 返回对应文字：running=跑团，cycling=车队
 const clubTypeName = computed(() => {
   return detail.value.club_type === "cycling" ? "车队" : "跑团";
 });
 
-const pageTitle = computed(() => {
-  return routeParams.value.from === "mine"
-    ? `我的${clubTypeName.value}`
-    : `${clubTypeName.value}详情`;
-});
-
 const userInfo = computed(() => store.state.userInfo);
+const userOpenid = computed(() => store.state.userInfo?.openid || '');
+
+// 排行榜：所有成员按跑量排序
+const rankedMembers = computed(() => {
+  return [...allMembers.value].sort((a, b) => (b.total_distance || b.total_km || 0) - (a.total_distance || a.total_km || 0));
+});
 
 const refMemberDetail = ref(null);
 function openMemberDetail(item) {
   refMemberDetail.value.open(item);
 }
 
-// 页面加载
-onLoad((options) => {
-  console.log("option===", options);
-  routeParams.value = options;
+const formatKm = (val) => {
+  if (!val) return '0.00';
+  return parseFloat(val).toFixed(2);
+};
 
+const formatEventTime = (time) => {
+  if (!time) return '';
+  const t = isNaN(time) ? dayjs(time) : dayjs(Number(time));
+  return t.format('MM/DD HH:mm');
+};
+
+const getCoverUrl = (item) => {
+  const url = item.background_image_url || item.image_url;
+  if (!url) return '';
+  if (url.startsWith('[')) {
+    try { return JSON.parse(url)[0] || ''; } catch (e) { return url; }
+  }
+  return url;
+};
+
+onLoad((options) => {
+  routeParams.value = options;
   if (!options.group_id || options.group_id === "null") {
     isEmpty.value = true;
     return;
   }
-
   getDetail();
 
   // #ifdef MP-WEIXIN
-  wx.showShareMenu({
-    withShareTicket: true,
-    menus: ["shareAppMessage", "shareTimeline"], // 开启分享给朋友和分享到朋友圈
-  });
+  wx.showShareMenu({ withShareTicket: true, menus: ["shareAppMessage", "shareTimeline"] });
   // #endif
-
-  // nextTick(() => {
-  // 	if (!store.state.userInfo.id) {
-  // 		return refUserLogin.value.open();
-  // 	}
-  // })
 });
 
-const getEvents = () => {
-  // /event-api/fsc_swipers?fsc_id=1004
-  request
-    .get(`/event-api/fsc_swipers?fsc_id=${routeParams.value.group_id}`)
-    .then((res) => {
-      eventList.value = res.map((item) => {
-        return {
-          ...item,
-          event_time: isNaN(item.event_time)
-            ? item.event_time
-            : Number(item.event_time),
-        };
-      });
-    });
-};
-
-// 页面卸载
 onUnload(() => {
   uni.removeStorageSync("groupDetail");
 });
 
-// 页面显示
 onShow(() => {
-  // 移除全局自定义事件监听器
   uni.$off("updateList");
-
-  // 监听全局的自定义事件
   uni.$once("updateList", (data) => {
-    // 判断从我的俱乐部创建，返回没有俱乐部 ID，页面空白的问题
     if (data.from === "mine" && data.group_id) {
       routeParams.value.group_id = data.group_id;
       getDetail();
     }
   });
-
   getEvents();
 });
 
-// 方法定义
-const viewMoreMembers = () => {
-  uni.$u.route(
-    `pagesSub/runningTeam/teamMemberList?group_id=${routeParams.value.group_id}`
-  );
-};
-
-const getDetail = (page) => {
+const getDetail = () => {
   const groupDetail = uni.getStorageSync("groupDetail");
-  if (groupDetail) {
-    detail.value = groupDetail;
-  }
+  if (groupDetail) detail.value = groupDetail;
 
-  uni.showLoading({
-    mask: true,
-  });
-
-  request
-    .get(
-      `/running-group/api/v1/groups/info?group_id=${routeParams.value.group_id}`
-    )
+  uni.showLoading({ mask: true });
+  request.get(`/running-group/api/v1/groups/info?group_id=${routeParams.value.group_id}`)
     .then((res) => {
       res.establish_time = res.establish_time.slice(0, 10);
       detail.value = res;
-
       isEmpty.value = false;
-
       getMemberList();
     });
 };
 
 const getMemberList = () => {
-  const data = {
-    pageIndex: 0,
-    pageSize: 9,
-    groupId: Number(detail.value.group_id),
-  };
+  const data = { pageIndex: 0, pageSize: 50, groupId: Number(detail.value.group_id) };
   request.post(`/running-group/api/v1/groups/members`, data).then((res) => {
     res = res.memberships || [];
+    allMembers.value = res;
     memberLeader.value = res.find((i) => i.role === "creator") || {};
     memberList.value = res.filter((i) => i.role !== "creator");
   });
+};
+
+const getEvents = () => {
+  if (!routeParams.value.group_id) return;
+  request.get(`/event-api/fsc_events?fsc_id=${routeParams.value.group_id}&status=ACT`)
+    .then((res) => {
+      eventList.value = (res.fsc_events || []).filter(i => i.status !== 'DELETED');
+    }).catch(() => {});
 };
 
 const joinGroup = () => {
@@ -335,20 +326,9 @@ const joinGroup = () => {
     content: `是否确认加入该${clubTypeName.value}？`,
     success: (res) => {
       if (res.confirm) {
-        const data = {
-          running_group: Number(detail.value.group_id),
-        };
-
-        uni.showLoading({
-          mask: true,
-        });
-        request.post(`/user-api/user/joinRunningGroup`, data).then((res) => {
-          uni.hideLoading();
-          getDetail();
-          uni.$u.toast("加入成功！");
-        });
-      } else if (res.cancel) {
-        console.log("用户点击取消");
+        uni.showLoading({ mask: true });
+        request.post(`/user-api/user/joinRunningGroup`, { running_group: Number(detail.value.group_id) })
+          .then(() => { uni.hideLoading(); getDetail(); uni.$u.toast("加入成功！"); });
       }
     },
   });
@@ -360,252 +340,383 @@ const leaveGroup = () => {
     content: `是否确认退出该${clubTypeName.value}？`,
     success: (res) => {
       if (res.confirm) {
-        uni.showLoading({
-          mask: true,
-        });
-        request.post(`/user-api/user/quitRunningGroup`).then((res) => {
+        uni.showLoading({ mask: true });
+        request.post(`/user-api/user/quitRunningGroup`).then(() => {
           uni.$u.toast("操作成功！");
-
-          // 调用用户数据，检查参加或创建俱乐部标记
           store.dispatch("getUserInfo");
-
           getDetail();
         });
-      } else if (res.cancel) {
-        console.log("用户点击取消");
       }
     },
   });
 };
 
-const callPhone = (phoneNumber) => {
-	console.log("callPhone", phoneNumber);
-  uni.makePhoneCall({
-    phoneNumber,
-  });
-};
-
-const navBarBg = ref("transparent");
-onPageScroll((e) => {
-  const scrollTop = e.scrollTop || 0;
-  if (scrollTop >= 5) {
-    navBarBg.value = "#ffffff";
-  } else {
-    navBarBg.value = "transparent";
-  }
-});
-
-// 弹出分享按钮
 const refShare = ref(null);
 const showShareBtn = () => {
-  console.log('23456')
   refShare.value.open(
-    {
-      avatar_url: detail.value.avatar_url,
-      name: detail.value.name,
-      establish_time: detail.value.establish_time,
-    },
-    // detail.value
+    { avatar_url: detail.value.avatar_url, name: detail.value.name, establish_time: detail.value.establish_time },
     `pagesSub/runningTeam/teamDetail?group_id=${routeParams.value.group_id}`
   );
 };
 </script>
 
 <style lang="scss" scoped>
-.panel {
-  border: 0;
-  background: #fff;
-  padding: 30rpx 20rpx;
+.page {
+  min-height: 100vh;
+  background: #FAFAFA;
+  padding-bottom: 200rpx;
 }
 
-::v-deep {
-  .event-item {
-    box-shadow: 0rpx 6rpx 12rpx 2rpx rgba(255, 140, 0, 0.16);
-    margin-bottom: 30rpx;
+.empty-container {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.club-header {
+  background: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 16rpx;
+}
+
+.club-avatar {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+}
+
+.club-name {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  margin-top: 16rpx;
+}
+
+.club-tags {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 12rpx;
+}
+
+.club-tag {
+  background: #3B3B3B;
+  border-radius: 8rpx;
+  padding: 4rpx 16rpx;
+  height: 36rpx;
+  display: flex;
+  align-items: center;
+}
+
+.club-tag-text {
+  color: #FFFFFF;
+  font-size: 20rpx;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.club-id {
+  font-size: 24rpx;
+  color: #9CA3AF;
+  line-height: 36rpx;
+}
+
+.header-divider {
+  width: 100%;
+  height: 1rpx;
+  background: #F3F4F6;
+  margin-top: 20rpx;
+}
+
+.stats-row {
+  display: flex;
+  width: 100%;
+  padding: 24rpx 32rpx;
+}
+
+.stat-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.stat-number {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #FF8C00;
+}
+
+.stat-label {
+  font-size: 20rpx;
+  color: #9CA3AF;
+}
+
+.tab-bar-wrap {
+  width: 100%;
+  padding: 16rpx 32rpx 0;
+}
+
+.tab-bar {
+  display: flex;
+  background: #F6F7F8;
+  border-radius: 44rpx;
+  padding: 6rpx;
+}
+
+.tab-item {
+  flex: 1;
+  height: 68rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 34rpx;
+
+  &.active {
+    background: #FF8C00;
   }
 }
 
-.share-btn {
-  margin: 0;
-  height: 80rpx;
-  width: 312rpx;
-  border-radius: 200rpx;
-  color: #fff;
-  border: 1px solid #07c160;
-  background-color: #07c160 !important;
-  padding: 0 20rpx;
-  font-size: 28rpx;
-  font-weight: bold;
-
-  &:after {
-    display: none;
-  }
+.tab-text {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #6B7280;
 }
 
-.section-summary {
-  height: 126rpx;
-  color: #999999;
-
-  .number {
-    font-weight: bold;
-    font-size: 30rpx;
-    color: #000;
-    line-height: 50rpx;
-    margin-bottom: 10rpx;
-  }
-
-  .divider {
-    width: 1rpx;
-    height: 58rpx;
-    background-color: #f3f3f3;
-    align-self: center;
-  }
+.tab-item.active .tab-text {
+  color: #FFFFFF;
 }
 
-.bar {
+.tab-content {
+  padding: 24rpx 24rpx 0;
+}
+
+// 排行榜
+.rank-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.rank-header {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.rank-title {
+  flex: 1;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+
+.rank-table-header {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 24rpx;
+  font-size: 22rpx;
+  color: #9CA3AF;
+}
+
+.rank-col-no { width: 80rpx; }
+.rank-col-user { flex: 1; }
+.rank-col-km { width: 160rpx; text-align: right; }
+
+.rank-row {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 24rpx;
+  background: #F6F7F8;
+  border-radius: 20rpx;
+  gap: 16rpx;
+}
+
+.rank-row-self {
+  background: #F0FDF4;
+}
+
+.rank-no {
+  width: 48rpx;
   height: 48rpx;
-  padding: 0 14rpx;
-  background: #f3f3f3;
-  font-size: 28rpx;
-  color: #000;
-  font-weight: bold;
-  border-radius: 8rpx 8rpx 8rpx 8rpx;
+  border-radius: 50%;
+  background: #E5E7EB;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #6B7280;
+  flex-shrink: 0;
 }
 
-.h4 {
+.rank-no-1 { background: #FFD700; color: #FFF; }
+.rank-no-2 { background: #C0C0C0; color: #FFF; }
+.rank-no-3 { background: #CD7F32; color: #FFF; }
+
+.rank-avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.rank-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+  min-width: 0;
+}
+
+.rank-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rank-sub {
+  font-size: 20rpx;
+  color: #9CA3AF;
+}
+
+.rank-km {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  flex-shrink: 0;
+}
+
+// 活动
+.events-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.event-card {
+  display: flex;
+  align-items: center;
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 20rpx;
+  gap: 24rpx;
+}
+
+.event-cover {
+  width: 160rpx;
+  height: 120rpx;
+  border-radius: 12rpx;
+  flex-shrink: 0;
+}
+
+.event-cover-placeholder {
+  width: 160rpx;
+  height: 120rpx;
+  border-radius: 12rpx;
+  background: #F6F7F8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.event-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  min-width: 0;
+}
+
+.event-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.event-time {
+  font-size: 24rpx;
+  color: #9CA3AF;
+}
+
+// 成员
+.members-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.member-row {
   display: flex;
   align-items: center;
   gap: 20rpx;
-  position: relative;
-  font-weight: 800;
-  font-size: 36rpx;
-  color: #000000;
-  line-height: 50rpx;
-  padding-left: 18rpx;
-  margin-bottom: 22rpx;
-
-  &:before {
-    position: absolute;
-    content: "";
-    width: 8rpx;
-    left: 0;
-    height: 32rpx;
-    background: #ff8c00;
-    border-radius: 4rpx 4rpx 4rpx 4rpx;
-  }
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #F3F4F6;
 }
 
-.cell-item {
-  min-width: 120rpx;
-  padding: 6rpx 10rpx 10rpx 0;
-  font-size: 24rpx;
+.member-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
-.leader-item {
-  font-size: 32rpx;
-
-  .img-box {
-    border-radius: 999px;
-    background: #ffffff;
-    margin-right: 30rpx;
-    overflow: hidden;
-  }
-
-  .img {
-    display: block;
-    width: 120rpx;
-    height: 120rpx;
-    background: #f5f5f5;
-  }
+.member-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+  min-width: 0;
 }
 
-.member-item {
-  // font-size: 32rpx;
-  margin: 0 36rpx 16rpx 0;
-  &:nth-child(4n) {
-    margin-right: 0;
-  }
-  .number {
-    font-weight: bold;
-    font-size: 30rpx;
-    color: #12012070;
-    margin-right: 20rpx;
-  }
-
-  .name {
-    text-align: left;
-    margin-left: 30rpx;
-  }
-
-  .score {
-    font-weight: bold;
-    font-size: 24rpx;
-    color: #000000;
-  }
-
-  .img {
-    border-radius: 999px;
-    display: block;
-    width: 120rpx;
-    height: 120rpx;
-    background: #f5f5f5;
-  }
-}
-
-.section-card {
-  position: relative;
-  z-index: 1;
-  padding: 34rpx 34rpx 0;
-  .img {
-    display: block;
-    width: 200rpx;
-    height: 200rpx;
-    background: #f5f5f5;
-    border-radius: 16rpx 16rpx 16rpx 16rpx;
-  }
-
-  .name {
-    font-weight: 800;
-    font-size: 36rpx;
-    color: #000000;
-    line-height: 50rpx;
-    margin-top: 16rpx;
-    margin-bottom: 18rpx;
-  }
-
-  .text {
-    font-weight: 500;
-    font-size: 24rpx;
-    line-height: 32rpx;
-  }
-}
-
-.h2 {
-  font-size: 32rpx;
+.member-name {
+  font-size: 28rpx;
   font-weight: 600;
+  color: #1A1A1A;
 }
 
-.cell {
-  line-height: 47rpx;
-
-  .label {
-    width: 174rpx;
-    color: #66768a;
-  }
-
-  .value {
-    color: #212121;
-    line-height: 36rpx;
-    width: 450rpx;
-  }
+.member-role-tag {
+  background: rgba(255, 140, 0, 0.1);
+  color: #FF8C00;
+  font-size: 20rpx;
+  padding: 2rpx 12rpx;
+  border-radius: 8rpx;
+  align-self: flex-start;
+  font-weight: 500;
 }
 
+.member-sub {
+  font-size: 22rpx;
+  color: #9CA3AF;
+}
+
+.empty-hint {
+  padding: 80rpx 0;
+  text-align: center;
+  font-size: 28rpx;
+  color: #9CA3AF;
+}
+
+// 底部
 .section-bottom {
   position: fixed;
   bottom: 30rpx;
   width: 100%;
   z-index: 10;
   padding: 0 30rpx 20rpx;
+  display: flex;
+  justify-content: space-between;
   gap: 25px;
 
   ::v-deep {
@@ -615,15 +726,17 @@ const showShareBtn = () => {
   }
 }
 
-.u-border-left {
-  border-color: #f3f3f3;
-}
-
-.empty-container {
-  min-height: 100vh;
+.share-btn {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  padding-bottom: 160rpx;
+  height: 80rpx;
+  width: 312rpx;
+  border-radius: 200rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #E5E7EB;
+  font-size: 28rpx;
+  color: #6B7280;
+  font-weight: 600;
 }
 </style>
