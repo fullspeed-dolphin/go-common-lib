@@ -361,6 +361,7 @@ const loadMyEvents = async () => {
 	loading.value = true;
 	const params = {
 		fsc_id: userInfo.value.running_group,
+		status: 'ACT',
 	};
 
 	try {
