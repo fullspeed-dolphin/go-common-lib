@@ -84,9 +84,9 @@
       <view v-if="activeTab === 'members'" class="members-section">
         <view v-if="memberList.length > 0" class="member-list">
           <view class="member-item" v-for="(m, idx) in memberList" :key="idx">
-            <image class="member-avatar" src="/static/images/user.png" mode="aspectFill" />
+            <image class="member-avatar" :src="m.avatar_url ? m.avatar_url + '?x-oss-process=image/resize,w_110,h_110,m_fill' : '/static/images/user.png'" mode="aspectFill" />
             <view class="member-info">
-              <text class="member-name">{{ m.real_name || '匿名用户' }}</text>
+              <text class="member-name">{{ m.nickname || m.real_name || '匿名用户' }}</text>
               <text class="member-time">{{ formatMemberTime(m.created_at) }}</text>
             </view>
           </view>
