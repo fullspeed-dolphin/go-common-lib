@@ -149,7 +149,7 @@
         <!-- 成员 -->
         <view v-if="activeTab === 'members'" class="members-section">
           <!-- 团长 -->
-          <view class="member-row" v-if="memberLeader.openid" @click="openMemberDetail(memberLeader)">
+          <view class="member-row" v-if="memberLeader.id" @click="openMemberDetail(memberLeader)">
             <image class="member-avatar"
               :src="memberLeader.avatar_url ? memberLeader.avatar_url + '?x-oss-process=image/resize,w_80,h_80,m_fill' : '/static/images/user.png'"
               mode="aspectFill" />
@@ -170,7 +170,7 @@
             </view>
             <u-icon name="arrow-right" size="14" color="#D1D5DB"></u-icon>
           </view>
-          <view v-if="!memberList.length && !memberLeader.openid" class="empty-hint">
+          <view v-if="!memberList.length && !memberLeader.id" class="empty-hint">
             <text>暂无成员</text>
           </view>
         </view>
