@@ -21,8 +21,8 @@
       <view class="club-header">
         <!-- 头像 -->
         <image class="club-avatar"
-          :src="(detail.avatar_url || 'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png') + '?x-oss-process=image/resize,w_160,h_160,m_fill'"
-          mode="aspectFill" />
+          :src="(detail.avatar_url || 'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png') + '?x-oss-process=image/resize,w_300,h_300,m_fill'"
+          mode="aspectFit" />
         <!-- 名称 -->
         <text class="club-name">{{ detail.name }}</text>
         <!-- 标签行 -->
@@ -441,6 +441,9 @@ const showShareBtn = () => {
   width: 160rpx;
   height: 160rpx;
   border-radius: 50%;
+  overflow: hidden;
+  background: #F6F7F8;
+  border: 4rpx solid #FF8C00;
 }
 
 .club-name {
