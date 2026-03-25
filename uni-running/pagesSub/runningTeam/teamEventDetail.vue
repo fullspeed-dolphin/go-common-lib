@@ -115,10 +115,6 @@
         <text class="cert-popup-desc">本活动需要运动保险，请填写证件信息</text>
         <view class="cert-form">
           <view class="cert-row">
-            <text class="cert-label">真实姓名</text>
-            <input class="cert-input" v-model="certForm.real_name" placeholder="请输入真实姓名" />
-          </view>
-          <view class="cert-row">
             <text class="cert-label">证件类型</text>
             <view class="cert-radios">
               <view class="cert-radio" :class="{ active: certForm.cert_type === 'CN_ID' }" @click="certForm.cert_type = 'CN_ID'">
@@ -128,6 +124,10 @@
                 <text>回乡证</text>
               </view>
             </view>
+          </view>
+          <view class="cert-row">
+            <text class="cert-label">真实姓名</text>
+            <input class="cert-input" v-model="certForm.real_name" placeholder="请输入真实姓名" />
           </view>
           <view class="cert-row">
             <text class="cert-label">证件号码</text>
