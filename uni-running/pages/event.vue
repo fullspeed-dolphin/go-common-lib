@@ -8,9 +8,10 @@
 						<!-- 滑块 -->
 						<view class="tag-slider" :style="sliderStyle" :class="sliderAnimClass"></view>
 						<!-- Tab 项 -->
-						<view class="tag-item" id="tab-0" :class="{ active: sliderPosition === 0 }" @click="onTabChange('mine', 0)">我的</view>
+						<view class="tag-item" id="tab-0" :class="{ active: sliderPosition === 0 }" @click="onTabChange('all', 0)">全部</view>
 						<view class="tag-item" id="tab-1" :class="{ active: sliderPosition === 1 }" @click="onTabChange('running', 1)">跑步</view>
 						<view class="tag-item" id="tab-2" :class="{ active: sliderPosition === 2 }" @click="onTabChange('cycling', 2)">骑行</view>
+						<view class="tag-item" id="tab-3" :class="{ active: sliderPosition === 3 }" @click="onTabChange('mine', 3)">我的跑团活动</view>
 					</view>
 				</view>
 			</view>
@@ -25,7 +26,7 @@
 						<view class="activity-card" v-for="item in filteredList" :key="item.id" @click="goDetail(item)">
 							<!-- 左侧图片 -->
 							<view class="card-image">
-								<image :src="item.background_image_url + '?x-oss-process=image/resize,w_400'" mode="aspectFill" />
+								<image :src="getCoverUrl(item) + '?x-oss-process=image/resize,w_400'" mode="aspectFill" v-if="getCoverUrl(item)" />
 								<view class="card-tag">报名中</view>
 							</view>
 							<!-- 右侧内容 -->
@@ -105,7 +106,7 @@ const upOption = {
 };
 
 // 分类筛选，默认"我的"
-const selectedType = ref('mine');
+const selectedType = ref('all');
 
 // Tab 切换动画相关
 const slideDirection = ref('');
@@ -218,7 +219,7 @@ const onTabChange = (type, index, direction = null, isLoop = false) => {
 // 滑动切换相关
 const touchStartX = ref(0);
 const touchStartY = ref(0);
-const tabTypes = ['mine', 'running', 'cycling'];
+const tabTypes = ['all', 'running', 'cycling', 'mine'];
 
 const onTouchStart = (e) => {
 	touchStartX.value = e.touches[0].clientX;
@@ -264,10 +265,28 @@ const myEventLoaded = ref(false);
 // 缓存跑团信息，避免重复请求
 const fscInfoCache = ref({});
 
+// 获取封面图URL（兼容单URL和JSON数组）
+const getCoverUrl = (item) => {
+	const url = item.background_image_url;
+	if (!url) return '';
+	if (url.startsWith('[')) {
+		try {
+			const arr = JSON.parse(url);
+			return arr[0] || '';
+		} catch (e) {
+			return url;
+		}
+	}
+	return url;
+};
+
 // 根据 club_type 过滤（无值或 running = 跑步，cycling = 骑行）
 const filteredList = computed(() => {
 	if (selectedType.value === 'mine') {
 		return myEventList.value;
+	}
+	if (selectedType.value === 'all') {
+		return eventList.value;
 	}
 	return eventList.value.filter(item => {
 		const type = item.club_type || 'running';
@@ -408,9 +427,13 @@ onLoad(() => {
 });
 
 onShow(() => {
-	// 加载"我的"活动
+	// 加载"我的跑团活动"
 	if (selectedType.value === 'mine') {
 		loadMyEvents();
+	}
+	// "全部"或具体分类 tab 自动刷新
+	if (['all', 'running', 'cycling'].includes(selectedType.value)) {
+		getMescroll()?.resetUpScroll();
 	}
 
 	// 监听刷新事件
