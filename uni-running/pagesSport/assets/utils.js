@@ -1,3 +1,4 @@
+import * as turf from '@turf/turf'
 // 将秒数转换为 时分 格式，小时为0时省略
 // 将秒数转换为 01:30:31 或 30:15（无小时部分）的格式。秒数为0时返回空字符串。
 export function formatDuration(sec) {
@@ -203,42 +204,118 @@ export function generateSpeedPolylines(points) {
 
 // 获取计算地图缩放级别
 export function getCenterScale(start, end, centerPoint) {
-    let distance1 = getDistance(start.latitude, start.longitude, centerPoint.latitude, centerPoint.longitude)
+    /* let distance1 = getDistance(start.latitude, start.longitude, centerPoint.latitude, centerPoint.longitude)
     let distance2 = getDistance(centerPoint.latitude, centerPoint.longitude, end.latitude, end.longitude)
     const distance = Number(distance1) + Number(distance2)
-    console.log('计算两点之间的距离', distance1, distance2, distance)
+    console.log('计算两点之间的距离', distance1, distance2, distance) */
+    // console.log('start, end',start, end)
+    var startFrom = turf.point([start.longitude, start.latitude]);
+    var startTo = turf.point([centerPoint.longitude, centerPoint.latitude]);
+    // var options = { units: "miles" };
 
+    var startDistance = turf.distance(startFrom, startTo) * 1000;
+
+    var endFrom = turf.point([end.longitude, end.latitude]);
+    var endTo = turf.point([centerPoint.longitude, centerPoint.latitude]);
+    var endDistance = turf.distance(endFrom, endTo)  * 1000;
+    // console.log("distance===",startDistance,endDistance)
+    const distance = Number(startDistance) + Number(endDistance)
+    // console.log("direction===",getOrientation(start,centerPoint))
+    console.log("direction===222",analyzeOrientationViaMid(
+      [start.longitude, start.latitude],
+      [centerPoint.longitude, centerPoint.latitude], 
+      [end.longitude, end.latitude]))
+    const directionObJ = analyzeOrientationViaMid(
+      [start.longitude, start.latitude],
+      [centerPoint.longitude, centerPoint.latitude], 
+      [end.longitude, end.latitude])
     let scale = 17
-    if (distance < 200) {
-      scale = 17
-    }
-    if (distance >= 200 && distance < 1000) {
-      scale = 16
-    }
-    if (distance >= 1000 && distance < 5000) {
-      scale = 15
-    }
-    if (distance >= 5000 && distance < 10000) {
+    if(directionObJ.orientation === 'vertical') {
       scale = 14
-    }
-    if (distance >= 10000 && distance < 15000) {
-      scale = 13
-    }
-    if (distance >= 15000 && distance < 50000) {
-      scale = 12
-    }
-    if (distance >= 50000 && distance < 200000) {
-      scale = 10
-    }
-    if (distance > 200000) {
-      scale = 8
-    }
+      if(directionObJ.details.totalSpan.v >= 10000 && directionObJ.details.totalSpan.v < 15000) {
+        scale = 12
+      }
+    } else {
+      if (distance < 200) {
+        scale = 17
+      }
+      if (distance >= 200 && distance < 1000) {
+        scale = 16
+      }
+      if (distance >= 1000 && distance < 5000) {
+        scale = 15
+      }
+      if (distance >= 5000 && distance < 10000) {
+        scale = 14
+      }
+      if (distance >= 10000 && distance < 15000) {
+        scale = 13
+      }
+      if (distance >= 15000 && distance < 50000) {
+        scale = 12
+      }
+      if (distance >= 50000 && distance < 200000) {
+        scale = 10
+      }
+      if (distance > 200000) {
+        scale = 8
+      }
 
-    console.log('计算地图缩放级别', scale)
+    }
+    console.log('计算地图缩放级别',scale,"距离",distance)
     return scale
   }
+/**
+ * 判断两个点相对于中间点的分布方向
+ * @param {Array} start - 起点坐标 [lng, lat]
+ * @param {Array} mid - 中间点坐标 [lng, lat]
+ * @param {Array} end - 终点坐标 [lng, lat]
+ * @returns {Object} 包含整体方向判断及详细数据
+ */
+function analyzeOrientationViaMid(start, mid, end) {
+  // 辅助函数：计算某点相对于参考点的横向和纵向实际距离
+  function getComponents(reference, target) {
+    // 构造纯横向点：保持参考点纬度，目标点经度
+    const pureHoriz = [target[0], reference[1]];
+    // 构造纯纵向点：保持参考点经度，目标点纬度
+    const pureVert = [reference[0], target[1]];
 
-  // 计算两坐标点之间的距离
+    // 计算实际距离 (单位: 米)
+    // 注意：如果经度相同，东西距离为0；如果纬度相同，南北距离为0
+    const distH = turf.distance(reference, pureHoriz, { units: 'meters' });
+    const distV = turf.distance(reference, pureVert, { units: 'meters' });
+
+    return { h: distH, v: distV };
+  }
+
+  // 1. 分析 起点 -> 中间点
+  const compStart = getComponents(mid, start);
+  
+  // 2. 分析 终点 -> 中间点
+  const compEnd = getComponents(mid, end);
+
+  // 3. 累加总的横向跨度和纵向跨度
+  // 这里我们关心的是整体覆盖的范围是横长还是竖长
+  const totalHorizontalSpan = compStart.h + compEnd.h;
+  const totalVerticalSpan = compStart.v + compEnd.v;
+
+  let orientation = '';
+  if (totalHorizontalSpan > totalVerticalSpan) {
+    orientation = 'horizontal'; // 横向为主 (东西向)
+  } else {
+    orientation = 'vertical';   // 纵向为主 (南北向)
+  }
+
+  return {
+    orientation: orientation,
+    details: {
+      startToMid: { horizontalDist: compStart.h, verticalDist: compStart.v },
+      endToMid: { horizontalDist: compEnd.h, verticalDist: compEnd.v },
+      totalSpan: { h: totalHorizontalSpan, v: totalVerticalSpan }
+    }
+  };
+}
+ // 计算两坐标点之间的距离
 function getDistance(lat1, lng1, lat2, lng2) {
   let rad1 = lat1 * Math.PI / 180.0;
   let rad2 = lat2 * Math.PI / 180.0;

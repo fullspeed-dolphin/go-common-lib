@@ -124,6 +124,7 @@ import { ref, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
+import * as turf from '@turf/turf'
 import { createMarker, formatPace, calculatePaceFromMeters, getTime, generateSpeedPolylines, getCenterScale } from "./assets/utils.js";
 
 import { useShare, buildPath } from "@/composables/useShare.js";
@@ -243,13 +244,26 @@ const initMap = (tracks) => {
 
   if (trackPoints.length > 0) {
     // 设置地图中心点
+    let temp = trackPoints.map(item => [+item.longitude, +item.latitude])
+  //   console.log("========",temp,[[-97.522259, 35.4691],
+  // [-97.502754, 35.463455],
+  // [-97.508269, 35.463245],])
+    let features = turf.points(temp);
+    let center = turf.center(features);
+    // console.log('mapCenter.value===',center,features,trackPoints[Math.round(trackPoints.length / 2)])
+    // mapCenter.value = [{latitude:center?.geometry?.coordinates[1],longitude:center?.geometry?.coordinates[0]}] // calculateCenterManual(trackPoints) // trackPoints[Math.round(trackPoints.length / 2)]
     mapCenter.value = trackPoints[Math.round(trackPoints.length / 2)]
-
-    const startPoint = trackPoints[0];
-    const endPoint = trackPoints[trackPoints.length - 1];
-
-    longitude.value = (startPoint.longitude + mapCenter.value.longitude + endPoint.longitude) / 3
-		latitude.value = (startPoint.latitude + mapCenter.value.latitude + endPoint.latitude) / 3
+    console.log('mapCenter.value===',mapCenter.value,trackPoints[Math.round(trackPoints.length / 2)])
+    // const startPoint = trackPoints[0];
+    // const endPoint = trackPoints[trackPoints.length - 1];
+    // longitude.value = (startPoint.longitude + mapCenter.value.longitude + endPoint.longitude) / 3
+		// latitude.value = (startPoint.latitude + mapCenter.value.latitude + endPoint.latitude) / 3
+  //  numbers.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+    let templongitude = trackPoints.map(item => item.longitude).reduce((a, b) => a + b, 0);
+    let templatitude = trackPoints.map(item => item.latitude).reduce((a, b) => a + b, 0);
+    longitude.value = center?.geometry?.coordinates[0]
+		latitude.value = center?.geometry?.coordinates[1]
+    
 
     // console.log("计算中心点坐标", startPoint, longitude.value, latitude.value)
 
@@ -354,7 +368,6 @@ const initMap = (tracks) => {
     // ];
   }
 };
-
 const detail = ref({})
 const activeHuawei = ref(false)
 const loadSportData = async () => {
