@@ -635,7 +635,8 @@ onShow(() => {
 	flex-direction: column;
 	gap: 6rpx;
 	min-width: 0;
-	justify-content: center;
+	justify-content: space-between;
+	height: 140rpx;
 }
 
 .card-title {
