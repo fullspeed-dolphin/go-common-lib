@@ -6,12 +6,28 @@
       <!-- 活动图片 -->
       <view class="section">
         <text class="section-label">活动图片</text>
-        <view class="img-row">
-          <view class="img-upload-item" v-for="idx in 3" :key="idx">
-            <template v-if="imageList[idx - 1]">
-              <image class="img-preview" :src="imageList[idx - 1]" mode="aspectFill" @click="previewImage(idx - 1)" />
-              <view class="img-delete" @click.stop="removeImage(idx - 1)">
+        <view class="img-row" id="imgRow">
+          <view class="img-upload-item"
+            v-for="(img, idx) in displaySlots" :key="'slot-' + idx"
+            :class="{
+              'img-dragging': dragState.dragging && dragState.fromIndex === idx,
+              'img-drag-over': dragState.dragging && dragState.overIndex === idx && dragState.overIndex !== dragState.fromIndex
+            }"
+            @longpress="onDragStart(idx, $event)"
+            @touchmove.prevent="onDragMove(idx, $event)"
+            @touchend="onDragEnd"
+            @touchcancel="onDragEnd"
+          >
+            <template v-if="img">
+              <image class="img-preview" :src="img" mode="aspectFill" @click="!dragState.dragging && previewImage(idx)" />
+              <view class="img-delete" @click.stop="removeImage(idx)">
                 <u-icon name="close" size="12" color="#fff"></u-icon>
+              </view>
+              <view class="img-sort-hint" v-if="!dragState.dragging">
+                <text class="img-sort-text">长按拖拽</text>
+              </view>
+              <view class="img-drag-mask" v-if="dragState.dragging && dragState.fromIndex === idx">
+                <text class="img-drag-mask-text">← 左右拖动排序 →</text>
               </view>
             </template>
             <view v-else class="img-add" @click="chooseImage">
@@ -42,12 +58,6 @@
           <view class="form-value-row">
             <text :class="form.event_location ? 'form-value-location' : 'placeholder'">{{ form.event_location || '请选择活动地点' }}</text>
             <u-icon name="arrow-right" size="16" color="#D1D5DB"></u-icon>
-          </view>
-        </view>
-        <view class="form-row">
-          <text class="form-label">活动项目</text>
-          <view class="form-value-row">
-            <input class="form-input" v-model="form.event_projects" placeholder="欢乐跑" placeholder-class="placeholder" />
           </view>
         </view>
         <view class="form-row form-row-last">
@@ -95,7 +105,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import { baseLink } from "@/utils/config.js";
@@ -107,6 +117,64 @@ const isSubmitting = ref(false);
 const showTimePicker = ref(false);
 const pickerTime = ref(Date.now());
 const imageList = ref([]);
+
+// 拖拽排序状态
+const dragState = ref({
+  dragging: false,
+  fromIndex: -1,
+  overIndex: -1,
+  startX: 0,
+});
+
+// 始终显示3个槽位
+const displaySlots = computed(() => {
+  const slots = [...imageList.value];
+  while (slots.length < 3) slots.push('');
+  return slots.slice(0, 3);
+});
+
+// 获取每个槽位的X范围（基于触摸位置判断落在哪个槽位）
+const getSlotIndex = (touchX, startX, fromIndex) => {
+  // 根据手指水平移动距离估算目标槽位
+  const slotWidth = 120; // 大约每个槽位的宽度(px)，含gap
+  const deltaX = touchX - startX;
+  let targetIndex = fromIndex + Math.round(deltaX / slotWidth);
+  targetIndex = Math.max(0, Math.min(2, targetIndex));
+  return targetIndex;
+};
+
+const onDragStart = (idx, e) => {
+  if (!imageList.value[idx]) return; // 空槽位不可拖拽
+  uni.vibrateShort(); // 触感反馈
+  dragState.value = {
+    dragging: true,
+    fromIndex: idx,
+    overIndex: idx,
+    startX: e.touches[0].clientX,
+  };
+};
+
+const onDragMove = (idx, e) => {
+  if (!dragState.value.dragging) return;
+  const touchX = e.touches[0].clientX;
+  const overIndex = getSlotIndex(touchX, dragState.value.startX, dragState.value.fromIndex);
+  // 只有目标槽位有图片时才允许交换
+  if (imageList.value[overIndex]) {
+    dragState.value.overIndex = overIndex;
+  }
+};
+
+const onDragEnd = () => {
+  if (!dragState.value.dragging) return;
+  const { fromIndex, overIndex } = dragState.value;
+  if (fromIndex !== overIndex && imageList.value[fromIndex] && imageList.value[overIndex]) {
+    // 交换位置
+    const temp = imageList.value[fromIndex];
+    imageList.value[fromIndex] = imageList.value[overIndex];
+    imageList.value[overIndex] = temp;
+  }
+  dragState.value = { dragging: false, fromIndex: -1, overIndex: -1, startX: 0 };
+};
 
 const form = ref({
   name: "",
@@ -314,6 +382,55 @@ const submitForm = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.img-dragging {
+  transform: scale(0.95);
+  transition: transform 0.15s;
+}
+
+.img-drag-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 20rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+}
+
+.img-drag-mask-text {
+  font-size: 20rpx;
+  color: #FFFFFF;
+  font-weight: 500;
+}
+
+.img-drag-over {
+  border: 3rpx solid #FF8C00;
+  border-radius: 20rpx;
+  transform: scale(1.05);
+  transition: transform 0.15s, border 0.15s;
+}
+
+.img-sort-hint {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 4rpx 0;
+  display: flex;
+  justify-content: center;
+}
+
+.img-sort-text {
+  font-size: 18rpx;
+  color: #FFFFFF;
 }
 
 .img-add {
