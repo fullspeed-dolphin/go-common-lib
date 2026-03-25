@@ -361,17 +361,16 @@ const loadMyEvents = async () => {
 	loading.value = true;
 	const params = {
 		fsc_id: userInfo.value.running_group,
-		visibility: 'rg_member_only',
-		is_free: 1,
-		status: 'ACT'
 	};
 
 	try {
 		const res = await request.get('/event-api/fsc_events', params);
-		let list = (res.fsc_events || []).map(item => ({
-			...item,
-			event_time: item.event_time
-		}));
+		let list = (res.fsc_events || [])
+			.filter(item => item.status !== 'DELETED')
+			.map(item => ({
+				...item,
+				event_time: item.event_time
+			}));
 
 		// 获取跑团信息
 		const uniqueFscIds = [...new Set(list.map(item => item.fsc_id).filter(Boolean))];
