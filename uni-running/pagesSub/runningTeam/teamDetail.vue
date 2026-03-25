@@ -440,10 +440,6 @@ const showShareBtn = () => {
 .club-avatar {
   width: 160rpx;
   height: 160rpx;
-  border-radius: 50%;
-  overflow: hidden;
-  background: #F6F7F8;
-  border: 4rpx solid #FF8C00;
 }
 
 .club-name {
