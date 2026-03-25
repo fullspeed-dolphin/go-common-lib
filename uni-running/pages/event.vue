@@ -25,20 +25,14 @@
 						<view class="activity-card" v-for="item in filteredList" :key="item.id" @click="goDetail(item)">
 							<!-- 左侧图片 -->
 							<view class="card-image">
-								<image :src="getCoverUrl(item) + '?x-oss-process=image/resize,w_400'" mode="aspectFill" v-if="getCoverUrl(item)" />
+								<image :src="getCoverUrl(item) + '?x-oss-process=image/resize,w_200,h_200,m_fill'" mode="aspectFill" v-if="getCoverUrl(item)" />
 								<view class="card-tag">报名中</view>
 							</view>
 							<!-- 右侧内容 -->
 							<view class="card-info">
 								<text class="card-title">{{ item.name }}</text>
-								<view class="info-row">
-									<image class="icon-img" src="/static/images/跑团.png" mode="aspectFill" />
-									<text>跑团: {{ item.fsc_name }}</text>
-								</view>
-								<view class="info-row">
-									<u-icon name="calendar-fill" size="24rpx" color="#FF8C00" />
-									<text>时间: {{ formatTime(item.event_time) }}</text>
-								</view>
+								<text class="card-time">{{ formatTime(item.event_time) }}</text>
+								<text class="card-club">{{ item.fsc_name }}</text>
 							</view>
 						</view>
 					</view>
@@ -61,7 +55,12 @@
 			<button class="join-btn" @click="goJoinClub">加入俱乐部</button>
 		</view>
 
-		<!-- <tabbar type="event" /> -->
+		<!-- 发布活动按钮（团长可见） -->
+		<view v-if="userInfo.running_group" class="publish-btn-wrapper">
+			<view class="publish-btn" @click="onClickPublish">
+				<text class="publish-btn-text">发布活动</text>
+			</view>
+		</view>
 	</view>
 </template>
 
@@ -412,6 +411,10 @@ const goJoinClub = () => {
 	uni.$u.route('pagesSub/runningTeam/teamList');
 };
 
+const onClickPublish = () => {
+	uni.$u.route(`pagesSub/runningTeam/teamEventTypeSelect?group_id=${userInfo.value.running_group}`);
+};
+
 onLoad(() => {
 	getTabWidths();
 });
@@ -585,11 +588,13 @@ onShow(() => {
 // 横向卡片
 .activity-card {
 	display: flex;
+	align-items: center;
 	background: #fff;
 	border-radius: 20rpx;
 	overflow: hidden;
-	height: 240rpx;
-	box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+	padding: 20rpx;
+	gap: 24rpx;
+	box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
 
 	&:active {
 		transform: scale(0.98);
@@ -598,10 +603,12 @@ onShow(() => {
 
 // 左侧图片
 .card-image {
-	width: 280rpx;
-	height: 240rpx;
+	width: 160rpx;
+	height: 160rpx;
+	border-radius: 16rpx;
 	flex-shrink: 0;
 	position: relative;
+	overflow: hidden;
 
 	image {
 		width: 100%;
@@ -611,12 +618,12 @@ onShow(() => {
 
 .card-tag {
 	position: absolute;
-	top: 12rpx;
-	left: 12rpx;
-	padding: 8rpx 20rpx;
+	top: 8rpx;
+	left: 8rpx;
+	padding: 4rpx 14rpx;
 	border-radius: 999rpx;
-	font-size: 24rpx;
-	font-weight: 500;
+	font-size: 20rpx;
+	font-weight: 600;
 	background: #FF8C00;
 	color: #fff;
 }
@@ -624,20 +631,29 @@ onShow(() => {
 // 右侧内容
 .card-info {
 	flex: 1;
-	padding: 16rpx 20rpx;
 	display: flex;
 	flex-direction: column;
+	gap: 8rpx;
 	min-width: 0;
 }
 
 .card-title {
-	font-size: 28rpx;
-	font-weight: 600;
-	color: #333;
-	margin-bottom: 8rpx;
+	font-size: 30rpx;
+	font-weight: 700;
+	color: #1A1A1A;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+}
+
+.card-time {
+	font-size: 24rpx;
+	color: #6B7280;
+}
+
+.card-club {
+	font-size: 22rpx;
+	color: #9CA3AF;
 }
 
 .info-row {
@@ -723,6 +739,30 @@ onShow(() => {
 	&:after {
 		display: none;
 	}
+}
+
+.publish-btn-wrapper {
+	position: fixed;
+	bottom: 30rpx;
+	width: 100%;
+	z-index: 10;
+	padding: 0 30rpx 20rpx;
+}
+
+.publish-btn {
+	width: 100%;
+	height: 96rpx;
+	background: #FF8C00;
+	border-radius: 48rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.publish-btn-text {
+	color: #FFFFFF;
+	font-size: 30rpx;
+	font-weight: 600;
 }
 
 </style>
