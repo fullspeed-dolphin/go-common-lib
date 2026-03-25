@@ -467,13 +467,13 @@ const showShareBtn = () => {
 
 .club-tag-text {
   color: #FFFFFF;
-  font-size: 20rpx;
+  font-size: 24rpx;
   font-weight: 600;
   line-height: 1;
 }
 
 .club-id {
-  font-size: 24rpx;
+  font-size: 28rpx;
   color: #9CA3AF;
   line-height: 36rpx;
 }
