@@ -114,15 +114,23 @@
         <view v-if="activeTab === 'events'" class="events-section">
           <view class="event-card" v-for="(item, idx) in eventList" :key="idx"
             @click="$u.route(`pagesSub/runningTeam/teamEventDetail?id=${item.id || item.event_id}`)">
+            <!-- 左侧日期 -->
+            <view class="event-date">
+              <text class="event-date-month">{{ getMonth(item.event_time) }}月</text>
+              <text class="event-date-day">{{ getDay(item.event_time) }}</text>
+            </view>
+            <!-- 中间信息 -->
+            <view class="event-info">
+              <text class="event-name">{{ item.name || item.description }}</text>
+              <text class="event-time">{{ formatEventTime(item.event_time) }}</text>
+              <text class="event-club">{{ detail.name || clubTypeName }}</text>
+            </view>
+            <!-- 右侧封面图 -->
             <image class="event-cover"
               :src="getCoverUrl(item) + '?x-oss-process=image/resize,w_200,h_200,m_fill'"
               mode="aspectFill" v-if="getCoverUrl(item)" />
             <view class="event-cover-placeholder" v-else>
-              <u-icon name="photo" size="24" color="#D1D5DB"></u-icon>
-            </view>
-            <view class="event-info">
-              <text class="event-name">{{ item.name || item.description }}</text>
-              <text class="event-time">{{ formatEventTime(item.event_time) }}</text>
+              <u-icon name="photo" size="20" color="#D1D5DB"></u-icon>
             </view>
           </view>
           <view v-if="!eventList.length" class="empty-hint">
@@ -242,6 +250,18 @@ function openMemberDetail(item) {
 const formatKm = (val) => {
   if (!val) return '0.00';
   return parseFloat(val).toFixed(2);
+};
+
+const getMonth = (time) => {
+  if (!time) return '';
+  const t = isNaN(time) ? dayjs(time) : dayjs(Number(time));
+  return t.format('M');
+};
+
+const getDay = (time) => {
+  if (!time) return '';
+  const t = isNaN(time) ? dayjs(time) : dayjs(Number(time));
+  return t.format('DD');
 };
 
 const formatEventTime = (time) => {
@@ -605,47 +625,48 @@ const showShareBtn = () => {
 .events-section {
   display: flex;
   flex-direction: column;
-  gap: 20rpx;
 }
 
 .event-card {
   display: flex;
   align-items: center;
-  background: #FFFFFF;
-  border-radius: 20rpx;
-  padding: 20rpx;
-  gap: 24rpx;
+  padding: 24rpx 0;
+  gap: 20rpx;
+  border-bottom: 1rpx solid #F3F4F6;
 }
 
-.event-cover {
-  width: 160rpx;
-  height: 120rpx;
-  border-radius: 12rpx;
-  flex-shrink: 0;
-}
-
-.event-cover-placeholder {
-  width: 160rpx;
-  height: 120rpx;
-  border-radius: 12rpx;
-  background: #F6F7F8;
+.event-date {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  width: 80rpx;
   flex-shrink: 0;
+}
+
+.event-date-month {
+  font-size: 22rpx;
+  color: #FF8C00;
+  font-weight: 600;
+}
+
+.event-date-day {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  line-height: 1.1;
 }
 
 .event-info {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8rpx;
+  gap: 6rpx;
   min-width: 0;
 }
 
 .event-name {
-  font-size: 28rpx;
-  font-weight: 600;
+  font-size: 30rpx;
+  font-weight: 700;
   color: #1A1A1A;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -655,6 +676,29 @@ const showShareBtn = () => {
 .event-time {
   font-size: 24rpx;
   color: #9CA3AF;
+}
+
+.event-club {
+  font-size: 22rpx;
+  color: #9CA3AF;
+}
+
+.event-cover {
+  width: 140rpx;
+  height: 100rpx;
+  border-radius: 12rpx;
+  flex-shrink: 0;
+}
+
+.event-cover-placeholder {
+  width: 140rpx;
+  height: 100rpx;
+  border-radius: 12rpx;
+  background: #F6F7F8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 // 成员
