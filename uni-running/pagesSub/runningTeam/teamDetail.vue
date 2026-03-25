@@ -88,7 +88,7 @@
           <view class="rank-table-header">
             <text class="rank-col-no">排名</text>
             <text class="rank-col-user">用户</text>
-            <text class="rank-col-km">累计 / 月折</text>
+            <text class="rank-col-km">累计跑量</text>
           </view>
           <!-- 排名行 -->
           <view class="rank-row" :class="{ 'rank-row-self': item.openid === userOpenid }"
