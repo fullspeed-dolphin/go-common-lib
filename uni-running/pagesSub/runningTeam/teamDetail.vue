@@ -50,19 +50,19 @@
         <!-- 统计行 -->
         <view class="stats-row">
           <view class="stat-item">
-            <text class="stat-number">{{ formatKm(detail.total_km) }}</text>
-            <text class="stat-label">月跑Km</text>
-          </view>
-          <view class="stat-item">
-            <text class="stat-number">{{ detail.gender_ratio || '0%' }}</text>
-            <text class="stat-label">月跑/人</text>
-          </view>
-          <view class="stat-item">
             <text class="stat-number">{{ detail.total_members || 0 }}</text>
+            <text class="stat-label">成员总数</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-number">{{ detail.gender_ratio || '--' }}</text>
+            <text class="stat-label">男女比例</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-number">--</text>
             <text class="stat-label">人均/Km</text>
           </view>
           <view class="stat-item">
-            <text class="stat-number">{{ 0 }}</text>
+            <text class="stat-number">--</text>
             <text class="stat-label">今日跑/人</text>
           </view>
         </view>
