@@ -61,12 +61,15 @@
           <view class="tab-bar">
             <view class="tab-item" :class="{ active: activeTab === 'rank' }" @click="activeTab = 'rank'">
               <text class="tab-text">排行榜</text>
+              <view class="tab-line" v-if="activeTab === 'rank'"></view>
             </view>
             <view class="tab-item" :class="{ active: activeTab === 'events' }" @click="activeTab = 'events'">
-              <text class="tab-text">跑团活动</text>
+              <text class="tab-text">跑团活动 ({{ eventList.length }})</text>
+              <view class="tab-line" v-if="activeTab === 'events'"></view>
             </view>
             <view class="tab-item" :class="{ active: activeTab === 'members' }" @click="activeTab = 'members'">
               <text class="tab-text">成员</text>
+              <view class="tab-line" v-if="activeTab === 'members'"></view>
             </view>
           </view>
         </view>
@@ -460,35 +463,39 @@ const showShareBtn = () => {
 
 .tab-bar-wrap {
   width: 100%;
-  padding: 16rpx 32rpx 16rpx;
+  padding: 16rpx 32rpx 0;
 }
 
 .tab-bar {
   display: flex;
-  gap: 20rpx;
+  gap: 48rpx;
 }
 
 .tab-item {
-  padding: 14rpx 32rpx;
-  border-radius: 32rpx;
-  background: #FFFFFF;
-  border: 1rpx solid #E5E7EB;
-
-  &.active {
-    background: #FF8C00;
-    border-color: #FF8C00;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 16rpx;
 }
 
 .tab-text {
-  font-size: 26rpx;
-  font-weight: 600;
-  color: #6B7280;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #9CA3AF;
   white-space: nowrap;
 }
 
 .tab-item.active .tab-text {
-  color: #FFFFFF;
+  color: #FF8C00;
+  font-weight: 700;
+}
+
+.tab-line {
+  width: 40rpx;
+  height: 6rpx;
+  border-radius: 3rpx;
+  background: #FF8C00;
+  margin-top: 8rpx;
 }
 
 .tab-content {
