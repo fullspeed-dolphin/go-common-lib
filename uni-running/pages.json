@@ -20,7 +20,7 @@
     },
     {
       "path": "pages/event",
-      "style": { "navigationBarTitleText": "全速俱乐部活动" }
+      "style": { "navigationBarTitleText": "跑团活动" }
     },
     {
       "path": "pages/sport",
