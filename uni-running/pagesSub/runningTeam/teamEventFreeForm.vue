@@ -73,6 +73,9 @@
             </view>
           </view>
         </view>
+        <view class="insurance-hint" v-if="form.need_insurance === 1">
+          <text class="insurance-hint-text">开启运动保险后，参与者报名时需填写正确的证件号码</text>
+        </view>
       </view>
 
       <!-- 活动描述 -->
@@ -307,6 +310,7 @@ const submitForm = async () => {
     contact: form.value.contact || undefined,
     description: form.value.description || undefined,
     is_free: 0,
+    need_insurance: form.value.need_insurance,
     status: "PND",
     visibility: "private",
     background_image_url: imageList.value.length > 0 ? JSON.stringify(imageList.value) : undefined,
@@ -457,6 +461,18 @@ const submitForm = async () => {
   border-radius: 24rpx;
   border: 1rpx solid #F3F4F6;
   overflow: hidden;
+}
+
+.insurance-hint {
+  padding: 12rpx 20rpx;
+  background: #FFF5EB;
+  border-radius: 0 0 24rpx 24rpx;
+  margin-top: -1rpx;
+}
+
+.insurance-hint-text {
+  font-size: 22rpx;
+  color: #FF8C00;
 }
 
 .form-row {

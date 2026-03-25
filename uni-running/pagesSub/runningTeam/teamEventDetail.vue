@@ -93,15 +93,49 @@
 
     <!-- 底部按钮 -->
     <view class="section-bottom">
-      <view class="btn-action" :class="{ 'btn-disabled': ['REJ','EXP'].includes(detail.status) }" @click="routeTo()">
+      <view class="btn-action" :class="{ 'btn-disabled': ['REJ','EXP'].includes(detail.status) || isRegistered }" @click="onActionClick()">
         <text class="btn-action-text">
-          <block v-if="detail.status === 'ACT'">{{ detail.event_detail_url ? '立即报名' : '报名中' }}</block>
-          <block v-if="detail.status === 'PND'">审核中</block>
-          <block v-if="detail.status === 'EXP'">已过期</block>
-          <block v-if="detail.status === 'REJ'">修改活动信息并重新提交</block>
+          <block v-if="isRegistered">已报名</block>
+          <block v-else-if="detail.status === 'ACT'">立即报名</block>
+          <block v-else-if="detail.status === 'PND'">审核中</block>
+          <block v-else-if="detail.status === 'EXP'">已过期</block>
+          <block v-else-if="detail.status === 'REJ'">修改活动信息并重新提交</block>
         </text>
       </view>
     </view>
+
+    <!-- 证件信息弹窗 -->
+    <u-popup :show="showCertPopup" mode="center" round="16" @close="showCertPopup = false">
+      <view class="cert-popup">
+        <text class="cert-popup-title">填写证件信息</text>
+        <text class="cert-popup-desc">本活动需要运动保险，请填写证件信息</text>
+        <view class="cert-form">
+          <view class="cert-row">
+            <text class="cert-label">证件类型</text>
+            <view class="cert-radios">
+              <view class="cert-radio" :class="{ active: certForm.cert_type === '身份证' }" @click="certForm.cert_type = '身份证'">
+                <text>身份证</text>
+              </view>
+              <view class="cert-radio" :class="{ active: certForm.cert_type === '护照' }" @click="certForm.cert_type = '护照'">
+                <text>护照</text>
+              </view>
+            </view>
+          </view>
+          <view class="cert-row">
+            <text class="cert-label">证件号码</text>
+            <input class="cert-input" v-model="certForm.cert_number" placeholder="请输入证件号码" />
+          </view>
+        </view>
+        <view class="cert-actions">
+          <view class="cert-btn cert-btn-cancel" @click="showCertPopup = false">
+            <text>取消</text>
+          </view>
+          <view class="cert-btn cert-btn-confirm" @click="submitRegistrationWithCert">
+            <text>确认报名</text>
+          </view>
+        </view>
+      </view>
+    </u-popup>
 
     <PhoneLogin ref="refPhoneLogin" />
   </view>
@@ -122,6 +156,9 @@ const detail = ref({});
 const fscInfo = ref(null);
 const routerParams = ref({});
 const activeTab = ref('intro');
+const isRegistered = ref(false);
+const showCertPopup = ref(false);
+const certForm = ref({ cert_type: '身份证', cert_number: '' });
 
 const userInfo = computed(() => store.state.userInfo);
 
@@ -159,6 +196,7 @@ onLoad((options) => {
   }
 
   getDetail();
+  checkMyRegistration();
 });
 
 onUnload(() => {
@@ -209,28 +247,78 @@ const previewImage = (idx) => {
   });
 };
 
-const routeTo = () => {
+// 查询我的报名状态
+const checkMyRegistration = () => {
+  if (!userInfo.value.id) return;
+  request.get(`/booking-api/fsc_events/registration/my?event_id=${routerParams.value.id}`)
+    .then((res) => {
+      isRegistered.value = res.data?.registered === true;
+    }).catch(() => {});
+};
+
+// 底部按钮点击
+const onActionClick = () => {
+  if (isRegistered.value) return;
+
   if (!userInfo.value.id) {
     return refPhoneLogin.value.open();
-  }
-
-  if (detail.value.status === 'ACT' && detail.value.event_detail_url) {
-    const token = uni.getStorageSync("token");
-    const separator = detail.value.event_detail_url.includes('?') ? '&' : '?';
-    const url = `${detail.value.event_detail_url}${separator}token=${token}`;
-    uni.$u.route(`pagesSub/settings/webView?link=${encodeURIComponent(url)}`);
-    return;
-  }
-
-  if (detail.value.status === "EXP" && !!detail.value.event_detail_url) {
-    uni.$u.route(`pagesSub/settings/webView?link=${detail.value.event_detail_url}`);
-    return;
   }
 
   if (detail.value.status === 'REJ') {
     uni.$u.route("pagesSub/runningTeam/teamEventForm?event_id=" + routerParams.value.id);
     return;
   }
+
+  if (detail.value.status !== 'ACT') return;
+
+  // 需要保险 → 弹窗输入证件
+  if (Number(detail.value.need_insurance) === 1) {
+    showCertPopup.value = true;
+    return;
+  }
+
+  // 不需要保险 → 直接报名
+  submitRegistration();
+};
+
+// 直接报名（不需要证件）
+const submitRegistration = () => {
+  uni.showLoading({ mask: true, title: '报名中...' });
+  request.post('/booking-api/fsc_events/registration', {
+    event_id: routerParams.value.id,
+  }).then((res) => {
+    uni.hideLoading();
+    uni.$u.toast('报名成功');
+    isRegistered.value = true;
+  }).catch((e) => {
+    uni.hideLoading();
+    const msg = e.msg || e.message || '报名失败';
+    uni.$u.toast(msg);
+  });
+};
+
+// 带证件信息报名
+const submitRegistrationWithCert = () => {
+  if (!certForm.value.cert_number) {
+    uni.$u.toast('请输入证件号码');
+    return;
+  }
+
+  uni.showLoading({ mask: true, title: '报名中...' });
+  request.post('/booking-api/fsc_events/registration', {
+    event_id: routerParams.value.id,
+    cert_type: certForm.value.cert_type,
+    cert_number: certForm.value.cert_number,
+  }).then((res) => {
+    uni.hideLoading();
+    showCertPopup.value = false;
+    uni.$u.toast('报名成功');
+    isRegistered.value = true;
+  }).catch((e) => {
+    uni.hideLoading();
+    const msg = e.msg || e.message || '报名失败';
+    uni.$u.toast(msg);
+  });
 };
 
 const showMore = () => {
@@ -482,5 +570,101 @@ const copyText = (txt) => {
   color: #FFFFFF;
   font-size: 30rpx;
   font-weight: 600;
+}
+
+.cert-popup {
+  width: 600rpx;
+  padding: 40rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.cert-popup-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  text-align: center;
+}
+
+.cert-popup-desc {
+  font-size: 24rpx;
+  color: #9CA3AF;
+  text-align: center;
+}
+
+.cert-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.cert-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.cert-label {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.cert-radios {
+  display: flex;
+  gap: 16rpx;
+}
+
+.cert-radio {
+  padding: 12rpx 32rpx;
+  border-radius: 28rpx;
+  font-size: 26rpx;
+  color: #6B7280;
+  background: #F6F7F8;
+  border: 1rpx solid #E5E7EB;
+
+  &.active {
+    background: #FFF5EB;
+    color: #FF8C00;
+    border-color: #FF8C00;
+    font-weight: 500;
+  }
+}
+
+.cert-input {
+  height: 80rpx;
+  background: #F6F7F8;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  color: #1A1A1A;
+}
+
+.cert-actions {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 8rpx;
+}
+
+.cert-btn {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 200rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.cert-btn-cancel {
+  background: #F6F7F8;
+  color: #6B7280;
+}
+
+.cert-btn-confirm {
+  background: #FF8C00;
+  color: #FFFFFF;
 }
 </style>
