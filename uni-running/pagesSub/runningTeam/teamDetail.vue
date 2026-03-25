@@ -263,6 +263,7 @@ onLoad((options) => {
     return;
   }
   getDetail();
+  getEvents();
 
   // #ifdef MP-WEIXIN
   wx.showShareMenu({ withShareTicket: true, menus: ["shareAppMessage", "shareTimeline"] });
@@ -291,7 +292,7 @@ const getDetail = () => {
   uni.showLoading({ mask: true });
   request.get(`/running-group/api/v1/groups/info?group_id=${routeParams.value.group_id}`)
     .then((res) => {
-      res.establish_time = res.establish_time.slice(0, 10);
+      res.establish_time = res.establish_time ? res.establish_time.slice(0, 10) : '';
       detail.value = res;
       isEmpty.value = false;
       getMemberList();
