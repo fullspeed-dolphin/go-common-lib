@@ -114,23 +114,31 @@
         <view v-if="activeTab === 'events'" class="events-section">
           <view class="event-card" v-for="(item, idx) in eventList" :key="idx"
             @click="$u.route(`pagesSub/runningTeam/teamEventDetail?id=${item.id || item.event_id}`)">
-            <!-- 左侧日期 -->
-            <view class="event-date">
-              <text class="event-date-month">{{ getMonth(item.event_time) }}月</text>
-              <text class="event-date-day">{{ getDay(item.event_time) }}</text>
-            </view>
-            <!-- 中间信息 -->
-            <view class="event-info">
-              <text class="event-name">{{ item.name || item.description }}</text>
-              <text class="event-time">{{ formatEventTime(item.event_time) }}</text>
-              <text class="event-club">{{ detail.name || clubTypeName }}</text>
-            </view>
-            <!-- 右侧封面图 -->
-            <image class="event-cover"
-              :src="getCoverUrl(item) + '?x-oss-process=image/resize,w_200,h_200,m_fill'"
-              mode="aspectFill" v-if="getCoverUrl(item)" />
-            <view class="event-cover-placeholder" v-else>
-              <u-icon name="photo" size="20" color="#D1D5DB"></u-icon>
+            <view class="event-card-top">
+              <!-- 左侧日期书签 -->
+              <view class="event-bookmark">
+                <view class="bookmark-month">
+                  <text class="bookmark-month-text">{{ getMonth(item.event_time) }}月</text>
+                </view>
+                <text class="bookmark-day">{{ getDay(item.event_time) }}</text>
+              </view>
+              <!-- 中间信息 + 右侧封面 -->
+              <view class="event-main">
+                <view class="event-top-row">
+                  <view class="event-info">
+                    <text class="event-name">{{ item.name || item.description }}</text>
+                    <text class="event-time">{{ formatEventTime(item.event_time) }}</text>
+                  </view>
+                  <image class="event-cover"
+                    :src="getCoverUrl(item) + '?x-oss-process=image/resize,w_240,h_160,m_fill'"
+                    mode="aspectFill" v-if="getCoverUrl(item)" />
+                </view>
+                <!-- 底部行 -->
+                <view class="event-bottom-row">
+                  <text class="event-club">{{ detail.name || clubTypeName }}</text>
+                  <text class="event-status-text" v-if="item.status === 'ACT'">{{ item._regCount || 0 }}人已报名/进行中</text>
+                </view>
+              </view>
             </view>
           </view>
           <view v-if="!eventList.length" class="empty-hint">
@@ -335,8 +343,17 @@ const getMemberList = () => {
 const getEvents = () => {
   if (!routeParams.value.group_id) return;
   request.get(`/event-api/fsc_events?fsc_id=${routeParams.value.group_id}&status=ACT`)
-    .then((res) => {
-      eventList.value = (res.fsc_events || []).filter(i => i.status !== 'DELETED');
+    .then(async (res) => {
+      const list = (res.fsc_events || []).filter(i => i.status !== 'DELETED');
+      eventList.value = list;
+      // 批量查询每个活动的报名人数
+      list.forEach((item) => {
+        request.get(`/booking-api/fsc_events/registration/list?event_id=${item.id}`)
+          .then((regRes) => {
+            item._regCount = regRes?.total || 0;
+            eventList.value = [...eventList.value]; // 触发响应式更新
+          }).catch(() => {});
+      });
     }).catch(() => {});
 };
 
@@ -625,46 +642,72 @@ const showShareBtn = () => {
 .events-section {
   display: flex;
   flex-direction: column;
+  gap: 20rpx;
 }
 
 .event-card {
-  display: flex;
-  align-items: center;
-  padding: 24rpx 0;
-  gap: 20rpx;
-  border-bottom: 1rpx solid #F3F4F6;
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  overflow: hidden;
 }
 
-.event-date {
+.event-card-top {
+  display: flex;
+}
+
+// 日期书签
+.event-bookmark {
+  width: 80rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 80rpx;
   flex-shrink: 0;
-  gap: 6rpx;
+  padding-top: 0;
 }
 
-.event-date-month {
+.bookmark-month {
+  background: #FF8C00;
+  border-radius: 0 0 12rpx 12rpx;
+  padding: 6rpx 14rpx;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.bookmark-month-text {
   font-size: 20rpx;
   color: #FFFFFF;
   font-weight: 600;
-  background: #FF8C00;
-  border-radius: 8rpx;
-  padding: 2rpx 12rpx;
 }
 
-.event-date-day {
+.bookmark-day {
   font-size: 44rpx;
   font-weight: 700;
   color: #1A1A1A;
   line-height: 1;
+  margin-top: 8rpx;
+}
+
+// 主区域
+.event-main {
+  flex: 1;
+  padding: 20rpx 20rpx 20rpx 12rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  min-width: 0;
+}
+
+.event-top-row {
+  display: flex;
+  gap: 16rpx;
 }
 
 .event-info {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 6rpx;
+  gap: 8rpx;
   min-width: 0;
 }
 
@@ -682,27 +725,28 @@ const showShareBtn = () => {
   color: #9CA3AF;
 }
 
+.event-cover {
+  width: 180rpx;
+  height: 120rpx;
+  border-radius: 12rpx;
+  flex-shrink: 0;
+}
+
+.event-bottom-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .event-club {
   font-size: 22rpx;
   color: #9CA3AF;
 }
 
-.event-cover {
-  width: 140rpx;
-  height: 100rpx;
-  border-radius: 12rpx;
-  flex-shrink: 0;
-}
-
-.event-cover-placeholder {
-  width: 140rpx;
-  height: 100rpx;
-  border-radius: 12rpx;
-  background: #F6F7F8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+.event-status-text {
+  font-size: 22rpx;
+  color: #22C55E;
+  font-weight: 600;
 }
 
 // 成员
