@@ -458,7 +458,7 @@ const showShareBtn = () => {
 }
 
 .club-tag {
-  background: #3B3B3B;
+  background: #FF8C00;
   border-radius: 8rpx;
   padding: 4rpx 16rpx;
   height: 36rpx;
