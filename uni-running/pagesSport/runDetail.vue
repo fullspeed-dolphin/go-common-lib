@@ -347,7 +347,7 @@ const initMap = (tracks) => {
     try {
       const mapCtx = uni.createMapContext("runMap");
       mapCtx.includePoints({
-        padding: [60, 60, 60, 60],
+        padding: [100, 60, 200, 60], // 100 用于避免顶部header覆盖轨迹，200 用于避免底部container覆盖轨迹
         points: trackPoints.map((p) => ({
           latitude: p.latitude,
           longitude: p.longitude,
