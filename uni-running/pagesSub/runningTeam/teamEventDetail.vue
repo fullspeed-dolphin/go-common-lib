@@ -42,8 +42,8 @@
           <text class="info-label">类型</text>
           <view class="info-value-row">
             <view class="type-tag tag-fsc">跑团活动</view>
-            <view class="type-tag" :class="Number(detail.is_free) === 1 ? 'tag-paid' : 'tag-free'">
-              {{ Number(detail.is_free) === 1 ? '付费' : '免费' }}
+            <view class="type-tag" :class="Number(detail.is_free) === 1 ? 'tag-free' : 'tag-paid'">
+              {{ Number(detail.is_free) === 1 ? '免费' : '付费' }}
             </view>
           </view>
         </view>
@@ -85,6 +85,11 @@
         <text class="empty-text">暂无参与成员</text>
       </view>
     </view>
+
+    <!-- 悬浮分享按钮 -->
+    <button v-if="detail.status === 'ACT'" class="float-share-btn" open-type="share">
+      <u-icon name="share" color="#fff" size="18"></u-icon>
+    </button>
 
     <!-- 底部按钮 -->
     <view class="section-bottom">
@@ -342,10 +347,10 @@ const copyText = (txt) => {
 }
 
 .type-tag {
-  font-size: 22rpx;
-  font-weight: 500;
-  padding: 4rpx 16rpx;
-  border-radius: 8rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  padding: 8rpx 24rpx;
+  border-radius: 10rpx;
   color: #FFFFFF;
 }
 
@@ -426,6 +431,29 @@ const copyText = (txt) => {
 .empty-text {
   font-size: 28rpx;
   color: #9CA3AF;
+}
+
+.float-share-btn {
+  position: fixed;
+  right: 30rpx;
+  bottom: 200rpx;
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
+  background: #FF8C00;
+  color: #fff;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 16rpx rgba(255, 140, 0, 0.4);
+  border: none;
+  padding: 0;
+  margin: 0;
+
+  &::after {
+    display: none;
+  }
 }
 
 .section-bottom {
