@@ -476,7 +476,7 @@ const showShareBtn = () => {
 .stats-row {
   display: flex;
   width: 100%;
-  padding: 24rpx 32rpx;
+  padding: 32rpx 32rpx;
 }
 
 .stat-item {
@@ -484,17 +484,17 @@ const showShareBtn = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6rpx;
+  gap: 10rpx;
 }
 
 .stat-number {
-  font-size: 36rpx;
+  font-size: 44rpx;
   font-weight: 700;
   color: #FF8C00;
 }
 
 .stat-label {
-  font-size: 20rpx;
+  font-size: 24rpx;
   color: #9CA3AF;
 }
 
