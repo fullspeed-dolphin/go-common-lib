@@ -36,17 +36,8 @@
 									<text>跑团: {{ item.fsc_name }}</text>
 								</view>
 								<view class="info-row">
-									<u-icon name="map-fill" size="24rpx" color="#FF8C00" />
-									<text>地点: {{ item.event_location }}</text>
-								</view>
-								<view class="info-row">
 									<u-icon name="calendar-fill" size="24rpx" color="#FF8C00" />
 									<text>时间: {{ formatTime(item.event_time) }}</text>
-								</view>
-								<!-- 底部人数 -->
-								<view class="card-footer">
-									<u-icon name="account-fill" size="24rpx" color="#FF8C00" />
-									<text class="capacity-text">人数限制: {{ item.capacity }}人</text>
 								</view>
 							</view>
 						</view>
@@ -607,7 +598,7 @@ onShow(() => {
 
 // 左侧图片
 .card-image {
-	width: 220rpx;
+	width: 280rpx;
 	height: 240rpx;
 	flex-shrink: 0;
 	position: relative;
