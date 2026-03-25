@@ -2,12 +2,7 @@
   <view class="page-container">
     <u-navbar title="活动详情" autoBack placeholder>
       <template #right>
-        <view class="nav-right">
-          <button class="nav-share-btn" open-type="share">
-            <u-icon name="share" size="20" color="#1A1A1A"></u-icon>
-          </button>
-          <u-icon name="more-dot-fill" size="20" color="#1A1A1A" @click="showMore"></u-icon>
-        </view>
+        <u-icon name="more-dot-fill" size="20" color="#1A1A1A" @click="showMore"></u-icon>
       </template>
     </u-navbar>
 
