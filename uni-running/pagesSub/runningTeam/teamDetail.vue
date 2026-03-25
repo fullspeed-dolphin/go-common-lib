@@ -641,19 +641,23 @@ const showShareBtn = () => {
   align-items: center;
   width: 80rpx;
   flex-shrink: 0;
+  gap: 6rpx;
 }
 
 .event-date-month {
-  font-size: 22rpx;
-  color: #FF8C00;
+  font-size: 20rpx;
+  color: #FFFFFF;
   font-weight: 600;
+  background: #FF8C00;
+  border-radius: 8rpx;
+  padding: 2rpx 12rpx;
 }
 
 .event-date-day {
-  font-size: 40rpx;
+  font-size: 44rpx;
   font-weight: 700;
   color: #1A1A1A;
-  line-height: 1.1;
+  line-height: 1;
 }
 
 .event-info {
