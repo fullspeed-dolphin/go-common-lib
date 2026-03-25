@@ -88,6 +88,7 @@
     <!-- 底部按钮 -->
     <view class="section-bottom">
       <view class="btn-publish" @click="submitForm">
+        <image class="btn-publish-icon" src="/static/icons/send.png" mode="aspectFit" />
         <text class="btn-publish-text">{{ isSubmitting ? '提交中...' : '发布活动' }}</text>
       </view>
     </view>
@@ -575,6 +576,12 @@ const submitForm = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 16rpx;
+}
+
+.btn-publish-icon {
+  width: 36rpx;
+  height: 36rpx;
 }
 
 .btn-publish-text {
