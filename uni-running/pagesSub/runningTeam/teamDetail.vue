@@ -33,6 +33,11 @@
           <text class="club-id">团号 {{ detail.group_id || '--' }}</text>
         </view>
 
+        <!-- 跑团宣言 -->
+        <view class="club-slogan" v-if="detail.introduction">
+          <text class="club-slogan-text">{{ detail.introduction }}</text>
+        </view>
+
         <!-- 分隔线 -->
         <view class="header-divider"></view>
 
@@ -464,6 +469,17 @@ const showShareBtn = () => {
   font-size: 24rpx;
   color: #9CA3AF;
   line-height: 36rpx;
+}
+
+.club-slogan {
+  padding: 12rpx 48rpx 0;
+}
+
+.club-slogan-text {
+  font-size: 24rpx;
+  color: #9CA3AF;
+  text-align: center;
+  line-height: 1.5;
 }
 
 .header-divider {
