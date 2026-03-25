@@ -67,7 +67,7 @@
           <view class="tab-bar" v-if="activeTab === 'intro'"></view>
         </view>
         <view class="tab-item" :class="{ 'tab-active': activeTab === 'members' }" @click="activeTab = 'members'">
-          <text class="tab-text">参与成员</text>
+          <text class="tab-text">参与成员 ({{ memberList.length }})</text>
           <view class="tab-bar" v-if="activeTab === 'members'"></view>
         </view>
       </view>
@@ -80,9 +80,18 @@
         <rich-text v-if="detail.text" :nodes="detail.text" class="rich-text-content"></rich-text>
       </view>
 
-      <!-- 参与成员（占位） -->
+      <!-- 参与成员 -->
       <view v-if="activeTab === 'members'" class="members-section">
-        <text class="empty-text">暂无参与成员</text>
+        <view v-if="memberList.length > 0" class="member-list">
+          <view class="member-item" v-for="(m, idx) in memberList" :key="idx">
+            <image class="member-avatar" src="/static/images/user.png" mode="aspectFill" />
+            <view class="member-info">
+              <text class="member-name">{{ m.real_name || '匿名用户' }}</text>
+              <text class="member-time">{{ formatMemberTime(m.created_at) }}</text>
+            </view>
+          </view>
+        </view>
+        <text v-else class="empty-text">暂无参与成员</text>
       </view>
     </view>
 
@@ -159,6 +168,7 @@ const activeTab = ref('intro');
 const isRegistered = ref(false);
 const showCertPopup = ref(false);
 const certForm = ref({ cert_type: '身份证', cert_number: '' });
+const memberList = ref([]);
 
 const userInfo = computed(() => store.state.userInfo);
 
@@ -197,6 +207,7 @@ onLoad((options) => {
 
   getDetail();
   checkMyRegistration();
+  getRegistrationList();
 });
 
 onUnload(() => {
@@ -247,6 +258,19 @@ const previewImage = (idx) => {
   });
 };
 
+// 获取报名成员列表
+const getRegistrationList = () => {
+  request.get(`/booking-api/fsc_events/registration/list?event_id=${routerParams.value.id}`)
+    .then((res) => {
+      memberList.value = res.data?.registrations || [];
+    }).catch(() => {});
+};
+
+const formatMemberTime = (time) => {
+  if (!time) return '';
+  return dayjs(time).format('M.DD HH:mm') + ' 报名';
+};
+
 // 查询我的报名状态
 const checkMyRegistration = () => {
   if (!userInfo.value.id) return;
@@ -272,7 +296,7 @@ const onActionClick = () => {
   if (detail.value.status !== 'ACT') return;
 
   // 需要保险 → 弹窗输入证件
-  if (Number(detail.value.need_insurance) === 1) {
+  if (detail.value.need_insurance && Number(detail.value.need_insurance) === 1) {
     showCertPopup.value = true;
     return;
   }
@@ -290,6 +314,7 @@ const submitRegistration = () => {
     uni.hideLoading();
     uni.$u.toast('报名成功');
     isRegistered.value = true;
+    getRegistrationList();
   }).catch((e) => {
     uni.hideLoading();
     const msg = e.msg || e.message || '报名失败';
@@ -314,6 +339,7 @@ const submitRegistrationWithCert = () => {
     showCertPopup.value = false;
     uni.$u.toast('报名成功');
     isRegistered.value = true;
+    getRegistrationList();
   }).catch((e) => {
     uni.hideLoading();
     const msg = e.msg || e.message || '报名失败';
@@ -511,14 +537,51 @@ const copyText = (txt) => {
 }
 
 .members-section {
-  padding: 60rpx 0;
+  padding: 20rpx 0;
+}
+
+.member-list {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+}
+
+.member-item {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #F3F4F6;
+}
+
+.member-avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.member-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.member-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.member-time {
+  font-size: 22rpx;
+  color: #9CA3AF;
 }
 
 .empty-text {
   font-size: 28rpx;
   color: #9CA3AF;
+  text-align: center;
+  padding: 60rpx 0;
 }
 
 .float-share-btn {
