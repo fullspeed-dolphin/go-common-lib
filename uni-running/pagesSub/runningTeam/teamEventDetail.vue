@@ -507,7 +507,7 @@ const copyText = (txt) => {
 }
 
 .tab-active .tab-text {
-  color: #1A1A1A;
+  color: #FF8C00;
   font-weight: 700;
 }
 
