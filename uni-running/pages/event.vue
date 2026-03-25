@@ -618,10 +618,10 @@ onShow(() => {
 
 .card-tag {
 	position: absolute;
-	top: 8rpx;
-	left: 8rpx;
-	padding: 4rpx 14rpx;
-	border-radius: 999rpx;
+	top: 0;
+	left: 0;
+	padding: 4rpx 16rpx;
+	border-radius: 0 0 12rpx 0;
 	font-size: 20rpx;
 	font-weight: 600;
 	background: #FF8C00;
@@ -649,12 +649,12 @@ onShow(() => {
 }
 
 .card-time {
-	font-size: 24rpx;
+	font-size: 26rpx;
 	color: #6B7280;
 }
 
 .card-club {
-	font-size: 22rpx;
+	font-size: 26rpx;
 	color: #9CA3AF;
 }
 
