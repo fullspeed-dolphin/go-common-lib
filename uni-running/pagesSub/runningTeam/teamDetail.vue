@@ -61,6 +61,8 @@
           </view>
         </view>
 
+        <view class="header-divider"></view>
+
         <!-- Tab 栏 -->
         <view class="tab-bar-wrap">
           <view class="tab-bar">
