@@ -460,26 +460,23 @@ const showShareBtn = () => {
 
 .tab-bar-wrap {
   width: 100%;
-  padding: 16rpx 32rpx 0;
+  padding: 16rpx 32rpx 16rpx;
 }
 
 .tab-bar {
   display: flex;
-  background: #F6F7F8;
-  border-radius: 44rpx;
-  padding: 6rpx;
+  gap: 20rpx;
 }
 
 .tab-item {
-  flex: 1;
-  height: 68rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 34rpx;
+  padding: 14rpx 32rpx;
+  border-radius: 32rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #E5E7EB;
 
   &.active {
     background: #FF8C00;
+    border-color: #FF8C00;
   }
 }
 
@@ -487,6 +484,7 @@ const showShareBtn = () => {
   font-size: 26rpx;
   font-weight: 600;
   color: #6B7280;
+  white-space: nowrap;
 }
 
 .tab-item.active .tab-text {
