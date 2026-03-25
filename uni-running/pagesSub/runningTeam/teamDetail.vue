@@ -45,8 +45,8 @@
         </view>
 
         <!-- 分隔线 -->
-        <view class="header-divider"></view>
-
+        <!-- 统计+Tab区域 -->
+        <view class="stats-tab-area">
         <!-- 统计行 -->
         <view class="stats-row">
           <view class="stat-item">
@@ -67,8 +67,6 @@
           </view>
         </view>
 
-        <view class="header-divider"></view>
-
         <!-- Tab 栏 -->
         <view class="tab-bar-wrap">
           <view class="tab-bar">
@@ -85,6 +83,7 @@
               <view class="tab-line" v-if="activeTab === 'members'"></view>
             </view>
           </view>
+        </view>
         </view>
       </view>
 
@@ -507,6 +506,13 @@ const showShareBtn = () => {
   height: 1rpx;
   background: #F3F4F6;
   margin-top: 20rpx;
+}
+
+.stats-tab-area {
+  background: #F6F7F8;
+  border-radius: 24rpx;
+  margin: 20rpx 24rpx 0;
+  padding-bottom: 8rpx;
 }
 
 .stats-row {
