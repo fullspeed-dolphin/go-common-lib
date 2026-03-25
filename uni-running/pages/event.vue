@@ -58,6 +58,7 @@
 		<!-- 发布活动按钮（团长可见） -->
 		<view v-if="userInfo.running_group" class="publish-btn-wrapper">
 			<view class="publish-btn" @click="onClickPublish">
+				<image class="publish-btn-icon" src="/static/icons/send.png" mode="aspectFit" />
 				<text class="publish-btn-text">发布活动</text>
 			</view>
 		</view>
@@ -760,6 +761,11 @@ onShow(() => {
 	align-items: center;
 	justify-content: center;
 	gap: 16rpx;
+}
+
+.publish-btn-icon {
+	width: 36rpx;
+	height: 36rpx;
 }
 
 .publish-btn-text {
