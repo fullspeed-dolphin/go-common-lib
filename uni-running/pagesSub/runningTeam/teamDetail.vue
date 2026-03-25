@@ -35,7 +35,7 @@
 
         <!-- 跑团地址 -->
         <view class="club-location" v-if="detail.establish_location">
-          <u-icon name="map" size="14" color="#9CA3AF"></u-icon>
+          <u-icon name="map" size="16" color="#9CA3AF"></u-icon>
           <text class="club-location-text">{{ detail.establish_location }}</text>
         </view>
 
@@ -487,7 +487,7 @@ const showShareBtn = () => {
 }
 
 .club-location-text {
-  font-size: 24rpx;
+  font-size: 28rpx;
   color: #9CA3AF;
 }
 
@@ -496,7 +496,7 @@ const showShareBtn = () => {
 }
 
 .club-slogan-text {
-  font-size: 24rpx;
+  font-size: 28rpx;
   color: #9CA3AF;
   text-align: center;
   line-height: 1.5;
