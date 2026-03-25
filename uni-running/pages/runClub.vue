@@ -628,8 +628,6 @@ $border-subtle: #F3F4F6;
   &__avatar-img {
     width: 100rpx;
     height: 100rpx;
-    border-radius: 24rpx;
-    background: #F6F7F8;
   }
 
   &--empty {
@@ -784,7 +782,6 @@ $border-subtle: #F3F4F6;
   &__avatar-img {
     width: 120rpx;
     height: 120rpx;
-    border-radius: 24rpx;
     flex-shrink: 0;
   }
 
