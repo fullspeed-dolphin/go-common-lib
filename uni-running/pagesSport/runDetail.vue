@@ -3,15 +3,15 @@
     <u-navbar title="" autoBack bgColor="transparent" />
     <section class="section-map">
       <view class="map-container">
-        <map v-if="isValidCoordinate(mapCenter.latitude, mapCenter.longitude)" id="runMap" :latitude="latitude" :longitude="longitude" :scale="mapScale" :markers="markers" :polyline="polylines"
-          :show-location="false" :enable-3D="false" :enable-overlooking="false" :enable-zoom="true" :enable-scroll="true" :enable-rotate="false" class="map"></map>
+        <map v-if="isValidCoordinate(mapCenter.latitude, mapCenter.longitude)" id="runMap" :latitude="latitude" :longitude="longitude" :scale="mapScale" :markers="markers" :polyline="polylines" :show-location="false"
+          :enable-3D="false" :enable-overlooking="false" :enable-zoom="true" :enable-scroll="true" :enable-rotate="false" class="map"></map>
         <view v-else class="map-placeholder">
           <text>地图加载中...</text>
         </view>
       </view>
     </section>
+
     <view class="container" :class="activeHuawei ? 'active-huawei' : ''">
-      <!-- 2. 运动详情数据 -->
       <section class="section-detail">
         <view class="detail-header">
           <view class="total-distance">
@@ -50,12 +50,12 @@
             <view class="stats-value">{{ detail.average_pace || "--" }}</view>
             <view class="stats-label">平均配速</view>
           </view>
-            <view class="stats-item">
-              <view class="stats-value">{{ detail.average_heart_rate || "--" }}</view>
+          <view class="stats-item">
+            <view class="stats-value">{{ detail.average_heart_rate || "--" }}</view>
             <view class="stats-label">平均心率(bpm)</view>
           </view>
           <view class="stats-item">
-              <view class="stats-value">{{ detail.average_run_cadence || "--"}}</view>
+            <view class="stats-value">{{ detail.average_run_cadence || "--"}}</view>
             <view class="stats-label">平均步频(步/分钟)</view>
           </view>
           <view class="stats-item">
@@ -96,23 +96,21 @@
             <view class="pace-col pace-col-wide">配速/公里</view>
             <view class="pace-col time-col">累计用时</view>
           </view>
-          <template v-for="(item, index) in paceData.splits" :key="item.key">
-            <view class="pace-row">
-              <view class="pace-col km-col">{{ item.kilometer }}</view>
-              <view class="pace-col pace-col-wide">
-                <view class="pace-bar-wrapper" :class="{ fastest: item.isFastest }">
-                  <view class="pace-bar" :style="{ width: getPaceBarWidth(item.pace) + '%' }"></view>
-                  <text class="pace-text">{{ formatPace(myTime(item.pace,'.')) }}</text>
-                </view>
+          <view class="pace-row" v-for="(item, index) in paceData.splits" :key="index">
+            <view class="pace-col km-col">{{ item.kilometer }}</view>
+            <view class="pace-col pace-col-wide">
+              <view class="pace-bar-wrapper" :class="{ fastest: item.isFastest }">
+                <view class="pace-bar" :style="{ width: getPaceBarWidth(item.pace) + '%' }"></view>
+                <text class="pace-text">{{ formatPace(myTime(item.pace,'.')) }}</text>
               </view>
-              <view class="pace-col time-col">{{
+            </view>
+            <view class="pace-col time-col">{{
                 myTime(item.cumulative_time)
               }}</view>
-            </view>
-            <!-- <view v-else-if="item.type === 'subtotal'" class="pace-subtotal">
+          </view>
+          <!-- <view v-else-if="item.type === 'subtotal'" class="pace-subtotal">
               <text class="subtotal-text">{{ item.text }}</text>
             </view> -->
-          </template>
         </view>
       </section>
     </view>
@@ -124,8 +122,15 @@ import { ref, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
-import * as turf from '@turf/turf'
-import { createMarker, formatPace, calculatePaceFromMeters, getTime, generateSpeedPolylines, getCenterScale } from "./assets/utils.js";
+import * as turf from "@turf/turf";
+import {
+  createMarker,
+  formatPace,
+  calculatePaceFromMeters,
+  getTime,
+  generateSpeedPolylines,
+  getCenterScale,
+} from "./assets/utils.js";
 
 import { useShare, buildPath } from "@/composables/useShare.js";
 
@@ -145,7 +150,6 @@ const mapScale = ref(15);
 const latitude = ref(0);
 const longitude = ref(0);
 
-// 活动数据
 const activityData = ref({
   totalDistance: 0, // 米
   duration: 0, // 秒
@@ -156,7 +160,6 @@ const activityData = ref({
   userAvatar: "",
 });
 
-// 配速数据
 const paceData = ref([]);
 
 const paceSubtotals = computed(() => {
@@ -238,138 +241,132 @@ const isValidCoordinate = (latitude, longitude) => {
 
 // 初始化地图
 const initMap = (tracks) => {
-  if (!tracks.length) return
+  if (!tracks || !tracks.length) return;
 
-  const trackPoints = tracks;
+  // 统一数值类型并过滤无效点
+  const trackPoints = tracks
+    .map((p) => ({
+      ...p,
+      latitude: Number(p.latitude),
+      longitude: Number(p.longitude),
+    }))
+    .filter((p) => !isNaN(p.latitude) && !isNaN(p.longitude));
 
-  if (trackPoints.length > 0) {
-    // 设置地图中心点
-    let temp = trackPoints.map(item => [+item.longitude, +item.latitude])
-  //   console.log("========",temp,[[-97.522259, 35.4691],
-  // [-97.502754, 35.463455],
-  // [-97.508269, 35.463245],])
-    let features = turf.points(temp);
-    let center = turf.center(features);
-    // console.log('mapCenter.value===',center,features,trackPoints[Math.round(trackPoints.length / 2)])
-    // mapCenter.value = [{latitude:center?.geometry?.coordinates[1],longitude:center?.geometry?.coordinates[0]}] // calculateCenterManual(trackPoints) // trackPoints[Math.round(trackPoints.length / 2)]
-    mapCenter.value = trackPoints[Math.round(trackPoints.length / 2)]
-    console.log('mapCenter.value===',mapCenter.value,trackPoints[Math.round(trackPoints.length / 2)])
-    // const startPoint = trackPoints[0];
-    // const endPoint = trackPoints[trackPoints.length - 1];
-    // longitude.value = (startPoint.longitude + mapCenter.value.longitude + endPoint.longitude) / 3
-		// latitude.value = (startPoint.latitude + mapCenter.value.latitude + endPoint.latitude) / 3
-  //  numbers.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
-    let templongitude = trackPoints.map(item => item.longitude).reduce((a, b) => a + b, 0);
-    let templatitude = trackPoints.map(item => item.latitude).reduce((a, b) => a + b, 0);
-    longitude.value = center?.geometry?.coordinates[0]
-		latitude.value = center?.geometry?.coordinates[1]
-    
+  if (!trackPoints.length) return;
 
-    // console.log("计算中心点坐标", startPoint, longitude.value, latitude.value)
+  // 计算边界盒（bbox）并设置中心为 bbox 中心
+  const coords = trackPoints.map((item) => [item.longitude, item.latitude]);
+  const features = turf.points(coords);
+  const bbox = turf.bbox(features); // [minLng, minLat, maxLng, maxLat]
+  const centerLng = (bbox[0] + bbox[2]) / 2;
+  const centerLat = (bbox[1] + bbox[3]) / 2;
 
-    mapScale.value = getCenterScale(
-      trackPoints[0],
-      trackPoints[trackPoints.length - 1],
-      mapCenter.value
-    );  
+  mapCenter.value = { latitude: centerLat, longitude: centerLng };
+  longitude.value = centerLng;
+  latitude.value = centerLat;
 
-    // 创建标记
-    let tempArr = [];
-    let tempIndex = 0;
-    let flag = false; // 标记是否超过5公里	
-    let flagFieldTotalDistance = true; // 标记是否有total_distance字段
-    let tempAPoints = trackPoints.filter((item, index) => {
-      // 判断是否有total_distance字段
-      if (!item.total_distance) {
-        flagFieldTotalDistance = false;
-        if(index === 0) {
-          return item
+  // 先创建标记（保留原有逻辑）
+  let tempArr = [];
+  let flag = false; // 标记是否超过5公里
+  let flagFieldTotalDistance = true; // 标记是否有total_distance字段
+  let tempAPoints = trackPoints.filter((item, index) => {
+    if (!item.total_distance) {
+      flagFieldTotalDistance = false;
+      if (index === 0) return item;
+    } else {
+      if (trackPoints[trackPoints.length - 1].total_distance > 5000) {
+        flag = true;
+        if (!tempArr.includes(parseInt(item.total_distance / 1000))) {
+          tempArr.push(parseInt(item.total_distance / 1000));
+          return item;
         }
       } else {
-        // 判断跑动距离是否超过5公里
-        if(trackPoints[trackPoints.length - 1].total_distance > 5000) {
-          flag = true;
-          if (!tempArr.includes(parseInt(item.total_distance / 1000))) {
-            tempArr.push(parseInt(item.total_distance / 1000));
-            tempIndex += 1;
-            return item;
-          }
-        } else {
-          if (!tempArr.includes(parseInt(item.total_distance / 500))) {
-            tempArr.push(parseInt(item.total_distance / 500));
-            tempIndex += 1;
-            return item;
-          }
+        if (!tempArr.includes(parseInt(item.total_distance / 500))) {
+          tempArr.push(parseInt(item.total_distance / 500));
+          return item;
         }
       }
-      // 终点的时候加一个标记
-      if (index === trackPoints.length - 1) {
-        return item;
-      }
-    });
-    
-    // console.log("=====tempAPoints====", tempAPoints);
-    markers.value = tempAPoints.map((item, index) => {
-      if(!flagFieldTotalDistance) {
-        // console.log("执行=====2222",detail.value.distance_in_meters)
+    }
+    if (index === trackPoints.length - 1) return item;
+  });
+
+  markers.value = tempAPoints.map((item, index) => {
+    if (!flagFieldTotalDistance) {
+      return createMarker(
+        index + 1,
+        tempAPoints[index].latitude,
+        tempAPoints[index].longitude,
+        "start",
+        index ? (+detail.value.distance_in_meters).toFixed(1) : 0
+      );
+    } else {
+      if (index === tempAPoints.length - 1) {
         return createMarker(
-            index + 1,
-            tempAPoints[index].latitude,
-            tempAPoints[index].longitude,
-            "start",
-            index ? (+detail.value.distance_in_meters).toFixed(1) : 0
-          )
+          index + 1,
+          tempAPoints[index].latitude,
+          tempAPoints[index].longitude,
+          "start",
+          (item.total_distance / 1000).toFixed(1)
+        );
       } else {
-        // console.log("执行=====1111")
-        if (index === tempAPoints.length - 1) {
+        if (flag) {
           return createMarker(
             index + 1,
             tempAPoints[index].latitude,
             tempAPoints[index].longitude,
             "start",
-            (item.total_distance / 1000).toFixed(1)
+            index * 1
           );
         } else {
-          if(flag) {
-            return createMarker(
-              index + 1,
-              tempAPoints[index].latitude,
-              tempAPoints[index].longitude,
-              "start",
-              index * 1
-            );
-          } else {
-            return createMarker(
-              index + 1,
-              tempAPoints[index].latitude,
-              tempAPoints[index].longitude,
-              "start",
-              index * 0.5
-            );
-          }
+          return createMarker(
+            index + 1,
+            tempAPoints[index].latitude,
+            tempAPoints[index].longitude,
+            "start",
+            index * 0.5
+          );
         }
       }
-    });
-    // 创建起点和终点标记
-    // console.log("==markers.value==", markers.value);
+    }
+  });
 
-    // 创建轨迹线
-    polylines.value = generateSpeedPolylines(trackPoints);
+  // 创建彩色轨迹线
+  polylines.value = generateSpeedPolylines(trackPoints);
 
-    // polylines.value = [
-    //   {
-    //     points: trackPoints,
-    //     color: "#7fba3a", // 绿色
-    //     width: 8,
-    //     arrowLine: false,
-    //     borderColor: "#FFFFFF",
-    //     borderWidth: 2,
-    //   },
-    // ];
+  // 如果只有一个点，直接设置一个合适的缩放
+  if (trackPoints.length === 1) {
+    mapScale.value = 17;
+    // 确保地图中心指向该点
+    longitude.value = trackPoints[0].longitude;
+    latitude.value = trackPoints[0].latitude;
+    return;
   }
+
+  // 根据 bbox 调整地图视野，使用 mapContext.includePoints 以保证所有点都可见
+  setTimeout(() => {
+    try {
+      const mapCtx = uni.createMapContext("runMap");
+      mapCtx.includePoints({
+        padding: [60, 60, 60, 60],
+        points: trackPoints.map((p) => ({
+          latitude: p.latitude,
+          longitude: p.longitude,
+        })),
+      });
+    } catch (e) {
+      console.warn("includePoints failed", e);
+      // 兜底：依然根据起终点与中心计算一个缩放
+      mapScale.value = getCenterScale(
+        trackPoints[0],
+        trackPoints[trackPoints.length - 1],
+        mapCenter.value
+      );
+    }
+  }, 200);
 };
-const detail = ref({})
-const activeHuawei = ref(false)
+
+const detail = ref({});
+const activeHuawei = ref(false);
 const loadSportData = async () => {
   uni.showLoading({
     title: "加载中...",
@@ -385,17 +382,21 @@ const loadSportData = async () => {
   Promise.all([
     request.get("/sport-api/api/healthdata/detail", params),
     request.get(`/sport-api/api/healthdata/track?id=${routerParams.value.id}`),
-  ]).then((res) => { 
+  ]).then((res) => {
     // console.log("res===promise",res)
-    res[0].average_pace = calculatePaceFromMeters(res[0].distance_in_meters, res[0].duration_in_seconds);
+    res[0].average_pace = calculatePaceFromMeters(
+      res[0].distance_in_meters,
+      res[0].duration_in_seconds
+    );
     res[0].duration_in_seconds = getTime(res[0].duration_in_seconds);
     res[0].average_run_cadence = parseInt(res[0].average_run_cadence || 0);
-    res[0].average_speed = (res[0].average_speed)?.toFixed(2);
-    res[0].distance_in_meters = (res[0].distance_in_meters / 1000)?.toFixed(2)
+    res[0].average_speed = res[0].average_speed?.toFixed(2);
+    res[0].distance_in_meters = (res[0].distance_in_meters / 1000)?.toFixed(2);
     res[0].start_time = dayjs(res[0].start_time).format("YYYY-MM-DD HH:mm:ss");
+
     detail.value = res[0];
-    detail.value.max_speed = (res[0].max_speed)?.toFixed(2)
-    // 轨迹数据接口
+    detail.value.max_speed = res[0].max_speed?.toFixed(2);
+
     initMap(res[1].points || []);
     // detail.value.averageRate = parseInt(
     //   res[1].points
@@ -403,37 +404,17 @@ const loadSportData = async () => {
     //     .reduce((acc, curr) => acc + curr, 0) / res[1].points.length
     // );
   });
-  // request.get("/sport-api/api/healthdata/detail", params).then((res) => {
-  //   res.average_pace = calculatePaceFromMeters(res.distance_in_meters, res.duration_in_seconds);
-  //   res.duration_in_seconds = getTime(res.duration_in_seconds);
-  //   res.average_run_cadence = parseInt(res.average_run_cadence || 0);
-  //   res.average_speed = (res.average_speed * 100)?.toFixed(0);
-  //   res.distance_in_meters = (res.distance_in_meters / 1000)?.toFixed(2)
-  //   res.start_time = dayjs(res.start_time).format("YYYY-MM-DD HH:mm:ss");
-  //   detail.value = res;
-  // });
-
-  // 轨迹数据接口
-  // request.get(`/sport-api/api/healthdata/track?id=${routerParams.value.id}`)
-  //   .then((res) => {
-
-  //     initMap(res.points || []);
-
-  //     detail.value.averageRate = parseInt(
-  //       res.points
-  //         .map((item) => item.heart_rate)
-  //         .reduce((acc, curr) => acc + curr, 0) / res.points.length
-  //     );
-  //   });
+  
   // 查询活动每公里配速分段数据
-  if(routerParams.value.device === '1') {
-    request.get(`/sport-api/api/healthdata/pace-splits?id=${routerParams.value.id}`)
-    .then((res) => {
-      activeHuawei.value = true
-      paceData.value = res
-      paceData.value.avg_pace = myTime(res.avg_pace,'.')   //(res.avg_pace / 60).toFixed(2)
-      paceData.value.best_pace = myTime(res.best_pace,'.') //(res.best_pace / 60).toFixed(2)
-    });
+  if (routerParams.value.device === "1") {
+    request
+      .get(`/sport-api/api/healthdata/pace-splits?id=${routerParams.value.id}`)
+      .then((res) => {
+        activeHuawei.value = true;
+        paceData.value = res;
+        paceData.value.avg_pace = myTime(res.avg_pace, "."); //(res.avg_pace / 60).toFixed(2)
+        paceData.value.best_pace = myTime(res.best_pace, "."); //(res.best_pace / 60).toFixed(2)
+      });
   }
 };
 
@@ -454,22 +435,21 @@ const formatTime = (seconds) => {
   }
 };
 
-function myTime(seconds,type=':') {
-    // 转为对应的 时, 分, 秒
-    let h = parseInt(seconds / 60 / 60 % 24)
-    let m = parseInt(seconds / 60 % 60)
-    let s = parseInt(seconds % 60)
-    // 自动补零
-    h = h > 9 ? h : '0' + h;
-    m = m > 9 ? m : '0' + m;
-    s = s > 9 ? s : '0' + s;
-    // 拼接字符串
-    let timestr = `${h}${type}${m}${type}${s}`;
-    if(type==='.') {
-      return m + type + s
-    }
-    // 将字符串返回
-    return timestr;
+function myTime(seconds, type = ":") {
+  // 转为对应的 时, 分, 秒
+  let h = parseInt((seconds / 60 / 60) % 24);
+  let m = parseInt((seconds / 60) % 60);
+  let s = parseInt(seconds % 60);
+  // 自动补零
+  h = h > 9 ? h : "0" + h;
+  m = m > 9 ? m : "0" + m;
+  s = s > 9 ? s : "0" + s;
+  // 拼接字符串
+  let timestr = `${h}${type}${m}${type}${s}`;
+  if (type === ".") {
+    return m + type + s;
+  }
+  return timestr;
 }
 // 获取配速条宽度 (用于可视化)
 const getPaceBarWidth = (pace) => {
@@ -477,10 +457,8 @@ const getPaceBarWidth = (pace) => {
   const maxPace = 650; // 最慢配速
   if (!pace || pace < minPace) return 100;
   if (pace > maxPace) return 10;
-  // 配速越快，条越短；配速越慢，条越长
-  console.log('1 - ((pace - minPace) / (maxPace - minPace))',(pace / 650) * 100)
+  
   return (pace / 650) * 100;
-  return 1 - ((pace - minPace) / (maxPace - minPace));
 };
 
 const routerParams = ref({});
@@ -491,8 +469,6 @@ onLoad((options) => {
     avatar_url: decodeURIComponent(options.avatar_url || ""),
     device: options.device,
   };
-
-  // console.log('options======>', options, routerParams.value)
 
   loadSportData();
 });
@@ -508,10 +484,10 @@ onLoad((options) => {
   position: absolute;
   z-index: 10;
   padding-bottom: 40rpx;
-  bottom:0;
+  bottom: 0;
   &.active-huawei {
-    top:50%;
-    height:100vh;
+    top: 53%;
+    height: 100vh;
   }
 }
 

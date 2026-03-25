@@ -109,7 +109,6 @@ import request from "@/utils/request.js";
 import PickerCell from "@/components/common/PickerCell.vue";
 import dayjs from "dayjs";
 import { formatDuration, formatDistance, calculatePaceFromMeters, getTypeSum } from "./assets/utils.js";
-import parse from "../uni_modules/uview-plus/components/u-parse/parse";
 // import { useShare } from "@/composables/useShare.js";
 
 // // 分享配置

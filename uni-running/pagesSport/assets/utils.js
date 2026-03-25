@@ -204,15 +204,9 @@ export function generateSpeedPolylines(points) {
 
 // 获取计算地图缩放级别
 export function getCenterScale(start, end, centerPoint) {
-    /* let distance1 = getDistance(start.latitude, start.longitude, centerPoint.latitude, centerPoint.longitude)
-    let distance2 = getDistance(centerPoint.latitude, centerPoint.longitude, end.latitude, end.longitude)
-    const distance = Number(distance1) + Number(distance2)
-    console.log('计算两点之间的距离', distance1, distance2, distance) */
     // console.log('start, end',start, end)
     var startFrom = turf.point([start.longitude, start.latitude]);
     var startTo = turf.point([centerPoint.longitude, centerPoint.latitude]);
-    // var options = { units: "miles" };
-
     var startDistance = turf.distance(startFrom, startTo) * 1000;
 
     var endFrom = turf.point([end.longitude, end.latitude]);
@@ -225,13 +219,15 @@ export function getCenterScale(start, end, centerPoint) {
       [start.longitude, start.latitude],
       [centerPoint.longitude, centerPoint.latitude], 
       [end.longitude, end.latitude]))
+
     const directionObJ = analyzeOrientationViaMid(
       [start.longitude, start.latitude],
       [centerPoint.longitude, centerPoint.latitude], 
       [end.longitude, end.latitude])
+      
     let scale = 17
     if(directionObJ.orientation === 'vertical') {
-      scale = 14
+      scale = 13
       if(directionObJ.details.totalSpan.v >= 10000 && directionObJ.details.totalSpan.v < 15000) {
         scale = 12
       }
