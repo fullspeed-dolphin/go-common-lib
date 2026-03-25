@@ -33,6 +33,12 @@
           <text class="club-id">团号 {{ detail.group_id || '--' }}</text>
         </view>
 
+        <!-- 跑团地址 -->
+        <view class="club-location" v-if="detail.establish_location">
+          <u-icon name="map" size="14" color="#9CA3AF"></u-icon>
+          <text class="club-location-text">{{ detail.establish_location }}</text>
+        </view>
+
         <!-- 跑团宣言 -->
         <view class="club-slogan" v-if="detail.introduction">
           <text class="club-slogan-text">{{ detail.introduction }}</text>
@@ -471,6 +477,19 @@ const showShareBtn = () => {
   font-size: 24rpx;
   color: #9CA3AF;
   line-height: 36rpx;
+}
+
+.club-location {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 12rpx 48rpx 0;
+}
+
+.club-location-text {
+  font-size: 24rpx;
+  color: #9CA3AF;
 }
 
 .club-slogan {
