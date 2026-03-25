@@ -62,8 +62,14 @@
 
       <!-- Tab 切换 -->
       <view class="tab-row">
-        <text class="tab-item" :class="{ 'tab-active': activeTab === 'intro' }" @click="activeTab = 'intro'">活动介绍</text>
-        <text class="tab-item" :class="{ 'tab-active': activeTab === 'members' }" @click="activeTab = 'members'">参与成员</text>
+        <view class="tab-item" :class="{ 'tab-active': activeTab === 'intro' }" @click="activeTab = 'intro'">
+          <text class="tab-text">活动介绍</text>
+          <view class="tab-bar" v-if="activeTab === 'intro'"></view>
+        </view>
+        <view class="tab-item" :class="{ 'tab-active': activeTab === 'members' }" @click="activeTab = 'members'">
+          <text class="tab-text">参与成员</text>
+          <view class="tab-bar" v-if="activeTab === 'members'"></view>
+        </view>
       </view>
 
       <!-- 活动介绍 -->
@@ -366,15 +372,27 @@ const copyText = (txt) => {
 }
 
 .tab-item {
-  font-size: 30rpx;
-  color: #9CA3AF;
-  padding-bottom: 8rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
 }
 
-.tab-active {
+.tab-text {
+  font-size: 30rpx;
+  color: #9CA3AF;
+}
+
+.tab-active .tab-text {
   color: #1A1A1A;
   font-weight: 700;
-  border-bottom: 4rpx solid #FF8C00;
+}
+
+.tab-bar {
+  width: 40rpx;
+  height: 6rpx;
+  background: #FF8C00;
+  border-radius: 3rpx;
 }
 
 .desc-section {
