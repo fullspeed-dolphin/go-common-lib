@@ -592,8 +592,8 @@ onShow(() => {
 	background: #fff;
 	border-radius: 20rpx;
 	overflow: hidden;
-	padding: 20rpx;
-	gap: 24rpx;
+	padding: 16rpx;
+	gap: 20rpx;
 	box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
 
 	&:active {
@@ -603,9 +603,9 @@ onShow(() => {
 
 // 左侧图片
 .card-image {
-	width: 160rpx;
-	height: 160rpx;
-	border-radius: 16rpx;
+	width: 200rpx;
+	height: 140rpx;
+	border-radius: 12rpx;
 	flex-shrink: 0;
 	position: relative;
 	overflow: hidden;
@@ -633,8 +633,9 @@ onShow(() => {
 	flex: 1;
 	display: flex;
 	flex-direction: column;
-	gap: 8rpx;
+	gap: 6rpx;
 	min-width: 0;
+	justify-content: center;
 }
 
 .card-title {
@@ -751,12 +752,13 @@ onShow(() => {
 
 .publish-btn {
 	width: 100%;
-	height: 96rpx;
+	height: 84rpx;
 	background: #FF8C00;
-	border-radius: 48rpx;
+	border-radius: 200rpx;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	gap: 16rpx;
 }
 
 .publish-btn-text {
