@@ -34,12 +34,12 @@
           <view class="banner-left__overlay">
             <view class="banner-left__top">
               <view class="upgrade-badge">
-                <text class="upgrade-badge__text">功能升级</text>
+                <text class="upgrade-badge__text">隆重上线</text>
               </view>
             </view>
             <view class="banner-left__bottom">
-              <text class="banner-left__title">跑团功能新玩法</text>
-              <text class="banner-left__highlight">先睹为快</text>
+              <text class="banner-left__title">全速体育</text>
+              <text class="banner-left__highlight">跑团功能</text>
               <text class="banner-left__desc">{{ bannerDesc }}</text>
             </view>
           </view>
@@ -214,7 +214,7 @@ const navSpacerHeight = navTop + navHeight + 8;
 // const onSwiperChange = (e) => { tabIndex.value = e.detail.current; };
 
 // ===== Banner 描述文本 =====
-const bannerDesc = '跑团活动 / 联动共享\n跑团贡献 / Siri捷径';
+const bannerDesc = '跑团活动 / 联动共享\n跑团贡献 / 运动保险';
 
 // ===== 我的跑团 =====
 const myClubDetail = ref(null);
