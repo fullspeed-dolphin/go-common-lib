@@ -262,7 +262,7 @@ const previewImage = (idx) => {
 const getRegistrationList = () => {
   request.get(`/booking-api/fsc_events/registration/list?event_id=${routerParams.value.id}`)
     .then((res) => {
-      memberList.value = res.data?.registrations || [];
+      memberList.value = res?.registrations || [];
     }).catch(() => {});
 };
 
@@ -276,7 +276,7 @@ const checkMyRegistration = () => {
   if (!userInfo.value.id) return;
   request.get(`/booking-api/fsc_events/registration/my?event_id=${routerParams.value.id}`)
     .then((res) => {
-      isRegistered.value = res.data?.registered === true;
+      isRegistered.value = res?.registered === true;
     }).catch(() => {});
 };
 

@@ -317,7 +317,13 @@ const submitForm = async () => {
   };
 
   try {
-    await request.post("/event-api/fsc_events", data);
+    const res = await request.post("/event-api/fsc_events", data);
+    // 创建成功后，自动为创建者报名（团长即第一个参与人员）
+    if (res?.id) {
+      await request.post("/booking-api/fsc_events/registration", {
+        event_id: res.id,
+      }).catch(() => {});
+    }
     uni.hideLoading();
     uni.$u.toast("发布成功");
     uni.$emit("updateList", { isChange: true });
