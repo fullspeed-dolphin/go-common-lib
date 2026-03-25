@@ -831,10 +831,10 @@ const showShareBtn = () => {
   height: 80rpx;
   width: 312rpx;
   border-radius: 200rpx;
-  background: #FFFFFF;
-  border: 1rpx solid #E5E7EB;
+  background: #18b566;
+  border: 1rpx solid #18b566;
   font-size: 28rpx;
-  color: #6B7280;
+  color: #FFFFFF;
   font-weight: 600;
 }
 </style>
