@@ -1,527 +1,440 @@
 <template>
-	<u-navbar :title="detail.name || '活动详情'" bgColor="#fff" placeholder></u-navbar>
-	
-	<view class="u-pb-30" style="background: #f5f5f5" :class="{
-      isFixedNavbar: isFixedNavbar,
-      isLoadedPage: isLoadedPage,
-    }">
-		<view class="event-status flex-center" v-if="detail.status === 'ACT'">
-			活动进行中
-		</view>
+  <view class="page-container">
+    <u-navbar title="活动详情" autoBack placeholder>
+      <template #right>
+        <view class="nav-right">
+          <button class="nav-share-btn" open-type="share">
+            <u-icon name="share" size="20" color="#1A1A1A"></u-icon>
+          </button>
+          <u-icon name="more-dot-fill" size="20" color="#1A1A1A" @click="showMore"></u-icon>
+        </view>
+      </template>
+    </u-navbar>
 
-		<section style="padding: 0; overflow: hidden; height: 750rpx">
-			<image class="img" :src="detail.background_image_url + '?x-oss-process=image/resize,w_700,h_700,m_fill'"
-				mode="aspectFill" style="width: 100%; display: block; height: 100%"></image>
-		</section>
+    <!-- 封面图轮播 -->
+    <view class="banner">
+      <swiper class="banner-swiper" :indicator-dots="coverImages.length > 1" indicator-color="rgba(255,255,255,0.4)" indicator-active-color="#FFFFFF">
+        <swiper-item v-for="(img, idx) in coverImages" :key="idx">
+          <image class="banner-img" :src="img + '?x-oss-process=image/resize,w_750'" mode="aspectFill" @click="previewImage(idx)" />
+        </swiper-item>
+      </swiper>
+    </view>
 
-		<view class="container">
-			<section class="section-event panel bgf" style="position: relative; z-index: 10">
-				<view class="h2">
-					<view class="ellipsis2">
-						{{ detail.name }}
-					</view>
-				</view>
+    <!-- 内容区 -->
+    <view class="content">
+      <!-- 活动标题 -->
+      <text class="event-title">{{ detail.name }}</text>
 
-				<view class="panel-item">
-					<view class="label">
-						<image class="icon" :src="staticBaseUrl + '/images/icon-event-time@2x.png'" mode="aspectFill"></image>
-						<text>报名时间：</text>
-					</view>
-					<view class="value">{{ detail.registration_time }}</view>
-				</view>
+      <!-- 信息区 -->
+      <view class="info-card">
+        <view class="info-row" v-if="fscInfo">
+          <text class="info-label">跑团</text>
+          <text class="info-value">{{ fscInfo.name }}</text>
+        </view>
+        <view class="info-row" v-if="detail.contact">
+          <text class="info-label">发起</text>
+          <view class="info-value-row">
+            <image class="info-avatar" src="/static/images/user.png" mode="aspectFill" />
+            <text class="info-value">{{ detail.contact }}</text>
+          </view>
+        </view>
+        <view class="info-row">
+          <text class="info-label">类型</text>
+          <view class="info-value-row">
+            <view class="type-tag tag-fsc">跑团活动</view>
+            <view class="type-tag" :class="Number(detail.is_free) === 1 ? 'tag-paid' : 'tag-free'">
+              {{ Number(detail.is_free) === 1 ? '付费' : '免费' }}
+            </view>
+          </view>
+        </view>
+        <view class="info-row" v-if="detail.event_time">
+          <text class="info-label">时间</text>
+          <text class="info-value">{{ detail.event_time }}</text>
+        </view>
+        <view class="info-row" v-if="detail.event_location">
+          <text class="info-label">地点</text>
+          <text class="info-value info-value-link" @click="copyText(detail.event_location)">{{ detail.event_location }}</text>
+        </view>
+      </view>
 
-				<view class="panel-item">
-					<view class="label">
-						<image class="icon" :src="staticBaseUrl + '/images/icon-event-date@2x.png'" mode="aspectFill"></image>
-						<text>活动开始时间：</text>
-					</view>
-					<view class="value">{{ detail.event_time }}</view>
-				</view>
-				<view class="panel-item">
-					<view class="label">
-						<image class="icon" :src="staticBaseUrl + '/images/icon-event-location@2x.png'" mode="aspectFill"></image>
-						<text>活动地点：</text>
-					</view>
-					<view class="value" @click="copyText(detail.event_location)">{{
-            detail.event_location
-          }}</view>
-				</view>
+      <!-- 分隔线 -->
+      <view class="divider"></view>
 
-				<view class="cell flex-row1 u-pl-20">
-					<view class="label">
-						<image class="icon" :src="staticBaseUrl + '/images/icon-event-item@2x.png'" mode="aspectFill"></image>
-						<text>活动项目：</text>
-					</view>
-					<view class="flex-row flex-wrap">
-						<view class="event-item flex-center" v-for="(item, index) in detail.eventItems" :key="index">
-							{{ item }}
-						</view>
-					</view>
-				</view>
+      <!-- Tab 切换 -->
+      <view class="tab-row">
+        <text class="tab-item" :class="{ 'tab-active': activeTab === 'intro' }" @click="activeTab = 'intro'">活动介绍</text>
+        <text class="tab-item" :class="{ 'tab-active': activeTab === 'members' }" @click="activeTab = 'members'">参与成员</text>
+      </view>
 
-				<view class="cell flex-row1 u-pl-20">
-					<view class="label">
-						<image class="icon" :src="staticBaseUrl + '/images/icon-event-item@2x.png'" mode="aspectFill"></image>
-						<text>活动性质：</text>
-					</view>
-					<view class="flex-row flex-wrap">
-						<view class="event-item flex-center tag-fsc">跑团活动</view>
-						<view class="event-item flex-center tag-visibility" v-if="detail.visibility">
-							{{ visibilityMap[detail.visibility] || detail.visibility }}
-						</view>
-						<view class="event-item flex-center" :class="Number(detail.is_free) === 1 ? 'tag-free' : 'tag-paid'">
-							{{ Number(detail.is_free) === 1 ? '免费' : '付费' }}
-						</view>
-					</view>
-				</view>
+      <!-- 活动介绍 -->
+      <view v-if="activeTab === 'intro'" class="desc-section">
+        <view class="desc-box" v-if="detail.description">
+          <text class="desc-text">{{ detail.description }}</text>
+        </view>
+        <rich-text v-if="detail.text" :nodes="detail.text" class="rich-text-content"></rich-text>
+      </view>
 
-				<view class="cell flex-start u-pl-20 customer-phone">
-					<view class="label">联系电话：</view>
-					<view class="value flex-start">
-						<view style="color: #43a047; margin-right: 10rpx" @click="callPhone(detail.contact)">{{detail.contact}}</view>
-					</view>
-					<u-button type="primary" color="#43A047" shape="circle" size="mini" @click="copyText(detail.contact)"
-						class="copy-btn"
-						customStyle="min-width: 76rpx; width: 76rpx;height: 34rpx; padding: 0; margin-left: 20rpx; font-weight: bold;font-size: 24rpx;color: #FFFFFF;">
-						复制
-					</u-button>
-				</view>
-			</section>
+      <!-- 参与成员（占位） -->
+      <view v-if="activeTab === 'members'" class="members-section">
+        <text class="empty-text">暂无参与成员</text>
+      </view>
+    </view>
 
-			<section class="panel" style="padding: 20rpx 0 0">
-				<view class="cell event-description" style="margin-top: 0">
-					<view class="label" style="font-size: 28rpx">活动说明：</view>
-				</view>
-				<rich-text :nodes="detail.text"></rich-text>
-			</section>
+    <!-- 底部按钮 -->
+    <view class="section-bottom">
+      <view class="btn-action" :class="{ 'btn-disabled': ['REJ','EXP'].includes(detail.status) }" @click="routeTo()">
+        <text class="btn-action-text">
+          <block v-if="detail.status === 'ACT'">{{ detail.event_detail_url ? '立即报名' : '报名中' }}</block>
+          <block v-if="detail.status === 'PND'">审核中</block>
+          <block v-if="detail.status === 'EXP'">已过期</block>
+          <block v-if="detail.status === 'REJ'">修改活动信息并重新提交</block>
+        </text>
+      </view>
+    </view>
 
-			<view class="section-bottom1">
-				<view class="u-border-top1" :class="{ isSignUp: isSignUp }">
-					<u-button type="primary" :color="['REJ','EXP'].includes(detail.status) ? '#999' : '#FF8C00'" shape="circle" customStyle="height: 80rpx;" @click="routeTo()">
-						<block v-if="detail.status === 'ACT'">{{ detail.event_detail_url ? '立即报名' : '报名中' }}</block>
-						<block v-if="detail.status === 'PND'">审核中</block>
-						<block v-if="detail.status === 'EXP'">已过期</block>
-						<block v-if="detail.status === 'REJ'">修改活动信息并重新提交</block>
-					</u-button>
-				</view>
-			</view>
-		</view>
-
-		<button v-if="detail.status === 'ACT'" class="share-btn flex-center" :class="{ active: isScroll }" open-type="share">
-			<u-icon name="share" color="#fff" size="18"></u-icon>
-		</button>
-
-		<PhoneLogin ref="refPhoneLogin" />
-	</view>
+    <PhoneLogin ref="refPhoneLogin" />
+  </view>
 </template>
+
 <script setup>
-	import {
-		ref,
-		computed
-	} from "vue";
-	import {
-		staticBaseUrl
-	} from "@/utils/config.js";
-	import {
-		onLoad,
-		onUnload,
-		onPageScroll,
-	} from "@dcloudio/uni-app";
-	import { useShare, buildPath } from "@/composables/useShare.js";
-	import {
-		useStore
-	} from "vuex";
-	import PhoneLogin from "@/components/common/PhoneLogin.vue";
-	import dayjs from "dayjs";
-	import request from "@/utils/request.js"
+import { ref, computed } from "vue";
+import { onLoad, onUnload } from "@dcloudio/uni-app";
+import { useShare, buildPath } from "@/composables/useShare.js";
+import { useStore } from "vuex";
+import PhoneLogin from "@/components/common/PhoneLogin.vue";
+import dayjs from "dayjs";
+import request from "@/utils/request.js";
 
-	const store = useStore();
+const store = useStore();
+const refPhoneLogin = ref(null);
+const detail = ref({});
+const fscInfo = ref(null);
+const routerParams = ref({});
+const activeTab = ref('intro');
 
-	// 模板引用
-	const refPhoneLogin = ref(null);
+const userInfo = computed(() => store.state.userInfo);
 
-	// 响应式数据
-	const isScroll = ref(false);
-	const isSignUp = ref(false);
-	const detail = ref({});
-	const isFixedNavbar = ref(true);
-	const isLoadedPage = ref(false);
-	const routerParams = ref({});
+// 封面图（兼容单URL和JSON数组）
+const coverImages = computed(() => {
+  const url = detail.value.background_image_url;
+  if (!url) return [];
+  if (url.startsWith('[')) {
+    try {
+      return JSON.parse(url).filter(Boolean);
+    } catch (e) {
+      return [url];
+    }
+  }
+  return [url];
+});
 
-	// 计算属性
-	const userInfo = computed(() => store.state.userInfo);
+// 分享配置
+useShare(() => ({
+  title: detail.value.name || '跑团活动详情',
+  path: buildPath('/pagesSub/runningTeam/teamEventDetail', { id: routerParams.value.id }),
+  imageUrl: coverImages.value[0] || ''
+}));
 
-	// visibility 映射
-	const visibilityMap = {
-		private: '全速俱乐部',
-		rg_member_only: '跑团内部可见',
-		public: '全平台可见'
-	};
+onLoad((options) => {
+  routerParams.value = options;
 
-	// 定时器
-	let timer = null;
+  if (options.status === 'REJ' && options.status_message) {
+    uni.showModal({
+      title: '审核未通过',
+      content: decodeURIComponent(options.status_message),
+      showCancel: false,
+      confirmText: '我知道了'
+    });
+  }
 
-	// 分享配置
-	useShare(() => ({
-		title: detail.value.name || '跑团活动详情',
-		path: buildPath('/pagesSub/runningTeam/teamEventDetail', { id: routerParams.value.id }),
-		imageUrl: detail.value.background_image_url || ''
-	}));
+  getDetail();
+});
 
-	// 页面加载
-	onLoad((options) => {
-		routerParams.value = options;
+onUnload(() => {
+  uni.removeStorageSync("eventDetail");
+});
 
-		// 如果状态是 REJ，弹窗显示拒绝原因
-		if (options.status === 'REJ' && options.status_message) {
-			uni.showModal({
-				title: '审核未通过',
-				content: decodeURIComponent(options.status_message),
-				showCancel: false,
-				confirmText: '我知道了'
-			});
-		}
+const getDetail = () => {
+  uni.showLoading({ mask: true });
+  request.get(`/event-api/fsc_events/${routerParams.value.id}`)
+    .then((res) => {
+      // 长图
+      if (res.long_image_url) {
+        res.text = `<img src="${res.long_image_url}?x-oss-process=image/resize,w_500" style="max-width:100%;" />`;
+      } else {
+        res.text = '';
+      }
 
-		getDetail();
-	});
+      // 时间格式化
+      const time = isNaN(res.event_time) ? res.event_time : Number(res.event_time);
+      res.event_time = dayjs(time).format('M.DD HH:mm');
 
-	// 页面卸载
-	onUnload(() => {
-		isLoadedPage.value = false;
-		uni.removeStorageSync("eventDetail");
-	});
-	
-	const navBarBg = ref('transparent');
-	onPageScroll((e) => {
-		isFixedNavbar.value = parseInt(e.scrollTop) < 30;
+      // 报名时间
+      try {
+        const list = JSON.parse(res.registration_time);
+        res.registration_time = `${dayjs(list[0]).format('M.DD HH:mm')} - ${dayjs(list[1]).format('M.DD HH:mm')}`;
+      } catch (e) {}
 
-		isScroll.value = true;
+      detail.value = res;
 
-		clearTimeout(timer);
-		timer = setTimeout(() => {
-			isScroll.value = false;
-		}, 100);
-		
-		if (e.scrollTop  >= 5) {
-		  navBarBg.value = "#ffffff";
-		} else {
-		  navBarBg.value = 'transparent';
-		}
-	});
+      // 获取跑团信息
+      if (res.fsc_id) {
+        getFscInfo(res.fsc_id);
+      }
+    });
+};
 
-	// 方法定义
-	const getDetail = () => {
-		const eventDetail = uni.getStorageSync("eventDetail");
-		if (eventDetail) {
-			detail.value = eventDetail;
-		}
+const getFscInfo = (fscId) => {
+  request.get(`/running-group/api/v1/groups/info?group_id=${fscId}`)
+    .then((res) => {
+      fscInfo.value = res;
+    }).catch(() => {});
+};
 
-		uni.showLoading({
-			mask: true,
-		});
-		request.get(`/event-api/fsc_events/${routerParams.value.id}`)
-			.then((res) => {
-				if (res.long_image_url) {
-					res.text = `<img src="${res.long_image_url}?x-oss-process=image/resize,w_500" style="max-width:100%;" />`;
-				} else {
-					res.text = `<div style="text-align:center;padding:40px 30px;"><img src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/logo.png" style="max-width:80%;" /><p style="color:#FF8C00;font-weight:bold;margin-top:20px;padding-bottom:120px;">全速体育提供技术支持</p></div>`;
-				}
-				res.eventItems = res.event_projects.split(",");
+const previewImage = (idx) => {
+  uni.previewImage({
+    current: idx,
+    urls: coverImages.value,
+  });
+};
 
-				// res.status = "ACT";
-				console.log("res", res);
-				const time = isNaN(res.event_time) ? res.event_time :  Number(res.event_time);
-				res.event_time = dayjs(time).format('YYYY-MM-DD HH:mm')
-				try {
-					const list = JSON.parse(res.registration_time)
-					res.registration_time = `${dayjs(list[0]).format('YYYY-MM-DD HH:mm')} 至 ${dayjs(list[1]).format('YYYY-MM-DD HH:mm').slice(5)}`
-				} catch (e) {
-					console.error(e)
-				}
+const routeTo = () => {
+  if (!userInfo.value.id) {
+    return refPhoneLogin.value.open();
+  }
 
-				detail.value = res;
+  if (detail.value.status === 'ACT' && detail.value.event_detail_url) {
+    const token = uni.getStorageSync("token");
+    const separator = detail.value.event_detail_url.includes('?') ? '&' : '?';
+    const url = `${detail.value.event_detail_url}${separator}token=${token}`;
+    uni.$u.route(`pagesSub/settings/webView?link=${encodeURIComponent(url)}`);
+    return;
+  }
 
-				isLoadedPage.value = true;
-			});
-	};
+  if (detail.value.status === "EXP" && !!detail.value.event_detail_url) {
+    uni.$u.route(`pagesSub/settings/webView?link=${detail.value.event_detail_url}`);
+    return;
+  }
 
-	const routeTo = () => {
-		if (!userInfo.value.id) {
-			return refPhoneLogin.value.open();
-		}
+  if (detail.value.status === 'REJ') {
+    uni.$u.route("pagesSub/runningTeam/teamEventForm?event_id=" + routerParams.value.id);
+    return;
+  }
+};
 
-		// ACT 状态且有 event_detail_url 时，跳转到配置的 URL 并携带 token
-		if (detail.value.status === 'ACT' && detail.value.event_detail_url) {
-			const token = uni.getStorageSync("token");
-			const separator = detail.value.event_detail_url.includes('?') ? '&' : '?';
-			const url = `${detail.value.event_detail_url}${separator}token=${token}`;
-			uni.$u.route(
-				`pagesSub/settings/webView?link=${encodeURIComponent(url)}`
-			);
-			return;
-		}
+const showMore = () => {
+  uni.showActionSheet({
+    itemList: ['复制活动链接'],
+    success: (res) => {
+      if (res.tapIndex === 0 && detail.value.event_detail_url) {
+        copyText(detail.value.event_detail_url);
+      }
+    }
+  });
+};
 
-		if (detail.value.status === "EXP" && !!detail.value.event_detail_url) {
-			uni.$u.route(
-				`pagesSub/settings/webView?link=${detail.value.event_detail_url}`
-			);
-			return;
-		}
-
-		if (detail.value.status === 'REJ') {
-			uni.$u.route("pagesSub/runningTeam/teamEventForm?event_id=" + routerParams.value.id);
-			return;
-		}
-	};
-
-	const cancelSignUp = () => {
-		uni.showModal({
-			title: "提示",
-			content: "确定取消报名吗？",
-			success: (res) => {
-				if (res.confirm) {
-					
-				} else if (res.cancel) {
-					console.log("用户点击取消");
-				}
-			},
-		});
-	};
-
-	const copyText = (txt) => {
-		uni.setClipboardData({
-			data: String(txt),
-		});
-	};
-
-	const callPhone = (phoneNumber) => {
-		uni.makePhoneCall({
-			phoneNumber,
-		});
-	};
+const copyText = (txt) => {
+  uni.setClipboardData({ data: String(txt) });
+};
 </script>
 
 <style lang="scss" scoped>
-	.share-btn {
-		position: fixed;
-		right: 20rpx;
-		bottom: 200rpx;
-		width: 90rpx;
-		height: 90rpx;
-		border-radius: 200rpx;
-		color: #fff;
-		z-index: 20;
-		border: 1px solid #18b566;
-		background-color: #18b566 !important;
-		margin-bottom: 20rpx !important;
-		flex-direction: column;
-		font-size: 20rpx;
-		box-shadow: 0px 0px 6rpx rgba(0, 0, 0, 0.4);
-		transition: transform 0.3s;
+.page-container {
+  min-height: 100vh;
+  background: #FFFFFF;
+  padding-bottom: 180rpx;
+}
 
-		&:after {
-			display: none;
-		}
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
 
-		&.active {
-			transform: translate(100rpx);
-		}
-	}
+.nav-share-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
 
-	.event-item {
-		color: #fff;
-		background: #FF8C00;
-		padding: 18rpx 26rpx;
-		margin: 20rpx 20rpx 0rpx 0;
-		border-radius: 16rpx;
-		font-size: 32rpx;
+  &::after {
+    display: none;
+  }
+}
 
-		// 活动性质 tag 颜色
-		&.tag-fsc {
-			background: #22c55e; // 跑团活动 - 绿色
-		}
+.banner {
+  width: 100%;
+  height: 440rpx;
+}
 
-		&.tag-visibility {
-			background: #f59e0b; // visibility - 橙色
-		}
+.banner-swiper {
+  width: 100%;
+  height: 440rpx;
+}
 
-		&.tag-free {
-			background: #10b981; // 免费 - 翠绿色
-		}
+.banner-img {
+  width: 100%;
+  height: 440rpx;
+}
 
-		&.tag-paid {
-			background: #ef4444; // 付费 - 红色
-		}
-	}
+.content {
+  padding: 32rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
 
-	.panel-item {
-		padding: 18rpx 14rpx;
-		margin-top: 20rpx;
-		background: #f6fafb;
-		border-radius: 16rpx;
+.event-title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  line-height: 1.3;
+}
 
-		.label {
-			margin-bottom: 10rpx;
-			font-weight: bold;
-			font-size: 28rpx;
-			color: #707070;
-			display: flex;
-			align-items: center;
+.info-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
 
-			.icon {
-				width: 44rpx;
-				height: 44rpx;
-				margin-right: 10rpx;
-			}
-		}
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
 
-		.value {
-			font-weight: bold;
-			font-size: 28rpx;
-			color: #000000;
-			line-height: 40rpx;
-		}
-	}
+.info-label {
+  font-size: 28rpx;
+  color: #9CA3AF;
+  font-weight: 500;
+  width: 80rpx;
+  flex-shrink: 0;
+}
 
-	.offlineEvents {
-		padding: 34rpx;
-	}
+.info-value {
+  font-size: 28rpx;
+  color: #1A1A1A;
+}
 
-	.panel {
-		margin: 30rpx auto;
-		padding: 20rpx;
-		border-radius: 26rpx;
-		box-shadow: unset;
-		background: #fff;
-	}
+.info-value-link {
+  color: #3B82F6;
+}
 
-	.h2 {
-		font-weight: 600;
-		font-size: 34rpx;
-		text-align: center;
-		line-height: 1.4;
-	}
+.info-value-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
 
-	.cell {
-		margin-top: 20rpx;
-		font-size: 24rpx;
-		line-height: 34rpx;
+.info-avatar {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+}
 
-		.label {
-			min-width: 120rpx;
-			display: flex;
-			align-items: center;
-			font-weight: bold;
-			font-size: 28rpx;
-			color: #707070;
-			line-height: 40rpx;
+.type-tag {
+  font-size: 22rpx;
+  font-weight: 500;
+  padding: 4rpx 16rpx;
+  border-radius: 8rpx;
+  color: #FFFFFF;
+}
 
-			.icon {
-				width: 44rpx;
-				height: 44rpx;
-				margin-right: 10rpx;
-			}
-		}
-	}
+.tag-fsc {
+  background: #22C55E;
+}
 
-	.customer-phone {
-		display: flex;
-		align-items: center;
+.tag-free {
+  background: #10B981;
+}
 
-		.label {
-			display: flex;
-			align-items: center;
-			font-weight: bold;
-			font-size: 28rpx;
-			color: #707070;
-		}
-	}
+.tag-paid {
+  background: #EF4444;
+}
 
-	.event-description {
-		.label {
-			padding: 16rpx 20rpx 14rpx 20rpx;
-		}
-	}
+.divider {
+  height: 1rpx;
+  background: #F3F4F6;
+}
 
-	.section-bottom1 {
-		position: fixed;
-		bottom: 0;
-		width: 100%;
-		left: 0;
-		z-index: 10;
-		padding: 48rpx 54rpx;
-		transform: translateY(100%);
+.tab-row {
+  display: flex;
+  gap: 32rpx;
+}
 
-		.txt {
-			font-size: 24rpx;
-			line-height: 34rpx;
-			margin-bottom: 22rpx;
-		}
-	}
+.tab-item {
+  font-size: 30rpx;
+  color: #9CA3AF;
+  padding-bottom: 8rpx;
+}
 
-	.section-event {
-		transform: translateY(0%);
-		// margin-top: -110rpx;
-	}
+.tab-active {
+  color: #1A1A1A;
+  font-weight: 700;
+  border-bottom: 4rpx solid #FF8C00;
+}
 
-	.isLoadedPage {
-		.section-bottom1 {
-			// transition: transform 0.5s;
-			// transform: translateY(0%);
-			animation: slideIn 0.5s 0.5s forwards;
-		}
+.desc-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
 
-		.section-event {
-			transition: margin 0.5s;
-			// transform: translateY(-100rpx);
-			margin-top: -100rpx;
-		}
-	}
+.desc-box {
+  background: #F9FAFB;
+  border-radius: 16rpx;
+  padding: 24rpx;
+}
 
-	::v-deep {
-		.isSignUp {
-			.u-button {
-				color: #ff8c00;
-				background: #f2f2f2;
-				border-color: #f2f2f2;
-			}
-		}
+.desc-text {
+  font-size: 28rpx;
+  color: #6B7280;
+  line-height: 1.6;
+}
 
-		.isFixedNavbar {
-			.up-navbar--fixed {
-				background: none !important;
+.rich-text-content {
+  width: 100%;
+}
 
-				.navbar-badge {
-					background: #fff;
-				}
-			}
-		}
-	}
+.members-section {
+  padding: 60rpx 0;
+  display: flex;
+  justify-content: center;
+}
 
-	.event-status {
-		position: absolute;
-		top: 200rpx;
-		right: 40rpx;
-		z-index: 2;
-		background: #19be6b;
-		color: #fff;
-		border-radius: 888rpx;
-		padding: 20rpx 30rpx;
-	}
+.empty-text {
+  font-size: 28rpx;
+  color: #9CA3AF;
+}
 
-	@keyframes slideIn {
-		0% {
-			transform: translateY(100%);
-			opacity: 0;
-		}
+.section-bottom {
+  position: fixed;
+  bottom: 30rpx;
+  width: 100%;
+  z-index: 10;
+  padding: 0 30rpx 20rpx;
+}
 
-		50% {
-			transform: translateY(10px);
-		}
+.btn-action {
+  width: 100%;
+  height: 84rpx;
+  background: #FF8C00;
+  border-radius: 200rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-		100% {
-			transform: translateY(0);
-			opacity: 1;
-		}
-	}
+.btn-action.btn-disabled {
+  background: #D1D5DB;
+}
+
+.btn-action-text {
+  color: #FFFFFF;
+  font-size: 30rpx;
+  font-weight: 600;
+}
 </style>
