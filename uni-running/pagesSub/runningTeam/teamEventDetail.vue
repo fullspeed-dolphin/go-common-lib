@@ -115,13 +115,17 @@
         <text class="cert-popup-desc">本活动需要运动保险，请填写证件信息</text>
         <view class="cert-form">
           <view class="cert-row">
+            <text class="cert-label">真实姓名</text>
+            <input class="cert-input" v-model="certForm.real_name" placeholder="请输入真实姓名" />
+          </view>
+          <view class="cert-row">
             <text class="cert-label">证件类型</text>
             <view class="cert-radios">
-              <view class="cert-radio" :class="{ active: certForm.cert_type === '身份证' }" @click="certForm.cert_type = '身份证'">
+              <view class="cert-radio" :class="{ active: certForm.cert_type === 'CN_ID' }" @click="certForm.cert_type = 'CN_ID'">
                 <text>身份证</text>
               </view>
-              <view class="cert-radio" :class="{ active: certForm.cert_type === '护照' }" @click="certForm.cert_type = '护照'">
-                <text>护照</text>
+              <view class="cert-radio" :class="{ active: certForm.cert_type === 'HK_MA_PASS' }" @click="certForm.cert_type = 'HK_MA_PASS'">
+                <text>回乡证</text>
               </view>
             </view>
           </view>
@@ -162,7 +166,7 @@ const routerParams = ref({});
 const activeTab = ref('intro');
 const isRegistered = ref(false);
 const showCertPopup = ref(false);
-const certForm = ref({ cert_type: '身份证', cert_number: '' });
+const certForm = ref({ real_name: '', cert_type: 'CN_ID', cert_number: '' });
 const memberList = ref([]);
 
 const userInfo = computed(() => store.state.userInfo);
@@ -319,6 +323,10 @@ const submitRegistration = () => {
 
 // 带证件信息报名
 const submitRegistrationWithCert = () => {
+  if (!certForm.value.real_name) {
+    uni.$u.toast('请输入真实姓名');
+    return;
+  }
   if (!certForm.value.cert_number) {
     uni.$u.toast('请输入证件号码');
     return;
@@ -327,6 +335,7 @@ const submitRegistrationWithCert = () => {
   uni.showLoading({ mask: true, title: '报名中...' });
   request.post('/booking-api/fsc_events/registration', {
     event_id: routerParams.value.id,
+    real_name: certForm.value.real_name,
     cert_type: certForm.value.cert_type,
     cert_number: certForm.value.cert_number,
   }).then((res) => {
