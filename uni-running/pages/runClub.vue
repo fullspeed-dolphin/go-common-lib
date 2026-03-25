@@ -109,8 +109,8 @@
               <image
                 v-if="myClubDetail.avatar_url"
                 class="club-card__avatar-img"
-                :src="myClubDetail.avatar_url + '?x-oss-process=image/resize,w_120,h_120,m_lfit'"
-                mode="aspectFill"
+                :src="myClubDetail.avatar_url + '?x-oss-process=image/resize,w_200,limit_0'"
+                mode="aspectFit"
               />
               <view v-else class="club-card__avatar">
                 <u-icon name="account-fill" size="28" color="#6B7280"></u-icon>
@@ -158,8 +158,8 @@
         >
           <image
             class="nearby-item__avatar-img"
-            :src="(club.avatar_url || 'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png') + '?x-oss-process=image/resize,w_120,h_120,m_fill'"
-            mode="aspectFill"
+            :src="(club.avatar_url || 'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png') + '?x-oss-process=image/resize,w_200,limit_0'"
+            mode="aspectFit"
           />
           <view class="nearby-item__info">
             <text class="nearby-item__name">{{ club.name }}</text>
