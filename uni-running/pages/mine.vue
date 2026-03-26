@@ -1,6 +1,8 @@
 <template>
   <view class="page">
     <view class="page-content">
+      <!-- 标题栏到英雄区的过渡 -->
+      <view class="nav-hero-transition"></view>
       <!-- Hero 区域 -->
       <view class="hero-section">
         <view class="hero-content">
@@ -15,9 +17,9 @@
               <u-icon name="edit-pen-fill" color="rgba(46,59,94,0.6)" size="16"></u-icon>
             </view>
             <view class="hero-coin-pill" @click="routeTo('/pagesSub/runCoin/myCoin')">
-              <image class="coin-icon" src="/static/images/coin.png" mode="aspectFill"></image>
+              <u-icon name="rmb-circle" color="#FFFFFF" size="20"></u-icon>
               <text class="coin-text">跑币 {{ coinInfo.fscoin || 0 }}</text>
-              <u-icon name="arrow-right" color="#2E3B5E" size="12"></u-icon>
+              <u-icon name="arrow-right" color="#FFFFFF" size="12"></u-icon>
             </view>
           </block>
           <view class="hero-name-row" v-else @click="handleUserClick">
@@ -322,8 +324,13 @@ const openWeComChat = () => {
 </script>
 
 <style lang="scss" scoped>
+.nav-hero-transition {
+  height: 60rpx;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF0E0 100%);
+}
+
 .hero-section {
-  background: linear-gradient(180deg, #FF8C00 0%, #FFD2A0 100%);
+  background: linear-gradient(180deg, #FFF0E0 0%, #FFFFFF 100%);
   padding: 0 32rpx 48rpx 32rpx;
 }
 
@@ -341,7 +348,7 @@ const openWeComChat = () => {
     width: 144rpx;
     height: 144rpx;
     border-radius: 50%;
-    border: 6rpx solid rgba(255, 255, 255, 0.33);
+    border: 6rpx solid #FF8C00;
     background: #f5f5f5;
   }
 }
@@ -363,7 +370,7 @@ const openWeComChat = () => {
   align-items: center;
   gap: 16rpx;
   padding: 20rpx 28rpx 20rpx 32rpx;
-  background: rgba(255, 255, 255, 0.35);
+  background: #FF8C00;
   border-radius: 100rpx;
 
   .coin-icon {
@@ -374,13 +381,13 @@ const openWeComChat = () => {
   .coin-text {
     font-size: 32rpx;
     font-weight: 700;
-    color: #2E3B5E;
+    color: #FFFFFF;
   }
 }
 
 .hero-transition {
   height: 80rpx;
-  background: linear-gradient(180deg, #FFD2A0 0%, #FAFAFA 100%);
+  background: linear-gradient(180deg, #FFFFFF 0%, #FAFAFA 100%);
 }
 
 .mine-content {

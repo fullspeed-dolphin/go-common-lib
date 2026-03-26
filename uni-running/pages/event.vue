@@ -8,9 +8,9 @@
 						<!-- 滑块 -->
 						<view class="tag-slider" :style="sliderStyle" :class="sliderAnimClass"></view>
 						<!-- Tab 项 -->
-						<view class="tag-item" id="tab-0" :class="{ active: sliderPosition === 0 }" @click="onTabChange('mine', 0)">我的</view>
+						<view class="tag-item" id="tab-0" :class="{ active: sliderPosition === 0 }" @click="onTabChange('all', 0)">全部</view>
 						<view class="tag-item" id="tab-1" :class="{ active: sliderPosition === 1 }" @click="onTabChange('running', 1)">跑步</view>
-						<view class="tag-item" id="tab-2" :class="{ active: sliderPosition === 2 }" @click="onTabChange('cycling', 2)">骑行</view>
+						<view class="tag-item" id="tab-2" :class="{ active: sliderPosition === 2 }" @click="onTabChange('mine', 2)">我的跑团活动</view>
 					</view>
 				</view>
 			</view>
@@ -25,29 +25,14 @@
 						<view class="activity-card" v-for="item in filteredList" :key="item.id" @click="goDetail(item)">
 							<!-- 左侧图片 -->
 							<view class="card-image">
-								<image :src="item.background_image_url + '?x-oss-process=image/resize,w_400'" mode="aspectFill" />
+								<image :src="getCoverUrl(item) + '?x-oss-process=image/resize,w_200,h_200,m_fill'" mode="aspectFill" v-if="getCoverUrl(item)" />
 								<view class="card-tag">报名中</view>
 							</view>
 							<!-- 右侧内容 -->
 							<view class="card-info">
 								<text class="card-title">{{ item.name }}</text>
-								<view class="info-row">
-									<image class="icon-img" src="/static/images/跑团.png" mode="aspectFill" />
-									<text>跑团: {{ item.fsc_name }}</text>
-								</view>
-								<view class="info-row">
-									<u-icon name="map-fill" size="24rpx" color="#FF8C00" />
-									<text>地点: {{ item.event_location }}</text>
-								</view>
-								<view class="info-row">
-									<u-icon name="calendar-fill" size="24rpx" color="#FF8C00" />
-									<text>时间: {{ formatTime(item.event_time) }}</text>
-								</view>
-								<!-- 底部人数 -->
-								<view class="card-footer">
-									<u-icon name="account-fill" size="24rpx" color="#FF8C00" />
-									<text class="capacity-text">人数限制: {{ item.capacity }}人</text>
-								</view>
+								<text class="card-time">{{ formatTime(item.event_time) }}</text>
+								<text class="card-club">{{ item.fsc_name }}</text>
 							</view>
 						</view>
 					</view>
@@ -70,7 +55,13 @@
 			<button class="join-btn" @click="goJoinClub">加入俱乐部</button>
 		</view>
 
-		<!-- <tabbar type="event" /> -->
+		<!-- 发布活动按钮（团长可见） -->
+		<view v-if="userInfo.running_group" class="publish-btn-wrapper">
+			<view class="publish-btn" @click="onClickPublish">
+				<image class="publish-btn-icon" src="/static/icons/send.png" mode="aspectFit" />
+				<text class="publish-btn-text">发布活动</text>
+			</view>
+		</view>
 	</view>
 </template>
 
@@ -89,7 +80,7 @@ const store = useStore();
 
 // 分享配置
 useShare({
-	title: '全速俱乐部活动',
+	title: '跑团活动',
 	path: '/pages/event'
 });
 const userInfo = computed(() => store.state.userInfo);
@@ -105,7 +96,7 @@ const upOption = {
 };
 
 // 分类筛选，默认"我的"
-const selectedType = ref('mine');
+const selectedType = ref('all');
 
 // Tab 切换动画相关
 const slideDirection = ref('');
@@ -218,7 +209,7 @@ const onTabChange = (type, index, direction = null, isLoop = false) => {
 // 滑动切换相关
 const touchStartX = ref(0);
 const touchStartY = ref(0);
-const tabTypes = ['mine', 'running', 'cycling'];
+const tabTypes = ['all', 'running', 'mine'];
 
 const onTouchStart = (e) => {
 	touchStartX.value = e.touches[0].clientX;
@@ -264,10 +255,28 @@ const myEventLoaded = ref(false);
 // 缓存跑团信息，避免重复请求
 const fscInfoCache = ref({});
 
+// 获取封面图URL（兼容单URL和JSON数组）
+const getCoverUrl = (item) => {
+	const url = item.background_image_url;
+	if (!url) return '';
+	if (url.startsWith('[')) {
+		try {
+			const arr = JSON.parse(url);
+			return arr[0] || '';
+		} catch (e) {
+			return url;
+		}
+	}
+	return url;
+};
+
 // 根据 club_type 过滤（无值或 running = 跑步，cycling = 骑行）
 const filteredList = computed(() => {
 	if (selectedType.value === 'mine') {
 		return myEventList.value;
+	}
+	if (selectedType.value === 'all') {
+		return eventList.value;
 	}
 	return eventList.value.filter(item => {
 		const type = item.club_type || 'running';
@@ -352,17 +361,17 @@ const loadMyEvents = async () => {
 	loading.value = true;
 	const params = {
 		fsc_id: userInfo.value.running_group,
-		visibility: 'rg_member_only',
-		is_free: 1,
-		status: 'ACT'
+		status: 'ACT',
 	};
 
 	try {
 		const res = await request.get('/event-api/fsc_events', params);
-		let list = (res.fsc_events || []).map(item => ({
-			...item,
-			event_time: item.event_time
-		}));
+		let list = (res.fsc_events || [])
+			.filter(item => item.status !== 'DELETED')
+			.map(item => ({
+				...item,
+				event_time: item.event_time
+			}));
 
 		// 获取跑团信息
 		const uniqueFscIds = [...new Set(list.map(item => item.fsc_id).filter(Boolean))];
@@ -403,14 +412,22 @@ const goJoinClub = () => {
 	uni.$u.route('pagesSub/runningTeam/teamList');
 };
 
+const onClickPublish = () => {
+	uni.$u.route(`pagesSub/runningTeam/teamEventTypeSelect?group_id=${userInfo.value.running_group}`);
+};
+
 onLoad(() => {
 	getTabWidths();
 });
 
 onShow(() => {
-	// 加载"我的"活动
+	// 加载"我的跑团活动"
 	if (selectedType.value === 'mine') {
 		loadMyEvents();
+	}
+	// "全部"或具体分类 tab 自动刷新
+	if (['all', 'running'].includes(selectedType.value)) {
+		getMescroll()?.resetUpScroll();
 	}
 
 	// 监听刷新事件
@@ -572,11 +589,13 @@ onShow(() => {
 // 横向卡片
 .activity-card {
 	display: flex;
+	align-items: center;
 	background: #fff;
 	border-radius: 20rpx;
 	overflow: hidden;
-	height: 240rpx;
-	box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+	padding: 16rpx;
+	gap: 20rpx;
+	box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
 
 	&:active {
 		transform: scale(0.98);
@@ -585,10 +604,12 @@ onShow(() => {
 
 // 左侧图片
 .card-image {
-	width: 220rpx;
-	height: 240rpx;
+	width: 200rpx;
+	height: 140rpx;
+	border-radius: 12rpx;
 	flex-shrink: 0;
 	position: relative;
+	overflow: hidden;
 
 	image {
 		width: 100%;
@@ -598,12 +619,12 @@ onShow(() => {
 
 .card-tag {
 	position: absolute;
-	top: 12rpx;
-	left: 12rpx;
-	padding: 8rpx 20rpx;
-	border-radius: 999rpx;
-	font-size: 24rpx;
-	font-weight: 500;
+	top: 0;
+	left: 0;
+	padding: 4rpx 16rpx;
+	border-radius: 0 0 12rpx 0;
+	font-size: 20rpx;
+	font-weight: 600;
 	background: #FF8C00;
 	color: #fff;
 }
@@ -611,20 +632,31 @@ onShow(() => {
 // 右侧内容
 .card-info {
 	flex: 1;
-	padding: 16rpx 20rpx;
 	display: flex;
 	flex-direction: column;
+	gap: 6rpx;
 	min-width: 0;
+	justify-content: space-between;
+	height: 140rpx;
 }
 
 .card-title {
-	font-size: 28rpx;
-	font-weight: 600;
-	color: #333;
-	margin-bottom: 8rpx;
+	font-size: 30rpx;
+	font-weight: 700;
+	color: #1A1A1A;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+}
+
+.card-time {
+	font-size: 26rpx;
+	color: #6B7280;
+}
+
+.card-club {
+	font-size: 26rpx;
+	color: #9CA3AF;
 }
 
 .info-row {
@@ -710,6 +742,36 @@ onShow(() => {
 	&:after {
 		display: none;
 	}
+}
+
+.publish-btn-wrapper {
+	position: fixed;
+	bottom: 30rpx;
+	width: 100%;
+	z-index: 10;
+	padding: 0 30rpx 20rpx;
+}
+
+.publish-btn {
+	width: 100%;
+	height: 84rpx;
+	background: #FF8C00;
+	border-radius: 200rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 16rpx;
+}
+
+.publish-btn-icon {
+	width: 36rpx;
+	height: 36rpx;
+}
+
+.publish-btn-text {
+	color: #FFFFFF;
+	font-size: 30rpx;
+	font-weight: 600;
 }
 
 </style>

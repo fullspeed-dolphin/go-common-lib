@@ -13,19 +13,19 @@
     <view v-show="pageIndex === 0" class="panel-section">
       <up-form :model="form" ref="uForm" :rules="rules" labelWidth="auto">
         <!-- 两个上传框并排 -->
-        <view class="flex-between-center">
+        <view class="upload-row">
           <view class="upload-item">
             <view class="upload-label tal b c0 u-mb-20">活动背景图(正方形)<text class="required-star u-ml-5">*</text></view>
-            <FileUpload v-model="form.background_image_url" width="324rpx" :height="120" @change="validateField('background_image_url')" />
+            <FileUpload v-model="form.background_image_url" width="100%" :height="120" @change="validateField('background_image_url')" />
           </view>
           <view class="upload-item">
             <view class="upload-label tal b c0 u-mb-20">活动详情(H5长图)</view>
-            <FileUpload v-model="form.long_image_url" width="324rpx" :height="120" @change="validateField('long_image_url')" />
+            <FileUpload v-model="form.long_image_url" width="100%" :height="120" @change="validateField('long_image_url')" />
           </view>
         </view>
 
-        <up-form-item label="活动名称" prop="name" required>
-          <input v-model="form.name" class="u-input" @input="validateField('name')" maxlength="50" placeholder="请输入活动名称" />
+        <up-form-item label="活动主题" prop="name" required>
+          <input v-model="form.name" class="u-input" @input="validateField('name')" maxlength="50" placeholder="请输入活动主题" />
         </up-form-item>
 
         <view class="textarea-cell">
@@ -465,6 +465,16 @@ async function createEvent(skipNavigation = false) {
 </script>
 
 <style lang="scss" scoped>
+.upload-row {
+  display: flex;
+  gap: 24rpx;
+}
+
+.upload-item {
+  flex: 1;
+  min-width: 0;
+}
+
 .submit-btn {
   width: 682rpx;
   height: 72rpx;
