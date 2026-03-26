@@ -58,11 +58,11 @@
             <text class="stat-label">男女比例</text>
           </view>
           <view class="stat-item">
-            <text class="stat-number">--</text>
+            <text class="stat-number">{{ groupStats.avg_km_per_member ? groupStats.avg_km_per_member.toFixed(1) : '--' }}</text>
             <text class="stat-label">人均/Km</text>
           </view>
           <view class="stat-item">
-            <text class="stat-number">--</text>
+            <text class="stat-number">{{ groupStats.today_runners > 0 ? groupStats.today_avg_km.toFixed(1) : '--' }}</text>
             <text class="stat-label">今日跑/人</text>
           </view>
         </view>
@@ -101,7 +101,7 @@
           <view class="rank-table-header">
             <text class="rank-col-no">排名</text>
             <text class="rank-col-user">用户</text>
-            <text class="rank-col-km">累计跑量</text>
+            <text class="rank-col-km">月跑量</text>
           </view>
           <!-- 排名行 -->
           <view class="rank-row" :class="{ 'rank-row-self': item.openid === userOpenid }"
@@ -114,9 +114,9 @@
               mode="aspectFill" />
             <view class="rank-info">
               <text class="rank-name">{{ item.nickname || '成员' }}</text>
-              <text class="rank-sub">{{ item.role === 'creator' ? '团长' : '成员' }}</text>
+              <text class="rank-sub">{{ item.streak_days > 0 ? `坚持跑步第 ${item.streak_days} 天` : '本月尚未开跑' }}</text>
             </view>
-            <text class="rank-km">{{ formatKm(item.total_distance || item.total_km || 0) }}</text>
+            <text class="rank-km">{{ formatKm(item.monthly_km || 0) }}</text>
           </view>
           <view v-if="!rankedMembers.length" class="empty-hint">
             <text>暂无排行数据</text>
@@ -250,6 +250,8 @@ const eventList = ref([]);
 const memberList = ref([]);
 const memberLeader = ref({});
 const allMembers = ref([]);
+const groupStats = ref({});
+const monthlyRanking = ref([]);
 
 const clubTypeName = computed(() => {
   return detail.value.club_type === "cycling" ? "车队" : "跑团";
@@ -258,10 +260,8 @@ const clubTypeName = computed(() => {
 const userInfo = computed(() => store.state.userInfo);
 const userOpenid = computed(() => store.state.userInfo?.openid || '');
 
-// 排行榜：所有成员按跑量排序
-const rankedMembers = computed(() => {
-  return [...allMembers.value].sort((a, b) => (b.total_distance || b.total_km || 0) - (a.total_distance || a.total_km || 0));
-});
+// 排行榜：使用月跑量排行数据
+const rankedMembers = computed(() => monthlyRanking.value);
 
 const refMemberDetail = ref(null);
 function openMemberDetail(item) {
@@ -308,6 +308,8 @@ onLoad((options) => {
   }
   getDetail();
   getEvents();
+  getGroupStats();
+  getMonthlyRanking();
 
   // #ifdef MP-WEIXIN
   wx.showShareMenu({ withShareTicket: true, menus: ["shareAppMessage", "shareTimeline"] });
@@ -351,6 +353,20 @@ const getMemberList = () => {
     memberLeader.value = res.find((i) => i.role === "creator") || {};
     memberList.value = res.filter((i) => i.role !== "creator");
   });
+};
+
+const getGroupStats = () => {
+  if (!routeParams.value.group_id) return;
+  request.get(`/sport-api/api/manual/group-sports-stats?group_id=${routeParams.value.group_id}`)
+    .then((res) => { groupStats.value = res || {}; })
+    .catch(() => {});
+};
+
+const getMonthlyRanking = () => {
+  if (!routeParams.value.group_id) return;
+  request.get(`/sport-api/api/manual/group-monthly-ranking?group_id=${routeParams.value.group_id}&page_size=50`)
+    .then((res) => { monthlyRanking.value = res?.list || []; })
+    .catch(() => {});
 };
 
 const getEvents = () => {

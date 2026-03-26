@@ -219,12 +219,13 @@ const bannerDesc = '跑团活动 / 联动共享\n运动保险 / 成员管理';
 // ===== 我的跑团 =====
 const myClubDetail = ref(null);
 const myClubLoaded = ref(false);
-const clubStats = [
-  { value: '- -', label: '月跑量 (km)' },
-  { value: '- -', label: '人均 (km)' },
-  { value: '- -', label: '本月跑 (人)' },
-  { value: '- -', label: '今日跑 (人)' },
-];
+const myClubStats = ref({});
+const clubStats = computed(() => [
+  { value: myClubStats.value.month_total_km ? parseFloat(myClubStats.value.month_total_km).toFixed(1) : '- -', label: '月跑量 (km)' },
+  { value: myClubStats.value.avg_km_per_member ? parseFloat(myClubStats.value.avg_km_per_member).toFixed(1) : '- -', label: '人均 (km)' },
+  { value: myClubStats.value.month_active_members != null ? myClubStats.value.month_active_members : '- -', label: '本月跑 (人)' },
+  { value: myClubStats.value.today_runners != null ? myClubStats.value.today_runners : '- -', label: '今日跑 (人)' },
+]);
 
 const getMyClubInfo = () => {
   const groupId = userInfo.value.running_group;
@@ -236,6 +237,7 @@ const getMyClubInfo = () => {
   request.get(`/running-group/api/v1/groups/info?group_id=${groupId}`)
     .then((res) => {
       myClubDetail.value = res;
+      getMyClubStats(groupId);
     })
     .catch(() => {
       myClubDetail.value = null;
@@ -243,6 +245,12 @@ const getMyClubInfo = () => {
     .finally(() => {
       myClubLoaded.value = true;
     });
+};
+
+const getMyClubStats = (groupId) => {
+  request.get(`/sport-api/api/manual/group-sports-stats?group_id=${groupId}`)
+    .then((res) => { myClubStats.value = res || {}; })
+    .catch(() => {});
 };
 
 // ===== 跑团排行列表 =====
