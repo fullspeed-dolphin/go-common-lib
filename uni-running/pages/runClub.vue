@@ -34,30 +34,44 @@
           <view class="banner-left__overlay">
             <view class="banner-left__top">
               <view class="upgrade-badge">
-                <text class="upgrade-badge__text">功能升级</text>
+                <text class="upgrade-badge__text">隆重上线</text>
               </view>
             </view>
             <view class="banner-left__bottom">
-              <text class="banner-left__title">跑团功能新玩法</text>
-              <text class="banner-left__highlight">先睹为快</text>
+              <text class="banner-left__title">全速体育</text>
+              <text class="banner-left__highlight">跑团功能</text>
               <text class="banner-left__desc">{{ bannerDesc }}</text>
             </view>
           </view>
         </view>
 
-        <!-- 右侧双卡片 -->
+        <!-- 右侧卡片区 -->
         <view class="banner-right">
-          <view class="mini-card mini-card--activity" @click="onClickActivity">
-            <view class="mini-card__text">
+          <!-- 上排：跑团活动 + 发布活动 并列（仅团长可见发布活动） -->
+          <view class="banner-right__top" v-if="isCreator">
+            <view class="mini-card mini-card--activity" @click="onClickActivity">
               <text class="mini-card__title">跑团活动</text>
-              <text class="mini-card__sub">等你参加</text>
+              <view class="mini-card__icon">
+                <u-icon name="bell-fill" size="28" color="#FF8C42"></u-icon>
+              </view>
             </view>
-            <view class="mini-card__icon">
-              <u-icon name="bell-fill" size="28" color="#3B82F6"></u-icon>
+            <view class="mini-card mini-card--publish" @click="onClickPublish">
+              <text class="mini-card__title">发布活动</text>
+              <view class="mini-card__icon">
+                <image class="mini-card__icon-img" src="/static/icons/send-orange.png" mode="aspectFit" />
+              </view>
             </view>
           </view>
+          <!-- 非团长：跑团活动全宽 -->
+          <view v-else class="mini-card mini-card--activity" @click="onClickActivity">
+            <text class="mini-card__title">跑团活动</text>
+            <view class="mini-card__icon">
+              <u-icon name="bell-fill" size="28" color="#FF8C42"></u-icon>
+            </view>
+          </view>
+          <!-- 下排：关于我们 全宽 -->
           <view class="mini-card mini-card--about" @click="onClickAbout">
-            <view class="mini-card__text">
+            <view>
               <text class="mini-card__title">关于我们</text>
               <text class="mini-card__sub">全速运动</text>
             </view>
@@ -95,8 +109,8 @@
               <image
                 v-if="myClubDetail.avatar_url"
                 class="club-card__avatar-img"
-                :src="myClubDetail.avatar_url + '?x-oss-process=image/resize,w_120,h_120,m_lfit'"
-                mode="aspectFill"
+                :src="myClubDetail.avatar_url + '?x-oss-process=image/resize,w_200,limit_0'"
+                mode="aspectFit"
               />
               <view v-else class="club-card__avatar">
                 <u-icon name="account-fill" size="28" color="#6B7280"></u-icon>
@@ -144,8 +158,8 @@
         >
           <image
             class="nearby-item__avatar-img"
-            :src="(club.avatar_url || 'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png') + '?x-oss-process=image/resize,w_120,h_120,m_fill'"
-            mode="aspectFill"
+            :src="(club.avatar_url || 'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png') + '?x-oss-process=image/resize,w_200,limit_0'"
+            mode="aspectFit"
           />
           <view class="nearby-item__info">
             <text class="nearby-item__name">{{ club.name }}</text>
@@ -200,7 +214,7 @@ const navSpacerHeight = navTop + navHeight + 8;
 // const onSwiperChange = (e) => { tabIndex.value = e.detail.current; };
 
 // ===== Banner 描述文本 =====
-const bannerDesc = '跑团活动 / 联动共享\n跑团贡献 / Siri捷径';
+const bannerDesc = '跑团活动 / 联动共享\n运动保险 / 成员管理';
 
 // ===== 我的跑团 =====
 const myClubDetail = ref(null);
@@ -298,7 +312,16 @@ onReachBottom(() => {
   getClubList(false);
 });
 
+// ===== 团长判断 =====
+const isCreator = computed(() => {
+  return !!(userInfo.value.running_group && myClubDetail.value);
+});
+
 // ===== 路由 =====
+const onClickPublish = () => {
+  if (!myClubDetail.value) return;
+  uni.$u.route(`pagesSub/runningTeam/teamEventTypeSelect?group_id=${myClubDetail.value.group_id}`);
+};
 const onClickActivity = () => {
   uni.$u.route('/pages/event');
 };
@@ -466,39 +489,44 @@ $border-subtle: #F3F4F6;
 }
 
 .banner-right {
-  width: 310rpx;
+  width: 340rpx;
   display: flex;
   flex-direction: column;
-  gap: 20rpx;
+  gap: 16rpx;
+}
+
+.banner-right__top {
+  display: flex;
+  gap: 16rpx;
+  height: 0;
+  flex: 1;
 }
 
 .mini-card {
   flex: 1;
   display: flex;
   flex-direction: column;
-  border-radius: 24rpx;
-  padding: 24rpx;
+  border-radius: 20rpx;
+  padding: 16rpx;
   overflow: hidden;
 
-  &--activity { background: #DBEAFE; }
-  &--about { background: #FFF3E0; }
-
-  &__text {
-    display: flex;
-    flex-direction: column;
-    gap: 16rpx;
-  }
+  &--activity { background: #FFE8D6; }
+  &--publish { background: #FFF3E0; }
+  &--about { background: #D4F5F5; }
 
   &__title {
-    font-size: 34rpx;
+    font-size: 30rpx;
     font-weight: 700;
     color: $c1;
+    white-space: nowrap;
+    display: block;
   }
 
   &__sub {
-    font-size: 28rpx;
-    font-weight: 500;
+    font-size: 26rpx;
     color: $c2;
+    display: block;
+    margin-top: 12rpx;
   }
 
   &__icon {
@@ -506,6 +534,11 @@ $border-subtle: #F3F4F6;
     display: flex;
     align-items: flex-end;
     justify-content: flex-end;
+  }
+
+  &__icon-img {
+    width: 48rpx;
+    height: 48rpx;
   }
 }
 
@@ -595,8 +628,6 @@ $border-subtle: #F3F4F6;
   &__avatar-img {
     width: 100rpx;
     height: 100rpx;
-    border-radius: 24rpx;
-    background: #F6F7F8;
   }
 
   &--empty {
@@ -751,7 +782,6 @@ $border-subtle: #F3F4F6;
   &__avatar-img {
     width: 120rpx;
     height: 120rpx;
-    border-radius: 24rpx;
     flex-shrink: 0;
   }
 

@@ -20,7 +20,7 @@
     },
     {
       "path": "pages/event",
-      "style": { "navigationBarTitleText": "全速俱乐部活动" }
+      "style": { "navigationBarTitleText": "跑团活动" }
     },
     {
       "path": "pages/sport",
@@ -119,6 +119,8 @@
         {"path": "runningTeam/teamMemberList","style": {"navigationStyle": "custom","navigationBarTitleText": "跑团成员"}},
         {"path": "runningTeam/teamSetting","style": {"navigationStyle": "custom", "navigationBarTitleText": "Club管理工具"}},
         {"path": "runningTeam/teamEventList","style": {"navigationStyle": "custom", "navigationBarTitleText": "活动列表"}},
+        {"path": "runningTeam/teamEventTypeSelect","style": {"navigationStyle": "custom","navigationBarTitleText": "创建活动"}},
+        {"path": "runningTeam/teamEventFreeForm","style": {"navigationStyle": "custom","navigationBarTitleText": "发布免费活动"}},
         {"path": "runningTeam/teamEventForm","style": {"navigationStyle": "custom","navigationBarTitleText": "提交活动申请"}},
         {"path": "runningTeam/teamSummary","style": {"navigationBarTitleText": "跑团数据"}},
         {"path": "runningTeam/teamMaps","style": {"navigationBarTitleText": "跑团地图库"}},
