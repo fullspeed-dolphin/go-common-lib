@@ -455,7 +455,7 @@ function myTime(seconds, type = ":") {
 // 获取配速条宽度 (用于可视化)
 const getPaceBarWidth = (pace) => {
   const minPace = 130; // 最快配速 每一公里花费130s
-  const maxPace = 590; // 最慢配速 每一公里花费650s
+  const maxPace = 550; // 最慢配速 每一公里花费650s
   if (!pace || pace < minPace) return 100;
   if (pace > maxPace) return 10;
   
