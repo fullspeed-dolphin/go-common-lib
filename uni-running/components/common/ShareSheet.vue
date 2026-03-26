@@ -36,7 +36,7 @@
     <up-popup :show="qrCodeShow" zIndex="11" @close="closeQrcode" overlayOpacity="0.3" :safeAreaInsetBottom="false" bgColor="#fff" mode="bottom" closeable>
       <view style="text-align: center;font-size:32rpx; margin-top:30rpx;font-weight:500;">小程序码</view>
 			<view style="text-align: center;margin-top:30rpx;">
-        <image :src="qrCodeSrc" style="width:350rpx;height:350rpx;"></image>
+        <image :src="qrCodeSrc" style="width:350rpx;height:350rpx;" show-menu-by-longpress></image>
         <view style="margin:20rpx 0;">长按小程序码下载</view>
       </view>
     </up-popup>
