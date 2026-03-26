@@ -11,7 +11,7 @@
       <view class="avatar" v-if="!detail.avatar_url">
         <text class="avatar-text">{{ avatarChar }}</text>
       </view>
-      <image v-else class="avatar-img" :src="detail.avatar_url + '?x-oss-process=image/resize,w_120,h_120,m_fill'" mode="aspectFill" />
+      <image v-else class="avatar-img" :src="detail.avatar_url + '?x-oss-process=image/resize,w_300,limit_0'" mode="aspectFit" />
       <text class="banner-name">{{ detail.name || '--' }}</text>
       <view class="banner-info-row">
         <view class="banner-tag">
@@ -63,22 +63,24 @@
         </view>
         <view class="data-stats">
           <view class="data-stat-item">
-            <text class="data-stat-number">{{ formatDistance(detail.total_km) }}</text>
-            <text class="data-stat-label">总距离(km)</text>
+            <text class="data-stat-number">{{ formatDistance(groupStats.total_km) }}</text>
+            <text class="data-stat-label">总跑量(km)</text>
           </view>
           <view class="data-stat-item">
-            <text class="data-stat-number">--</text>
-            <text class="data-stat-label">本周(km)</text>
+            <text class="data-stat-number">{{ formatDistance(groupStats.avg_km_per_member) }}</text>
+            <text class="data-stat-label">平均跑量(km)</text>
           </view>
           <view class="data-stat-item">
-            <text class="data-stat-number">{{ detail.total_members || 0 }}</text>
-            <text class="data-stat-label">活跃人数</text>
+            <text class="data-stat-number">{{ groupStats.today_runners || 0 }}</text>
+            <text class="data-stat-label">今日活跃</text>
           </view>
         </view>
-        <!-- Mini Chart -->
+        <!-- Mini Chart: 本周每日跑量 -->
         <view class="mini-chart">
-          <view class="mini-bar" v-for="(h, i) in chartBars" :key="i"
-            :style="{ height: h + '%', background: chartColors[i] }"></view>
+          <view class="mini-bar-col" v-for="(h, i) in chartBars" :key="i">
+            <view class="mini-bar" :style="{ height: h + '%', background: chartBarColors[i] }"></view>
+            <text class="mini-bar-label">{{ weekDayLabels[i] }}</text>
+          </view>
         </view>
       </view>
     </view>
@@ -105,10 +107,27 @@ const store = useStore();
 const group_id = ref("");
 const detail = ref({});
 const eventStats = ref({ active: 0, pending: 0 });
+const groupStats = ref({});
 
-// 柱状图数据（装饰性）
-const chartBars = [35, 55, 70, 80, 60, 45, 75];
-const chartColors = ['#FFD2A0', '#FFB347', '#FF8C00', '#FF8C00', '#FFB347', '#FFD2A0', '#FF8C00'];
+const weekDayLabels = ['一', '二', '三', '四', '五', '六', '日'];
+
+// 柱状图：根据本周每日跑量动态计算高度百分比
+const chartBars = computed(() => {
+  const daily = groupStats.value.week_daily_km || [0, 0, 0, 0, 0, 0, 0];
+  const max = Math.max(...daily, 1);
+  return daily.map(v => Math.max((v / max) * 100, v > 0 ? 8 : 3));
+});
+
+const chartBarColors = computed(() => {
+  const daily = groupStats.value.week_daily_km || [0, 0, 0, 0, 0, 0, 0];
+  const max = Math.max(...daily, 1);
+  return daily.map(v => {
+    const ratio = v / max;
+    if (ratio >= 0.7) return '#FF8C00';
+    if (ratio >= 0.4) return '#FFB347';
+    return '#FFD2A0';
+  });
+});
 
 const clubTypeName = computed(() => {
   return detail.value.club_type === 'cycling' ? '车队' : '跑团';
@@ -135,6 +154,12 @@ const getDetail = () => {
     .then((res) => {
       detail.value = res;
     });
+};
+
+const getGroupStats = () => {
+  request.get(`/sport-api/api/manual/group-sports-stats?group_id=${group_id.value}`)
+    .then((res) => { groupStats.value = res || {}; })
+    .catch(() => {});
 };
 
 const getEventStats = () => {
@@ -192,12 +217,14 @@ onLoad((options) => {
   group_id.value = options.group_id;
   getDetail();
   getEventStats();
+  getGroupStats();
 });
 
 onShow(() => {
   if (group_id.value) {
     getDetail();
     getEventStats();
+    getGroupStats();
   }
 });
 </script>
@@ -237,7 +264,6 @@ onShow(() => {
 .avatar-img {
   width: 128rpx;
   height: 128rpx;
-  border-radius: 50%;
 }
 
 .banner-name {
@@ -254,7 +280,7 @@ onShow(() => {
 }
 
 .banner-tag {
-  background: #3B3B3B;
+  background: #FF8C00;
   border-radius: 8rpx;
   padding: 4rpx 16rpx;
   display: flex;
@@ -264,13 +290,13 @@ onShow(() => {
 
 .banner-tag-text {
   color: #FFFFFF;
-  font-size: 20rpx;
+  font-size: 24rpx;
   font-weight: 600;
   line-height: 1;
 }
 
 .banner-id {
-  font-size: 24rpx;
+  font-size: 28rpx;
   color: #9CA3AF;
   line-height: 36rpx;
 }
@@ -399,17 +425,34 @@ onShow(() => {
 .mini-chart {
   display: flex;
   align-items: flex-end;
-  gap: 16rpx;
-  height: 120rpx;
+  gap: 12rpx;
+  height: 160rpx;
   background: #F6F7F8;
   border-radius: 16rpx;
-  padding: 16rpx 24rpx;
+  padding: 16rpx 24rpx 8rpx;
+}
+
+.mini-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
 }
 
 .mini-bar {
-  flex: 1;
+  width: 100%;
   border-radius: 8rpx 8rpx 0 0;
-  min-height: 10rpx;
+  min-height: 4rpx;
+  transition: height 0.3s ease;
+}
+
+.mini-bar-label {
+  font-size: 18rpx;
+  color: #9CA3AF;
+  margin-top: 6rpx;
+  line-height: 1;
 }
 
 .section-bottom {

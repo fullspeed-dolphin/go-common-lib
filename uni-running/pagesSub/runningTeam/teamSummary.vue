@@ -3,13 +3,13 @@
 		<section class="section-card u-flex-y-center">
 			<image class="img" :src="
             (detail.avatar_url ||
-            'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_120,h_120,m_fill'
-          " mode="aspectFill"></image>
+            'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_300,limit_0'
+          " mode="aspectFit"></image>
 			<view class="">
 				<view class="name ellipsis2">{{ detail.name }}</view>
 				<view class="" style="margin-top: 30rpx;">
-					<view class="">总举办活动次数：<text style="color:#FF8C00">0次</text></view>
-					<view class="" style="margin-top: 30rpx;">跑团活动参与总人数：<text style="color:#FF8C00">0人</text></view>
+					<view class="">总举办活动次数：<text style="color:#FF8C00">{{ groupStats.total_events || 0 }}次</text></view>
+					<view class="" style="margin-top: 30rpx;">跑团活动参与总人数：<text style="color:#FF8C00">{{ groupStats.total_event_participants || 0 }}人</text></view>
 				</view>
 			</view>
 		</section>
@@ -17,35 +17,35 @@
 		<section class="section-summary panel flex-row bgf">
 			<view class="flex-1 flex-col-center">
 				<view class="number">
-					{{ detail.test || 0 }}
+					{{ formatKm(groupStats.total_km) }}
 				</view>
 				跑团总跑量
 			</view>
 			<view class="divider"></view>
 			<view class="flex-1 flex-col-center">
 				<view class="number">
-					{{ detail.test || 0 }}
+					{{ formatKm(groupStats.today_total_km) }}
 				</view>
 				今日总跑量
 			</view>
 			<view class="divider"></view>
 			<view class="flex-1 flex-col-center">
 				<view class="number">
-					{{ detail.test || 0 }}
+					{{ formatKm(groupStats.last_week_total_km) }}
 				</view>
 				上周总跑量
 			</view>
 			<view class="divider"></view>
 			<view class="flex-1 flex-col-center">
 				<view class="number">
-					{{ detail.test || 0 }}
+					{{ formatKm(groupStats.last_month_total_km) }}
 				</view>
 				上月总跑量
 			</view>
 		</section>
 
 		<view class="u-pl-34 u-pt-30">
-			<view class="member-item u-flex-row" v-for="(item, index) in memberList" :key="index">
+			<view class="member-item u-flex-row" v-for="(item, index) in rankedMembers" :key="index">
 				<view class="img" style="width:120rpx;height:120rpx;margin-right:30rpx;">
 					<up-lazy-load height="70" borderRadius="100" :image="
 							(item.avatar_url ||
@@ -54,10 +54,8 @@
 				</view>
 				<view class="">
 					<view class="ellipsis name">{{item.nickname}}</view>
-					<view class="score">今日跑量 <text style="color:#FF8C00;">0 km</text> </view>
-					<view class="score">上周跑量 <text style="color:#FF8C00;">0 km</text> </view>
-					<view class="score">上月跑量 <text style="color:#FF8C00;">0 km</text> </view>
-					<view class="score">年度跑量 <text style="color:#FF8C00;">0 km</text> </view>
+					<view class="score">本月跑量 <text style="color:#FF8C00;">{{ formatKm(item.monthly_km) }} km</text> </view>
+					<view class="score">连续打卡 <text style="color:#FF8C00;">{{ item.streak_days || 0 }} 天</text> </view>
 				</view>
 			</view>
 		</view>
@@ -79,7 +77,6 @@
 	import {
 		useStore
 	} from "vuex";
-	import EventItem from "@/components/EventItem.vue";
 	import request from "@/utils/request.js"
 
 	// 使用store
@@ -95,6 +92,8 @@
 	const eventList = ref([]);
 	const memberList = ref([]);
 	const memberLeader = ref({});
+	const groupStats = ref({});
+	const rankedMembers = ref([]);
 
 	const userInfo = computed(() => store.state.userInfo);
 
@@ -104,17 +103,30 @@
 		path: buildPath('/pagesSub/runningTeam/teamSummary', { group_id: routeParams.value.group_id })
 	}));
 
-	onLoad((options) => {
-		console.log("option", options);
-		routeParams.value = options;
+	const formatKm = (val) => {
+		if (!val) return '0.00';
+		return parseFloat(val).toFixed(2);
+	};
 
+	onLoad((options) => {
+		routeParams.value = options;
 		getDetail();
+		getGroupStats();
+		getMonthlyRanking();
 	});
 
-	const getEvents = () => {
-		request.get(`/event-api/getOfflineEventSwiper`).then(res => {
-			eventList.value = res;
-		});
+	const getGroupStats = () => {
+		if (!routeParams.value.group_id) return;
+		request.get(`/sport-api/api/manual/group-sports-stats?group_id=${routeParams.value.group_id}`)
+			.then((res) => { groupStats.value = res || {}; })
+			.catch(() => {});
+	};
+
+	const getMonthlyRanking = () => {
+		if (!routeParams.value.group_id) return;
+		request.get(`/sport-api/api/manual/group-monthly-ranking?group_id=${routeParams.value.group_id}&page_size=100`)
+			.then((res) => { rankedMembers.value = res?.list || []; })
+			.catch(() => {});
 	};
 
 	// 页面卸载
@@ -185,13 +197,13 @@
 		.img {
 			width: 168rpx;
 			height: 168rpx;
-			border-radius: 16rpx 16rpx 16rpx 16rpx;
 			margin-right: 42rpx;
 		}
 
 		.name {
 			font-weight: 800;
 			font-size: 42rpx;
+			line-height: 1.4;
 		}
 	}
 
