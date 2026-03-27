@@ -882,9 +882,7 @@ function shareImage() {
   wx.showShareImageMenu({ path });
 	
 	setTimeout(() => {
-		uni.switchTab({
-			url: '/pages/index'
-		})
+		uni.navigateBack()
 	}, 300)
 }
 
