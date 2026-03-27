@@ -17,7 +17,7 @@
           <view class="total-distance">
             <view class="distance-label">总里程</view>
             <view class="distance-value">
-              <text class="amount">{{ detail.distance_in_meters}}</text>
+              <text class="amount">{{ detail.distance_km}}</text>
               <text class="unit">公里</text>
             </view>
           </view>
@@ -100,7 +100,7 @@
             <view class="pace-col km-col">{{ item.kilometer }}</view>
             <view class="pace-col pace-col-wide">
               <view class="pace-bar-wrapper" :class="{ fastest: item.isFastest }">
-                <view class="pace-bar" :style="{ width: getPaceBarWidth(item.pace) + '%' }"></view>
+                <view class="pace-bar" :style="{ width: item.width + '%' }"></view>
                 <text class="pace-text">{{ formatPace(myTime(item.pace,'.')) }}</text>
               </view>
             </view>
@@ -129,7 +129,7 @@ import {
   calculatePaceFromMeters,
   getTime,
   generateSpeedPolylines,
-  getCenterScale,
+  getCenterScale, formatDistanceToKm
 } from "./assets/utils.js";
 
 import { useShare, buildPath } from "@/composables/useShare.js";
@@ -240,11 +240,11 @@ const isValidCoordinate = (latitude, longitude) => {
 };
 
 // 初始化地图
-const initMap = (tracks) => {
-  if (!tracks || !tracks.length) return;
+const initMap = ({points, km_markers, distance_km }) => {
+  if (!points || !points.length) return;
 
   // 统一数值类型并过滤无效点
-  const trackPoints = tracks
+  const trackPoints = points
     .map((p) => ({
       ...p,
       latitude: Number(p.latitude),
@@ -265,70 +265,28 @@ const initMap = (tracks) => {
   longitude.value = centerLng;
   latitude.value = centerLat;
 
-  // 先创建标记（保留原有逻辑）
-  let tempArr = [];
-  let flag = false; // 标记是否超过5公里
-  let flagFieldTotalDistance = true; // 标记是否有total_distance字段
-  let tempAPoints = trackPoints.filter((item, index) => {
-    if (!item.total_distance) {
-      flagFieldTotalDistance = false;
-      if (index === 0) return item;
-    } else {
-      if (trackPoints[trackPoints.length - 1].total_distance > 5000) {
-        flag = true;
-        if (!tempArr.includes(parseInt(item.total_distance / 1000))) {
-          tempArr.push(parseInt(item.total_distance / 1000));
-          return item;
-        }
-      } else {
-        if (!tempArr.includes(parseInt(item.total_distance / 500))) {
-          tempArr.push(parseInt(item.total_distance / 500));
-          return item;
-        }
-      }
-    }
-    if (index === trackPoints.length - 1) return item;
-  });
+  // 创建标记
+  const full_km_markers = [
+    {
+      kilometer: 0,
+      longitude: points[0].longitude,
+      latitude: points[0].latitude,
+    },
+    ...km_markers,
+    {
+      kilometer: distance_km,
+      longitude: points[points.length - 1].longitude,
+      latitude: points[points.length - 1].latitude,
+    },
+  ]
 
-  markers.value = tempAPoints.map((item, index) => {
-    if (!flagFieldTotalDistance) {
-      return createMarker(
-        index + 1,
-        tempAPoints[index].latitude,
-        tempAPoints[index].longitude,
-        "start",
-        index ? (+detail.value.distance_in_meters).toFixed(1) : 0
-      );
-    } else {
-      if (index === tempAPoints.length - 1) {
-        return createMarker(
-          index + 1,
-          tempAPoints[index].latitude,
-          tempAPoints[index].longitude,
-          "start",
-          (item.total_distance / 1000).toFixed(1)
-        );
-      } else {
-        if (flag) {
-          return createMarker(
-            index + 1,
-            tempAPoints[index].latitude,
-            tempAPoints[index].longitude,
-            "start",
-            index * 1
-          );
-        } else {
-          return createMarker(
-            index + 1,
-            tempAPoints[index].latitude,
-            tempAPoints[index].longitude,
-            "start",
-            index * 0.5
-          );
-        }
-      }
-    }
-  });
+  markers.value = full_km_markers.map(item => {
+    return createMarker(
+      item.latitude,
+      item.longitude,
+      item.kilometer
+    );
+  })
 
   // 创建彩色轨迹线
   polylines.value = generateSpeedPolylines(trackPoints);
@@ -383,7 +341,7 @@ const loadSportData = async () => {
     request.get("/sport-api/api/healthdata/detail", params),
     request.get(`/sport-api/api/healthdata/track?id=${routerParams.value.id}`),
   ]).then((res) => {
-    // console.log("res===promise",res)
+    console.log("res===promise",res[0])
     res[0].average_pace = calculatePaceFromMeters(
       res[0].distance_in_meters,
       res[0].duration_in_seconds
@@ -391,31 +349,39 @@ const loadSportData = async () => {
     res[0].duration_in_seconds = getTime(res[0].duration_in_seconds);
     res[0].average_run_cadence = parseInt(res[0].average_run_cadence || 0);
     res[0].average_speed = res[0].average_speed?.toFixed(2);
-    res[0].distance_in_meters = (res[0].distance_in_meters / 1000)?.toFixed(2);
+    res[0].distance_km = formatDistanceToKm(res[0].distance_in_meters);
     res[0].start_time = dayjs(res[0].start_time).format("YYYY-MM-DD HH:mm:ss");
 
     detail.value = res[0];
     detail.value.max_speed = res[0].max_speed?.toFixed(2);
 
-    initMap(res[1].points || []);
-    // detail.value.averageRate = parseInt(
-    //   res[1].points
-    //     .map((item) => item.heart_rate)
-    //     .reduce((acc, curr) => acc + curr, 0) / res[1].points.length
-    // );
+    initMap({
+      ...res[1],
+      distance_km: res[0].distance_km
+    } || {});
   });
-  
+	
   // 查询活动每公里配速分段数据
-  if (routerParams.value.device === "1") {
-    request
-      .get(`/sport-api/api/healthdata/pace-splits?id=${routerParams.value.id}`)
-      .then((res) => {
-        activeHuawei.value = true;
-        paceData.value = res;
-        paceData.value.avg_pace = myTime(res.avg_pace, "."); //(res.avg_pace / 60).toFixed(2)
-        paceData.value.best_pace = myTime(res.best_pace, "."); //(res.best_pace / 60).toFixed(2)
+  request
+    .get(`/sport-api/api/healthdata/pace-splits?id=${routerParams.value.id}`)
+    .then((res) => {
+      activeHuawei.value = true;
+      
+      // 取最大值作为基准值
+      const maxPace = Math.max(...res.splits.map(item => item.pace));
+
+      console.log('maxPace====>', maxPace)
+
+      paceData.value.splits = res.splits.map(item => {
+        return {
+          ...item,
+          kilometer: item.kilometer.toFixed(2),
+          width: getPaceBarWidth(item.pace, maxPace)
+        }
       });
-  }
+      paceData.value.avg_pace = myTime(res.avg_pace, "."); //(res.avg_pace / 60).toFixed(2)
+      paceData.value.best_pace = myTime(res.best_pace, "."); //(res.best_pace / 60).toFixed(2)
+    });
 };
 
 // 格式化时间 (秒 -> HH:MM:SS 或 MM:SS)
@@ -453,13 +419,12 @@ function myTime(seconds, type = ":") {
 }
 
 // 获取配速条宽度 (用于可视化)
-const getPaceBarWidth = (pace) => {
+const getPaceBarWidth = (pace, maxPace) => {
   const minPace = 130; // 最快配速 每一公里花费130s
-  const maxPace = 550; // 最慢配速 每一公里花费650s
+  const maxBasicPace = 550; // 最慢配速 每一公里花费650s
   if (!pace || pace < minPace) return 100;
-  if (pace > maxPace) return 10;
-  
-  return (pace / maxPace) * 100;
+  // 最大值都留 10% 空白
+  return (pace / (Math.max(maxPace, maxBasicPace)  * 1.1)) * 100;
 };
 
 const routerParams = ref({});

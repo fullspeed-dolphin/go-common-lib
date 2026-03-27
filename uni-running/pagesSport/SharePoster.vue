@@ -1,6 +1,7 @@
 
 <template>
-  <up-popup v-if="show" :show="show" @close="close" closeable custom-style="background:rgba(0,0,0,.8);top:0;">
+  <div class="sharePoster">
+    <up-popup v-if="show" :show="show" @close="close" closeable custom-style="background:rgba(0,0,0,.8);top:0;">
     <view style="height:100vh;padding-top:250rpx;">
 			<swiper class="event-swiper" :circular="posterPaths.length > 1" @change="changeSwiper" indicator-active-color="#FF8C00" :display-multiple-items="posterPaths.length > 1 ? 1.2 : 1">
 				<swiper-item v-if="showPoster1">
@@ -46,9 +47,14 @@
 					<view class="iconfont flex-center icon-baocuntupian" style="background:#FE837A"></view>
 					保存图片
 				</div>
+        <div class="flex-col-center flex-1" @click="close">
+					<view class="iconfont flex-center icon-shanchu" style="color: #222; background:#f7f8fc"></view>
+					关闭
+				</div>
       </section>
 		</view>
   </up-popup>
+  </div>
 </template>
 <script setup>
 import lPainter from "@/uni_modules/lime-painter/components/l-painter/l-painter.vue"
@@ -876,9 +882,7 @@ function shareImage() {
   wx.showShareImageMenu({ path });
 	
 	setTimeout(() => {
-		uni.switchTab({
-			url: '/pages/index'
-		})
+		uni.navigateBack()
 	}, 300)
 }
 
@@ -929,12 +933,7 @@ defineExpose({
 		}
 	}
 	.event-swiper {
-	  // padding: 0 34rpx;
 	  height: 1020rpx;
-
-	  .event-swiper-item {
-	    // padding-right: 20rpx;
-	  }
 	}
 	.poster-center {
 	  display: flex;
@@ -946,6 +945,7 @@ defineExpose({
 		width: 100%;
 	}
 	.section-btns{
+    padding: 0 50rpx;
 		margin-top:50rpx;
 		color:#fff;
 		font-size: 24rpx;

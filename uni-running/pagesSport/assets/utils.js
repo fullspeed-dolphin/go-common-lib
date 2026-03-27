@@ -28,6 +28,12 @@ export function formatDistance(meters) {
   return `${display} km`;
 }
 
+export function formatDistanceToKm(meters) {
+  const m = parseFloat(meters) || 0;
+  const km = m / 1000;
+  return km.toFixed(2);
+}
+
 /**
  * 根据米数和秒数计算配速
  * @param {number} meters - 跑步距离（米）
@@ -94,10 +100,10 @@ export function getTypeSum(list, type) {
 }
 
 // 创建标记
-export const createMarker = (id, latitude, longitude, type, strDistance) => {
-  const isStart = type === "start";
+export const createMarker = (latitude, longitude, strDistance) => {
+  // const isStart = type === "start";
   return {
-    id,
+    id: strDistance,
     latitude,
     longitude,
     width: 10,
@@ -116,7 +122,7 @@ export const createMarker = (id, latitude, longitude, type, strDistance) => {
     // iconPath: isStart
     //   ? "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/go@2x.png"
     //   : "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/end@2x.png",
-    title: isStart ? "起" : "终",
+    // title: isStart ? "起" : "终",
   };
 };
 
