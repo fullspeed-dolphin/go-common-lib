@@ -18,8 +18,11 @@
             <u-button type="primary" shape="circle" color="#ccc" @click="unDevice()">解除绑定</u-button>
           </view>
         </template>
-        
-        <u-button v-else type="primary" color="#FF8C00" shape="circle" @click="refCommonDialog.open()">立即绑定</u-button>
+        <template v-else>
+          <u-button v-if="deviceInfo.platform === 'garmin'" type="primary" color="#FF8C00" shape="circle" @click="refCommonDialog.open()">立即绑定</u-button>
+          <u-button v-else type="primary" color="#FF8C00" shape="circle" @click="authHuaWeiLogin">立即绑定</u-button>
+        </template>
+
       </view>
     </section>
 
@@ -51,12 +54,13 @@ import { useShare, buildPath } from "@/composables/useShare.js";
 
 // 分享配置
 useShare(() => ({
-  title: routerParams.value.value ? `${routerParams.value.value} - 设备详情` : "设备详情",
+  title: routerParams.value.value
+    ? `${routerParams.value.value} - 设备详情`
+    : "设备详情",
   path: buildPath("/pagesSub/device/deviceDetail", {
     value: routerParams.value.value,
   }),
 }));
-
 
 const routerParams = ref({});
 const refCommonDialog = ref(null);
@@ -66,17 +70,21 @@ const computedTitle = computed(() => {
     return "设备详情";
   }
 
-  return !deviceInfo.value.bound ? '设备详情' : '添加' + (deviceInfo.value.display_name || '设备');
-})
+  return !deviceInfo.value.bound
+    ? "设备详情"
+    : "添加" + (deviceInfo.value.display_name || "设备");
+});
 
 // 页面加载
 onLoad((optons) => {
   routerParams.value = optons;
 });
 
+
 onShow(() => {
   getDeviceData();
-})
+  checkHuaweiAuth();
+});
 
 const deviceInfo = ref({});
 function getDeviceData() {
@@ -87,7 +95,8 @@ function getDeviceData() {
     console.log("设备列表====>", res);
 
     const imgMapping = {
-      huawei: "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/华为运动健康@2x.png",
+      huawei:
+        "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/华为运动健康@2x.png",
       garmin:
         "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/佳明@2x.png",
       gaochi:
@@ -100,19 +109,62 @@ function getDeviceData() {
       gaochi: gaoChi,
     };
 
-    deviceInfo.value = (res.bindings || []).map((item) => {
-      let created_at = item.created_at?.replace("T", " ")?.slice(0, 16);
+    deviceInfo.value = (res.bindings || [])
+      .map((item) => {
+        let created_at = item.created_at?.replace("T", " ")?.slice(0, 16);
 
-      return {
-        ...item,
-        imgUrl: imgMapping[item.platform] || "",
-        termText: termMapping[item.platform] || "",
-        label: item.display_name || item.platform,
-        value: item.platform,
-        created_at: created_at ? created_at + '绑定' : "",
-      };
-    }).find(item => item.platform === routerParams.value.platform);
+        return {
+          ...item,
+          imgUrl: imgMapping[item.platform] || "",
+          termText: termMapping[item.platform] || "",
+          label: item.display_name || item.platform,
+          value: item.platform,
+          created_at: created_at ? created_at + "绑定" : "",
+        };
+      })
+      .find((item) => item.platform === routerParams.value.platform);
   });
+}
+
+const authParams = ref({})
+function checkHuaweiAuth() {
+  try {
+    const { code, error, state } = wx.getEnterOptionsSync().referrerInfo.extraData;
+    // 通过code获取AT
+    if (code) {
+		const tempCode = code.replaceAll("+","%2B")
+		request.get("/sport-api/huawei/oauth/callback?code="+tempCode+"&state="+authParams.value.state+"&source=miniprogram").then((res) => {
+			getDeviceData();
+		 }).catch((error)=>{
+		   console.log("error==11",error)
+		 });
+    }
+    console.log("华为返回222",code, error, state)
+  } catch (error) {
+    console.log("error==",error);
+  }
+}
+
+function authHuaWeiLogin() {
+  request
+    .get("/sport-api/huawei/oauth/miniprogram/authorize")
+    .then((res) => {
+      authParams.value = res;
+      wx.navigateToMiniProgram({
+        appId: "wxa6c04f899577d944",
+        path: "pages/authLogin/authLogin",
+        extraData: {
+          lang: "zh-CN",
+          client_id: res.client_id,
+          scope: res.scope.split(" "),
+          state: res.state,
+        },
+      });
+      console.log("res====222==", res);
+    })
+    .catch((error) => {
+      console.log("error==222", error);
+    });
 }
 
 function copyAuthLink() {
@@ -124,7 +176,7 @@ function copyAuthLink() {
     huawei: "/sport-api/huawei/oauth/authorize",
     garmin: "/sport-api/garmin/oauth/request-token",
     gaochi: "/sport-api/gaochi/oauth/request-token",
-  }
+  };
 
   request.get(linkMapping[routerParams.value.platform]).then((res) => {
     console.log("res====>", res);
@@ -163,14 +215,14 @@ const unDevice = () => {
           huawei: "/sport-api/huawei/deregister",
           garmin: "/sport-api/garmin/deregister",
           gaochi: "/sport-api/gaochi/deregister",
-        }
+        };
         request.post(linkMapping[routerParams.value.platform]).then((res) => {
           console.log("解除绑定====>", res);
 
           uni.$u.toast("解除绑定成功");
 
           getDeviceData();
-        })
+        });
       } else if (res.cancel) {
         console.log("用户点击取消");
       }

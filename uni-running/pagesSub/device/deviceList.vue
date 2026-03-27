@@ -49,49 +49,11 @@ function getDevicesList() {
   });
 }
 onShow(() => {
-  try {
-    const { code, error, state } = wx.getEnterOptionsSync().referrerInfo.extraData;
-    // 通过code获取AT
-    if (code) {
-		const tempCode = code.replaceAll("+","%2B")
-		request.get("/sport-api/huawei/oauth/callback?code="+tempCode+"&state="+params.value.state+"&source=miniprogram").then((res) => {
-			uni.$u.route(`/pagesSub/device/deviceDetail?platform=${res.platform}`);
-		 }).catch((error)=>{
-		   console.log("error==11",error)
-		 });
-    }
-    console.log("华为返回222",code, error, state)
-  } catch (error) {
-    console.log("error==",error);
-  }
-});
-function routeToDetail(item) {
-		
-  if(item.platform=='huawei') {
-    if(item.created_at) {
-      uni.$u.route(`/pagesSub/device/deviceDetail?platform=${item.platform}`);
-    } else {
-      request.get("/sport-api/huawei/oauth/miniprogram/authorize").then((res) => {
-          params.value = res
-          wx.navigateToMiniProgram({
-            appId: "wxa6c04f899577d944",
-            path: "pages/authLogin/authLogin",
-            extraData: {
-              lang: "zh-CN",
-              client_id: res.client_id,
-              scope: res.scope.split(" "),
-              state: res.state
-            }
-          })
-       console.log("res====222==",res)
-      }).catch((error)=>{
-        console.log("error==222",error)
-      });
-    }
-  } else {
-    uni.$u.route(`/pagesSub/device/deviceDetail?platform=${item.platform}`);
-  }
   
+});
+
+function routeToDetail(item) {
+  uni.$u.route(`/pagesSub/device/deviceDetail?platform=${item.platform}`);
 }
 
 // 页面加载
