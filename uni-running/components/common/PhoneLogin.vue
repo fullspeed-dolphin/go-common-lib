@@ -144,6 +144,12 @@ const getPhoneNumber = async ({ detail }) => {
   try {
     const res = await request.post("/wechat-login/login", data);
 
+    if (!res.sessionToken) {
+      uni.$u.toast(res.getPhoneErrMsg || "登录失败，请重试");
+      isDisabled.value = false;
+      return;
+    }
+
     uni.$u.toast("登录成功");
     uni.setStorageSync("token", res.sessionToken);
     await store.dispatch("getUserInfo");

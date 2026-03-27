@@ -244,24 +244,10 @@
 					group_id: res1.running_group,
 				});
 
-				// 创建俱乐部时显示审批提示弹窗
-				if (!group_id.value) {
-					uni.showModal({
-						title: '提示',
-						content: '你的俱乐部正在审批中，审批完成之后将在此显示',
-						showCancel: false,
-						confirmText: '我知道了',
-						success: () => {
-							uni.navigateBack();
-						}
-					});
-				} else {
-					// 更新俱乐部时直接提示并返回
-					uni.$u.toast("更新成功");
-					setTimeout(() => {
-						uni.navigateBack();
-					}, 500);
-				}
+				uni.$u.toast(group_id.value ? "更新成功" : "创建成功");
+				setTimeout(() => {
+					uni.navigateBack();
+				}, 500);
 			}).catch(e => {
 				uni.hideLoading()
 				uni.showModal({
