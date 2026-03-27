@@ -302,7 +302,7 @@ const getCoverUrl = (item) => {
 
 onLoad((options) => {
   routeParams.value = options;
-  if (!options.group_id || options.group_id === "null") {
+  if (!options.group_id || options.group_id === "null" || options.group_id === "undefined") {
     isEmpty.value = true;
     return;
   }
@@ -321,6 +321,18 @@ onUnload(() => {
 });
 
 onShow(() => {
+  // 创建跑团后返回：store 已更新但页面还是空状态，直接用 store 的 group_id 加载
+  if (isEmpty.value) {
+    const storeGroupId = store.state.userInfo?.running_group;
+    if (storeGroupId) {
+      routeParams.value.group_id = storeGroupId;
+      isEmpty.value = false;
+      getDetail();
+      getGroupStats();
+      getMonthlyRanking();
+    }
+  }
+
   uni.$off("updateList");
   uni.$once("updateList", (data) => {
     if (data.from === "mine" && data.group_id) {
