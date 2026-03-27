@@ -284,8 +284,6 @@ const onImageUploaded = async (imageUrl) => {
       { showError: false, includeResponse: true }
     );
 
-    // let res = {"code":200,"msg":"success","data":{"km":"16.03","time":"1:32:50","speed":"5'47\"","created_at":"2026-01-29T06:38:00","token":"eyJrbSI6IjE2LjAzIiwidGltZSI6IjE6MzI6NTAiLCJzcGVlZCI6IjUnNDdcIiIsIm9wZW5pZCI6ImNsaS10ZXN0IiwiZXhwaXJlX2F0IjoxNzY5Njc5MjE3fQ.24c7a1bafd1a003101ab2ec252383007376b85a11db6741e39439744c90df927"}}
-
     const dataInfo = res?.data;
     // 校验返回数据是否有效（不为空、不为0）
     const isValidData =
@@ -518,13 +516,14 @@ function confirmToCheck() {
 }
 
 ::v-deep {
-  /*
-		因为需要登录才能添加所以注释了这段
-		.u-popup__content__close{
-			left: 50rpx!important;
-			top: 150rpx!important;
-			right: auto!important;
-		}*/
+  .sharePoster{
+      .u-popup__content__close{
+        left: 50rpx!important;
+        top: 150rpx!important;
+        right: auto!important;
+      }
+  }
+
   .uicon-arrow-right {
     color: #ff8c00 !important;
   }
