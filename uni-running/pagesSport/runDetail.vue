@@ -362,7 +362,7 @@ const initMap = (tracks) => {
         mapCenter.value
       );
     }
-  }, 200);
+  }, 100);
 };
 
 const detail = ref({});
@@ -455,11 +455,11 @@ function myTime(seconds, type = ":") {
 // 获取配速条宽度 (用于可视化)
 const getPaceBarWidth = (pace) => {
   const minPace = 130; // 最快配速 每一公里花费130s
-  const maxPace = 650; // 最慢配速 每一公里花费650s
+  const maxPace = 550; // 最慢配速 每一公里花费650s
   if (!pace || pace < minPace) return 100;
   if (pace > maxPace) return 10;
   
-  return (pace / 650) * 100;
+  return (pace / maxPace) * 100;
 };
 
 const routerParams = ref({});
