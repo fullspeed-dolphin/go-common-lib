@@ -44,7 +44,6 @@ const viewDetail = (item) => {
   uni.$u.route(`pagesSport/runDetail`, {
     ...userInfo.value,
     id: item.id,
-    device:item.platform.includes('huawei') ? '1' : '0',
   });
 };
 </script>
