@@ -101,28 +101,57 @@ export function getTypeSum(list, type) {
 
 // 创建标记
 export const createMarker = (latitude, longitude, strDistance) => {
-  // const isStart = type === "start";
   return {
     id: strDistance,
     latitude,
     longitude,
-    width: 10,
-    height: 15,
-    // anchor: { x: 0.5, y: 0.5 },
+    width: 28,
+    height: 28,
+    anchor: { x: 0.5, y: 0.5 },
     label: {
-      borderRadius: 10,
-      borderWidth: 1,
-      padding: 2,
+      borderRadius: 14,
+      borderWidth: 2,
+      padding: 4,
       content: String(strDistance),
       fontSize: 10,
       bgColor: "#000",
       borderColor: "#fff",
-      color: "#fff"
+      color: "#fff",
+      textAlign: 'center'
     },
-    // iconPath: isStart
-    //   ? "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/go@2x.png"
-    //   : "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/end@2x.png",
-    // title: isStart ? "起" : "终",
+    // 使用透明占位图避免显示平台默认红色图标（data URI 1x1 GIF）
+    iconPath: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=',
+  };
+};
+
+/**
+ * 创建带文本的起/终点标记
+ * @param {number} latitude
+ * @param {number} longitude
+ * @param {string} text - 文本内容，例如 'go' 或 'end'
+ * @param {object} opts - 可选项: { bgColor, borderColor, color, fontSize }
+ */
+export const createTextMarker = (latitude, longitude, text, opts = {}) => {
+  const { bgColor = '#4CAF50', borderColor = '#ffffff', color = '#ffffff', fontSize = 12 } = opts;
+  return {
+    id: text + '_' + latitude + '_' + longitude,
+    latitude,
+    longitude,
+    width: 24,
+    height: 24,
+    anchor: { x: 0.5, y: 0.5 },
+    // 隐藏默认红色图标，使用透明占位
+    iconPath: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=',
+    label: {
+      borderRadius: 18,
+      borderWidth: 2,
+      padding: 4,
+      content: String(text),
+      fontSize,
+      bgColor,
+      borderColor,
+      color,
+    },
   };
 };
 

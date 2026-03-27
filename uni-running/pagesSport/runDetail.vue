@@ -125,6 +125,7 @@ import dayjs from "dayjs";
 import * as turf from "@turf/turf";
 import {
   createMarker,
+  createTextMarker,
   formatPace,
   calculatePaceFromMeters,
   getTime,
@@ -265,28 +266,23 @@ const initMap = ({points, km_markers, distance_km }) => {
   longitude.value = centerLng;
   latitude.value = centerLat;
 
-  // 创建标记
-  const full_km_markers = [
-    {
-      kilometer: 0,
-      longitude: points[0].longitude,
-      latitude: points[0].latitude,
-    },
-    ...km_markers,
-    {
-      kilometer: distance_km,
-      longitude: points[points.length - 1].longitude,
-      latitude: points[points.length - 1].latitude,
-    },
-  ]
-
-  markers.value = full_km_markers.map(item => {
+  markers.value = km_markers.map(item => {
     return createMarker(
       item.latitude,
       item.longitude,
       item.kilometer
     );
   })
+  // 添加起点和终点标记（置于所有公里标记之后，便于显示）
+  try {
+    const startPoint = trackPoints[0];
+    const endPoint = trackPoints[trackPoints.length - 1];
+    const startMarker = createTextMarker(Number(startPoint.latitude), Number(startPoint.longitude), 'go', { bgColor: '#4CAF50', borderColor: '#ffffff', color: '#ffffff', fontSize: 12 });
+    const endMarker = createTextMarker(Number(endPoint.latitude), Number(endPoint.longitude), 'end', { bgColor: '#ff4444', borderColor: '#ffffff', color: '#ffffff', fontSize: 12 });
+    markers.value.push(startMarker, endMarker);
+  } catch (e) {
+    console.warn('create start/end marker failed', e);
+  }
 
   // 创建彩色轨迹线
   polylines.value = generateSpeedPolylines(trackPoints);
