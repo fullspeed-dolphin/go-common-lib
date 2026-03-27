@@ -114,7 +114,7 @@
               mode="aspectFill" />
             <view class="rank-info">
               <text class="rank-name">{{ item.nickname || '成员' }}</text>
-              <text class="rank-sub">{{ item.streak_days > 0 ? `坚持跑步第 ${item.streak_days} 天` : '本月尚未开跑' }}</text>
+              <text class="rank-sub">{{ item.streak_days > 0 ? `连续打卡 ${item.streak_days} 天` : '暂无连续打卡' }}</text>
             </view>
             <text class="rank-km">{{ formatKm(item.monthly_km || 0) }}</text>
           </view>
@@ -338,7 +338,10 @@ onShow(() => {
   uni.$once("updateList", (data) => {
     if (data.from === "mine" && data.group_id) {
       routeParams.value.group_id = data.group_id;
+      isEmpty.value = false;
       getDetail();
+      getGroupStats();
+      getMonthlyRanking();
     }
   });
   getEvents();
@@ -619,7 +622,7 @@ const showShareBtn = () => {
 
 .rank-title {
   flex: 1;
-  font-size: 30rpx;
+  font-size: 32rpx;
   font-weight: 700;
   color: #1A1A1A;
 }
@@ -628,13 +631,14 @@ const showShareBtn = () => {
   display: flex;
   align-items: center;
   padding: 12rpx 24rpx;
-  font-size: 22rpx;
+  font-size: 26rpx;
   color: #9CA3AF;
+  gap: 16rpx;
 }
 
-.rank-col-no { width: 80rpx; }
+.rank-col-no { width: 136rpx; }
 .rank-col-user { flex: 1; }
-.rank-col-km { width: 160rpx; text-align: right; }
+.rank-col-km { text-align: right; flex-shrink: 0; }
 
 .rank-row {
   display: flex;
@@ -657,7 +661,7 @@ const showShareBtn = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24rpx;
+  font-size: 28rpx;
   font-weight: 700;
   color: #6B7280;
   flex-shrink: 0;
@@ -683,7 +687,7 @@ const showShareBtn = () => {
 }
 
 .rank-name {
-  font-size: 28rpx;
+  font-size: 32rpx;
   font-weight: 600;
   color: #1A1A1A;
   overflow: hidden;
@@ -692,12 +696,12 @@ const showShareBtn = () => {
 }
 
 .rank-sub {
-  font-size: 20rpx;
+  font-size: 24rpx;
   color: #9CA3AF;
 }
 
 .rank-km {
-  font-size: 30rpx;
+  font-size: 34rpx;
   font-weight: 700;
   color: #1A1A1A;
   flex-shrink: 0;

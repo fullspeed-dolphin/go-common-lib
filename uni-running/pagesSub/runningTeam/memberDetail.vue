@@ -20,8 +20,24 @@
           <view class="detail-label">{{ detail.nickname || '成员' }}</view>
         </view>
 
+        <!-- 月跑量 -->
+        <view class="detail-row" v-if="detail.monthly_km !== undefined">
+          <view class="detail-icon">
+            <u-icon name="map" size="36" color="#ff8c00" />
+          </view>
+          <view class="detail-label">本月跑量：{{ formatKm(detail.monthly_km) }} km</view>
+        </view>
+
+        <!-- 连续打卡 -->
+        <view class="detail-row" v-if="detail.streak_days !== undefined">
+          <view class="detail-icon">
+            <u-icon name="calendar" size="36" color="#ff8c00" />
+          </view>
+          <view class="detail-label">{{ detail.streak_days > 0 ? `连续打卡 ${detail.streak_days} 天` : '暂无连续打卡' }}</view>
+        </view>
+
         <!-- 性别 -->
-        <view class="detail-row">
+        <view class="detail-row" v-if="detail.gender !== undefined">
           <view class="detail-icon">
             <u-icon name="man" size="36" color="#ff8c00" />
           </view>
@@ -66,6 +82,11 @@ const emit = defineEmits(["close", "confirm"]);
 // 响应式数据
 const isShowPop = ref(false);
 const detail = ref({});
+
+const formatKm = (val) => {
+  if (!val) return '0.00';
+  return parseFloat(val).toFixed(2);
+};
 
 // 方法定义
 const open = (data) => {
