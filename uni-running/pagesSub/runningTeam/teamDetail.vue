@@ -338,7 +338,10 @@ onShow(() => {
   uni.$once("updateList", (data) => {
     if (data.from === "mine" && data.group_id) {
       routeParams.value.group_id = data.group_id;
+      isEmpty.value = false;
       getDetail();
+      getGroupStats();
+      getMonthlyRanking();
     }
   });
   getEvents();

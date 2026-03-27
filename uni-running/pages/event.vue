@@ -286,15 +286,16 @@ const filteredList = computed(() => {
 
 // 获取跑团信息
 const getFscInfo = async (fscId) => {
-	if (fscInfoCache.value[fscId]) {
+	if (fscId in fscInfoCache.value) {
 		return fscInfoCache.value[fscId];
 	}
 	try {
-		const res = await request.get(`/running-group/api/v1/groups/info?group_id=${fscId}`);
+		const res = await request.get(`/running-group/api/v1/groups/info?group_id=${fscId}`, null, { showError: false });
 		fscInfoCache.value[fscId] = res;
 		return res;
 	} catch (e) {
 		console.error('获取跑团信息失败', e);
+		fscInfoCache.value[fscId] = null;
 		return null;
 	}
 };
@@ -304,10 +305,11 @@ const loadData = async (mescroll) => {
 	loading.value = true;
 
 	const params = {
-		pageIndex: mescroll.num - 1,
-		pageSize: 10,
+		page_index: mescroll.num - 1,
+		page_size: 10,
 		visibility: 'private',
-		is_free: 1
+		is_free: 1,
+		status: 'ACT'
 	};
 
 	try {
@@ -315,7 +317,6 @@ const loadData = async (mescroll) => {
 		loading.value = false;
 
 		let list = (res.fsc_events || [])
-			.filter(item => item.status === 'ACT') // 只显示进行中的活动
 			.map(item => ({
 				...item,
 				event_time: item.event_time
