@@ -18,6 +18,7 @@ import { onLoad, onShow } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 
 const deviceList = ref([]);
+const params = ref({})
 function getDevicesList() {
   uni.showLoading({
     mask: true,
@@ -48,26 +49,49 @@ function getDevicesList() {
   });
 }
 onShow(() => {
-  // getDevicesList();
   try {
     const { code, error, state } = wx.getEnterOptionsSync().referrerInfo.extraData;
-    console.log(code, error, state)
+    // 通过code获取AT
+    if (code) {
+		const tempCode = code.replaceAll("+","%2B")
+		request.get("/sport-api/huawei/oauth/callback?code="+tempCode+"&state="+params.value.state+"&source=miniprogram").then((res) => {
+			uni.$u.route(`/pagesSub/device/deviceDetail?platform=${res.platform}`);
+		 }).catch((error)=>{
+		   console.log("error==11",error)
+		 });
+    }
+    console.log("华为返回222",code, error, state)
   } catch (error) {
-    console.log(error);
+    console.log("error==",error);
   }
 });
 function routeToDetail(item) {
-  uni.$u.route(`/pagesSub/device/deviceDetail?platform=${item.platform}`);
-  // wx.navigateToMiniProgram({
-  //   appId: "wxa6c04f899577d944",
-  //   path: "pages/authLogin/authLogin",
-  //   extraData: {
-  //     lang: "zh-CN",
-  //     client_id: "115644435",
-  //     scope: ["https://www.huawei.com/healthkit/step.read"],
-  //     state: 'xxxx'
-  //   }
-  // })
+		
+  if(item.platform=='huawei') {
+    if(item.created_at) {
+      uni.$u.route(`/pagesSub/device/deviceDetail?platform=${item.platform}`);
+    } else {
+      request.get("/sport-api/huawei/oauth/miniprogram/authorize").then((res) => {
+          params.value = res
+          wx.navigateToMiniProgram({
+            appId: "wxa6c04f899577d944",
+            path: "pages/authLogin/authLogin",
+            extraData: {
+              lang: "zh-CN",
+              client_id: res.client_id,
+              scope: res.scope.split(" "),
+              state: res.state
+            }
+          })
+       console.log("res====222==",res)
+      }).catch((error)=>{
+        console.log("error==222",error)
+      });
+    }
+  } else {
+    uni.$u.route(`/pagesSub/device/deviceDetail?platform=${item.platform}`);
+  }
+  
 }
 
 // 页面加载
