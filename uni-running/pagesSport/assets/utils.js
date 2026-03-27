@@ -101,30 +101,26 @@ export function getTypeSum(list, type) {
 
 // 创建标记
 export const createMarker = (latitude, longitude, strDistance) => {
-  // const isStart = type === "start";
   return {
     id: strDistance,
     latitude,
     longitude,
-    width: 10,
-    height: 15,
-    // anchor: { x: 0.5, y: 0.5 },
+    width: 28,
+    height: 28,
+    anchor: { x: 0.5, y: 0.5 },
     label: {
-      borderRadius: 10,
-      borderWidth: 1,
-      padding: 2,
+      borderRadius: 14,
+      borderWidth: 2,
+      padding: 4,
       content: String(strDistance),
       fontSize: 10,
       bgColor: "#000",
       borderColor: "#fff",
-      color: "#fff"
+      color: "#fff",
+      textAlign: 'center'
     },
     // 使用透明占位图避免显示平台默认红色图标（data URI 1x1 GIF）
     iconPath: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=',
-    // iconPath: isStart
-    //   ? "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/go@2x.png"
-    //   : "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/end@2x.png",
-    // title: isStart ? "起" : "终",
   };
 };
 
