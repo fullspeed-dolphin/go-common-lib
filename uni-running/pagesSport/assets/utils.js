@@ -119,10 +119,43 @@ export const createMarker = (latitude, longitude, strDistance) => {
       borderColor: "#fff",
       color: "#fff"
     },
+    // 使用透明占位图避免显示平台默认红色图标（data URI 1x1 GIF）
+    iconPath: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=',
     // iconPath: isStart
     //   ? "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/go@2x.png"
     //   : "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/end@2x.png",
     // title: isStart ? "起" : "终",
+  };
+};
+
+/**
+ * 创建带文本的起/终点标记
+ * @param {number} latitude
+ * @param {number} longitude
+ * @param {string} text - 文本内容，例如 'go' 或 'end'
+ * @param {object} opts - 可选项: { bgColor, borderColor, color, fontSize }
+ */
+export const createTextMarker = (latitude, longitude, text, opts = {}) => {
+  const { bgColor = '#4CAF50', borderColor = '#ffffff', color = '#ffffff', fontSize = 12 } = opts;
+  return {
+    id: text + '_' + latitude + '_' + longitude,
+    latitude,
+    longitude,
+    width: 24,
+    height: 24,
+    anchor: { x: 0.5, y: 0.5 },
+    // 隐藏默认红色图标，使用透明占位
+    iconPath: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=',
+    label: {
+      borderRadius: 18,
+      borderWidth: 2,
+      padding: 4,
+      content: String(text),
+      fontSize,
+      bgColor,
+      borderColor,
+      color,
+    },
   };
 };
 
