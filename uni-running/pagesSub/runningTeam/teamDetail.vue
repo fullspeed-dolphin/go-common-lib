@@ -303,6 +303,7 @@ const getCoverUrl = (item) => {
 onLoad((options) => {
   routeParams.value = options;
   if (!options.group_id || options.group_id === "null" || options.group_id === "undefined") {
+    routeParams.value.group_id = null;
     isEmpty.value = true;
     return;
   }
