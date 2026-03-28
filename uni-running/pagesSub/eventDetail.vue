@@ -4,7 +4,7 @@
 	<view class="u-pb-30" style="background: #f5f5f5" :class="{
       isLoadedPage: isLoadedPage,
     }">
-		<view class="event-status flex-center" v-if="detail.status === 'ACT'">
+		<view class="event-status flex-center" v-if="detail.status === 'ACT'" :style="themeColor !== '#43A047' ? { background: themeColor } : {}">
 			活动进行中
 		</view>
 
@@ -14,14 +14,14 @@
 		</section>
 
 		<view class="container">
-			<section class="section-event panel bgf" style="position: relative; z-index: 10">
-				<view class="h2">
+			<section class="section-event panel bgf" style="position: relative; z-index: 10;">
+				<view class="h2" :style="themeColor !== '#43A047' ? { color: themeColor } : {}">
 					<view class="ellipsis2">
 						{{ detail.name }}
 					</view>
 				</view>
 
-				<view class="panel-item">
+				<view class="panel-item" :style="themePanelItemStyle">
 					<view class="label">
 						<image class="icon" :src="staticBaseUrl + '/images/icon-event-time@2x.png'" mode="aspectFill"></image>
 						<text>报名时间：</text>
@@ -29,7 +29,7 @@
 					<view class="value">{{ detail.registration_time }}</view>
 				</view>
 
-				<view class="panel-item">
+				<view class="panel-item" :style="themePanelItemStyle">
 					<view class="label">
 						<image class="icon" :src="staticBaseUrl + '/images/icon-event-date@2x.png'" mode="aspectFill"></image>
 						<text>{{ isCourseEvent ? '课程开始时间：' : '活动开始时间：' }}</text>
@@ -38,7 +38,7 @@
             dayjs(detail.event_time).format("YYYY-MM-DD HH:mm")
           }}</view>
 				</view>
-				<view class="panel-item">
+				<view class="panel-item" :style="themePanelItemStyle">
 					<view class="label">
 						<image class="icon" :src="staticBaseUrl + '/images/icon-event-location@2x.png'" mode="aspectFill"></image>
 						<text>活动地点：</text>
@@ -48,19 +48,20 @@
           }}</view>
 				</view>
 
-				<view class="panel-item">
+				<view class="panel-item" :style="themePanelItemStyle">
 					<view class="label">
 						<image class="icon" :src="staticBaseUrl + '/images/icon-event-item@2x.png'" mode="aspectFill"></image>
 						<text>活动项目：</text>
 					</view>
 					<view class="flex-row flex-wrap">
-						<view class="event-item flex-center" v-for="(item, index) in detail.eventItems" :key="index">
+						<view class="event-item flex-center" v-for="(item, index) in detail.eventItems" :key="index"
+							:style="themeGradient ? { background: themeGradient } : {}">
 							{{ item }}
 						</view>
 					</view>
 				</view>
 
-				<view class="panel-item">
+				<view class="panel-item" :style="themePanelItemStyle">
 					<view class="label">
 						<image class="icon" :src="staticBaseUrl + '/images/icon-event-item@2x.png'" mode="aspectFill"></image>
 						<text>活动性质：</text>
@@ -87,9 +88,9 @@
 				<view class="cell flex-start u-pl-20 customer-phone">
 					<view class="label">联系电话：</view>
 					<view class="value flex-start">
-						<view style="color: #43a047; margin-right: 10rpx" @click="callPhone(detail.contact)">{{detail.contact}}</view>
+						<view :style="{ color: themeColor, marginRight: '10rpx' }" @click="callPhone(detail.contact)">{{detail.contact}}</view>
 					</view>
-					<u-button type="primary" color="#43A047" shape="circle" size="mini" @click="copyText(detail.contact)"
+					<u-button type="primary" :color="themeColor" shape="circle" size="mini" @click="copyText(detail.contact)"
 						class="copy-btn"
 						customStyle="min-width: 76rpx; width: 76rpx;height: 34rpx; padding: 0; margin-left: 20rpx; font-weight: bold;font-size: 24rpx;color: #FFFFFF;">
 						复制
@@ -109,7 +110,7 @@
 				  {{isSignUp ? '取消' : ''}}报名截止：2025.09.30 9:00
 			  </view> -->
 				<view class="u-border-top1" :class="{ isSignUp: isSignUp }">
-					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;" @click="routeTo()">
+					<u-button type="primary" :color="themeBtnColor" shape="circle" customStyle="height: 80rpx;" @click="routeTo()">
 						<block v-if="Number(detail.is_free) === 1">进入活动</block>
 						<block v-else-if="detail.status === 'ACT'">{{
               isSignUp ? "取消报名" : (isCourseEvent ? "立即报班" : "活动报名")
@@ -121,7 +122,7 @@
 			</view>
 		</view>
 
-		<button class="share-btn flex-center" :class="{ active: isScroll }" open-type="share">
+		<button class="share-btn flex-center" :class="{ active: isScroll }" :style="themeGradient ? { background: themeGradient, borderColor: 'transparent' } : {}" open-type="share">
 			<u-icon name="share" color="#fff" size="18"></u-icon>
 		</button>
 
@@ -172,6 +173,28 @@
 	const isLoadedPage = ref(false);
 	const routerParams = ref({});
 	const isPaidEvent = ref(false); // 普通活动是否为付费活动
+
+	// 动态主题色（基于 color_config）
+	const themeColor = computed(() => detail.value?.color_config?.solid || '#43A047');
+	const themeGradient = computed(() => {
+		const g = detail.value?.color_config?.gradient;
+		if (g?.length === 2) return `linear-gradient(90deg, ${g[0]}, ${g[1]})`;
+		return null;
+	});
+	const themeBtnColor = computed(() => {
+		const g = detail.value?.color_config?.gradient;
+		return g?.length === 2 ? g[0] : '#FF8C00';
+	});
+	// 信息卡片浅色背景（主题色 10% 透明度）
+	const themePanelItemStyle = computed(() => {
+		if (!detail.value?.color_config?.solid) return {};
+		const c = detail.value.color_config.solid;
+		// hex to rgba with 0.08 opacity
+		const r = parseInt(c.slice(1, 3), 16);
+		const g = parseInt(c.slice(3, 5), 16);
+		const b = parseInt(c.slice(5, 7), 16);
+		return { background: `rgba(${r}, ${g}, ${b}, 0.08)` };
+	});
 
 	// 计算属性
 	const userInfo = computed(() => store.state.userInfo);
