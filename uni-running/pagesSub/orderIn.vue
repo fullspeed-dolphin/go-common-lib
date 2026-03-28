@@ -29,18 +29,23 @@
     </view>
   </section>
 
-  <view v-if="showField('package')" class="section" style="margin-top:30rpx;">
+  <view v-if="showField('package')" class="section" style="margin-top:30rpx;" :style="{ '--theme-color': themeColor }">
     <view class="section-title">
       <text>{{ getLabel('package') }}</text>
       <text v-if="eventCapacity.mode === 'event'" class="remaining-quota">（剩余名额：{{ (eventCapacity.capacity || 0) - (eventCapacity.capacity_used || 0) }}）</text>
     </view>
     <view class="section-content">
+      <!-- 空状态提示 -->
+      <view v-if="!packageList.length" class="package-empty-hint">
+        <u-icon name="info-circle" color="#999" size="18"></u-icon>
+        <text>{{ showField('code') ? `请输入${getLabel('code')}查看可选套餐` : '暂无可选套餐' }}</text>
+      </view>
       <view class="price-item" v-for="(item, index) in packageList" :key="index" :class="{ disabled: item.isFull, active: item.count > 0 }">
 
         <!-- 套餐头部：左侧信息 + 右侧数量选择器 -->
         <view class="price-item-header" @click="onPackageClick(item)">
           <view class="price-item-left">
-            <view class="price-item-label">{{ item.label }}</view>
+            <view class="price-item-label">{{ item.label }}<text v-if="item.groupSize > 1" class="group-size-hint">（需{{ item.groupSize }}张报名卡）</text></view>
             <view class="price-item-meta">
               <text class="price-item-price">￥{{ item.price }}</text>
               <text v-if="item.isFull" class="price-item-status">已满</text>
@@ -77,8 +82,8 @@
               </view>
               <view class="slot-name">{{ slot.full_name }}</view>
             </view>
-            <!-- 添加按钮：只有当组未满时才显示 -->
-            <view v-if="group.length < (item.groupSize || 1)" class="slot-item" @click="handleAddSigner(item, groupIndex)">
+            <!-- 添加按钮：显示所有剩余空位 -->
+            <view v-for="emptyIdx in ((item.groupSize || 1) - group.length)" :key="'empty-' + emptyIdx" class="slot-item" @click="handleAddSigner(item, groupIndex)">
               <view class="slot-empty">
                 <u-icon name="plus" color="#999" size="20"></u-icon>
               </view>
@@ -91,12 +96,11 @@
   </view>
 
   <!-- 提示信息区域 -->
-  <section v-if="packageList.length" class="section-tips">
+  <section v-if="packageList.length && totalSelectedCount > 0" class="section-tips" :style="{ '--theme-color': themeColor }">
     <view class="tips-title">温馨提示</view>
     <view class="tips-list">
-      <view class="tips-item">1、最多可选择 <text class="tips-highlight">{{ multiPackageCount }}</text> 种套餐</view>
-      <view class="tips-item">2、每份套餐最多选择 <text class="tips-highlight">{{ maxSignersPerPackage }}</text> 张报名卡，如需多人报名请增加套餐份数</view>
-      <view class="tips-item">3、参赛服尺寸请详询活动组织方</view>
+      <view class="tips-item">1、最多可选择 <text class="tips-highlight">{{ multiPackageCount }}</text> 种套餐，如需多人报名请增加套餐份数</view>
+      <view class="tips-item">2、参赛服尺寸请详询活动组织方</view>
     </view>
   </section>
 
@@ -120,36 +124,40 @@
           <text class="payment-name">微信支付</text>
         </view>
         <view class="payment-card-right">
-          <u-icon name="checkmark-circle-fill" color="#FF8C00" size="40rpx"></u-icon>
+          <u-icon name="checkmark-circle-fill" :color="themeColor" size="40rpx"></u-icon>
         </view>
       </view>
     </view>
   </section>
 
-  <section class="section-bottom">
+  <!-- 底部固定区域：协议 + 按钮 -->
+  <view class="fixed-bottom-bar">
     <view class="agreement-wrapper flex-start">
-      <up-checkbox shape="circle" activeColor="#8CC63E" v-model:checked="isAgree" :usedAlone="true" size="32rpx" />
+      <up-checkbox shape="circle" :activeColor="themeColor" v-model:checked="isAgree" :usedAlone="true" size="32rpx" />
       <view class="agreement-text">
         <text @click="isAgree = !isAgree">我已阅读并同意</text>
-        <text style="color: #ff8c00" @click="$u.route('pagesSub/settings/agreement?type=signUp')">《用户协议》</text>
+        <text :style="{ color: themeColor }" @click="$u.route('pagesSub/settings/agreement?type=signUp')">《用户协议》</text>
         <text>、</text>
-        <text style="color: #ff8c00" @click="$u.route('pagesSub/settings/agreement?type=baoxian')">《保险须知》</text>
+        <text :style="{ color: themeColor }" @click="$u.route('pagesSub/settings/agreement?type=baoxian')">《保险须知》</text>
         <template v-if="event_id === '01KCRXHMXF7SEBYCMZ1X2M4E0Y'">
           <text>、</text>
-          <text style="color: #ff8c00" @click="$u.route('pagesSub/settings/agreement?type=notices_ShuiLianHu')">《水濂湖报名须知》</text>
+          <text :style="{ color: themeColor }" @click="$u.route('pagesSub/settings/agreement?type=notices_ShuiLianHu')">《水濂湖报名须知》</text>
           <text>、</text>
-          <text style="color: #ff8c00" @click="$u.route('pagesSub/settings/agreement?type=rule_ShuiLianHu')">《水濂湖活动章程》</text>
+          <text :style="{ color: themeColor }" @click="$u.route('pagesSub/settings/agreement?type=rule_ShuiLianHu')">《水濂湖活动章程》</text>
           <text>、</text>
-          <text style="color: #ff8c00" @click="$u.route('pagesSub/settings/agreement?type=disclaimer_ShuiLianHu')">《水濂湖免责声明》</text>
+          <text :style="{ color: themeColor }" @click="$u.route('pagesSub/settings/agreement?type=disclaimer_ShuiLianHu')">《水濂湖免责声明》</text>
         </template>
       </view>
     </view>
-    <view class="" style="padding: 56rpx 20rpx 80rpx">
-      <u-button type="primary" color="#ff8c00" shape="circle" @click="submitOrder()">￥{{ totalPrice }} 支付</u-button>
+    <view style="margin-top: 20rpx;">
+      <u-button type="primary" :color="themeBtnColor" shape="circle" customStyle="height: 80rpx;" @click="submitOrder()">{{ totalPrice > 0 ? `￥${totalPrice} 支付` : '确认报名' }}</u-button>
     </view>
-  </section>
+  </view>
 
-  <SignerList ref="refSignerList" @select="onSelectSigner" />
+  <!-- 底部占位，防止内容被固定栏遮挡 -->
+  <view style="height: 280rpx;"></view>
+
+  <SignerList ref="refSignerList" @select="onSelectSigner" :themeColor="themeColor" />
   <GroupList ref="refGroupList" @success="getUserGroup()" />
 </template>
 <script setup>
@@ -190,6 +198,19 @@ const packageList = ref([]);
 const computedCode = ref({});
 const event_id = ref("");
 const isSubmitting = ref(false);
+const colorConfig = ref(null);
+
+// 动态主题色
+const themeColor = computed(() => colorConfig.value?.solid || '#FF8C00');
+const themeGradient = computed(() => {
+  const g = colorConfig.value?.gradient;
+  if (g?.length === 2) return `linear-gradient(90deg, ${g[0]}, ${g[1]})`;
+  return null;
+});
+const themeBtnColor = computed(() => {
+  const g = colorConfig.value?.gradient;
+  return g?.length === 2 ? g[0] : '#FF8C00';
+});
 const selectedAddress = ref("");
 const addressPickerColumns = ref([]);
 const multiPackageCount = ref(1); // 存储 multi_package 字段值
@@ -601,16 +622,6 @@ const submitOrder = async () => {
   //   }
   // }
 
-  // 校验：如果选中的套餐总价为0，拒绝付款
-  if (totalPrice.value === 0) {
-    uni.showModal({
-      title: "提示",
-      content: "当前套餐不支持单独购买",
-      showCancel: false,
-    });
-    return;
-  }
-
   if (isSubmitting.value) return;
   isSubmitting.value = true;
   uni.showLoading({ mask: true });
@@ -638,7 +649,20 @@ const submitOrder = async () => {
 
     const tempList = orderNoList.filter((i) => !!i);
     if (tempList.length) {
-      payOrder(orderNoList);
+      if (totalPrice.value === 0) {
+        // 0 元报名：后端已直接设为 SUCC，跳过支付，提示成功
+        uni.hideLoading();
+        uni.showModal({
+          title: "报名成功",
+          content: "您已成功报名，无需支付",
+          showCancel: false,
+          success: () => {
+            uni.navigateBack();
+          },
+        });
+      } else {
+        payOrder(orderNoList);
+      }
     }
   } catch (e) {
     console.error(e);
@@ -747,6 +771,13 @@ const getEventAddresses = async () => {
 
     // 读取表单标签配置
     formLabels.value = res?.form_labels || null;
+    // 读取主题色配置并存储供子页面使用
+    colorConfig.value = res?.color_config || null;
+    if (res?.color_config) {
+      uni.setStorageSync('eventThemeColor', res.color_config);
+    } else {
+      uni.removeStorageSync('eventThemeColor');
+    }
 
     // 获取 multi_package 字段，判断是否多选
     if (res && res.multi_package !== undefined && res.multi_package !== null) {
@@ -853,7 +884,7 @@ defineOptions({
   .tips-title {
     font-size: 28rpx;
     font-weight: bold;
-    color: #ff8c00;
+    color: var(--theme-color, #ff8c00);
     margin-bottom: 16rpx;
   }
 
@@ -865,8 +896,38 @@ defineOptions({
     }
 
     .tips-highlight {
-      color: #ff8c00;
+      color: var(--theme-color, #ff8c00);
       font-weight: bold;
+    }
+  }
+}
+
+.fixed-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  padding: 20rpx 34rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.06);
+
+  .agreement-wrapper {
+    gap: 10rpx;
+  }
+
+  .agreement-text {
+    flex: 1;
+    font-size: 24rpx;
+    line-height: 1.5;
+    color: #333;
+    word-wrap: break-word;
+    word-break: break-all;
+
+    text {
+      font-size: 24rpx;
+      line-height: 1.5;
     }
   }
 }
@@ -960,18 +1021,29 @@ defineOptions({
   padding: 30rpx 20rpx;
 }
 
+.package-empty-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  padding: 40rpx 0;
+  font-size: 28rpx;
+  color: #999;
+}
+
 .price-item {
-  background: #f6fafb;
+  background: #f0f4f5;
   border-radius: 16rpx;
   margin-bottom: 20rpx;
   overflow: hidden;
+  border: 2rpx solid rgba(0, 0, 0, 0.04);
 
   &.active {
-    border: 2rpx solid #ff8c00;
+    border: 2rpx solid var(--theme-color, #ff8c00);
     box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.15);
 
     .price-item-header {
-      background: #ff8c00;
+      background: var(--theme-color, #ff8c00);
     }
 
     .price-item-label {
@@ -1006,7 +1078,7 @@ defineOptions({
     justify-content: space-between;
     align-items: center;
     padding: 24rpx 20rpx;
-    background: #f6fafb;
+    background: #f0f4f5;
     transition: background 0.2s ease;
   }
 
@@ -1042,7 +1114,7 @@ defineOptions({
 
   .price-item-price {
     font-size: 28rpx;
-    color: #ff8c00;
+    color: var(--theme-color, #ff8c00);
     font-weight: bold;
     transition: color 0.2s ease;
   }

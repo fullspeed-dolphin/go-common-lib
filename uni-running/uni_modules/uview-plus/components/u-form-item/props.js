@@ -11,6 +11,10 @@ export const props = defineMixin({
             type: String,
             default: ""
         },
+        tipsColor: {
+            type: String,
+            default: "#FF8C00"
+        },
         // 绑定的值
         prop: {
             type: String,

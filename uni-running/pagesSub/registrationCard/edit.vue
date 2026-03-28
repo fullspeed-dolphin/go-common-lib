@@ -1,9 +1,9 @@
 <template>
-  <RegistrationCardForm v-model="form" mode="edit" @submit="handleSubmit" />
+  <RegistrationCardForm v-model="form" mode="edit" :themeColor="themeColor" @submit="handleSubmit" />
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import RegistrationCardForm from "./form.vue";
 import request from "@/utils/request.js";
@@ -15,6 +15,10 @@ import {
 
 const form = ref({});
 const cardId = ref(null);
+const themeColor = computed(() => {
+  const config = uni.getStorageSync('eventThemeColor');
+  return config?.solid || '#FF8C00';
+});
 
 // 省市区数据
 const { loadRegionData, codeToName, nameToCode } = useRegionData();

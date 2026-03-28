@@ -4,11 +4,11 @@
 		<up-form ref="formRef" :model="form" :rules="rules" labelWidth="260rpx">
 			<view class="section-title">基本信息</view>
 			<view class="panel bgf">
-				<up-form-item label="姓名" tips="用于购买保险，必须实名" prop="name" required>
+				<up-form-item label="姓名" :tipsColor="themeColor" tips="用于购买保险，必须实名" prop="name" required>
 					<view class="flex-start">
 						<up-input v-model="form.name" placeholder="请填写您的真实姓名" border="none" inputAlign="right" />
 						<view class="owner">
-							<up-checkbox v-model:checked="form.isOwner" :usedAlone="true" shape="circle" activeColor="#8CC63E" size="16" />
+							<up-checkbox v-model:checked="form.isOwner" :usedAlone="true" shape="circle" :activeColor="themeColor" size="16" />
 							本人
 						</view>
 					</view>
@@ -19,7 +19,7 @@
 				</up-form-item>
 
 				<up-form-item label="性别" prop="gender" required>
-					<up-radio-group v-model="form.gender" activeColor="#8CC63E" shape="square"
+					<up-radio-group v-model="form.gender" :activeColor="themeColor" shape="square"
 						customStyle="flex: 0 0 auto; margin-left: auto;">
 						<up-radio :name="'male'" label="男" />
 						<up-radio :name="'female'" label="女" />
@@ -42,17 +42,17 @@
 					</view>
 					<up-picker v-model="selectedIdType" :show="showIdTypePicker" :columns="[idTypeOptions]"
 						:defaultIndex="idTypeIndex" keyName="name" valueName="id" cancelText="取消" confirmText="确认"
-						confirmColor="#FF8C00" @confirm="onIdTypeConfirm" @cancel="showIdTypePicker = false"
+						:confirmColor="themeColor" @confirm="onIdTypeConfirm" @cancel="showIdTypePicker = false"
 						@close="showIdTypePicker = false" />
 				</up-form-item>
 
-				<up-form-item label="证件号码" prop="idCardNumber" tips="用于购买保险，必须输入真实的证件号码" required>
+				<up-form-item label="证件号码" prop="idCardNumber" :tipsColor="themeColor" tips="用于购买保险，必须输入真实的证件号码" required>
 					<up-input v-model="form.idCardNumber" placeholder="请填写证件号码" border="none" inputAlign="right" />
 				</up-form-item>
 
 				<up-form-item label="出生日期" prop="birthday">
 					<up-datetime-picker hasInput v-model="birthdayTimestamp" mode="date" cancelText="取消" confirmText="确认"
-						confirmColor="#FF8C00" :minDate="startDate" :maxDate="endDate" @confirm="onBirthdayConfirm">
+						:confirmColor="themeColor" :minDate="startDate" :maxDate="endDate" @confirm="onBirthdayConfirm">
 						<template #trigger="{ value }">
 							<up-input :modelValue="value || ''" placeholder="请选择" border="none" inputAlign="right" readonly>
 								<template #suffix>
@@ -84,7 +84,7 @@
 					</view>
 					<up-picker v-model="selectedCountry" :show="showCountryPicker" :columns="[countryOptions]"
 						:defaultIndex="countryIndex" keyName="name" valueName="id" cancelText="取消" confirmText="确认"
-						confirmColor="#FF8C00" @confirm="onCountryConfirm" @cancel="showCountryPicker = false"
+						:confirmColor="themeColor" @confirm="onCountryConfirm" @cancel="showCountryPicker = false"
 						@close="showCountryPicker = false" />
 				</up-form-item>
 				<up-form-item label="省市区" prop="region" required>
@@ -97,20 +97,20 @@
 					</view>
 					<up-picker v-model="selectedProvince" :show="showProvincePicker" :columns="[provinceOptions]"
 						:defaultIndex="provinceIndex" keyName="name" valueName="code" cancelText="取消" confirmText="确认"
-						confirmColor="#FF8C00" @confirm="onProvinceConfirm" @cancel="showProvincePicker = false"
+						:confirmColor="themeColor" @confirm="onProvinceConfirm" @cancel="showProvincePicker = false"
 						@close="showProvincePicker = false" />
 					<up-picker v-model="selectedCity" :show="showCityPicker" :columns="[cityOptions]" :defaultIndex="cityIndex"
-						keyName="name" valueName="code" cancelText="取消" confirmText="确认" confirmColor="#FF8C00"
+						keyName="name" valueName="code" cancelText="取消" confirmText="确认" :confirmColor="themeColor"
 						@confirm="onCityConfirm" @cancel="showCityPicker = false" @close="showCityPicker = false" />
 					<up-picker v-model="selectedArea" :show="showAreaPicker" :columns="[areaOptions]" :defaultIndex="areaIndex"
-						keyName="name" valueName="code" cancelText="取消" confirmText="确认" confirmColor="#FF8C00"
+						keyName="name" valueName="code" cancelText="取消" confirmText="确认" :confirmColor="themeColor"
 						@confirm="onAreaConfirm" @cancel="showAreaPicker = false" @close="showAreaPicker = false" />
 				</up-form-item>
-				<up-form-item label="详细地址" prop="address" tips="邮寄需要" required>
+				<up-form-item label="详细地址" prop="address" :tipsColor="themeColor" tips="邮寄需要" required>
 					<view class="address-input-wrapper">
 						<up-input v-model="form.address" placeholder="请填写详细地址" border="none" inputAlign="right" />
 						<view class="address-icon-wrapper" @click="handleChooseLocation">
-							<up-icon name="map" size="20" color="#FF8C00" />
+							<up-icon name="map" size="20" :color="themeColor" />
 						</view>
 					</view>
 				</up-form-item>
@@ -122,7 +122,7 @@
 					<PickerCell v-model="form.bloodType" :border="false" :columns="bloodTypeOptions" />
 				</up-form-item>
 
-				<up-form-item label="参赛服尺寸" prop="clothesSize" tips="参赛服尺码仅为参赛者个人信息，活动是否包含参赛服以具体活动宣发为准，详询活动组织方，如活动或课程不提供参赛服则选择'无参赛服'。" required>
+				<up-form-item label="参赛服尺寸" prop="clothesSize" :tipsColor="themeColor" tips="参赛服尺码仅为参赛者个人信息，活动是否包含参赛服以具体活动宣发为准，详询活动组织方，如活动或课程不提供参赛服则选择'无参赛服'。" required>
 					<view @click="showOnceTip">
 						<PickerCell v-model="form.clothesSize" :disabled="isReadOnlyClothSize" :border="false" :columns="tshirtSizeOptions" />
 					</view>
@@ -137,7 +137,7 @@
 			</view>
 
 			<view class="panel bgf">
-				<view style="font-size: 32rpx;margin-bottom: 20rpx;color:rgb(255, 140, 0);">提示：</view>
+				<view :style="{ fontSize: '32rpx', marginBottom: '20rpx', color: themeColor }">提示：</view>
 				<view style="color:#777;font-size:24rpx;line-height: 1.3;">
 					<div class="u-flex-row"><div style="width:30rpx;">1、</div><div>请如实填写姓名和身份证信息，以便我们为您购买赛事保险。</div></div>
 					<div class="u-flex-row"><div style="width:30rpx;">2、</div><div>参赛服尺码仅为参赛者个人信息，活动是否包含参赛服以具体活动宣发为准，详询活动组织方，如活动或课程不提供参赛服则选择'无参赛服'。</div></div>
@@ -147,7 +147,7 @@
 			<view class="panel bgf">
 				<view class="agree-text">
 					<span>阅读并同意以下内容</span>
-					<up-checkbox v-model:checked="form.agreed" :usedAlone="true" shape="circle" activeColor="#8CC63E" />
+					<up-checkbox v-model:checked="form.agreed" :usedAlone="true" shape="circle" :activeColor="themeColor" />
 				</view>
 				<view class="agree-content">您已知晓您在全速运动录入的参赛人身份信息，并将用于报名
 					活动赛事等所有需要实名制的赛事产品，并在您保存时进行
@@ -157,7 +157,7 @@
 
 			<section class="section-bottom">
 				<view style="padding: 54rpx 48rpx">
-					<u-button type="primary" :color="form.agreed ? '#FF8C00' : '#F2F2F2'" :disabled="!form.agreed || submitting"
+					<u-button type="primary" :color="form.agreed ? themeColor : '#F2F2F2'" :disabled="!form.agreed || submitting"
 						shape="circle" :customStyle="buttonCustomStyle" @click="onSubmit">保存</u-button>
 				</view>
 			</section>
@@ -194,6 +194,10 @@
 		modelValue: {
 			type: Object,
 			default: () => ({})
+		},
+		themeColor: {
+			type: String,
+			default: '#FF8C00'
 		},
 		mode: {
 			type: String,

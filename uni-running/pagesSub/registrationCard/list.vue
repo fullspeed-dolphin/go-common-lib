@@ -23,7 +23,7 @@
 				</view>
 				<view class="card-item-actions">
 					<view class="card-item-actions-item" @click.stop="handleSetAsOwner(item)">
-						<up-checkbox shape="circle" activeColor="#8CC63E" :checked="item.is_self == 1" size="14"></up-checkbox>
+						<up-checkbox shape="circle" :activeColor="themeColor" :checked="item.is_self == 1" size="14"></up-checkbox>
 						设为本人
 					</view>
 					<view class="card-item-actions-item-group">
@@ -42,7 +42,7 @@
 
 		<section class="section-bottom">
 			<view style="padding: 56rpx 54rpx 40rpx">
-				<u-button type="primary" color="#FF8C00" shape="circle"
+				<u-button type="primary" :color="themeColor" shape="circle"
 					@click="$u.route('pagesSub/registrationCard/create')">添加报名卡</u-button>
 			</view>
 		</section>
@@ -51,6 +51,7 @@
 <script setup>
 	import {
 		ref,
+		computed,
 		onMounted
 	} from "vue";
 	import {
@@ -74,6 +75,10 @@
 	const loading = ref(false);
 	const options = ref({});
 	const isSelectMode = ref(false);
+	const themeColor = computed(() => {
+		const config = uni.getStorageSync('eventThemeColor');
+		return config?.solid || '#FF8C00';
+	});
 
 	// 格式化身份证号显示
 	const formatIdCard = (idCard) => {

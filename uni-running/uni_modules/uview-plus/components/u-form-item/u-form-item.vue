@@ -44,7 +44,7 @@
 							class="u-form-item__body__left__content__required"
 						>*</text>
 						<view v-if="tips" @click="showTip(tips)">
-								<up-icon name="info-circle" size="16" color="#FF8C00" class="tip-icon" />
+								<up-icon name="info-circle" size="16" :color="tipsColor" class="tip-icon" />
 							</view>
 					</view>
 				</view>

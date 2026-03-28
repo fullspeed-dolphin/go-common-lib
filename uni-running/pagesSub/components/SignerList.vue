@@ -1,5 +1,5 @@
 <template>
-	<up-popup :show="show" @close="close" closeable>
+	<up-popup :show="show" @close="close" closeable :customStyle="{ '--theme-color': themeColor }">
 		<view class="flex-center van-hairline--bottom" style="height: 100rpx;padding: 0 34rpx;">
 			<view class="" style="font-weight: bold;font-size: 30rpx;color: rgba(0,0,0,0.8);">选择报名卡</view>
 		</view>
@@ -7,7 +7,7 @@
 		<view class="card-item van-hairline--bottom" v-for="(item, index) in dataList" :key="index" @click="selectItem(item)">
 			<view class="card-item-wrapper">
 				<view class="radio-btn" @click.stop="selectItem(item)">
-					<u-icon v-if="selectedId === item.id" name="checkmark-circle-fill" color="#FF8C00" size="22"></u-icon>
+					<u-icon v-if="selectedId === item.id" name="checkmark-circle-fill" :color="themeColor" size="22"></u-icon>
 					<view v-else class="radio-circle"></view>
 				</view>
 				<view class="card-item-content">
@@ -30,12 +30,12 @@
 					</view>
 				</view>
 				<view class="edit-btn" @click.stop="editCard(item.id)">
-					<u-icon name="edit-pen" color="#FF8C00" size="25"></u-icon>
+					<u-icon name="edit-pen" :color="themeColor" size="25"></u-icon>
 				</view>
 			</view>
 		</view>
-		<u-button v-if="dataList.length" color="#FF8C00" @click="confirmSelect" shape="circle" :plain="!selectedId" customStyle="margin: 40rpx auto;width: 500rpx;">确认</u-button>
-		<u-button color="#FF8C00" @click="$u.route('pagesSub/registrationCard/list')" shape="circle" plain customStyle="margin: 40rpx auto;width: 500rpx;">创建报名卡</u-button>
+		<u-button v-if="dataList.length" :color="themeColor" @click="confirmSelect" shape="circle" :plain="!selectedId" customStyle="margin: 40rpx auto;width: 500rpx;">确认</u-button>
+		<u-button :color="themeColor" @click="$u.route('pagesSub/registrationCard/list')" shape="circle" plain customStyle="margin: 40rpx auto;width: 500rpx;">创建报名卡</u-button>
 	</up-popup>
 </template>
 
@@ -52,6 +52,10 @@
 	const show = ref(false);
 	const selectedId = ref(null);
 	const selectedItem = ref(null);
+
+	const props = defineProps({
+		themeColor: { type: String, default: '#FF8C00' }
+	});
 
 	const eventData = ref({})
 	function open(data) {
