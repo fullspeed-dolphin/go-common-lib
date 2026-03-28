@@ -83,7 +83,11 @@ onLoad((optons) => {
 
 onShow(() => {
   getDeviceData();
-  checkHuaweiAuth();
+  // 华为回调命中时即将跳走，不必再刷新列表
+  const handled = handleHuaweiCallback();
+  if (!handled) {
+    getDeviceData();
+  }
 });
 
 const deviceInfo = ref({});
@@ -127,21 +131,30 @@ function getDeviceData() {
 }
 
 const authParams = ref({})
-function checkHuaweiAuth() {
+let handledCode = null;
+function handleHuaweiCallback() {
   try {
-    const { code, error, state } = wx.getEnterOptionsSync().referrerInfo.extraData;
-    // 通过code获取AT
-    if (code) {
-		const tempCode = code.replaceAll("+","%2B")
-		request.get("/sport-api/huawei/oauth/callback?code="+tempCode+"&state="+authParams.value.state+"&source=miniprogram").then((res) => {
-			getDeviceData();
-		 }).catch((error)=>{
-		   console.log("error==11",error)
-		 });
-    }
-    console.log("华为返回222",code, error, state)
-  } catch (error) {
-    console.log("error==",error);
+    const enterOptions = wx.getEnterOptionsSync();
+    const extraData = enterOptions?.referrerInfo?.extraData;
+    if (!extraData?.code) return false;
+
+    // 同一个 code 只处理一次（getEnterOptionsSync 的结果在小程序生命周期内不会清除）
+    if (extraData.code === handledCode) return false;
+    handledCode = extraData.code;
+
+    const tempCode = extraData.code.replaceAll("+", "%2B");
+    request
+      .get("/sport-api/huawei/oauth/callback?code=" + tempCode + "&state=" + authParams.value.state + "&source=miniprogram")
+      .then(() => {
+        getDeviceData();
+      })
+      .catch((error) => {
+        console.log("华为回调失败", error);
+      });
+    return true;
+  } catch (e) {
+    // 非华为小程序返回场景，无 extraData，忽略即可
+    return false;
   }
 }
 

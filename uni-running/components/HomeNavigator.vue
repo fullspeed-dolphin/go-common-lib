@@ -1,6 +1,5 @@
 <template>
-  <!-- 只在正式版和开发版中显示，体验版中隐藏（用于规避审核） -->
-  <view class="menu" v-if="isReleaseVersion()">
+  <view class="menu">
     <view class="menu-item" v-for="(item, index) in navList" :key="index" @click="routeTo(item)">
       <view class="menu-item-bg">
         <image class="menu-item-icon" :src="item.icon_url + '?x-oss-process=image/resize,w_90,h_90,m_fill'" mode="aspectFill"></image>
@@ -13,7 +12,6 @@
 import { ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
-import { isReleaseVersion } from "@/utils/util.js";
 
 const navList = ref([]);
 // 页面显示

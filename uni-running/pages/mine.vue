@@ -152,7 +152,6 @@ import UserLogin from "@/components/UserLogin.vue";
 import AccessUser from "@/components/common/AccessUser.vue";
 import request from "@/utils/request.js";
 import { useShare } from "@/composables/useShare.js";
-import { isReleaseVersion } from "@/utils/util.js";
 
 const store = useStore();
 
