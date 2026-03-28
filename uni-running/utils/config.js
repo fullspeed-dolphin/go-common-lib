@@ -1,4 +1,4 @@
-let baseUrl = 'https://uat.speexpay.com';
+let baseUrl = 'https://speexpay.com';
 let envVersion = 'release';
 
 // 微信小程序版本
