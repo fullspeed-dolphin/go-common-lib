@@ -6,11 +6,11 @@ let envVersion = 'release';
 	envVersion = uni.getAccountInfoSync().miniProgram.envVersion;
 // #endif
 
-// 生产版本
-if (['trial'].includes(envVersion)) {
-	baseUrl = 'https://uat.speexpay.com'
-	envVersion = 'trial'
-}
+// UAT 环境（暂时关闭，体验版也走生产）
+// if (['trial'].includes(envVersion)) {
+// 	baseUrl = 'https://uat.speexpay.com'
+// 	envVersion = 'trial'
+// }
 
 export const baseLink = baseUrl
 
