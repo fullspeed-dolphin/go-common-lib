@@ -1,7 +1,7 @@
 <template>
   <view class="page">
     <u-navbar :title="detail.event_info?.name || ''" placeholder />
-    <view class="header">
+    <view class="header" :style="{ background: headerBg }">
       <view class="title">
         <view>报名成功！</view>
         <view class="btn" @click="viewEventDetail()">赛事详情</view>
@@ -80,40 +80,44 @@
           </view>
         </view>
         <view class="section-actions">
-          <u-button v-if="signInfo?.bib_url" type="primary" shape="circle" color="#FF8C00" @click="viewBib(signInfo)">查看号码布</u-button>
-          <u-button v-if="!signInfo?.bib_url" type="primary" plain shape="circle" color="#FF8C00" @click="viewBib(signInfo)">查看号码布</u-button>
-          <u-button v-if="signInfo?.certificate_url" type="primary" shape="circle" color="#FF8C00" @click="viewCertificate(signInfo)">查看完赛证书</u-button>
-          <u-button v-if="!signInfo?.certificate_url" type="primary" plain shape="circle" color="#FF8C00" @click="viewCertificate(signInfo)">查看完赛证书</u-button>
+          <u-button v-if="signInfo?.bib_url" type="primary" shape="circle" :color="themeColor" @click="viewBib(signInfo)">查看号码布</u-button>
+          <u-button v-if="!signInfo?.bib_url" type="primary" plain shape="circle" :color="themeColor" @click="viewBib(signInfo)">查看号码布</u-button>
+          <u-button v-if="signInfo?.certificate_url" type="primary" shape="circle" :color="themeColor" @click="viewCertificate(signInfo)">查看完赛证书</u-button>
+          <u-button v-if="!signInfo?.certificate_url" type="primary" plain shape="circle" :color="themeColor" @click="viewCertificate(signInfo)">查看完赛证书</u-button>
         </view>
       </view>
     </view>
     <view class="refund">
-      <view class="refund-title">本赛事已开启退赛服务</view>
-      <view class="refund-content">
-        <view>
-          <text>退赛服务截止时间：</text>
-          <text>{{ refundDeadline }}</text>
+      <view v-if="detail.amount === 0" class="refund-free-tip">0元赛事无法退赛</view>
+      <template v-else>
+        <view class="refund-title">本赛事已开启退赛服务</view>
+        <view class="refund-content">
+          <view>
+            <text>退赛服务截止时间：</text>
+            <text>{{ refundDeadline }}</text>
+          </view>
+          <view> 规定： </view>
+          <view>
+            1、支付成功起<text class="red">{{ refundValidHour }}小时</text>内退赛，全额退报名费
+          </view>
+          <view>
+            2、报名后<text class="red">{{ refundValidHour }}小时</text>超出比赛结束时间的，无法退赛
+          </view>
+          <view>
+            3、支付成功后<text class="red">{{ refundValidHour }}小时</text>内如已发货，不支持退款
+          </view>
+          <view>
+            4、报名后<text class="red">{{ refundValidHour }}小时</text>内完赛，不支持退赛退款
+          </view>
+          <view> 5、退赛服务截止后，不再受理任何退赛申请 </view>
         </view>
-        <view> 规定： </view>
-        <view>
-          1、支付成功起<text class="red">{{ refundValidHour }}小时</text>内退赛，全额退报名费
-        </view>
-        <view>
-          2、报名后<text class="red">{{ refundValidHour }}小时</text>超出比赛结束时间的，无法退赛
-        </view>
-        <view>
-          3、支付成功后<text class="red">{{ refundValidHour }}小时</text>内如已发货，不支持退款
-        </view>
-        <view>
-          4、报名后<text class="red">{{ refundValidHour }}小时</text>内完赛，不支持退赛退款
-        </view>
-        <view> 5、退赛服务截止后，不再受理任何退赛申请 </view>
-      </view>
-      <view class="refund-button">
-        <u-button type="primary" :color="canRefund ? '#FF8C00' : '#CCCCCC'" shape="circle" :disabled="!canRefund" @click="refundOrder(detail)">
-          {{ canRefund ? '申请退赛' : '已超过退赛时间' }}
-        </u-button>
-      </view>
+      </template>
+    </view>
+    <!-- 底部悬浮按钮 -->
+    <view class="bottom-bar" v-if="detail.amount > 0">
+      <u-button type="primary" :color="themeColor" shape="circle" @click="refundOrder(detail)">
+        {{ canRefund ? '申请退赛' : '已超过退赛时间' }}
+      </u-button>
     </view>
     <CommonDialog ref="refundDialogRef" confirmButtonTxt="确认" cancelButtonTxt="取消" @confirm="confirmRefund" @close="closeRefund">
       <view class="refund-dialog-content">
@@ -154,6 +158,15 @@ const order_no = ref("");
 const loading = ref(false);
 const countdownText = ref("");
 let countdownTimer = null;
+
+// 动态主题色（基于 color_config）
+const themeColor = computed(() => detail.value.event_info?.color_config?.solid || '#FF8C00');
+const themeGradient = computed(() => {
+  const g = detail.value.event_info?.color_config?.gradient;
+  if (g?.length === 2) return `linear-gradient(135deg, ${g[0]}, ${g[1]})`;
+  return null;
+});
+const headerBg = computed(() => themeGradient.value || themeColor.value);
 
 // 分享配置
 useShare(() => ({
@@ -332,8 +345,11 @@ const getOrderDetail = () => {
         detail.value.sign_info_list = [];
       }
 
+      const eventApiPath = res.order_type === 'online_events'
+        ? `/event-api/online_events/${res.event_id}`
+        : `/event-api/api/v1/events/${res.event_id}`;
       request
-        .get(`/event-api/api/v1/events/${res.event_id}`)
+        .get(eventApiPath)
         .then((eventRes) => {
           detail.value.event_info = eventRes;
           // 事件信息加载后启动倒计时
@@ -411,7 +427,11 @@ const viewCertificate = (signInfo) => {
 };
 
 const viewEventDetail = () => {
-  uni.$u.route(`pagesSub/eventDetail?id=${detail.value.event_id}`);
+  if (detail.value.order_type === 'online_events') {
+    uni.$u.route(`pagesDashboard/pkEvent/pkEvent?id=${detail.value.event_id}`);
+  } else {
+    uni.$u.route(`pagesSub/eventDetail?id=${detail.value.event_id}`);
+  }
 };
 
 // 组件卸载时清除定时器
@@ -426,9 +446,10 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 .page {
   background: #fafafa;
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
 }
 .header {
+  // background 由内联样式动态设置（themeColor / themeGradient），此处仅做 fallback
   background: #ff8c00;
   width: 100%;
   padding: 42rpx 34rpx 142rpx 34rpx;
@@ -524,6 +545,12 @@ onUnmounted(() => {
 .refund {
   margin-top: 48rpx;
   padding: 0 54rpx;
+  .refund-free-tip {
+    font-size: 28rpx;
+    color: #999;
+    text-align: center;
+    padding: 26rpx 0;
+  }
   .refund-title {
     font-weight: 800;
     font-size: 32rpx;
@@ -535,17 +562,18 @@ onUnmounted(() => {
     font-size: 28rpx;
     color: #000000;
     line-height: 48rpx;
-    margin-bottom: 26rpx;
     .red {
       color: #e53935;
     }
   }
-  .refund-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 26rpx 0 44rpx 0;
-  }
+}
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 48rpx 54rpx;
+  z-index: 10;
 }
 .refund-dialog-content {
   padding: 48rpx 48rpx 24rpx 48rpx;

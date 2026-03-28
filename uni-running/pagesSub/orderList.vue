@@ -22,11 +22,12 @@
 
 		<!-- 内容区域 -->
 		<view class="content-wrapper"
+			:style="`padding-top: ${statusBarHeight + 50 + 60}px;`"
 			@touchstart="onTouchStart"
 			@touchend="handleTouchEnd">
 			<mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" :top="0">
 				<view class="order-list" :class="['list-transition', listAnimClass]">
-					<view class="order-item" v-for="(order, index) in filteredList" :key="order.order_no || index">
+					<view class="order-item" v-for="(order, index) in filteredList" :key="order.order_no || index" :style="getCardStyle(order)">
 						<view class="flex-between-center u-mb-20">
 							<view class="order-no flex-row" @click="setClipboardData(order.order_no)">
 								订单号:
@@ -76,7 +77,10 @@
 								<view class="c9 fs24">
 									创建时间:{{order.created_at}}
 								</view>
-								<view v-if="order.status == 'SUCC' && order.canRefund">
+								<view v-if="order.status == 'SUCC' && order.amount === 0">
+									<text class="c9 fs24">0元订单无法退款</text>
+								</view>
+								<view v-else-if="order.status == 'SUCC' && order.canRefund">
 									<!-- 申请退款 online_events 修改为联系客服办理 -->
 									<u-button v-if="order.order_type === 'online_events'" type="primary" open-type="contact" color="#FF8C00" customStyle="height: 50rpx;"
 										size="small" plain shape="circle">
@@ -185,6 +189,27 @@ watch(currentIndex, () => {
 const handleTouchEnd = (e) => {
 	onTouchEnd(e, tabList.value);
 };
+
+// 根据 color_config 生成卡片渐变背景 + 主题色阴影
+function getCardStyle(order) {
+	const cc = order.event_info?.color_config;
+	if (!cc) return {};
+	const hex2rgba = (hex, a) => {
+		const r = parseInt(hex.slice(1, 3), 16);
+		const g = parseInt(hex.slice(3, 5), 16);
+		const b = parseInt(hex.slice(5, 7), 16);
+		return `rgba(${r}, ${g}, ${b}, ${a})`;
+	};
+	const style = {};
+	const g = cc.gradient;
+	if (g?.length === 2) {
+		style.background = `linear-gradient(135deg, ${hex2rgba(g[0], 0.08)}, #ffffff 40%, #ffffff 60%, ${hex2rgba(g[1], 0.06)})`;
+		style.boxShadow = `0 2px 10px ${hex2rgba(g[0], 0.12)}, 0 1px 4px ${hex2rgba(g[1], 0.08)}`;
+	} else if (cc.solid) {
+		style.boxShadow = `0 2px 10px ${hex2rgba(cc.solid, 0.12)}`;
+	}
+	return style;
+}
 
 function setClipboardData(data) {
 	uni.setClipboardData({
@@ -393,7 +418,7 @@ defineOptions({
 }
 
 .content-wrapper {
-	padding-top: 260rpx;
+	// padding-top 由内联样式动态计算：statusBarHeight + 50 (navbar) + 60 (tab高度+间距)
 }
 
 .order-list {
