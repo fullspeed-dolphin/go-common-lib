@@ -76,8 +76,7 @@ const detail = ref({})
 const visitAmount = ref(0)
 function getDetail (){
 	uni.showLoading({ mask: true });
-	request.get(`/event-api/api/v1/events/${routeParams.value.event_id}`).then((res) => {
-		res.event_id = res.id
+	request.get(`/image-service/albums/detail`, { event_id: routeParams.value.event_id }).then((res) => {
 		res.event_time = res.event_time?.slice(0, 10)
 		detail.value = res
 
@@ -86,12 +85,10 @@ function getDetail (){
 			data: res
 		})
 	});
-	
+
 	request.post(`/image-service/albums/view/count?event_id=${routeParams.value.event_id}`).then((res) => {
 		visitAmount.value = res.view_count
 	});
-
-	
 }
 
 function addVistAmount() {

@@ -79,30 +79,24 @@
 		});
 
 		const params = {
-			pageIndex: mescroll.num - 1,
-			pageSize: 10,
+			page_index: mescroll.num - 1,
+			page_size: 10,
 			keyword: searchTxt.value
 		};
 
-		request.get(`/event-api/api/v1/events`, params).then((res) => {
+		request.get(`/image-service/albums/list`, params).then((res) => {
 				//如果是第一页需手动制空列表
 				if (mescroll.num == 1) dataList.value = []
 
-				res = res.events?.filter?.(item => item.id).map(item => {
-					return {
-						event_id: item.id,
-						name: item.name,
-						description: item.description,
-						image_url: item.image_url,
-						event_time: item.event_time?.slice(0, 10),
-						event_location: item.event_location
-					}
-				});
+				const list = (res.albums || []).map(item => ({
+					...item,
+					event_time: item.event_time?.slice(0, 10)
+				}));
 
-				dataList.value = dataList.value.concat(res)
+				dataList.value = dataList.value.concat(list)
 
 				//隐藏下拉刷新和上拉加载的状态;
-				mescroll.endSuccess(res.length);
+				mescroll.endSuccess(list.length);
 			})
 			.catch((error) => {
 				console.log(error)
