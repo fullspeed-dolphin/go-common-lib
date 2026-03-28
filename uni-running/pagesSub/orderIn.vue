@@ -649,20 +649,7 @@ const submitOrder = async () => {
 
     const tempList = orderNoList.filter((i) => !!i);
     if (tempList.length) {
-      if (totalPrice.value === 0) {
-        // 0 元报名：后端已直接设为 SUCC，跳过支付，提示成功
-        uni.hideLoading();
-        uni.showModal({
-          title: "报名成功",
-          content: "您已成功报名，无需支付",
-          showCancel: false,
-          success: () => {
-            uni.navigateBack();
-          },
-        });
-      } else {
-        payOrder(orderNoList);
-      }
+      payOrder(orderNoList);
     }
   } catch (e) {
     console.error(e);
@@ -758,7 +745,12 @@ const payOrder = async (reg_no) => {
   });
 
   request.post(`/pay/wechat/payment`, data).then((res) => {
-    wxPay(res);
+    if (res.free) {
+      uni.hideLoading();
+      uni.$u.route("pagesSub/orderSuccess?order_no=" + res.order_no);
+    } else {
+      wxPay(res);
+    }
   });
 };
 
