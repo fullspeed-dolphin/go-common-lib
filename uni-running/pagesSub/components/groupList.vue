@@ -69,15 +69,11 @@ const store = useStore();
 			content: "是否确认加入该跑团？",
 			success: (res) => {
 				if (res.confirm) {
-					const data = {
-						running_group: Number(item.group_id),
-					};
-
 					uni.showLoading({
 						mask: true
 					});
-					request.post(`/user-api/user/joinRunningGroup`, data)
-						.then(async (res) => {
+					request.post(`/running-group/api/v1/groups/join`, { group_id: Number(item.group_id) })
+						.then(async () => {
 							uni.hideLoading();
 							uni.$u.toast("加入成功！");
 
@@ -86,7 +82,8 @@ const store = useStore();
 							await store.dispatch("getUserInfo");
 
 							emit("success");
-						});
+						})
+						.catch(() => { uni.hideLoading(); });
 				} else if (res.cancel) {
 					console.log("用户点击取消");
 				}

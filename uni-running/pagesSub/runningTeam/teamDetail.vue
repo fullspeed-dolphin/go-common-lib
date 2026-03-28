@@ -118,6 +118,9 @@
             </view>
             <text class="rank-km">{{ formatKm(item.monthly_km || 0) }}</text>
           </view>
+          <view v-if="rankingHasMore" class="load-more" @click="getMonthlyRanking(true)">
+            <text class="load-more-text">加载更多</text>
+          </view>
           <view v-if="!rankedMembers.length" class="empty-hint">
             <text>暂无排行数据</text>
           </view>
@@ -183,6 +186,9 @@
             </view>
             <u-icon name="arrow-right" size="14" color="#D1D5DB"></u-icon>
           </view>
+          <view v-if="memberHasMore" class="load-more" @click="getMemberList(true)">
+            <text class="load-more-text">加载更多</text>
+          </view>
           <view v-if="!memberList.length && !memberLeader.id" class="empty-hint">
             <text>暂无成员</text>
           </view>
@@ -244,6 +250,7 @@ const onLoginSuccess = () => {
 };
 
 const isEmpty = ref(false);
+const pageLoading = ref(false);
 const detail = ref({});
 const routeParams = ref({});
 const eventList = ref([]);
@@ -300,6 +307,21 @@ const getCoverUrl = (item) => {
   return url;
 };
 
+// 统一加载所有数据
+const loadAllData = () => {
+  pageLoading.value = true;
+  uni.showLoading({ mask: true });
+  Promise.all([
+    getDetail(),
+    getEvents(),
+    getGroupStats(),
+    getMonthlyRanking(),
+  ]).finally(() => {
+    pageLoading.value = false;
+    uni.hideLoading();
+  });
+};
+
 onLoad((options) => {
   routeParams.value = options;
   if (!options.group_id || options.group_id === "null" || options.group_id === "undefined") {
@@ -307,10 +329,7 @@ onLoad((options) => {
     isEmpty.value = true;
     return;
   }
-  getDetail();
-  getEvents();
-  getGroupStats();
-  getMonthlyRanking();
+  loadAllData();
 
   // #ifdef MP-WEIXIN
   wx.showShareMenu({ withShareTicket: true, menus: ["shareAppMessage", "shareTimeline"] });
@@ -318,7 +337,9 @@ onLoad((options) => {
 });
 
 onUnload(() => {
-  uni.removeStorageSync("groupDetail");
+  if (routeParams.value.group_id) {
+    uni.removeStorageSync(`groupDetail_${routeParams.value.group_id}`);
+  }
 });
 
 onShow(() => {
@@ -328,9 +349,7 @@ onShow(() => {
     if (storeGroupId) {
       routeParams.value.group_id = storeGroupId;
       isEmpty.value = false;
-      getDetail();
-      getGroupStats();
-      getMonthlyRanking();
+      loadAllData();
     }
   }
 
@@ -339,66 +358,84 @@ onShow(() => {
     if (data.from === "mine" && data.group_id) {
       routeParams.value.group_id = data.group_id;
       isEmpty.value = false;
-      getDetail();
-      getGroupStats();
-      getMonthlyRanking();
+      loadAllData();
     }
   });
-  getEvents();
+  if (!isEmpty.value) getEvents();
 });
 
 const getDetail = () => {
-  const groupDetail = uni.getStorageSync("groupDetail");
+  const cacheKey = `groupDetail_${routeParams.value.group_id}`;
+  const groupDetail = uni.getStorageSync(cacheKey);
   if (groupDetail) detail.value = groupDetail;
 
-  uni.showLoading({ mask: true });
-  request.get(`/running-group/api/v1/groups/info?group_id=${routeParams.value.group_id}`)
+  return request.get(`/running-group/api/v1/groups/info?group_id=${routeParams.value.group_id}`)
     .then((res) => {
       res.establish_time = res.establish_time ? res.establish_time.slice(0, 10) : '';
       detail.value = res;
+      uni.setStorageSync(cacheKey, res);
       isEmpty.value = false;
       getMemberList();
-    });
+    })
+    .catch(() => {});
 };
 
-const getMemberList = () => {
-  const data = { pageIndex: 0, pageSize: 50, groupId: Number(detail.value.group_id) };
+const memberPageIndex = ref(0);
+const memberPageSize = 50;
+const memberHasMore = ref(false);
+
+const getMemberList = (loadMore = false) => {
+  if (loadMore) memberPageIndex.value++;
+  else memberPageIndex.value = 0;
+
+  const data = { pageIndex: memberPageIndex.value, pageSize: memberPageSize, groupId: Number(detail.value.group_id) };
   request.post(`/running-group/api/v1/groups/members`, data).then((res) => {
-    res = res.memberships || [];
-    allMembers.value = res;
-    memberLeader.value = res.find((i) => i.role === "creator") || {};
-    memberList.value = res.filter((i) => i.role !== "creator");
+    const list = res.memberships || [];
+    if (loadMore) {
+      allMembers.value = [...allMembers.value, ...list];
+    } else {
+      allMembers.value = list;
+    }
+    memberLeader.value = allMembers.value.find((i) => i.role === "creator") || {};
+    memberList.value = allMembers.value.filter((i) => i.role !== "creator");
+    memberHasMore.value = list.length >= memberPageSize;
   });
 };
 
 const getGroupStats = () => {
-  if (!routeParams.value.group_id) return;
-  request.get(`/sport-api/api/manual/group-sports-stats?group_id=${routeParams.value.group_id}`)
+  if (!routeParams.value.group_id) return Promise.resolve();
+  return request.get(`/sport-api/api/manual/group-sports-stats?group_id=${routeParams.value.group_id}`)
     .then((res) => { groupStats.value = res || {}; })
     .catch(() => {});
 };
 
-const getMonthlyRanking = () => {
-  if (!routeParams.value.group_id) return;
-  request.get(`/sport-api/api/manual/group-monthly-ranking?group_id=${routeParams.value.group_id}&page_size=50`)
-    .then((res) => { monthlyRanking.value = res?.list || []; })
+const rankingPageSize = 50;
+const rankingHasMore = ref(false);
+
+const getMonthlyRanking = (loadMore = false) => {
+  if (!routeParams.value.group_id) return Promise.resolve();
+  const offset = loadMore ? monthlyRanking.value.length : 0;
+  return request.get(`/sport-api/api/manual/group-monthly-ranking?group_id=${routeParams.value.group_id}&page_size=${rankingPageSize}&offset=${offset}`)
+    .then((res) => {
+      const list = res?.list || [];
+      if (loadMore) {
+        monthlyRanking.value = [...monthlyRanking.value, ...list];
+      } else {
+        monthlyRanking.value = list;
+      }
+      rankingHasMore.value = list.length >= rankingPageSize;
+    })
     .catch(() => {});
 };
 
 const getEvents = () => {
-  if (!routeParams.value.group_id) return;
-  request.get(`/event-api/fsc_events?fsc_id=${routeParams.value.group_id}&status=ACT`)
-    .then(async (res) => {
+  if (!routeParams.value.group_id) return Promise.resolve();
+  return request.get(`/event-api/fsc_events?fsc_id=${routeParams.value.group_id}&status=ACT`)
+    .then((res) => {
       const list = (res.fsc_events || []).filter(i => i.status !== 'DELETED');
+      // 后端已返回 registration_count，无需逐个请求
+      list.forEach((item) => { item._regCount = item.registration_count || 0; });
       eventList.value = list;
-      // 批量查询每个活动的报名人数
-      list.forEach((item) => {
-        request.get(`/booking-api/fsc_events/registration/list?event_id=${item.id}`)
-          .then((regRes) => {
-            item._regCount = regRes?.total || 0;
-            eventList.value = [...eventList.value]; // 触发响应式更新
-          }).catch(() => {});
-      });
     }).catch(() => {});
 };
 
@@ -413,8 +450,9 @@ const joinGroup = () => {
     success: (res) => {
       if (res.confirm) {
         uni.showLoading({ mask: true });
-        request.post(`/user-api/user/joinRunningGroup`, { running_group: Number(detail.value.group_id) })
-          .then(() => { uni.hideLoading(); getDetail(); uni.$u.toast("加入成功！"); });
+        request.post(`/running-group/api/v1/groups/join`, { group_id: Number(detail.value.group_id) })
+          .then(() => { uni.hideLoading(); store.dispatch("getUserInfo"); getDetail(); uni.$u.toast("加入成功！"); })
+          .catch(() => { uni.hideLoading(); });
       }
     },
   });
@@ -427,11 +465,14 @@ const leaveGroup = () => {
     success: (res) => {
       if (res.confirm) {
         uni.showLoading({ mask: true });
-        request.post(`/user-api/user/quitRunningGroup`).then(() => {
-          uni.$u.toast("操作成功！");
-          store.dispatch("getUserInfo");
-          getDetail();
-        });
+        request.post(`/running-group/api/v1/groups/leave`, { group_id: Number(detail.value.group_id) })
+          .then(() => {
+            uni.hideLoading();
+            uni.$u.toast("操作成功！");
+            store.dispatch("getUserInfo");
+            getDetail();
+          })
+          .catch(() => { uni.hideLoading(); });
       }
     },
   });
@@ -868,6 +909,14 @@ const showShareBtn = () => {
   color: #9CA3AF;
 }
 
+.load-more {
+  padding: 24rpx 0;
+  text-align: center;
+}
+.load-more-text {
+  font-size: 26rpx;
+  color: #FF8C00;
+}
 .empty-hint {
   padding: 80rpx 0;
   text-align: center;

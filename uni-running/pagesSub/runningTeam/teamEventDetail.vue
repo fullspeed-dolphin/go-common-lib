@@ -97,9 +97,11 @@
 
     <!-- 底部按钮 -->
     <view class="section-bottom">
-      <view class="btn-action" :class="{ 'btn-disabled': ['REJ','EXP'].includes(detail.status) || isRegistered }" @click="onActionClick()">
+      <view class="btn-action" :class="{ 'btn-disabled': ['REJ','EXP'].includes(detail.status) || isRegistered || isFull || !isRegistrationOpen }" @click="onActionClick()">
         <text class="btn-action-text">
           <block v-if="isRegistered">已报名</block>
+          <block v-else-if="isFull">报名已满</block>
+          <block v-else-if="!isRegistrationOpen">报名未开放</block>
           <block v-else-if="detail.status === 'ACT'">立即报名</block>
           <block v-else-if="detail.status === 'PND'">审核中</block>
           <block v-else-if="detail.status === 'EXP'">已过期</block>
@@ -161,10 +163,12 @@ import request from "@/utils/request.js";
 const store = useStore();
 const refPhoneLogin = ref(null);
 const detail = ref({});
+const rawDetail = ref({}); // 未格式化的原始数据，用于边界检查
 const fscInfo = ref(null);
 const routerParams = ref({});
 const activeTab = ref('intro');
 const isRegistered = ref(false);
+const isFull = ref(false);
 const showCertPopup = ref(false);
 const certForm = ref({ real_name: '', cert_type: 'CN_ID', cert_number: '' });
 const memberList = ref([]);
@@ -204,9 +208,14 @@ onLoad((options) => {
     });
   }
 
-  getDetail();
-  checkMyRegistration();
-  getRegistrationList();
+  uni.showLoading({ mask: true });
+  Promise.all([
+    getDetail(),
+    checkMyRegistration(),
+    getRegistrationList(),
+  ]).finally(() => {
+    uni.hideLoading();
+  });
 });
 
 onUnload(() => {
@@ -214,8 +223,7 @@ onUnload(() => {
 });
 
 const getDetail = () => {
-  uni.showLoading({ mask: true });
-  request.get(`/event-api/fsc_events/${routerParams.value.id}`)
+  return request.get(`/event-api/fsc_events/${routerParams.value.id}`)
     .then((res) => {
       // 长图
       if (res.long_image_url) {
@@ -235,6 +243,7 @@ const getDetail = () => {
       } catch (e) {}
 
       detail.value = res;
+      rawDetail.value = { ...res, event_time: isNaN(res.event_time) ? res.event_time : Number(res.event_time), registration_time: res.registration_time };
 
       // 获取跑团信息
       if (res.fsc_id) {
@@ -259,9 +268,14 @@ const previewImage = (idx) => {
 
 // 获取报名成员列表
 const getRegistrationList = () => {
-  request.get(`/booking-api/fsc_events/registration/list?event_id=${routerParams.value.id}`)
+  return request.get(`/booking-api/fsc_events/registration/list?event_id=${routerParams.value.id}`)
     .then((res) => {
       memberList.value = res?.registrations || [];
+      // 检查是否已满
+      const capacity = rawDetail.value.capacity;
+      if (capacity && capacity > 0 && memberList.value.length >= capacity) {
+        isFull.value = true;
+      }
     }).catch(() => {});
 };
 
@@ -272,12 +286,26 @@ const formatMemberTime = (time) => {
 
 // 查询我的报名状态
 const checkMyRegistration = () => {
-  if (!userInfo.value.id) return;
-  request.get(`/booking-api/fsc_events/registration/my?event_id=${routerParams.value.id}`)
+  if (!userInfo.value.id) return Promise.resolve();
+  return request.get(`/booking-api/fsc_events/registration/my?event_id=${routerParams.value.id}`)
     .then((res) => {
       isRegistered.value = res?.registered === true;
     }).catch(() => {});
 };
+
+// 检查报名时间窗口
+const isRegistrationOpen = computed(() => {
+  try {
+    const raw = rawDetail.value.registration_time;
+    if (!raw) return true; // 没有设置报名时间则默认开放
+    const list = JSON.parse(raw);
+    if (!Array.isArray(list) || list.length < 2) return true;
+    const now = dayjs();
+    return now.isAfter(dayjs(list[0])) && now.isBefore(dayjs(list[1]));
+  } catch (e) {
+    return true;
+  }
+});
 
 // 底部按钮点击
 const onActionClick = () => {
@@ -293,6 +321,18 @@ const onActionClick = () => {
   }
 
   if (detail.value.status !== 'ACT') return;
+
+  // 检查报名是否已满
+  if (isFull.value) {
+    uni.$u.toast('报名人数已满');
+    return;
+  }
+
+  // 检查报名时间窗口
+  if (!isRegistrationOpen.value) {
+    uni.$u.toast('不在报名时间范围内');
+    return;
+  }
 
   // 需要保险 → 弹窗输入证件
   if (detail.value.need_insurance && Number(detail.value.need_insurance) === 1) {
