@@ -1,15 +1,15 @@
 <template>
-	<up-popup :show="show" @close="close" closeable>
+	<up-popup :show="show" @close="close" closeable :customStyle="{ '--theme-color': color }">
 		<view class="flex-between-center" style="height: 100rpx;padding: 0 34rpx;">
 			<view class="" style="font-weight: bold;font-size: 30rpx;color: rgba(0,0,0,0.8);">AI找我</view>
 		</view>
 
 		<view class="section-tabs flex-center van-hairline--bottom" style="color: #999;">
-			<view class="flex-col-center flex-1" :class="{active: activeTab === 1}" @click="activeTab = 1">
+			<view class="flex-col-center flex-1" :class="{active: activeTab === 1}" :style="activeTab === 1 ? { color: color } : {}" @click="activeTab = 1">
 				<view class="iconfont icon-renlianguanli2" style="font-size: 38rpx;"></view>
 				人脸
 			</view>
-			<view class="flex-col-center flex-1" :class="{active: activeTab === 2}" @click="activeTab = 2">
+			<view class="flex-col-center flex-1" :class="{active: activeTab === 2}" :style="activeTab === 2 ? { color: color } : {}" @click="activeTab = 2">
 				<view class="iconfont icon-a-haomapai1" style="font-size: 38rpx;"></view>
 				号码牌
 			</view>
@@ -36,7 +36,7 @@
 						<text @click="isAgree = !isAgree">
 							<text class="u-ml-5">我已阅读并同意该</text>
 						</text>
-						<text style="color: #ff8c00"
+						<text :style="{ color: color }"
 							@click="$u.route('pagesSub/settings/agreement?type=faceScanPolicy')">《人脸识别使用条款》</text>
 					</view>
 				</section>
@@ -48,7 +48,7 @@
 
 					<u-button type="primary" :disabled="searchTxt.length < 2" @click="searcNumber()"
 						customStyle="width:146rpx;margin-left:16rpx;border-radius:16rpx;height: 92rpx;font-size:30rpx;"
-						color="#FF8C00">
+						:color="color">
 						搜索
 					</u-button>
 				</view>
@@ -106,8 +106,10 @@
 	const facePhoto = ref('');
 	
 	const event_id = ref('')
-	function open(eventid) {
+	const color = ref('#FF8C00')
+	function open(eventid, themeColor) {
 		event_id.value = eventid
+		if (themeColor) color.value = themeColor
 		console.log('open')
 		show.value = true;
 	}
@@ -290,18 +292,16 @@
 		margin-right: 18rpx;
 
 		.txt {
-			width: 60rpx;
+			width: 62rpx;
 			height: 28rpx;
 			font-family: PingFang SC, PingFang SC;
 			font-weight: 800;
 			font-size: 20rpx;
-			color: #FF8C00;
+			color: var(--theme-color, #FF8C00);
 			line-height: 28rpx;
 			text-align: center;
 			font-style: normal;
 			text-transform: none;
-			width: 62rpx;
-			height: 28rpx;
 			background: #FFFFFF;
 			border-radius: 0rpx 0rpx 0rpx 0rpx;
 		}
@@ -323,7 +323,6 @@
 	.section-tabs {
 		font-weight: bold;
 		font-size: 26rpx;
-		color: #FF8C00;
 		line-height: 48rpx;
 		padding-bottom: 32rpx;
 
@@ -334,7 +333,6 @@
 
 		.active {
 			position: relative;
-			color: #FF8C00;
 
 			&:before {
 				position: absolute;
@@ -344,7 +342,7 @@
 				content: "";
 				width: 50rpx;
 				height: 6rpx;
-				background: #FF8C00;
+				background: var(--theme-color, #FF8C00);
 				border-radius: 4rpx 4rpx 4rpx 4rpx;
 			}
 		}

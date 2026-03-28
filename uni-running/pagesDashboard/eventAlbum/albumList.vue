@@ -10,23 +10,29 @@
 			</view> -->
 		</section>
 		<mescroll-body @init="mescrollInit" @down="downCallback" @up="getList" top="0">
-			<view class="card-item bgf u-flex" v-for="item in dataList" :key="item.event_id" @click="viewDetail(item)">
-				<up-lazy-load class="img" borderRadius="16" :image="item.image_url + '?x-oss-process=image/resize,w_150,h_150,m_fill'" mode="aspectFill" />
-
-				<view class="card-content">
-					<view class="title ellipsis2">
-						{{item.description}}
+			<view class="card-list">
+				<view class="card-item" v-for="item in dataList" :key="item.event_id" :style="getCardStyle(item)" @click="viewDetail(item)">
+					<view class="card-banner">
+						<image class="banner-img"
+							:src="item.image_url + '?x-oss-process=image/resize,w_400/quality,q_75/format,webp'"
+							mode="widthFix" />
 					</view>
-					<view class="info-row">
-						<u-icon name="clock" size="14" />
-						<view class="info-text">
-							{{item.event_time}}
-						</view>
-					</view>
-					<view class="info-row">
-						<u-icon name="map" size="14" />
-						<view class="info-text ellipsis2">
-							{{item.event_location}}
+					<view class="card-body">
+						<view class="card-title ellipsis2">{{item.name}}</view>
+						<view class="card-desc ellipsis2" v-if="item.description && item.description !== item.name">{{item.description}}</view>
+						<view class="card-meta">
+							<view class="meta-item" v-if="item.event_time">
+								<u-icon name="clock" size="22rpx" color="#999" />
+								<text class="meta-text">{{item.event_time}}</text>
+							</view>
+							<view class="meta-item" v-if="item.event_location">
+								<u-icon name="map" size="22rpx" color="#999" />
+								<text class="meta-text">{{item.event_location}}</text>
+							</view>
+							<view class="meta-item" v-if="item.view_count">
+								<u-icon name="eye" size="22rpx" color="#999" />
+								<text class="meta-text">{{item.view_count}}</text>
+							</view>
 						</view>
 					</view>
 				</view>
@@ -51,6 +57,26 @@
 		title: '活动相册',
 		path: '/pagesDashboard/eventAlbum/albumList'
 	});
+
+	function getCardStyle(item) {
+		const cc = item.color_config
+		if (!cc) return {}
+		const hex2rgba = (hex, a) => {
+			const r = parseInt(hex.slice(1, 3), 16)
+			const g = parseInt(hex.slice(3, 5), 16)
+			const b = parseInt(hex.slice(5, 7), 16)
+			return `rgba(${r}, ${g}, ${b}, ${a})`
+		}
+		const style = {}
+		const g = cc.gradient
+		if (g?.length === 2) {
+			style.background = `linear-gradient(135deg, ${hex2rgba(g[0], 0.08)}, #ffffff 40%, #ffffff 60%, ${hex2rgba(g[1], 0.06)})`
+			style.boxShadow = `0 2px 10px ${hex2rgba(g[0], 0.12)}, 0 1px 4px ${hex2rgba(g[1], 0.08)}`
+		} else if (cc.solid) {
+			style.boxShadow = `0 2px 10px ${hex2rgba(cc.solid, 0.12)}`
+		}
+		return style
+	}
 
 	const searchTxt = ref("")
 
@@ -111,59 +137,66 @@
 		position: relative;
 		z-index: 10;
 		padding: 20rpx 34rpx;
-		background: #fafafa;
+		background: #f5f5f5;
 	}
 
-	.card-item{
-		width: 682rpx;
-		min-height: 200rpx;
-		border-radius: 16rpx;
-		padding: 28rpx 24rpx;
-		margin: 0rpx auto 30rpx;
-		align-items: flex-start;
+	.card-list {
+		padding: 24rpx 24rpx;
+	}
 
-		.img{
-			width: 160rpx;
-			height: 160rpx;
-			flex-shrink: 0;
+	.card-item {
+		background: #fff;
+		border-radius: 24rpx;
+		overflow: hidden;
+		margin-bottom: 32rpx;
+		border: 2rpx solid rgba(0, 0, 0, 0.06);
+
+		.card-banner {
+			width: 100%;
+			overflow: hidden;
+
+			.banner-img {
+				width: 100%;
+				display: block;
+			}
 		}
 
-		.card-content{
-			flex: 1;
-			margin-left: 24rpx;
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-			justify-content: flex-start;
-		}
+		.card-body {
+			padding: 20rpx 28rpx 24rpx;
 
-		.title{
-			font-weight: bold;
-			font-size: 32rpx;
-			color: #000;
-			line-height: 1.4;
-			margin-bottom: 16rpx;
-			text-align: left;
-		}
+			.card-title {
+				font-weight: 600;
+				font-size: 30rpx;
+				color: #1a1a1a;
+				line-height: 1.4;
+				text-align: left;
+			}
 
-		.info-row{
-			display: flex;
-			align-items: flex-start;
-			margin-top: 12rpx;
-			color: #979797;
-			font-size: 26rpx;
-			line-height: 1.4;
-			text-align: left;
-		}
+			.card-desc {
+				font-size: 24rpx;
+				color: #666;
+				line-height: 1.4;
+				margin-top: 8rpx;
+				text-align: left;
+			}
 
-		.info-text{
-			margin-left: 12rpx;
-			text-align: left;
-		}
+			.card-meta {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				margin-top: 16rpx;
+				gap: 24rpx;
 
-		::v-deep{
-			.u-icon--right{
-				align-items: flex-start;
+				.meta-item {
+					display: flex;
+					align-items: center;
+					gap: 6rpx;
+
+					.meta-text {
+						font-size: 22rpx;
+						color: #999;
+					}
+				}
 			}
 		}
 	}
