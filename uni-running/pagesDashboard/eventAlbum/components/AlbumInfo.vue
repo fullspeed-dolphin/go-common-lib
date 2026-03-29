@@ -2,7 +2,7 @@
 	<view class="AlbumInfo">
 		<u-navbar :title="detail.name" placeholder></u-navbar>
 		<section class="section-banner" :style="{ height: bannerHeight }">
-			<up-lazy-load class="img" :image="bannerSrc" :mode="bannerMode" :height="bannerHeight" />
+			<image class="img" :src="bannerSrc" :mode="bannerMode" :style="{ height: bannerHeight }" @load="onBannerLoad" />
 			<view v-if="album_total" class="summary">
 				<view class="item u-flex-y-center" :style="{ background: themeColor + 'CC' }">
 					<!-- displayType === 'photo' ? '照片' : '视频' -->
@@ -98,28 +98,24 @@ const MAX_HEIGHT = 600
 const bannerHeight = ref(MIN_HEIGHT + 'rpx')
 const bannerMode = ref('aspectFill')
 
+const cacheBuster = Date.now()
 const bannerSrc = computed(() => {
 	const url = detail.value.background_image_url || detail.value.image_url
-	return url ? url + '?x-oss-process=image/resize,w_600' : ''
+	return url ? url + `?x-oss-process=image/resize,w_600&t=${cacheBuster}` : ''
 })
 
-watch(bannerSrc, (src) => {
-	if (!src) return
-	uni.getImageInfo({
-		src,
-		success: (info) => {
-			const ratio = info.height / info.width
-			const h = Math.round(750 * ratio)
-			if (h <= MAX_HEIGHT) {
-				bannerHeight.value = Math.max(h, MIN_HEIGHT) + 'rpx'
-				bannerMode.value = 'widthFix'
-			} else {
-				bannerHeight.value = MAX_HEIGHT + 'rpx'
-				bannerMode.value = 'aspectFill'
-			}
-		}
-	})
-})
+function onBannerLoad(e) {
+	const { width, height } = e.detail
+	const ratio = height / width
+	const h = Math.round(750 * ratio)
+	if (h <= MAX_HEIGHT) {
+		bannerHeight.value = Math.max(h, MIN_HEIGHT) + 'rpx'
+		bannerMode.value = 'widthFix'
+	} else {
+		bannerHeight.value = MAX_HEIGHT + 'rpx'
+		bannerMode.value = 'aspectFill'
+	}
+}
 function getDetail (){
 	uni.showLoading({ mask: true });
 	request.get(`/image-service/albums/detail`, { event_id: routeParams.value.event_id }).then((res) => {

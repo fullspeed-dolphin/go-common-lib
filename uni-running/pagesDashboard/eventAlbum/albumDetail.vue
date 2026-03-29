@@ -105,9 +105,8 @@
 		title: album_info.value?.name
 			? `全速运动 - ${album_info.value.name} - 活动相册`
 			: '全速运动 - 活动相册',
-		path: buildPath('/pagesDashboard/eventAlbum/albumDetail', {
-			event_id: currentEvent.value.event_id,
-			name: album_info.value?.name || ''
+		path: buildPath('/pagesDashboard/eventAlbum/albumCover', {
+			event_id: currentEvent.value.event_id
 		}),
 		imageUrl: album_info.value?.image_url || album_info.value?.background_image_url || ''
 	}));

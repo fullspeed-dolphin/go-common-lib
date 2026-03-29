@@ -14,7 +14,7 @@
 				<view class="card-item" v-for="item in dataList" :key="item.event_id" :style="getCardStyle(item)" @click="viewDetail(item)">
 					<view class="card-banner">
 						<image class="banner-img"
-							:src="item.image_url + '?x-oss-process=image/resize,w_400/quality,q_75/format,webp'"
+							:src="item.image_url + '?x-oss-process=image/resize,w_400/quality,q_75/format,webp&t=' + cacheKey"
 							mode="widthFix" />
 					</view>
 					<view class="card-body">
@@ -49,6 +49,7 @@
 	import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 	const { mescrollInit, downCallback } = useMescroll(onPageScroll, onReachBottom)
 
+	const cacheKey = Date.now()
 	import request from "@/utils/request.js";
 	import { useShare } from "@/composables/useShare.js";
 

@@ -59,6 +59,7 @@
 				{ "path": "angelForm","style": { "navigationBarTitleText": "全速天使招募"} },
 				{ "path": "eventAlbum/albumList","style": { "navigationStyle": "custom","navigationBarTitleText": "活动相册"} },
 				{ "path": "eventAlbum/albumDetail","style": { "navigationBarTitleText": "详情", "navigationStyle": "custom"} },
+				{ "path": "eventAlbum/albumCover","style": { "navigationStyle": "custom" } },
 				{ "path": "eventAlbum/contractForm","style": { "navigationStyle": "custom","navigationBarTitleText": "入驻摄影师"} },
 				{ "path": "eventAlbum/faceSearchResult","style": { "navigationBarTitleText": "搜索结果", "navigationStyle": "custom"} },
 				{ "path": "pkEvent/pkEvent","style": { "navigationStyle": "custom", "navigationBarTitleText": "为爱奔跑520"} },
