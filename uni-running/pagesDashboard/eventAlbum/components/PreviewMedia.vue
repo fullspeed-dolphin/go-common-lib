@@ -2,7 +2,7 @@
 	<view class="PreviewMedia">
 		<up-popup :show="isShowModal" @close="close" overlayOpacity="0.9" bgColor="transparent" mode="center" closeable>
 			<view class="flex-center" style="height: 100vh;width:100vw">
-				<SwiperSection ref="refSwiper" :originIndex="originIndex" @loadingMore="loadingMore" v-if="isShowModal" />
+				<SwiperSection ref="refSwiper" :originIndex="originIndex" @loadingMore="loadingMore" @close="close" v-if="isShowModal" />
 			</view>
 		</up-popup>
 	</view>

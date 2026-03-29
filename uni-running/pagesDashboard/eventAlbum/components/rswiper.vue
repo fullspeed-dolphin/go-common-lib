@@ -1,5 +1,9 @@
 <template>
-  <view class="SwiperSection">
+  <view class="SwiperSection" :style="{
+    transform: `translateY(${pullDownY}px)`,
+    opacity: pullDownOpacity,
+    transition: isPullingDown ? 'none' : 'transform 0.3s ease, opacity 0.3s ease'
+  }">
 
     <!-- 三图滑动模式：实现跟手滑动效果 -->
     <view
@@ -18,23 +22,22 @@
       >
         <!-- 上一张 -->
         <view class="slide" :style="{ width: screenWidth + 'px' }">
-          <image
-            v-if="prevImage.url750"
-            class="slide-image"
-            :src="prevImage.url750"
-            mode="widthFix"
-          />
+          <view v-if="prevImage.url750" class="slide-img-wrap">
+            <image class="slide-image slide-image--blur" :src="prevImage.urlTiny" mode="widthFix" />
+            <image class="slide-image slide-image--main" :class="{ 'is-loaded': prevLoaded }"
+              :src="prevImage.url750" mode="widthFix" @load="prevLoaded = true" />
+          </view>
         </view>
 
         <!-- 当前（支持缩放） -->
         <view class="slide" :style="{ width: screenWidth + 'px' }">
-          <movable-area :key="'ma-' + originIndex + '-' + movableKey" class="movable-area" scale-area>
+          <movable-area class="movable-area" scale-area>
             <movable-view
               class="movable-view"
               direction="all"
               :inertia="true"
-              :damping="50"
-              :friction="2"
+              :damping="20"
+              :friction="1"
               :scale="true"
               :scale-min="1"
               :scale-max="4"
@@ -42,31 +45,31 @@
               :x="moveX"
               :y="moveY"
               @scale="onScale"
+              @change="onMoveChange"
             >
-                <image
-                  v-if="lookIdStatus"
-                  class="slide-image"
-                  :src="currentImage.url"
-                  mode="widthFix"
-                />
-                <image
-                v-else
-                  class="slide-image"
-                  :src="currentImage.url750"
-                  mode="widthFix"
-                />
+              <view class="slide-img-wrap">
+                <image class="slide-image slide-image--blur" :src="currentImage.urlTiny" mode="widthFix" />
+                <image v-if="lookIdStatus"
+                  class="slide-image slide-image--main" :class="{ 'is-loaded': currentLoaded }"
+                  :src="currentImage.url" mode="widthFix" @load="currentLoaded = true" />
+                <image v-else
+                  class="slide-image slide-image--main" :class="{ 'is-loaded': currentLoaded }"
+                  :src="currentImage.url750" mode="widthFix" @load="currentLoaded = true" />
+                <view v-if="!currentLoaded" class="hd-loading">
+                  <up-loading-icon size="20" color="#fff" />
+                </view>
+              </view>
             </movable-view>
           </movable-area>
         </view>
 
         <!-- 下一张 -->
         <view class="slide" :style="{ width: screenWidth + 'px' }">
-          <image
-            v-if="nextImage.url750"
-            class="slide-image"
-            :src="nextImage.url750"
-            mode="widthFix"
-          />
+          <view v-if="nextImage.url750" class="slide-img-wrap">
+            <image class="slide-image slide-image--blur" :src="nextImage.urlTiny" mode="widthFix" />
+            <image class="slide-image slide-image--main" :class="{ 'is-loaded': nextLoaded }"
+              :src="nextImage.url750" mode="widthFix" @load="nextLoaded = true" />
+          </view>
         </view>
       </view>
     </view>
@@ -80,12 +83,40 @@
         </up-button>
       </div>
 
-      <view class="section-slider">
-        <xzsliderrange v-model="originIndexArr" solo :decoration="false" @move="sliderChange" :size="30" height="2px"
-					@touchEnd="changeSlideEnd"
-          activeBgc="rgb(0, 122, 255)" :max="Number(originList.length - 1 || 0)" :min="0" :total="Number(album_total || 0)"
-          hintColor="#fff" @showNum="e => isShowAmount = e" />
-        <view class="title" :style="{ opacity: !isShowAmount ? 0 : 1 }">
+      <!-- 缩略图导航条 -->
+      <view class="thumb-strip">
+        <view
+          class="thumb-viewport"
+          @touchstart.stop="onThumbTouchStart"
+          @touchmove.stop="onThumbTouchMove"
+          @touchend.stop="onThumbTouchEnd"
+        >
+          <!-- 固定在中央的选中指示框，用 JS 定位确保和缩略图对齐 -->
+          <view class="thumb-gate" :style="{ left: (screenWidth / 2 - 22) + 'px' }"></view>
+          <view
+            class="thumb-list"
+            :style="{
+              transform: `translate3d(${thumbOffset}px, 0, 0)`,
+              transition: isThumbDragging ? 'none' : isThumbCoasting ? 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'transform 0.3s ease'
+            }"
+          >
+            <view
+              v-for="(item, idx) in originList"
+              :key="idx"
+              class="thumb-item"
+              :class="{ 'thumb-item--active': idx === originIndex }"
+              @tap="onThumbTap(idx)"
+            >
+              <image
+                class="thumb-img"
+                :src="item + '?x-oss-process=image/resize,w_250/quality,q_80/format,webp'"
+                mode="aspectFill"
+                lazy-load
+              />
+            </view>
+          </view>
+        </view>
+        <view class="title">
           {{ originIndex + 1 }}
           <text class="c9">/{{ originList.length }}(总{{ album_total }})</text>
         </view>
@@ -116,7 +147,6 @@
 </template>
 
 <script setup>
-import xzsliderrange from "./xz-slider-range/xz-slider-range.vue"
 import SharePoster from "./SharePoster.vue"
 import request from "@/utils/request.js"
 import {
@@ -150,17 +180,32 @@ const props = defineProps({
   }
 })
 
-const emits = defineEmits(['loadingMore'])
+const emits = defineEmits(['loadingMore', 'close'])
 
 // ==================== 基础状态 ====================
 const originList = ref([])
 const originIndex = ref(0)
 const originIndexArr = ref([0])
 const isloading = ref(false)
-const isShowAmount = ref(false)
 const isAlbumComplete = ref(false)
 // ==========查看高清图状态 ========
 const lookIdStatus = ref(false)
+// ==========blur-up 加载状态 ========
+const prevLoaded = ref(false)
+const currentLoaded = ref(false)
+const nextLoaded = ref(false)
+// ==========缩略图导航条 ========
+const THUMB_W = 40     // 缩略图宽度(px)
+const THUMB_GAP = 4    // 缩略图间距(px)
+const THUMB_STEP = THUMB_W + THUMB_GAP // 44, 每张缩略图占位
+const thumbOffset = ref(0) // 缩略图列表的 translateX
+const isThumbDragging = ref(false)
+const isThumbCoasting = ref(false) // 惯性滑动中
+const thumbTouchStartX = ref(0)
+const thumbStartOffset = ref(0)
+const thumbLastX = ref(0)
+const thumbLastTime = ref(0)
+const thumbVelocity = ref(0)
 // ==================== 屏幕宽度 ====================
 const screenWidth = ref(375)
 function updateScreenWidth() {
@@ -179,7 +224,6 @@ const currentScaleValue = ref(1)
 const moveX = ref(0)
 const moveY = ref(0)
 const isZoomed = computed(() => currentScaleValue.value > 1.05)
-const movableKey = ref(0) // 用于强制重建 movable-area
 
 // ==================== 滑动状态 ====================
 const translateX = ref(-screenWidth.value) // 初始位置：显示中间那张
@@ -191,15 +235,22 @@ const touchCurrentX = ref(0)
 const lastTapTime = ref(0)
 const isSwiping = ref(false)
 const touchCount = ref(0)
+// ==========下滑关闭 ========
+const isPullingDown = ref(false)
+const pullDownY = ref(0)
+const pullDownOpacity = ref(1)
 
 // ==================== 图片数据 ====================
 function getImageData(index) {
   const url = originList.value[index] || ''
-  if (!url) return { url: '', url750: '', height: '500rpx' }
+  if (!url) return { url: '', url750: '', urlTiny: '', urlThumb: '', height: '500rpx' }
 
+  // url250 和详情页网格用同一个 URL，直接命中缓存
+  const url250 = url + '?x-oss-process=image/resize,w_250/quality,q_80/format,webp'
   return {
     url: url,
     url750: url + '?x-oss-process=image/resize,w_750/quality,q_80/format,webp',
+    urlTiny: url250,
     height: getPhotoHeight(url)
   }
 }
@@ -228,6 +279,8 @@ watch(
     originIndexArr.value[0] = originIndex.value;
     // 重置位置
     translateX.value = -screenWidth.value
+    // 首次进入时定位缩略图条到当前图片
+    updateThumbScroll()
   },
   { immediate: true }
 );
@@ -240,25 +293,22 @@ watch(
 watch(
   () => originIndex.value,
   () => {
-    // 第一步：重置缩放
-    scaleValue.value = 1
-    currentScaleValue.value = 1
-
-    // 第二步：强制触发位置更新（先设置非零值，再设为0）
-    // Vue 会优化掉"相同值"的更新，原生组件不会收到信号
-    moveX.value = 0.001
-    moveY.value = 0.001
-
-    // 第三步：延迟后设回 0，确保原生组件有时间处理
-    setTimeout(() => {
-      moveX.value = 0
-      moveY.value = 0
-    }, 16)
-
-    // 第四步：强制重建 movable-area（双保险）
-    movableKey.value++
+    // 缩略图条自动居中
+    updateThumbScroll()
   }
 );
+
+function resetMovable() {
+  scaleValue.value = 1
+  currentScaleValue.value = 1
+  // 先设非零值强制 Vue 检测到变化，再归零
+  moveX.value = 0.01
+  moveY.value = 0.01
+  nextTick(() => {
+    moveX.value = 0
+    moveY.value = 0
+  })
+}
 
 // ==================== 手势处理 ====================
 function onTouchStart(e) {
@@ -281,8 +331,8 @@ function onTouchStart(e) {
 }
 
 function onTouchMove(e) {
-  // 多指触摸或缩放状态，不处理滑动
-  if (e.touches.length > 1 || isZoomed.value || !isSwiping.value) {
+  // 多指触摸或缩放状态，不处理
+  if (e.touches.length > 1 || isZoomed.value) {
     return
   }
 
@@ -291,27 +341,43 @@ function onTouchMove(e) {
   const deltaX = currentX - touchStartX.value
   const deltaY = currentY - touchStartY.value
 
-  // 判断是否是水平滑动
-  if (Math.abs(deltaX) < Math.abs(deltaY) && Math.abs(deltaY) > 10) {
-    // 垂直滑动，不处理
-    isSwiping.value = false
+  // 已经进入下拉模式，跟手
+  if (isPullingDown.value) {
+    const dy = Math.max(0, deltaY)
+    pullDownY.value = dy
+    pullDownOpacity.value = Math.max(0.3, 1 - dy / 400)
+    return
+  }
+
+  // 尚未确定方向
+  if (!isSwiping.value && !isPullingDown.value) return
+
+  // 首次判断方向
+  if (isSwiping.value && Math.abs(deltaX) < Math.abs(deltaY) && Math.abs(deltaY) > 10) {
+    if (deltaY > 0) {
+      // 下滑 → 进入下拉关闭模式
+      isSwiping.value = false
+      isPullingDown.value = true
+      pullDownY.value = deltaY
+      pullDownOpacity.value = Math.max(0.3, 1 - deltaY / 400)
+    } else {
+      // 上滑，忽略
+      isSwiping.value = false
+    }
     return
   }
 
   touchCurrentX.value = currentX
 
-  // 计算位移，添加边界阻尼效果
+  // 水平滑动：切换图片
   let newTranslateX = -screenWidth.value + deltaX
 
-  // 边界阻尼：第一张不能右滑，最后一张不能左滑
   const isFirstImage = originIndex.value <= 0
   const isLastImage = originIndex.value >= originList.value.length - 1
 
   if (isFirstImage && deltaX > 0) {
-    // 第一张，右滑添加阻尼
     newTranslateX = -screenWidth.value + deltaX * 0.3
   } else if (isLastImage && deltaX < 0) {
-    // 最后一张，左滑添加阻尼
     newTranslateX = -screenWidth.value + deltaX * 0.3
   }
 
@@ -320,6 +386,18 @@ function onTouchMove(e) {
 
 function onTouchEnd(e) {
   const now = Date.now()
+
+  // 下拉关闭判断
+  if (isPullingDown.value) {
+    isPullingDown.value = false
+    if (pullDownY.value > 120) {
+      emits('close')
+    } else {
+      pullDownY.value = 0
+      pullDownOpacity.value = 1
+    }
+    return
+  }
 
   // 检测双击（仅在非滑动时）
   const deltaX = touchCurrentX.value - touchStartX.value
@@ -374,6 +452,16 @@ function onDoubleTap() {
 
 function onScale(e) {
   currentScaleValue.value = e.detail.scale
+  // 缩放回正常大小时，自动归位
+  if (e.detail.scale <= 1.05 && (moveX.value !== 0 || moveY.value !== 0)) {
+    moveX.value = 0
+    moveY.value = 0
+  }
+}
+
+function onMoveChange(e) {
+  moveX.value = e.detail.x
+  moveY.value = e.detail.y
 }
 
 // ==================== 图片切换 ====================
@@ -383,13 +471,16 @@ function goToPrev() {
     return
   }
 
-  // 播放滑动动画
   isAnimating.value = true
   translateX.value = 0
 
   setTimeout(() => {
     isAnimating.value = false
-    // 更新 index，watch 会自动重置缩放状态，movable-area 会因为 key 变化而重建
+    resetMovable()
+    // 向前切：旧 prev 已加载 → 新 current，旧 current → 新 next
+    nextLoaded.value = currentLoaded.value
+    currentLoaded.value = prevLoaded.value
+    prevLoaded.value = false
     originIndex.value--
     originIndexArr.value[0] = originIndex.value
     translateX.value = -screenWidth.value
@@ -430,13 +521,16 @@ function goToNext() {
     isloading.value = true
   }
 
-  // 播放滑动动画
   isAnimating.value = true
   translateX.value = -screenWidth.value * 2
 
   setTimeout(() => {
     isAnimating.value = false
-    // 更新 index，watch 会自动重置缩放状态，movable-area 会因为 key 变化而重建
+    resetMovable()
+    // 向后切：旧 next 已加载 → 新 current，旧 current → 新 prev
+    prevLoaded.value = currentLoaded.value
+    currentLoaded.value = nextLoaded.value
+    nextLoaded.value = false
     originIndex.value++
     originIndexArr.value[0] = originIndex.value
     translateX.value = -screenWidth.value
@@ -452,39 +546,121 @@ function snapBack() {
   }, 300)
 }
 
-function changeSlideEnd() {
-	
-}
-// ==================== 滑块控制 ====================
-const sliderChange = (e) => {
-  if (originIndex.value === e[0]) return;
+// ==================== 缩略图导航 ====================
+// item N 的中心 = thumbOffset + N * THUMB_STEP + THUMB_W / 2
 
-  // 更新 index，watch 会自动重置缩放状态
-  originIndex.value = e[0];
+function offsetForIndex(idx) {
+  return screenWidth.value / 2 - idx * THUMB_STEP - THUMB_W / 2
+}
+
+function indexAtCenter() {
+  const raw = (screenWidth.value / 2 - thumbOffset.value - THUMB_W / 2) / THUMB_STEP
+  return Math.max(0, Math.min(originList.value.length - 1, Math.round(raw)))
+}
+
+function clampOffset(val) {
+  const maxOff = offsetForIndex(0)
+  const minOff = offsetForIndex(originList.value.length - 1)
+  return Math.max(minOff, Math.min(maxOff, val))
+}
+
+function updateThumbScroll() {
+  thumbOffset.value = clampOffset(offsetForIndex(originIndex.value))
+}
+
+function switchToIndex(idx) {
+  if (idx < 0 || idx >= originList.value.length || idx === originIndex.value) return
+  resetMovable()
+  prevLoaded.value = false
+  currentLoaded.value = false
+  nextLoaded.value = false
+  originIndex.value = idx
+  originIndexArr.value[0] = idx
   translateX.value = -screenWidth.value
-  addViewCount()
   lookIdStatus.value = false
+}
+
+function triggerLoadIfNeeded() {
   const totalCount = Number(album_total.value) || 0
   const isAllLoaded = totalCount === 0 || originList.value.length >= totalCount
-
-  if (originIndex.value >= originList.value.length - 1 && isAllLoaded) {
-    if (!isAlbumComplete.value) {
-      isAlbumComplete.value = true
-      uni.showModal({
-        title: '提示',
-        content: '当前相册已经全部浏览完成',
-        showCancel: false,
-        confirmText: '知道了'
-      })
-    }
-    return;
-  }
-
   if (originIndex.value + 6 > originList.value.length && !isAllLoaded && !isloading.value) {
-    emits("loadingMore", originIndex.value);
-    isloading.value = true;
+    emits('loadingMore', originIndex.value)
+    isloading.value = true
   }
-};
+}
+
+function onThumbTap(idx) {
+  switchToIndex(idx)
+  addViewCount()
+  triggerLoadIfNeeded()
+}
+
+function onThumbTouchStart(e) {
+  isThumbDragging.value = true
+  isThumbCoasting.value = false
+  const x = e.touches[0].clientX
+  thumbTouchStartX.value = x
+  thumbStartOffset.value = thumbOffset.value
+  thumbLastX.value = x
+  thumbLastTime.value = Date.now()
+  thumbVelocity.value = 0
+}
+
+function onThumbTouchMove(e) {
+  if (!isThumbDragging.value) return
+  const x = e.touches[0].clientX
+  const now = Date.now()
+  const dt = now - thumbLastTime.value
+  if (dt > 0) {
+    thumbVelocity.value = (x - thumbLastX.value) / dt // px/ms
+  }
+  thumbLastX.value = x
+  thumbLastTime.value = now
+
+  const deltaX = x - thumbTouchStartX.value
+  thumbOffset.value = clampOffset(thumbStartOffset.value + deltaX)
+
+  const idx = indexAtCenter()
+  switchToIndex(idx)
+}
+
+function onThumbTouchEnd(e) {
+  if (!isThumbDragging.value) return
+  isThumbDragging.value = false
+
+  const endX = e.changedTouches[0].clientX
+  const moved = Math.abs(endX - thumbTouchStartX.value)
+
+  if (moved < 5) {
+    const idx = Math.floor((endX - thumbOffset.value) / THUMB_STEP)
+    const clampedIdx = Math.max(0, Math.min(originList.value.length - 1, idx))
+    switchToIndex(clampedIdx)
+    thumbOffset.value = clampOffset(offsetForIndex(originIndex.value))
+    addViewCount()
+    triggerLoadIfNeeded()
+    return
+  }
+
+  // 惯性滑动：根据松手速度继续滑动
+  const v = thumbVelocity.value
+  const coast = v * 300 // 惯性距离
+  const targetOffset = clampOffset(thumbOffset.value + coast)
+  // 算出惯性终点处的 index，吸附到它
+  const tempOffset = targetOffset
+  const rawIdx = (screenWidth.value / 2 - tempOffset - THUMB_W / 2) / THUMB_STEP
+  const targetIdx = Math.max(0, Math.min(originList.value.length - 1, Math.round(rawIdx)))
+  const finalOffset = clampOffset(offsetForIndex(targetIdx))
+
+  isThumbCoasting.value = true
+  thumbOffset.value = finalOffset
+  switchToIndex(targetIdx)
+
+  setTimeout(() => {
+    isThumbCoasting.value = false
+    addViewCount()
+    triggerLoadIfNeeded()
+  }, 400)
+}
 
 // ==================== 工具函数 ====================
 function getPhotoHeight(url, targetWidth = 750) {
@@ -573,7 +749,7 @@ defineExpose({
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: #000;
+  background: transparent;
 }
 
 .slides-container {
@@ -597,10 +773,45 @@ defineExpose({
   overflow: hidden;
 }
 
+.slide-img-wrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
 .slide-image {
   width: 100%;
   max-height: 100vh;
   object-fit: contain;
+}
+
+.slide-image--blur {
+  // 使用详情页缓存的 w_250 图，无需模糊
+}
+
+.slide-image--main {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.slide-image--main.is-loaded {
+  opacity: 1;
+}
+
+.hd-loading {
+  position: absolute;
+  bottom: 20rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12rpx;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
 }
 
 .movable-area {
@@ -629,5 +840,56 @@ defineExpose({
   bottom: 10rpx;
   left: 0;
   z-index: 100;
+}
+
+.thumb-strip {
+  padding: 0 0 8rpx;
+  margin-top: 24rpx;
+}
+
+.thumb-viewport {
+  position: relative;
+  width: 100%;
+  height: 48px;
+  overflow: hidden;
+}
+
+.thumb-gate {
+  position: absolute;
+  top: 2px;
+  width: 44px;
+  height: 44px;
+  border: 2px solid #fff;
+  border-radius: 4px;
+  box-sizing: border-box;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.thumb-list {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 48px;
+  will-change: transform;
+}
+
+.thumb-item {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  overflow: hidden;
+  opacity: 0.8;
+  transition: opacity 0.15s ease;
+}
+
+.thumb-item--active {
+  opacity: 1;
+}
+
+.thumb-img {
+  width: 100%;
+  height: 100%;
 }
 </style>

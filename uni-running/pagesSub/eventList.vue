@@ -2,7 +2,7 @@
   <view class="page">
     <u-navbar autoBack placeholder title="活动列表" />
     <!-- 分类标签 -->
-    <view class="section-filter">
+    <view class="section-filter" :style="{ top: (statusBarHeight + 44) + 'px' }">
       <view class="category-tags">
         <view class="tags-inner">
           <view class="tag-slider" :style="getSliderStyle()" :class="sliderAnimClass"></view>
@@ -14,7 +14,7 @@
     </view>
 
     <!-- 内容区域 -->
-    <view class="content-wrapper" @touchstart="onTouchStart" @touchend="onTouchEnd">
+    <view class="content-wrapper" :style="{ paddingTop: (statusBarHeight + 44 + 50) + 'px' }" @touchstart="onTouchStart" @touchend="onTouchEnd">
       <mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" :top="0">
         <view class="event-list" :class="['list-transition', listAnimationClass]">
           <view class="u-mb-20" v-for="(item, index) in filteredList" :key="index">
@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick } from "vue";
+import { ref, computed, nextTick, onMounted } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import { onPageScroll, onReachBottom } from "@dcloudio/uni-app";
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
@@ -49,6 +49,9 @@ import { useShare } from "@/composables/useShare.js";
 
 // 使用store
 const store = useStore();
+
+// 状态栏高度
+const statusBarHeight = ref(uni.getSystemInfoSync().statusBarHeight || 0);
 
 // 分享配置
 useShare({
@@ -254,7 +257,6 @@ onShow(() => {
 
 .section-filter {
   position: fixed;
-  top: 88px;
   width: 100%;
   z-index: 10;
   background: #f5f5f5;
@@ -308,7 +310,6 @@ onShow(() => {
 }
 
 .content-wrapper {
-  padding-top: 100rpx;
 }
 
 .event-list {
