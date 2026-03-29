@@ -19,10 +19,10 @@
           </view>
         </template>
         <template v-else>
-          <u-button v-if="deviceInfo.platform === 'garmin'" type="primary" color="#FF8C00" shape="circle" @click="refCommonDialog.open()">立即绑定</u-button>
+          <u-button v-if="deviceInfo.platform === 'gaochi'" type="primary" color="#FF8C00" shape="circle" @click="refCommonDialog.open()">立即绑定</u-button>
+          <u-button v-else-if="deviceInfo.platform === 'garmin'" type="primary" color="#FF8C00" shape="circle" @click="authGarminLogin">立即绑定</u-button>
           <u-button v-else type="primary" color="#FF8C00" shape="circle" @click="authHuaWeiLogin">立即绑定</u-button>
         </template>
-
       </view>
     </section>
 
@@ -83,11 +83,7 @@ onLoad((optons) => {
 
 onShow(() => {
   getDeviceData();
-  // 华为回调命中时即将跳走，不必再刷新列表
-  const handled = handleHuaweiCallback();
-  if (!handled) {
-    getDeviceData();
-  }
+  checkAuthCallback();
 });
 
 const deviceInfo = ref({});
@@ -96,8 +92,6 @@ function getDeviceData() {
     mask: true,
   });
   request.get("/sport-api/api/platform/bindings").then((res) => {
-    console.log("设备列表====>", res);
-
     const imgMapping = {
       huawei:
         "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/华为运动健康@2x.png",
@@ -130,39 +124,86 @@ function getDeviceData() {
   });
 }
 
-const authParams = ref({})
-let handledCode = null;
-function handleHuaweiCallback() {
+/**
+ * 统一处理小程序回跳授权回调（华为 / Garmin）
+ * 用 localStorage 标记 pending 状态，避免每次 onShow 重复调用
+ */
+function checkAuthCallback() {
   try {
-    const enterOptions = wx.getEnterOptionsSync();
-    const extraData = enterOptions?.referrerInfo?.extraData;
-    if (!extraData?.code) return false;
+    const pendingAuth = uni.getStorageSync("pending_device_auth");
+    if (!pendingAuth) return;
 
-    // 同一个 code 只处理一次（getEnterOptionsSync 的结果在小程序生命周期内不会清除）
-    if (extraData.code === handledCode) return false;
-    handledCode = extraData.code;
+    const extraData = wx.getEnterOptionsSync()?.referrerInfo?.extraData;
+    if (!extraData) return;
 
-    const tempCode = extraData.code.replaceAll("+", "%2B");
-    request
-      .get("/sport-api/huawei/oauth/callback?code=" + tempCode + "&state=" + authParams.value.state + "&source=miniprogram")
-      .then(() => {
-        getDeviceData();
-      })
-      .catch((error) => {
-        console.log("华为回调失败", error);
-      });
-    return true;
-  } catch (e) {
-    // 非华为小程序返回场景，无 extraData，忽略即可
-    return false;
+    if (pendingAuth.platform === "huawei" && extraData.code) {
+      // 华为回调：extraData 包含 code
+      const tempCode = extraData.code.replaceAll("+", "%2B");
+      const state = pendingAuth.state || "";
+      uni.removeStorageSync("pending_device_auth");
+
+      request
+        .get("/sport-api/huawei/oauth/callback?code=" + tempCode + "&state=" + state + "&source=miniprogram")
+        .then(() => {
+          uni.$u.toast("华为绑定成功");
+          // 跳转到智能设备列表
+          setTimeout(() => {
+            // uni.$u.route({ type: "redirect", url: "/pagesSub/device/deviceList" });
+            getDeviceData();
+          }, 800);
+        })
+        .catch((error) => {
+          console.log("华为回调失败", error);
+          uni.$u.toast("绑定失败，请重试");
+        });
+    } else if (pendingAuth.platform === "garmin" && extraData.verifier) {
+      // Garmin 回调：extraData 包含 { token, verifier }
+      const token = extraData.token || pendingAuth.oauth_token || "";
+      const verifier = extraData.verifier;
+      uni.removeStorageSync("pending_device_auth");
+
+      let accessTokenUrl = "/sport-api/garmin/oauth/access-token?oauth_token=" + encodeURIComponent(token) + "&oauth_verifier=" + encodeURIComponent(verifier);
+      // #ifdef MP-WEIXIN
+      accessTokenUrl += "&source=miniprogram";
+      // #endif
+
+      request
+        .get(accessTokenUrl)
+        .then(() => {
+          uni.$u.toast("佳明绑定成功");
+          // 跳转到智能设备列表
+          setTimeout(() => {
+            // uni.$u.route({ type: "redirect", url: "/pagesSub/device/deviceList" });
+            getDeviceData();
+          }, 800);
+        })
+        .catch((error) => {
+          console.log("Garmin回调失败", error);
+          uni.$u.toast("绑定失败，请重试");
+        });
+    } else {
+      // extraData 不匹配当前 pending platform，忽略
+      console.log("回调数据不匹配", pendingAuth.platform, extraData);
+    }
+  } catch (error) {
+    console.log("checkAuthCallback error", error);
   }
 }
 
+/**
+ * 华为小程序授权绑定
+ */
 function authHuaWeiLogin() {
   request
     .get("/sport-api/huawei/oauth/miniprogram/authorize")
     .then((res) => {
-      authParams.value = res;
+      // 标记 pending 状态，存储 state 供回调使用
+      uni.setStorageSync("pending_device_auth", {
+        platform: "huawei",
+        state: res.state,
+        timestamp: Date.now(),
+      });
+
       wx.navigateToMiniProgram({
         appId: "wxa6c04f899577d944",
         path: "pages/authLogin/authLogin",
@@ -173,10 +214,59 @@ function authHuaWeiLogin() {
           state: res.state,
         },
       });
-      console.log("res====222==", res);
+      console.log("华为授权跳转", res);
     })
     .catch((error) => {
-      console.log("error==222", error);
+      console.log("华为授权请求失败", error);
+      uni.$u.toast("获取授权信息失败");
+    });
+}
+
+/**
+ * Garmin 小程序授权绑定（爱运动）
+ *
+ * 后端接口：GET /sport-api/garmin/oauth/miniprogram/authorize
+ * 返回：{ oauth_token: "794f1e55-6d93-496a-989a-708b6025a82d" }
+ *
+ * 跳转到 Garmin 爱运动小程序：
+ *   appId: wx50e8581d710d2480
+ *   path:  pages/authorization/index?token={oauth_token}
+ *
+ * 爱运动小程序授权完成后通过 navigateBackMiniProgram 返回：
+ *   extraData: { token: "原始oauth_token", verifier: "oauth_verifier" }
+ */
+function authGarminLogin() {
+  uni.showLoading({ mask: true });
+
+  request
+    .get("/sport-api/garmin/oauth/miniprogram/authorize")
+    .then((res) => {
+      uni.hideLoading();
+      console.log("Garmin miniprogram authorize 响应", res);
+
+      const requestToken = res.oauth_token;
+      if (!requestToken) {
+        uni.$u.toast("获取授权信息失败");
+        return;
+      }
+
+      // 标记 pending 状态，供回跳时 checkAuthCallback 使用
+      uni.setStorageSync("pending_device_auth", {
+        platform: "garmin",
+        oauth_token: requestToken,
+        timestamp: Date.now(),
+      });
+
+      wx.navigateToMiniProgram({
+        appId: "wx50e8581d710d2480",
+        path: "pages/authorization/index?token=" + requestToken,
+      });
+      console.log("Garmin 授权跳转, token:", requestToken);
+    })
+    .catch((error) => {
+      uni.hideLoading();
+      console.log("Garmin miniprogram request-token 请求失败", error);
+      uni.$u.toast("获取授权信息失败");
     });
 }
 
@@ -186,12 +276,16 @@ function copyAuthLink() {
   });
 
   const linkMapping = {
-    huawei: "/sport-api/huawei/oauth/authorize",
-    garmin: "/sport-api/garmin/oauth/request-token",
     gaochi: "/sport-api/gaochi/oauth/request-token",
   };
 
-  request.get(linkMapping[routerParams.value.platform]).then((res) => {
+  const apiPath = linkMapping[routerParams.value.platform];
+  if (!apiPath) {
+    uni.hideLoading();
+    return;
+  }
+
+  request.get(apiPath).then((res) => {
     console.log("res====>", res);
 
     uni.setClipboardData({
@@ -209,9 +303,17 @@ const confirmAsync = () => {
     title: "同步中...",
   });
 
-  setTimeout(() => {
+  if (deviceInfo.value.platform === 'huawei') {
+    request.get("/sport-api/huawei/sync/recent7days").then((res) => {
+      console.log("华为 同步====>", res);
+
     uni.$u.toast("同步成功");
-  }, 1300);
+    });
+  }
+
+  // setTimeout(() => {
+  //   uni.$u.toast("同步成功");
+  // }, 1300);
 };
 
 const unDevice = () => {
