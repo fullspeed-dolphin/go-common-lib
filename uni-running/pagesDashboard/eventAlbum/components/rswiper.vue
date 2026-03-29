@@ -31,36 +31,23 @@
 
         <!-- 当前（支持缩放） -->
         <view class="slide" :style="{ width: screenWidth + 'px' }">
-          <movable-area class="movable-area" scale-area>
-            <movable-view
-              class="movable-view"
-              direction="all"
-              :inertia="true"
-              :damping="20"
-              :friction="1"
-              :scale="true"
-              :scale-min="1"
-              :scale-max="4"
-              :scale-value="scaleValue"
-              :x="moveX"
-              :y="moveY"
-              @scale="onScale"
-              @change="onMoveChange"
-            >
-              <view class="slide-img-wrap">
-                <image class="slide-image slide-image--blur" :src="currentImage.urlTiny" mode="widthFix" />
-                <image v-if="lookIdStatus"
-                  class="slide-image slide-image--main" :class="{ 'is-loaded': currentLoaded }"
-                  :src="currentImage.url" mode="widthFix" @load="currentLoaded = true" />
-                <image v-else
-                  class="slide-image slide-image--main" :class="{ 'is-loaded': currentLoaded }"
-                  :src="currentImage.url750" mode="widthFix" @load="currentLoaded = true" />
-                <view v-if="!currentLoaded" class="hd-loading">
-                  <up-loading-icon size="20" color="#fff" />
-                </view>
+          <view class="zoom-container" :style="{
+            transform: `translate(${panX}px, ${panY}px) scale(${zoomScale})`,
+            transition: isZoomAnimating ? 'transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)' : 'none'
+          }">
+            <view class="slide-img-wrap">
+              <image class="slide-image slide-image--blur" :src="currentImage.urlTiny" mode="widthFix" />
+              <image v-if="lookIdStatus"
+                class="slide-image slide-image--main" :class="{ 'is-loaded': currentLoaded }"
+                :src="currentImage.url" mode="widthFix" @load="currentLoaded = true" />
+              <image v-else
+                class="slide-image slide-image--main" :class="{ 'is-loaded': currentLoaded }"
+                :src="currentImage.url750" mode="widthFix" @load="currentLoaded = true" />
+              <view v-if="!currentLoaded" class="hd-loading">
+                <up-loading-icon size="20" color="#fff" />
               </view>
-            </movable-view>
-          </movable-area>
+            </view>
+          </view>
         </view>
 
         <!-- 下一张 -->
@@ -97,7 +84,7 @@
             class="thumb-list"
             :style="{
               transform: `translate3d(${thumbOffset}px, 0, 0)`,
-              transition: isThumbDragging ? 'none' : isThumbCoasting ? 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'transform 0.3s ease'
+              transition: isThumbDragging ? 'none' : isThumbCoasting ? 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'transform 0.3s ease'
             }"
           >
             <view
@@ -152,8 +139,7 @@ import request from "@/utils/request.js"
 import {
   ref,
   watch,
-  computed,
-  nextTick
+  computed
 } from 'vue';
 import { useStore } from "vuex";
 const store = useStore();
@@ -206,24 +192,38 @@ const thumbStartOffset = ref(0)
 const thumbLastX = ref(0)
 const thumbLastTime = ref(0)
 const thumbVelocity = ref(0)
-// ==================== 屏幕宽度 ====================
+// ==================== 屏幕尺寸 ====================
 const screenWidth = ref(375)
-function updateScreenWidth() {
+const screenHeight = ref(667)
+function updateScreenSize() {
   try {
     const sysInfo = uni.getSystemInfoSync()
     screenWidth.value = sysInfo.screenWidth || sysInfo.windowWidth || 375
+    screenHeight.value = sysInfo.screenHeight || sysInfo.windowHeight || 667
   } catch (e) {
     screenWidth.value = 375
+    screenHeight.value = 667
   }
 }
-updateScreenWidth()
+updateScreenSize()
 
-// ==================== 缩放状态 ====================
-const scaleValue = ref(1)
-const currentScaleValue = ref(1)
-const moveX = ref(0)
-const moveY = ref(0)
-const isZoomed = computed(() => currentScaleValue.value > 1.05)
+// ==================== 缩放状态（CSS transform 驱动） ====================
+const zoomScale = ref(1)
+const panX = ref(0)
+const panY = ref(0)
+const isZoomAnimating = ref(false)
+const isZoomed = computed(() => zoomScale.value > 1.05)
+
+// ==================== 手势状态机 ====================
+// 'none' | 'swipe' | 'pinch' | 'pan' | 'pulldown'
+const gestureMode = ref('none')
+const pinchStartDist = ref(0)
+const pinchStartScale = ref(1)
+const pinchStartPanX = ref(0)
+const pinchStartPanY = ref(0)
+const pinchStartMid = ref({ x: 0, y: 0 })
+let lastPanDeltaX = 0
+let lastPanDeltaY = 0
 
 // ==================== 滑动状态 ====================
 const translateX = ref(-screenWidth.value) // 初始位置：显示中间那张
@@ -233,7 +233,6 @@ const touchStartY = ref(0)
 const touchStartTime = ref(0)
 const touchCurrentX = ref(0)
 const lastTapTime = ref(0)
-const isSwiping = ref(false)
 const touchCount = ref(0)
 // ==========下滑关闭 ========
 const isPullingDown = ref(false)
@@ -285,110 +284,211 @@ watch(
   { immediate: true }
 );
 
-// ==================== 缩放状态自动重置 ====================
-// 当 originIndex 变化时，自动重置缩放状态
-// 问题：原生组件状态与 Vue 响应式系统不同步
-// 解决：1. 强制触发位置更新（先设非零值再设回0）
-//       2. 使用独立 key 强制重建 movable-area
+// ==================== originIndex watch ====================
 watch(
   () => originIndex.value,
   () => {
-    // 缩略图条自动居中
     updateThumbScroll()
   }
 );
 
+// ==================== 缩放重置 ====================
 function resetMovable() {
-  scaleValue.value = 1
-  currentScaleValue.value = 1
-  // 先设非零值强制 Vue 检测到变化，再归零
-  moveX.value = 0.01
-  moveY.value = 0.01
-  nextTick(() => {
-    moveX.value = 0
-    moveY.value = 0
-  })
+  zoomScale.value = 1
+  panX.value = 0
+  panY.value = 0
+  isZoomAnimating.value = false
+  gestureMode.value = 'none'
+}
+
+// ==================== 缩放辅助函数 ====================
+function getTouchDistance(t1, t2) {
+  const dx = t1.clientX - t2.clientX
+  const dy = t1.clientY - t2.clientY
+  return Math.sqrt(dx * dx + dy * dy)
+}
+
+function getTouchMidpoint(t1, t2) {
+  return {
+    x: (t1.clientX + t2.clientX) / 2,
+    y: (t1.clientY + t2.clientY) / 2
+  }
+}
+
+function clampVal(val, min, max) {
+  return Math.max(min, Math.min(max, val))
+}
+
+function getDisplayHeight() {
+  const url = currentImage.value.url || currentImage.value.url750 || ''
+  const filename = url.substring(url.lastIndexOf('/') + 1)
+  const wMatch = filename.match(/_w(\d+)/)
+  const hMatch = filename.match(/_h(\d+)/)
+  if (!wMatch || !hMatch) return screenWidth.value
+  const ratio = parseInt(hMatch[1]) / parseInt(wMatch[1])
+  return screenWidth.value * ratio
+}
+
+function maxPanX() {
+  return Math.max(0, (zoomScale.value * screenWidth.value - screenWidth.value) / 2)
+}
+
+function maxPanY() {
+  const imgH = getDisplayHeight()
+  return Math.max(0, (zoomScale.value * imgH - screenHeight.value) / 2)
 }
 
 // ==================== 手势处理 ====================
 function onTouchStart(e) {
-  touchCount.value = e.touches.length
+  const touches = e.touches
+  touchCount.value = touches.length
 
-  // 多指触摸或缩放状态，不处理滑动
-  if (touchCount.value > 1 || isZoomed.value) {
-    isSwiping.value = false
+  if (isAnimating.value) return
+
+  // 双指 → 捏合缩放
+  if (touches.length === 2) {
+    gestureMode.value = 'pinch'
+    isZoomAnimating.value = false
+    pinchStartDist.value = getTouchDistance(touches[0], touches[1])
+    pinchStartScale.value = zoomScale.value
+    pinchStartPanX.value = panX.value
+    pinchStartPanY.value = panY.value
+    pinchStartMid.value = getTouchMidpoint(touches[0], touches[1])
     return
   }
 
-  // 如果正在动画中，不响应
-  if (isAnimating.value) return
-
-  touchStartX.value = e.touches[0].clientX
-  touchStartY.value = e.touches[0].clientY
-  touchCurrentX.value = e.touches[0].clientX
+  // 单指
+  touchStartX.value = touches[0].clientX
+  touchStartY.value = touches[0].clientY
+  touchCurrentX.value = touches[0].clientX
   touchStartTime.value = Date.now()
-  isSwiping.value = true
+  lastPanDeltaX = 0
+  lastPanDeltaY = 0
+  if (gestureMode.value !== 'pinch') {
+    gestureMode.value = 'none'
+  }
 }
 
 function onTouchMove(e) {
-  // 多指触摸或缩放状态，不处理
-  if (e.touches.length > 1 || isZoomed.value) {
-    return
-  }
+  const touches = e.touches
 
-  const currentX = e.touches[0].clientX
-  const currentY = e.touches[0].clientY
-  const deltaX = currentX - touchStartX.value
-  const deltaY = currentY - touchStartY.value
-
-  // 已经进入下拉模式，跟手
-  if (isPullingDown.value) {
-    const dy = Math.max(0, deltaY)
-    pullDownY.value = dy
-    pullDownOpacity.value = Math.max(0.3, 1 - dy / 400)
-    return
-  }
-
-  // 尚未确定方向
-  if (!isSwiping.value && !isPullingDown.value) return
-
-  // 首次判断方向
-  if (isSwiping.value && Math.abs(deltaX) < Math.abs(deltaY) && Math.abs(deltaY) > 10) {
-    if (deltaY > 0) {
-      // 下滑 → 进入下拉关闭模式
-      isSwiping.value = false
-      isPullingDown.value = true
-      pullDownY.value = deltaY
-      pullDownOpacity.value = Math.max(0.3, 1 - deltaY / 400)
-    } else {
-      // 上滑，忽略
-      isSwiping.value = false
+  // ---- 捏合缩放 ----
+  if (gestureMode.value === 'pinch') {
+    if (touches.length === 2) {
+      const dist = getTouchDistance(touches[0], touches[1])
+      const ratio = dist / pinchStartDist.value
+      const newScale = clampVal(pinchStartScale.value * ratio, 0.5, 5)
+      zoomScale.value = newScale
+      // 补偿平移使中点稳定
+      const mid = getTouchMidpoint(touches[0], touches[1])
+      panX.value = pinchStartPanX.value + (mid.x - pinchStartMid.value.x)
+      panY.value = pinchStartPanY.value + (mid.y - pinchStartMid.value.y)
     }
     return
   }
 
-  touchCurrentX.value = currentX
+  const currentX = touches[0].clientX
+  const currentY = touches[0].clientY
+  const deltaX = currentX - touchStartX.value
+  const deltaY = currentY - touchStartY.value
 
-  // 水平滑动：切换图片
-  let newTranslateX = -screenWidth.value + deltaX
-
-  const isFirstImage = originIndex.value <= 0
-  const isLastImage = originIndex.value >= originList.value.length - 1
-
-  if (isFirstImage && deltaX > 0) {
-    newTranslateX = -screenWidth.value + deltaX * 0.3
-  } else if (isLastImage && deltaX < 0) {
-    newTranslateX = -screenWidth.value + deltaX * 0.3
+  // ---- 已锁定的手势 ----
+  if (gestureMode.value === 'pulldown') {
+    pullDownY.value = Math.max(0, deltaY)
+    pullDownOpacity.value = Math.max(0.3, 1 - Math.max(0, deltaY) / 400)
+    return
   }
 
-  translateX.value = newTranslateX
+  if (gestureMode.value === 'pan') {
+    const dx = deltaX - lastPanDeltaX
+    const dy = deltaY - lastPanDeltaY
+    lastPanDeltaX = deltaX
+    lastPanDeltaY = deltaY
+    panX.value = clampVal(panX.value + dx, -maxPanX(), maxPanX())
+    panY.value = clampVal(panY.value + dy, -maxPanY(), maxPanY())
+    return
+  }
+
+  if (gestureMode.value === 'swipe') {
+    touchCurrentX.value = currentX
+    let newTranslateX = -screenWidth.value + deltaX
+    const isFirst = originIndex.value <= 0
+    const isLast = originIndex.value >= originList.value.length - 1
+    if (isFirst && deltaX > 0) newTranslateX = -screenWidth.value + deltaX * 0.3
+    else if (isLast && deltaX < 0) newTranslateX = -screenWidth.value + deltaX * 0.3
+    translateX.value = newTranslateX
+    return
+  }
+
+  // ---- 首次判断方向（前 10px） ----
+  const absDX = Math.abs(deltaX)
+  const absDY = Math.abs(deltaY)
+  if (absDX < 10 && absDY < 10) return
+
+  if (isZoomed.value) {
+    // 缩放状态下的手势判断
+    if (absDX > absDY) {
+      // 水平：检查是否到边界
+      const atLeft = panX.value >= maxPanX() - 1
+      const atRight = panX.value <= -maxPanX() + 1
+      if ((deltaX > 0 && atLeft) || (deltaX < 0 && atRight)) {
+        gestureMode.value = 'swipe'
+        touchCurrentX.value = currentX
+      } else {
+        gestureMode.value = 'pan'
+        lastPanDeltaX = deltaX
+        lastPanDeltaY = deltaY
+      }
+    } else {
+      gestureMode.value = 'pan'
+      lastPanDeltaX = deltaX
+      lastPanDeltaY = deltaY
+    }
+  } else {
+    // 未缩放
+    if (absDX > absDY) {
+      gestureMode.value = 'swipe'
+      touchCurrentX.value = currentX
+    } else if (deltaY > 0) {
+      gestureMode.value = 'pulldown'
+      isPullingDown.value = true
+      pullDownY.value = deltaY
+      pullDownOpacity.value = Math.max(0.3, 1 - deltaY / 400)
+    }
+  }
 }
 
 function onTouchEnd(e) {
   const now = Date.now()
 
-  // 下拉关闭判断
-  if (isPullingDown.value) {
+  // ---- 捏合结束 ----
+  if (gestureMode.value === 'pinch') {
+    if (zoomScale.value < 1) {
+      isZoomAnimating.value = true
+      zoomScale.value = 1
+      panX.value = 0
+      panY.value = 0
+      setTimeout(() => { isZoomAnimating.value = false }, 300)
+    } else if (zoomScale.value > 4) {
+      isZoomAnimating.value = true
+      zoomScale.value = 4
+      setTimeout(() => { isZoomAnimating.value = false }, 300)
+    } else {
+      // 限制平移不超出边界
+      const mx = maxPanX(), my = maxPanY()
+      if (Math.abs(panX.value) > mx || Math.abs(panY.value) > my) {
+        isZoomAnimating.value = true
+        panX.value = clampVal(panX.value, -mx, mx)
+        panY.value = clampVal(panY.value, -my, my)
+        setTimeout(() => { isZoomAnimating.value = false }, 300)
+      }
+    }
+    gestureMode.value = 'none'
+    return
+  }
+
+  // ---- 下拉关闭 ----
+  if (gestureMode.value === 'pulldown') {
     isPullingDown.value = false
     if (pullDownY.value > 120) {
       emits('close')
@@ -396,72 +496,77 @@ function onTouchEnd(e) {
       pullDownY.value = 0
       pullDownOpacity.value = 1
     }
+    gestureMode.value = 'none'
     return
   }
 
-  // 检测双击（仅在非滑动时）
+  // ---- 双击检测 ----
   const deltaX = touchCurrentX.value - touchStartX.value
-  if (Math.abs(deltaX) < 10 && now - lastTapTime.value < 300 && touchCount.value === 1) {
+  if (gestureMode.value === 'none' && Math.abs(deltaX) < 10 && now - lastTapTime.value < 300 && touchCount.value === 1) {
     onDoubleTap()
     lastTapTime.value = 0
-    isSwiping.value = false
+    gestureMode.value = 'none'
     return
   }
   lastTapTime.value = now
 
-  // 缩放状态或非滑动状态，不处理
-  if (isZoomed.value || !isSwiping.value) {
-    isSwiping.value = false
+  // ---- 平移结束 ----
+  if (gestureMode.value === 'pan') {
+    const mx = maxPanX(), my = maxPanY()
+    if (Math.abs(panX.value) > mx || Math.abs(panY.value) > my) {
+      isZoomAnimating.value = true
+      panX.value = clampVal(panX.value, -mx, mx)
+      panY.value = clampVal(panY.value, -my, my)
+      setTimeout(() => { isZoomAnimating.value = false }, 300)
+    }
+    gestureMode.value = 'none'
     return
   }
 
-  isSwiping.value = false
+  // ---- 滑动切换 ----
+  if (gestureMode.value === 'swipe') {
+    const duration = now - touchStartTime.value
+    const velocity = deltaX / duration
+    const threshold = screenWidth.value * 0.2
+    const velocityThreshold = 0.3
 
-  const duration = now - touchStartTime.value
-  const velocity = deltaX / duration // px/ms
+    const shouldGoNext = (deltaX < -threshold || velocity < -velocityThreshold) && originIndex.value < originList.value.length - 1
+    const shouldGoPrev = (deltaX > threshold || velocity > velocityThreshold) && originIndex.value > 0
 
-  // 判断是否切换
-  const threshold = screenWidth.value * 0.2 // 滑动超过20%
-  const velocityThreshold = 0.3 // 速度阈值
-
-  const shouldGoNext = (deltaX < -threshold || velocity < -velocityThreshold) && originIndex.value < originList.value.length - 1
-  const shouldGoPrev = (deltaX > threshold || velocity > velocityThreshold) && originIndex.value > 0
-
-  if (shouldGoNext) {
-    lookIdStatus.value = false
-    goToNext()
-  } else if (shouldGoPrev) {
-    lookIdStatus.value = false
-    goToPrev()
-  } else {
-    // 回弹到原位
-    snapBack()
+    if (shouldGoNext) {
+      lookIdStatus.value = false
+      goToNext()
+    } else if (shouldGoPrev) {
+      lookIdStatus.value = false
+      goToPrev()
+    } else {
+      snapBack()
+    }
+    gestureMode.value = 'none'
+    return
   }
+
+  gestureMode.value = 'none'
 }
 
 // ==================== 双击缩放 ====================
 function onDoubleTap() {
-  if (currentScaleValue.value > 1.05) {
-    scaleValue.value = 1
-    moveX.value = 0
-    moveY.value = 0
+  isZoomAnimating.value = true
+  if (zoomScale.value > 1.05) {
+    zoomScale.value = 1
+    panX.value = 0
+    panY.value = 0
   } else {
-    scaleValue.value = 2
+    // 以点击位置为中心放大到 2x
+    const tapX = touchStartX.value
+    const tapY = touchStartY.value
+    const centerX = screenWidth.value / 2
+    const centerY = screenHeight.value / 2
+    zoomScale.value = 2
+    panX.value = (centerX - tapX)
+    panY.value = (centerY - tapY)
   }
-}
-
-function onScale(e) {
-  currentScaleValue.value = e.detail.scale
-  // 缩放回正常大小时，自动归位
-  if (e.detail.scale <= 1.05 && (moveX.value !== 0 || moveY.value !== 0)) {
-    moveX.value = 0
-    moveY.value = 0
-  }
-}
-
-function onMoveChange(e) {
-  moveX.value = e.detail.x
-  moveY.value = e.detail.y
+  setTimeout(() => { isZoomAnimating.value = false }, 300)
 }
 
 // ==================== 图片切换 ====================
@@ -643,7 +748,7 @@ function onThumbTouchEnd(e) {
 
   // 惯性滑动：根据松手速度继续滑动
   const v = thumbVelocity.value
-  const coast = v * 300 // 惯性距离
+  const coast = v * 600 // 惯性距离
   const targetOffset = clampOffset(thumbOffset.value + coast)
   // 算出惯性终点处的 index，吸附到它
   const tempOffset = targetOffset
@@ -659,7 +764,7 @@ function onThumbTouchEnd(e) {
     isThumbCoasting.value = false
     addViewCount()
     triggerLoadIfNeeded()
-  }, 400)
+  }, 600)
 }
 
 // ==================== 工具函数 ====================
@@ -814,17 +919,14 @@ defineExpose({
   border-radius: 50%;
 }
 
-.movable-area {
-  width: 100%;
-  height: 100%;
-}
-
-.movable-view {
+.zoom-container {
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  transform-origin: center center;
+  will-change: transform;
 }
 
 .title {
