@@ -13,7 +13,7 @@
     <section class="section-bottom">
       <view style="padding: 56rpx 54rpx 40rpx">
         <template v-if="deviceInfo.bound">
-          <u-button type="primary" shape="circle" @click="confirmAsync()">手动同步</u-button>
+          <u-button type="primary" shape="circle" @click="confirmAsync()">同步最近数据</u-button>
           <view class="u-mt-30">
             <u-button type="primary" shape="circle" color="#ccc" @click="unDevice()">解除绑定</u-button>
           </view>
@@ -22,7 +22,6 @@
           <u-button v-if="deviceInfo.platform === 'garmin'" type="primary" color="#FF8C00" shape="circle" @click="refCommonDialog.open()">立即绑定</u-button>
           <u-button v-else type="primary" color="#FF8C00" shape="circle" @click="authHuaWeiLogin">立即绑定</u-button>
         </template>
-
       </view>
     </section>
 
@@ -96,8 +95,6 @@ function getDeviceData() {
     mask: true,
   });
   request.get("/sport-api/api/platform/bindings").then((res) => {
-    console.log("设备列表====>", res);
-
     const imgMapping = {
       huawei:
         "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/华为运动健康@2x.png",
@@ -173,10 +170,9 @@ function authHuaWeiLogin() {
           state: res.state,
         },
       });
-      console.log("res====222==", res);
     })
     .catch((error) => {
-      console.log("error==222", error);
+      console.error(error);
     });
 }
 
@@ -209,9 +205,17 @@ const confirmAsync = () => {
     title: "同步中...",
   });
 
-  setTimeout(() => {
-    uni.$u.toast("同步成功");
-  }, 1300);
+  if (deviceInfo.value.platform === 'huawei') {
+    request.get("/sport-api/huawei/sync/recent7days").then((res) => {
+      console.log("华为 同步====>", res);
+
+      uni.$u.toast("同步成功");
+    });
+  }
+
+  // setTimeout(() => {
+  //   uni.$u.toast("同步成功");
+  // }, 1300);
 };
 
 const unDevice = () => {

@@ -1,6 +1,8 @@
 import { clearUserInfo} from "@/utils/util.js"
 import { baseLink } from "@/utils/config.js"
 
+console.log('baseLink======>', baseLink)
+
 function fetch(options) {
 	return new Promise((resolve, reject) => {
 		let url = options.url;
