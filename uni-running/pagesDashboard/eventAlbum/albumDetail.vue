@@ -12,8 +12,8 @@
 				<section class="section-tabs flex-between-center" :class="{isFixed: isShowBackTop}"
 					:style="{ top: addUnit(getPx('44px') + getWindowInfo().statusBarHeight,'px') }">
 					<view class="u-flex-row">
-						<view class="item" :class="{active: displayType === 'photo'}" @click="changeTab('photo')">照片</view>
-						<view class="item" :class="{active: displayType === 'video'}" @click="changeTab('video')">视频</view>
+						<view class="item" :class="{active: displayType === 'photo'}" :style="displayType === 'photo' ? {'--tab-color': themeColor} : {}" @click="changeTab('photo')">照片</view>
+						<view class="item" :class="{active: displayType === 'video'}" :style="displayType === 'video' ? {'--tab-color': themeColor} : {}" @click="changeTab('video')">视频</view>
 					</view>
 					<view class="">
 						<button class="share-btn flex-center" open-type="share">
@@ -41,7 +41,7 @@
 				
 				<block v-if="displayType === 'video'">
 					<view class="card-video" v-for="(item, index) in virtualList" :id="'zp-id-' + item.zp_index"
-						:key="item.zp_index" @click="$refs.refPreviewVideo.openModal(item.item)">
+						:key="item.zp_index" @click="$refs.refPreviewMedia.openModal(item.item, item.zp_index, 'video')">
 						<view class="iconfont icon-bofang"></view>
 						<image class="img" :src="item.item + '?x-oss-process=video/snapshot,t_5,f_jpg,w_720'" mode="aspectFill"></image>
 					</view>
@@ -73,6 +73,7 @@
 
 	const album_total = computed(() => store.state.album_total);
 	const album_info = computed(() => store.state.album_info);
+	const themeColor = computed(() => album_info.value?.color_config?.solid || '#FF8C00');
 
 	import zPaging from "./components/z-paging/components/z-paging/z-paging.vue"
 	import request from "@/utils/request.js"
@@ -125,7 +126,7 @@
 
 	async function loadingMore(index) {
 		await loadMoreData()
-		refPreviewMedia.value.openModal('', index, currentPageData.value)
+		refPreviewMedia.value.openModal('', index, displayType.value === 'video' ? 'video' : 'photo')
 	}
 
 	const scrollTimer = ref(null)
@@ -201,7 +202,7 @@
 	}
 
 	function handleImg(link, index) {
-		refPreviewMedia.value.openModal(link, index, currentPageData.value)
+		refPreviewMedia.value.openModal(link, index, 'photo')
 	}
 
 	const pageShow = ref(false)
@@ -315,19 +316,17 @@
 
 			.item {
 				position: relative;
-				width: 94rpx;
-				padding-bottom: 10rpx;
+				padding: 0 10rpx 10rpx;
 				font-size: 16px;
 
 				&.active:before {
 					position: absolute;
 					content: "";
 					bottom: -10rpx;
-					left: 50%;
-					transform: translateX(-50%);
-					background: #FF8C00;
-					width: 14px;
+					left: 0;
+					right: 0;
 					height: 4px;
+					background: var(--tab-color, #FF8C00);
 					border-radius: 2px;
 				}
 			}

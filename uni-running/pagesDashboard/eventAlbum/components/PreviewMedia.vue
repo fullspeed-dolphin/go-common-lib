@@ -2,14 +2,13 @@
 	<view class="PreviewMedia">
 		<up-popup :show="isShowModal" @close="close" overlayOpacity="0.9" bgColor="transparent" mode="center" closeable>
 			<view class="flex-center" style="height: 100vh;width:100vw">
-				<SwiperSection ref="refSwiper" :originIndex="originIndex" @loadingMore="loadingMore" @close="close" v-if="isShowModal" />
+				<SwiperSection ref="refSwiper" :originIndex="originIndex" :mediaType="mediaType" @loadingMore="loadingMore" @close="close" v-if="isShowModal" />
 			</view>
 		</up-popup>
 	</view>
 </template>
 
 <script setup>
-import SliderRange from "./xz-slider-range/xz-slider-range.vue";
 import SwiperSection from "./rswiper.vue"
 	import {
 		ref, onMounted, computed
@@ -30,10 +29,12 @@ import SwiperSection from "./rswiper.vue"
 	const refSwiper = ref(null);
 	const originList = ref([]) // 源数据
 	const originIndex = ref(0) // 记录源数据的下标
-	
-	function openModal(link, index) {
-		console.log('link====>', link, index)
+	const mediaType = ref('photo') // 'photo' | 'video'
+
+	function openModal(link, index, type = 'photo') {
+		console.log('link====>', link, index, type)
 		if(link) {
+			mediaType.value = type
 			isShowModal.value = true;
 		}
 

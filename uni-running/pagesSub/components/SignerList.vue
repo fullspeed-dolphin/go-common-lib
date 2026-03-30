@@ -4,38 +4,42 @@
 			<view class="" style="font-weight: bold;font-size: 30rpx;color: rgba(0,0,0,0.8);">选择报名卡</view>
 		</view>
 
-		<view class="card-item van-hairline--bottom" v-for="(item, index) in dataList" :key="index" @click="selectItem(item)">
-			<view class="card-item-wrapper">
-				<view class="radio-btn" @click.stop="selectItem(item)">
-					<u-icon v-if="selectedId === item.id" name="checkmark-circle-fill" :color="themeColor" size="22"></u-icon>
-					<view v-else class="radio-circle"></view>
-				</view>
-				<view class="card-item-content">
-					<!-- 第一行：姓名 + 本人标签 -->
-					<view class="name">
-						<view class="name-text">{{ item.full_name }}</view>
-						<view class="name-owner" v-if="item.is_self">本人</view>
+		<scroll-view scroll-y class="card-scroll-area">
+			<view class="card-item van-hairline--bottom" v-for="(item, index) in dataList" :key="index" @click="selectItem(item)">
+				<view class="card-item-wrapper">
+					<view class="radio-btn" @click.stop="selectItem(item)">
+						<u-icon v-if="selectedId === item.id" name="checkmark-circle-fill" :color="themeColor" size="22"></u-icon>
+						<view v-else class="radio-circle"></view>
 					</view>
-					<!-- 第二行：身份证号 -->
-					<view class="id-card-row">
-						<view class="id-card-number-text">{{ formatIdCard(item.cert_number || "") }}</view>
+					<view class="card-item-content">
+						<!-- 第一行：姓名 + 本人标签 -->
+						<view class="name">
+							<view class="name-text">{{ item.full_name }}</view>
+							<view class="name-owner" v-if="item.is_self" :style="{ color: themeColor, backgroundColor: themeColor + '1A' }">本人</view>
+						</view>
+						<!-- 第二行：身份证号 -->
+						<view class="id-card-row">
+							<view class="id-card-number-text">{{ formatIdCard(item.cert_number || "") }}</view>
+						</view>
+						<!-- 第三行：年龄段(性别) | 参赛服尺码 | 血型 -->
+						<view class="info-row">
+							<view class="info-item">{{ item.ageScope }}({{ item.genderString }})</view>
+							<view class="info-separator">|</view>
+							<view class="info-item">衣服尺码: {{ item.tshirt_size || '-' }}</view>
+							<view class="info-separator">|</view>
+							<view class="info-item">血型: {{ item.blood_type || '-' }}</view>
+						</view>
 					</view>
-					<!-- 第三行：年龄段(性别) | 参赛服尺码 | 血型 -->
-					<view class="info-row">
-						<view class="info-item">{{ item.ageScope }}({{ item.genderString }})</view>
-						<view class="info-separator">|</view>
-						<view class="info-item">衣服尺码: {{ item.tshirt_size || '-' }}</view>
-						<view class="info-separator">|</view>
-						<view class="info-item">血型: {{ item.blood_type || '-' }}</view>
+					<view class="edit-btn" @click.stop="editCard(item.id)">
+						<u-icon name="edit-pen" :color="themeColor" size="25"></u-icon>
 					</view>
-				</view>
-				<view class="edit-btn" @click.stop="editCard(item.id)">
-					<u-icon name="edit-pen" :color="themeColor" size="25"></u-icon>
 				</view>
 			</view>
+		</scroll-view>
+		<view class="popup-bottom-btns">
+			<u-button v-if="dataList.length" :color="themeColor" @click="confirmSelect" shape="circle" :plain="!selectedId" customStyle="width: 500rpx;">确认</u-button>
+			<u-button :color="themeColor" @click="$u.route('pagesSub/registrationCard/list')" shape="circle" plain customStyle="width: 500rpx;">创建报名卡</u-button>
 		</view>
-		<u-button v-if="dataList.length" :color="themeColor" @click="confirmSelect" shape="circle" :plain="!selectedId" customStyle="margin: 40rpx auto;width: 500rpx;">确认</u-button>
-		<u-button :color="themeColor" @click="$u.route('pagesSub/registrationCard/list')" shape="circle" plain customStyle="margin: 40rpx auto;width: 500rpx;">创建报名卡</u-button>
 	</up-popup>
 </template>
 
@@ -173,6 +177,18 @@
 </script>
 
 <style lang="scss" scoped>
+	.card-scroll-area {
+		max-height: 60vh;
+	}
+
+	.popup-bottom-btns {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 20rpx;
+		padding: 30rpx 0 40rpx;
+	}
+
 	.card-item {
 		margin: 20rpx;
 		padding: 32rpx 20rpx;
@@ -228,11 +244,9 @@
 				display: flex;
 				align-items: center;
 				margin-left: 20rpx;
-				background: #f1ffde;
 				border-radius: 8rpx 8rpx 8rpx 8rpx;
 				font-weight: bold;
 				font-size: 24rpx;
-				color: #8cc63e;
 				padding: 8rpx 16rpx;
 			}
 		}

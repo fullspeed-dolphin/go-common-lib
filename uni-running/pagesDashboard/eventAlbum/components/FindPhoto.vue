@@ -4,32 +4,32 @@
 			<view class="" style="font-weight: bold;font-size: 30rpx;color: rgba(0,0,0,0.8);">AI找我</view>
 		</view>
 
-		<view class="section-tabs flex-center van-hairline--bottom" style="color: #999;">
-			<view class="flex-col-center flex-1" :class="{active: activeTab === 1}" :style="activeTab === 1 ? { color: color } : {}" @click="activeTab = 1">
-				<view class="iconfont icon-renlianguanli2" style="font-size: 38rpx;"></view>
+		<view class="section-tabs van-hairline--bottom">
+			<view class="tab-item flex-col-center" :class="{active: activeTab === 1}" :style="activeTab === 1 ? { color: color } : {}" @click="activeTab = 1">
+				<view class="iconfont icon-renlianguanli2" style="font-size: 52rpx;"></view>
 				人脸
 			</view>
-			<view class="flex-col-center flex-1" :class="{active: activeTab === 2}" :style="activeTab === 2 ? { color: color } : {}" @click="activeTab = 2">
-				<view class="iconfont icon-a-haomapai1" style="font-size: 38rpx;"></view>
+			<view class="tab-item flex-col-center" :class="{active: activeTab === 2}" :style="activeTab === 2 ? { color: color } : {}" @click="activeTab = 2">
+				<view class="iconfont icon-a-haomapai1" style="font-size: 52rpx;"></view>
 				号码牌
 			</view>
 		</view>
 		<view style="padding-bottom: 60rpx;">
-			<div v-if="activeTab === 1" class="flex-col-center" style="height:500rpx;">
-				<section @click="takePhoto()" class="section-camera u-flex-xy-center bgf" style="font-weight: bold;color: #267FF7;width: 216rpx;
-				height: 216rpx;margin-bottom:40rpx;">
-					<div class="flex-col-center upload-box" style="">
+			<view v-if="activeTab === 1" class="flex-col-center" style="padding: 40rpx 0;">
+				<view @click="takePhoto()" class="section-camera u-flex-xy-center bgf" style="font-weight: bold;color: #267FF7;width: 216rpx;
+				height: 216rpx;">
+					<view class="flex-col-center upload-box">
 						<view class="iconfont icon-paizhao flex-center"></view>
 						<view>点击人脸拍照</view>
-					</div>
-				</section>
-				<view class="" style="font-weight: bold;text-align: center;
-							font-size: 24rpx;line-height: 36rpx;margin-top: 26rpx;margin-bottom:22rpx;
+					</view>
+				</view>
+				<view style="font-weight: bold;text-align: center;
+							font-size: 24rpx;line-height: 36rpx;margin-top: 40rpx;margin-bottom:22rpx;
 							color: #999;">
 					请拍摄正脸照片，以确保人脸搜索的准确性
 				</view>
 
-				<section class="section-bottom" style="margin: 0rpx auto;">
+				<view class="section-bottom">
 					<view class="txt flex-start">
 						<up-checkbox shape="circle" activeColor="#8CC63E" v-model:checked="isAgree" :usedAlone="true"
 							:customStyle="{ marginRight: '-10rpx' }" size="32rpx" />
@@ -39,8 +39,8 @@
 						<text :style="{ color: color }"
 							@click="$u.route('pagesSub/settings/agreement?type=faceScanPolicy')">《人脸识别使用条款》</text>
 					</view>
-				</section>
-			</div>
+				</view>
+			</view>
 
 			<view v-if="activeTab === 2" class="flex-col-center" style="height:500rpx;">
 				<view class="flex-start" style="margin-top:14rpx;">
@@ -321,13 +321,21 @@
 	}
 
 	.section-tabs {
+		display: flex;
+		width: 100%;
+		box-sizing: border-box;
+		padding: 0 80rpx 32rpx;
+		color: #999;
 		font-weight: bold;
 		font-size: 26rpx;
 		line-height: 48rpx;
-		padding-bottom: 32rpx;
+
+		.tab-item {
+			flex: 1;
+		}
 
 		.iconfont {
-			height: 38rpx;
+			height: 52rpx;
 			margin-bottom: 10rpx;
 		}
 
@@ -336,14 +344,14 @@
 
 			&:before {
 				position: absolute;
-				bottom: -10rpx;
+				bottom: -28rpx;
 				left: 50%;
-				transform: translate(-50%);
+				transform: translateX(-50%);
 				content: "";
 				width: 50rpx;
 				height: 6rpx;
 				background: var(--theme-color, #FF8C00);
-				border-radius: 4rpx 4rpx 4rpx 4rpx;
+				border-radius: 4rpx;
 			}
 		}
 	}

@@ -334,6 +334,10 @@
 			return;
 		}
 
+		if (detail.value.status === "PND") {
+			return uni.$u.toast("报名时间未到\n感谢你的关注");
+		}
+
 		if (detail.value.status !== "ACT") {
 			return uni.$u.toast("活动无效");
 		}

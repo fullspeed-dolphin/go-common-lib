@@ -135,6 +135,10 @@
             <text class="cert-label">证件号码</text>
             <input class="cert-input" v-model="certForm.cert_number" placeholder="请输入证件号码" />
           </view>
+          <view class="cert-row">
+            <text class="cert-label">手机号</text>
+            <input class="cert-input" v-model="certForm.contact_number" type="number" placeholder="请输入手机号" maxlength="11" />
+          </view>
         </view>
         <view class="cert-actions">
           <view class="cert-btn cert-btn-cancel" @click="showCertPopup = false">
@@ -170,7 +174,7 @@ const activeTab = ref('intro');
 const isRegistered = ref(false);
 const isFull = ref(false);
 const showCertPopup = ref(false);
-const certForm = ref({ real_name: '', cert_type: 'CN_ID', cert_number: '' });
+const certForm = ref({ real_name: '', cert_type: 'CN_ID', cert_number: '', contact_number: '' });
 const memberList = ref([]);
 
 const userInfo = computed(() => store.state.userInfo);
@@ -371,6 +375,18 @@ const submitRegistrationWithCert = () => {
     uni.$u.toast('请输入证件号码');
     return;
   }
+  if (!certForm.value.contact_number) {
+    uni.$u.toast('请输入手机号');
+    return;
+  }
+  if (certForm.value.cert_type === 'CN_ID' && !/^1[3-9]\d{9}$/.test(certForm.value.contact_number)) {
+    uni.$u.toast('请输入正确的大陆手机号');
+    return;
+  }
+  if (certForm.value.cert_type === 'HK_MA_PASS' && !/^[4-9]\d{7}$/.test(certForm.value.contact_number)) {
+    uni.$u.toast('请输入正确的港澳手机号');
+    return;
+  }
 
   uni.showLoading({ mask: true, title: '报名中...' });
   request.post('/booking-api/fsc_events/registration', {
@@ -378,6 +394,7 @@ const submitRegistrationWithCert = () => {
     real_name: certForm.value.real_name,
     cert_type: certForm.value.cert_type,
     cert_number: certForm.value.cert_number,
+    contact_number: certForm.value.contact_number,
   }).then((res) => {
     uni.hideLoading();
     showCertPopup.value = false;

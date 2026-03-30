@@ -8,9 +8,9 @@
     <!-- 三图滑动模式：实现跟手滑动效果 -->
     <view
       class="slides-container"
-      @touchstart.stop="onTouchStart"
-      @touchmove.stop="onTouchMove"
-      @touchend.stop="onTouchEnd"
+      @touchstart="onTouchStart"
+      @touchmove="onTouchMove"
+      @touchend="onTouchEnd"
     >
       <view
         class="slides-track"
@@ -31,7 +31,23 @@
 
         <!-- 当前（支持缩放） -->
         <view class="slide" :style="{ width: screenWidth + 'px' }">
-          <view class="zoom-container" :style="{
+          <!-- 视频模式：不包 zoom-container，小程序原生 video 不支持父级 CSS transform -->
+          <view v-if="currentImage.isVideo" class="slide-img-wrap">
+            <video class="slide-video"
+              id="preview-video"
+              :src="currentImage.url"
+              :poster="currentImage.url750"
+              :controls="true"
+              :show-center-play-btn="true"
+              object-fit="contain"
+              @play="isVideoPlaying = true"
+              @pause="isVideoPlaying = false"
+              @ended="isVideoPlaying = false"
+              @fullscreenchange="e => isVideoFullscreen = e.detail.fullScreen"
+            />
+          </view>
+          <!-- 图片模式：用 zoom-container 支持缩放 -->
+          <view v-else class="zoom-container" :style="{
             transform: `translate(${panX}px, ${panY}px) scale(${zoomScale})`,
             transition: isZoomAnimating ? 'transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)' : 'none'
           }">
@@ -61,10 +77,10 @@
       </view>
     </view>
 
-    <section class="bottom-info">
+    <section class="bottom-info" v-show="!isVideoFullscreen">
       <div class="flex-center">
         <up-button @click="loadHDimage()" shape="circle" type="primary"
-         v-if="!lookIdStatus"
+         v-if="!lookIdStatus && mediaType === 'photo'"
           customStyle="width:188rpx;height:64rpx;margin:0;font-size:24rpx;color: #babab6;border-color:rgba(255, 255, 255, 0.27);background:rgba(34, 34, 34, 0.8);">
           查看高清图
         </up-button>
@@ -96,7 +112,9 @@
             >
               <image
                 class="thumb-img"
-                :src="item + '?x-oss-process=image/resize,w_250/quality,q_80/format,webp'"
+                :src="mediaType === 'video'
+                  ? item + '?x-oss-process=video/snapshot,t_5,f_jpg,w_720'
+                  : item + '?x-oss-process=image/resize,w_250/quality,q_80/format,webp'"
                 mode="aspectFill"
                 lazy-load
               />
@@ -163,6 +181,10 @@ const props = defineProps({
   originIndex: {
     type: [Number, String],
     default: 0
+  },
+  mediaType: {
+    type: String,
+    default: 'photo' // 'photo' | 'video'
   }
 })
 
@@ -176,6 +198,9 @@ const isloading = ref(false)
 const isAlbumComplete = ref(false)
 // ==========查看高清图状态 ========
 const lookIdStatus = ref(false)
+// ==========视频播放状态 ========
+const isVideoPlaying = ref(false)
+const isVideoFullscreen = ref(false)
 // ==========blur-up 加载状态 ========
 const prevLoaded = ref(false)
 const currentLoaded = ref(false)
@@ -242,14 +267,27 @@ const pullDownOpacity = ref(1)
 // ==================== 图片数据 ====================
 function getImageData(index) {
   const url = originList.value[index] || ''
-  if (!url) return { url: '', url750: '', urlTiny: '', urlThumb: '', height: '500rpx' }
+  if (!url) return { url: '', url750: '', urlTiny: '', isVideo: false, height: '500rpx' }
 
-  // url250 和详情页网格用同一个 URL，直接命中缓存
+  if (props.mediaType === 'video') {
+    // 视频：复用详情页网格的截图 URL 命中缓存
+    const snapshot = url + '?x-oss-process=video/snapshot,t_5,f_jpg,w_720'
+    return {
+      url: url,
+      url750: snapshot,
+      urlTiny: snapshot,
+      isVideo: true,
+      height: '500rpx'
+    }
+  }
+
+  // 图片：url250 和详情页网格用同一个 URL，直接命中缓存
   const url250 = url + '?x-oss-process=image/resize,w_250/quality,q_80/format,webp'
   return {
     url: url,
     url750: url + '?x-oss-process=image/resize,w_750/quality,q_80/format,webp',
     urlTiny: url250,
+    isVideo: false,
     height: getPhotoHeight(url)
   }
 }
@@ -570,11 +608,19 @@ function onDoubleTap() {
 }
 
 // ==================== 图片切换 ====================
+function pauseVideoIfPlaying() {
+  if (isVideoPlaying.value) {
+    try { uni.createVideoContext('preview-video').pause() } catch(e) {}
+    isVideoPlaying.value = false
+  }
+}
+
 function goToPrev() {
   if (originIndex.value <= 0) {
     snapBack()
     return
   }
+  pauseVideoIfPlaying()
 
   isAnimating.value = true
   translateX.value = 0
@@ -594,6 +640,7 @@ function goToPrev() {
 }
 
 function goToNext() {
+  pauseVideoIfPlaying()
   const totalCount = Number(album_total.value) || 0
   const isAllLoaded = totalCount === 0 || originList.value.length >= totalCount
 
@@ -675,6 +722,7 @@ function updateThumbScroll() {
 
 function switchToIndex(idx) {
   if (idx < 0 || idx >= originList.value.length || idx === originIndex.value) return
+  isVideoPlaying.value = false
   resetMovable()
   prevLoaded.value = false
   currentLoaded.value = false
@@ -802,20 +850,23 @@ function loadHDimage() {
 }
 
 function downloadPicture() {
-  const imageUrl = currentImage.value.url;
+  const mediaUrl = currentImage.value.url;
 
-  if (!imageUrl) {
-    uni.showToast({ title: '获取图片失败', icon: 'none' });
+  if (!mediaUrl) {
+    uni.showToast({ title: '获取失败', icon: 'none' });
     return;
   }
 
   uni.showLoading({ title: '下载中...' });
 
   uni.downloadFile({
-    url: imageUrl,
+    url: mediaUrl,
     success: (res) => {
       if (res.statusCode === 200) {
-        uni.saveImageToPhotosAlbum({
+        const saveMethod = currentImage.value.isVideo
+          ? uni.saveVideoToPhotosAlbum
+          : uni.saveImageToPhotosAlbum;
+        saveMethod({
           filePath: res.tempFilePath,
           success: () => {
             uni.hideLoading();
@@ -823,8 +874,13 @@ function downloadPicture() {
           },
           fail: (err) => {
             uni.hideLoading();
-            if (err.errMsg?.includes('auth deny')) {
-              uni.showToast({ title: '请授权相册权限', icon: 'none' });
+            if (err.errMsg?.includes('auth deny') || err.errMsg?.includes('authorize')) {
+              uni.showModal({
+                title: '提示',
+                content: '需要您授权"保存到相册"权限，请在设置中开启',
+                confirmText: '去设置',
+                success: (r) => { if (r.confirm) uni.openSetting() }
+              });
             } else {
               uni.showToast({ title: '保存失败', icon: 'none' });
             }
@@ -896,6 +952,12 @@ defineExpose({
 .slide-image--blur {
   // 使用详情页缓存的 w_250 图，无需模糊
 }
+
+.slide-video {
+  width: 100%;
+  max-height: 100vh;
+}
+
 
 .slide-image--main {
   position: absolute;

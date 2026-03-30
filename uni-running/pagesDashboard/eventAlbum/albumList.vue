@@ -12,14 +12,11 @@
 		<mescroll-body @init="mescrollInit" @down="downCallback" @up="getList" top="0">
 			<view class="card-list">
 				<view class="card-item" v-for="item in dataList" :key="item.event_id" :style="getCardStyle(item)" @click="viewDetail(item)">
-					<view class="card-banner">
-						<image class="banner-img"
-							:src="item.image_url + '?x-oss-process=image/resize,w_750/quality,q_75/format,webp&t=' + cacheKey"
-							mode="widthFix" lazy-load />
-					</view>
+					<image class="card-cover"
+						:src="item.image_url + '?x-oss-process=image/resize,w_400/quality,q_75/format,webp&t=' + cacheKey"
+						mode="aspectFill" lazy-load />
 					<view class="card-body">
 						<view class="card-title ellipsis2">{{item.name}}</view>
-						<view class="card-desc ellipsis2" v-if="item.description && item.description !== item.name">{{item.description}}</view>
 						<view class="card-meta">
 							<view class="meta-item" v-if="item.event_time">
 								<u-icon name="clock" size="22rpx" color="#999" />
@@ -146,47 +143,40 @@
 	}
 
 	.card-item {
+		display: flex;
+		flex-direction: row;
 		background: #fff;
-		border-radius: 24rpx;
+		border-radius: 16rpx;
 		overflow: hidden;
-		margin-bottom: 32rpx;
+		margin-bottom: 20rpx;
 		border: 2rpx solid rgba(0, 0, 0, 0.06);
 
-		.card-banner {
-			width: 100%;
-			overflow: hidden;
-
-			.banner-img {
-				width: 100%;
-				display: block;
-			}
+		.card-cover {
+			flex: none;
+			width: 240rpx;
+			height: 200rpx;
 		}
 
 		.card-body {
-			padding: 20rpx 28rpx 24rpx;
+			flex: 1;
+			padding: 20rpx 24rpx;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			overflow: hidden;
 
 			.card-title {
 				font-weight: 600;
-				font-size: 30rpx;
+				font-size: 28rpx;
 				color: #1a1a1a;
 				line-height: 1.4;
 				text-align: left;
 			}
 
-			.card-desc {
-				font-size: 24rpx;
-				color: #666;
-				line-height: 1.4;
-				margin-top: 8rpx;
-				text-align: left;
-			}
-
 			.card-meta {
 				display: flex;
-				flex-wrap: wrap;
-				align-items: center;
-				margin-top: 16rpx;
-				gap: 24rpx;
+				flex-direction: column;
+				gap: 8rpx;
 
 				.meta-item {
 					display: flex;
