@@ -322,7 +322,7 @@ onReachBottom(() => {
 
 // ===== 团长判断 =====
 const isCreator = computed(() => {
-  return !!(userInfo.value.running_group && myClubDetail.value);
+  return !!(userInfo.value.running_group && myClubDetail.value && myClubDetail.value.user_role === 'creator');
 });
 
 // ===== 路由 =====

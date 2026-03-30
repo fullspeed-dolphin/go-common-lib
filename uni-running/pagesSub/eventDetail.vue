@@ -291,17 +291,25 @@
 			});
 	};
 
-	// 检查普通活动是否付费
+	// 检查普通活动是否付费：遍历 tickets，任一 price != 0 即为付费
 	const checkEventPrice = () => {
 		request.post('/booking-api/user/price', {
 			event_id: routerParams.value.id
 		})
-			.then(() => {
-				// 接口返回成功（状态码200），认为是付费活动
-				isPaidEvent.value = true;
+			.then((res) => {
+				const tickets = res?.tickets;
+				if (!tickets) {
+					isPaidEvent.value = false;
+					return;
+				}
+				isPaidEvent.value = tickets.some(ticket =>
+					Object.values(ticket?.price || {}).some(pkg => {
+						const p = typeof pkg === 'object' ? pkg.price : pkg;
+						return p != 0;
+					})
+				);
 			})
 			.catch(() => {
-				// 接口返回失败，认为是免费活动
 				isPaidEvent.value = false;
 			});
 	};

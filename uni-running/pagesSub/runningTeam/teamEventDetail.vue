@@ -24,7 +24,7 @@
       <view class="info-card">
         <view class="info-row" v-if="fscInfo">
           <text class="info-label">跑团</text>
-          <text class="info-value">{{ fscInfo.name }}</text>
+          <text class="info-value info-value-link" @click="$u.route(`pagesSub/runningTeam/teamDetail?group_id=${detail.fsc_id}`)">{{ fscInfo.name }} ›</text>
         </view>
         <view class="info-row" v-if="detail.contact">
           <text class="info-label">发起</text>
@@ -129,7 +129,8 @@
           </view>
           <view class="cert-row">
             <text class="cert-label">真实姓名</text>
-            <input class="cert-input" v-model="certForm.real_name" placeholder="请输入真实姓名" />
+            <input class="cert-input" :class="{ 'cert-input-error': nameError }" v-model="certForm.real_name" placeholder="请输入真实姓名" @blur="validateName" />
+            <text class="cert-error-text" v-if="nameError">{{ nameError }}</text>
           </view>
           <view class="cert-row">
             <text class="cert-label">证件号码</text>
@@ -207,6 +208,14 @@ const isRegistered = ref(false);
 const isFull = ref(false);
 const showCertPopup = ref(false);
 const certForm = ref({ real_name: '', cert_type: 'CN_ID', cert_number: '', contact_number: '' });
+const nameError = ref('');
+const validateName = () => {
+  const name = certForm.value.real_name.trim();
+  if (!name) { nameError.value = ''; return; }
+  if (!/^[\u4e00-\u9fff\u3400-\u4dbf\uF900-\uFAFF]+$/.test(name)) { nameError.value = '姓名仅支持中文'; return; }
+  if (name.length < 2) { nameError.value = '姓名至少2个字'; return; }
+  nameError.value = '';
+};
 const memberList = ref([]);
 const showJoinGroupModal = ref(false);
 const joinedGroupInfo = ref(null);
@@ -277,7 +286,8 @@ const getDetail = () => {
 
       // 时间格式化
       const time = isNaN(res.event_time) ? res.event_time : Number(res.event_time);
-      res.event_time = dayjs(time).format('M.DD HH:mm');
+      const t = dayjs(time);
+      res.event_time = t.year() !== dayjs().year() ? t.format('YYYY.M.DD HH:mm') : t.format('M.DD HH:mm');
 
       // 报名时间
       try {
@@ -412,8 +422,13 @@ const submitRegistration = () => {
 
 // 带证件信息报名
 const submitRegistrationWithCert = () => {
+  certForm.value.real_name = certForm.value.real_name.trim();
   if (!certForm.value.real_name) {
     uni.$u.toast('请输入真实姓名');
+    return;
+  }
+  if (certForm.value.real_name.length < 2 || !/^[\u4e00-\u9fff\u3400-\u4dbf\uF900-\uFAFF]+$/.test(certForm.value.real_name)) {
+    uni.$u.toast('姓名须为2个字以上的中文');
     return;
   }
   if (!certForm.value.cert_number) {
@@ -848,6 +863,16 @@ const copyText = (txt) => {
   padding: 0 24rpx;
   font-size: 28rpx;
   color: #1A1A1A;
+}
+
+.cert-input-error {
+  border: 1rpx solid #EF4444;
+}
+
+.cert-error-text {
+  font-size: 22rpx;
+  color: #EF4444;
+  margin-top: 4rpx;
 }
 
 .cert-actions {
