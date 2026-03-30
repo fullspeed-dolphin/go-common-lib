@@ -55,7 +55,7 @@
           </view>
           <view class="stat-item">
             <text class="stat-number">{{ detail.gender_ratio || '--' }}</text>
-            <text class="stat-label">男女比例</text>
+            <text class="stat-label">男:女</text>
           </view>
           <view class="stat-item">
             <text class="stat-number">{{ groupStats.avg_km_per_member ? groupStats.avg_km_per_member.toFixed(1) : '--' }}</text>

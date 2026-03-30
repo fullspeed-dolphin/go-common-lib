@@ -133,11 +133,21 @@
           </view>
           <view class="cert-row">
             <text class="cert-label">证件号码</text>
-            <input class="cert-input" v-model="certForm.cert_number" placeholder="请输入证件号码" />
+            <input class="cert-input" v-model="certForm.cert_number" :placeholder="certForm.cert_type === 'HK_MA_PASS' ? '请输入回乡证号码' : '请输入身份证号码'" />
           </view>
           <view class="cert-row">
             <text class="cert-label">手机号</text>
-            <input class="cert-input" v-model="certForm.contact_number" type="number" placeholder="请输入手机号" maxlength="11" />
+            <text class="cert-hint">{{ certForm.cert_type === 'HK_MA_PASS' ? '请输入港澳手机号码' : '请输入大陆手机号码（不带区号）' }}</text>
+            <view class="cert-phone-wrap">
+              <text class="cert-phone-prefix">{{ certForm.cert_type === 'HK_MA_PASS' ? '+852' : '+86' }}</text>
+              <input
+                class="cert-input cert-phone-input"
+                v-model="certForm.contact_number"
+                type="number"
+                :placeholder="certForm.cert_type === 'HK_MA_PASS' ? '8位港澳手机号' : '11位大陆手机号'"
+                :maxlength="certForm.cert_type === 'HK_MA_PASS' ? 8 : 11"
+              />
+            </view>
           </view>
         </view>
         <view class="cert-actions">
@@ -178,7 +188,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { onLoad, onUnload } from "@dcloudio/uni-app";
 import { useShare, buildPath } from "@/composables/useShare.js";
 import { useStore } from "vuex";
@@ -202,6 +212,11 @@ const showJoinGroupModal = ref(false);
 const joinedGroupInfo = ref(null);
 
 const userInfo = computed(() => store.state.userInfo);
+
+// 切换证件类型时清空手机号
+watch(() => certForm.value.cert_type, () => {
+  certForm.value.contact_number = '';
+});
 
 // 封面图（兼容单URL和JSON数组）
 const coverImages = computed(() => {
@@ -757,12 +772,14 @@ const copyText = (txt) => {
   display: flex;
   flex-direction: column;
   gap: 24rpx;
+  overflow: visible;
 }
 
 .cert-row {
   display: flex;
   flex-direction: column;
   gap: 12rpx;
+  overflow: visible;
 }
 
 .cert-label {
@@ -774,6 +791,8 @@ const copyText = (txt) => {
 .cert-radios {
   display: flex;
   gap: 16rpx;
+  padding-bottom: 2rpx;
+  overflow: visible;
 }
 
 .cert-radio {
@@ -790,6 +809,36 @@ const copyText = (txt) => {
     border-color: #FF8C00;
     font-weight: 500;
   }
+}
+
+.cert-hint {
+  font-size: 22rpx;
+  color: #FF8C00;
+}
+
+.cert-phone-wrap {
+  display: flex;
+  align-items: center;
+  background: #F6F7F8;
+  border-radius: 16rpx;
+  height: 80rpx;
+  padding: 0 24rpx;
+  gap: 12rpx;
+}
+
+.cert-phone-prefix {
+  font-size: 28rpx;
+  color: #9CA3AF;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.cert-phone-input {
+  flex: 1;
+  background: transparent !important;
+  padding: 0 !important;
+  height: 100% !important;
+  border-radius: 0 !important;
 }
 
 .cert-input {
