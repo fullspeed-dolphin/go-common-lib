@@ -151,6 +151,28 @@
       </view>
     </u-popup>
 
+    <!-- 自动入团成功弹窗 -->
+    <u-popup :show="showJoinGroupModal" mode="center" round="16" :closeOnClickOverlay="false">
+      <view class="join-group-modal">
+        <view class="join-group-icon">
+          <u-icon name="checkmark-circle-fill" color="#22C55E" size="48"></u-icon>
+        </view>
+        <text class="join-group-title">报名成功</text>
+        <view class="join-group-info" v-if="joinedGroupInfo">
+          <image
+            class="join-group-avatar"
+            :src="joinedGroupInfo.avatar_url ? joinedGroupInfo.avatar_url + '?x-oss-process=image/resize,w_120,h_120,m_fill' : '/static/images/user.png'"
+            mode="aspectFill"
+          />
+          <text class="join-group-text">已自动加入跑团</text>
+          <text class="join-group-name">{{ joinedGroupInfo.name }}</text>
+        </view>
+        <view class="join-group-btn" @click="showJoinGroupModal = false">
+          <text class="join-group-btn-text">我知道了</text>
+        </view>
+      </view>
+    </u-popup>
+
     <PhoneLogin ref="refPhoneLogin" />
   </view>
 </template>
@@ -176,6 +198,8 @@ const isFull = ref(false);
 const showCertPopup = ref(false);
 const certForm = ref({ real_name: '', cert_type: 'CN_ID', cert_number: '', contact_number: '' });
 const memberList = ref([]);
+const showJoinGroupModal = ref(false);
+const joinedGroupInfo = ref(null);
 
 const userInfo = computed(() => store.state.userInfo);
 
@@ -355,9 +379,15 @@ const submitRegistration = () => {
     event_id: routerParams.value.id,
   }).then((res) => {
     uni.hideLoading();
-    uni.$u.toast('报名成功');
     isRegistered.value = true;
     getRegistrationList();
+    if (res.auto_joined_group) {
+      joinedGroupInfo.value = res.auto_joined_group;
+      showJoinGroupModal.value = true;
+      store.dispatch("getUserInfo");
+    } else {
+      uni.$u.toast('报名成功');
+    }
   }).catch((e) => {
     uni.hideLoading();
     const msg = e.msg || e.message || '报名失败';
@@ -398,9 +428,15 @@ const submitRegistrationWithCert = () => {
   }).then((res) => {
     uni.hideLoading();
     showCertPopup.value = false;
-    uni.$u.toast('报名成功');
     isRegistered.value = true;
     getRegistrationList();
+    if (res.auto_joined_group) {
+      joinedGroupInfo.value = res.auto_joined_group;
+      showJoinGroupModal.value = true;
+      store.dispatch("getUserInfo");
+    } else {
+      uni.$u.toast('报名成功');
+    }
   }).catch((e) => {
     uni.hideLoading();
     const msg = e.msg || e.message || '报名失败';
@@ -790,5 +826,70 @@ const copyText = (txt) => {
 .cert-btn-confirm {
   background: #FF8C00;
   color: #FFFFFF;
+}
+
+.join-group-modal {
+  width: 560rpx;
+  padding: 48rpx 40rpx 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.join-group-icon {
+  margin-bottom: 8rpx;
+}
+
+.join-group-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+
+.join-group-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+  margin: 16rpx 0;
+  padding: 24rpx;
+  background: #F9FAFB;
+  border-radius: 16rpx;
+  width: 100%;
+}
+
+.join-group-avatar {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+}
+
+.join-group-text {
+  font-size: 26rpx;
+  color: #9CA3AF;
+}
+
+.join-group-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.join-group-btn {
+  width: 100%;
+  height: 80rpx;
+  background: #FF8C00;
+  border-radius: 200rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8rpx;
+}
+
+.join-group-btn-text {
+  color: #FFFFFF;
+  font-size: 28rpx;
+  font-weight: 600;
 }
 </style>
