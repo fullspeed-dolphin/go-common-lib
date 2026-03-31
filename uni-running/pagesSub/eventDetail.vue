@@ -215,6 +215,30 @@
 
 	// 定时器
 	let timer = null;
+	// 轮询活动状态（30秒间隔）
+	let statusTimer = null;
+	const pollStatus = () => {
+		const id = routerParams.value.id;
+		if (!id) return;
+		const url = routerParams.value.fsc_id
+			? `/event-api/fsc_events/${id}/status`
+			: `/event-api/api/v1/events/${id}/status`;
+		request.get(url).then((res) => {
+			if (res?.status && res.status !== detail.value.status) {
+				detail.value.status = res.status;
+			}
+		}).catch(() => {});
+	};
+	const startStatusPolling = () => {
+		stopStatusPolling();
+		statusTimer = setInterval(pollStatus, 30000);
+	};
+	const stopStatusPolling = () => {
+		if (statusTimer) {
+			clearInterval(statusTimer);
+			statusTimer = null;
+		}
+	};
 
 	// 分享配置
 	useShare(() => ({
@@ -230,10 +254,12 @@
 	onLoad((options) => {
 		routerParams.value = options;
 		getDetail();
+		startStatusPolling();
 	});
 
 	// 页面卸载
 	onUnload(() => {
+		stopStatusPolling();
 		isLoadedPage.value = false;
 		uni.removeStorageSync("eventDetail");
 	});
