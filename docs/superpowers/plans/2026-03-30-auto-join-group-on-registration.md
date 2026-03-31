@@ -461,7 +461,7 @@ func (s *FscEventRegistrationService) CreateRegistration(req *types.FscEventRegi
 	}
 
 	// 已取消，重新激活
-	if existing != nil && existing.Status == "CANCELLED" {
+	if existing != nil && existing.Status == "CXL" {
 		if err := s.repo.Reactivate(req.EventID, userID, req.RealName, req.ContactNumber, req.CertType, req.CertNumber, req.Remark); err != nil {
 			return nil, err
 		}

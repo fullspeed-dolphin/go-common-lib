@@ -60,9 +60,12 @@
               <u-button v-if="!['EXP', 'ACT'].includes(item.status)" type="primary" size="mini" shape="circle" color="#2979ff"
                 customStyle="margin:0;width:120rpx;height:52rpx;font-size:22rpx;"
                 @click.stop="editEvent(item)">更新</u-button>
-              <u-button v-if="!['EXP', 'ACT'].includes(item.status)" type="error" size="mini" shape="circle" color="#f56c6c"
+              <u-button type="error" size="mini" shape="circle" color="#f56c6c"
                 customStyle="margin:0;width:120rpx;height:52rpx;font-size:22rpx;"
                 @click.stop="removeItem(item)">删除</u-button>
+              <u-button v-if="detail.user_role === 'creator'" type="primary" size="mini" plain shape="circle" color="#10B981"
+                customStyle="margin:0;width:160rpx;height:52rpx;font-size:22rpx;"
+                @click.stop="viewRegistrations(item)">报名信息</u-button>
               <u-button type="primary" size="mini" plain shape="circle" color="#FF8C00"
                 customStyle="margin:0;width:120rpx;height:52rpx;font-size:22rpx;"
                 @click.stop="viewEvent(item)">详情</u-button>
@@ -221,6 +224,10 @@ const createEvent = () => {
 
 const editEvent = (item) => {
   uni.$u.route(`pagesSub/runningTeam/teamEventForm?id=${item.id}&group_id=${group_id.value}`);
+};
+
+const viewRegistrations = (item) => {
+  uni.$u.route(`pagesSub/runningTeam/teamEventRegistrations?event_id=${item.id}&event_name=${encodeURIComponent(item.name)}`);
 };
 
 const viewEvent = (item) => {
