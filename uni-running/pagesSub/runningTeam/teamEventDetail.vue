@@ -209,12 +209,21 @@ const isFull = ref(false);
 const showCertPopup = ref(false);
 const certForm = ref({ real_name: '', cert_type: 'CN_ID', cert_number: '', contact_number: '' });
 const nameError = ref('');
+// 姓名校验：2-12个中文，允许间隔号·（新疆等少数民族姓名）
+const validateChineseName = (name) => {
+  if (!name) return '请输入真实姓名';
+  if (!/^[\u4e00-\u9fff\u3400-\u4dbf\uF900-\uFAFF\u00b7]+$/.test(name)) return '姓名仅支持中文和间隔号·';
+  if (/^\u00b7|\u00b7$/.test(name)) return '间隔号不能在姓名首尾';
+  if (/\u00b7{2}/.test(name)) return '间隔号不能连续使用';
+  const chineseCount = name.replace(/\u00b7/g, '').length;
+  if (chineseCount < 2) return '姓名至少2个中文字';
+  if (chineseCount > 12) return '姓名不能超过12个中文字';
+  return '';
+};
 const validateName = () => {
   const name = certForm.value.real_name.trim();
   if (!name) { nameError.value = ''; return; }
-  if (!/^[\u4e00-\u9fff\u3400-\u4dbf\uF900-\uFAFF]+$/.test(name)) { nameError.value = '姓名仅支持中文'; return; }
-  if (name.length < 2) { nameError.value = '姓名至少2个字'; return; }
-  nameError.value = '';
+  nameError.value = validateChineseName(name);
 };
 const memberList = ref([]);
 const showJoinGroupModal = ref(false);
@@ -423,12 +432,9 @@ const submitRegistration = () => {
 // 带证件信息报名
 const submitRegistrationWithCert = () => {
   certForm.value.real_name = certForm.value.real_name.trim();
-  if (!certForm.value.real_name) {
-    uni.$u.toast('请输入真实姓名');
-    return;
-  }
-  if (certForm.value.real_name.length < 2 || !/^[\u4e00-\u9fff\u3400-\u4dbf\uF900-\uFAFF]+$/.test(certForm.value.real_name)) {
-    uni.$u.toast('姓名须为2个字以上的中文');
+  const nameErr = validateChineseName(certForm.value.real_name);
+  if (nameErr) {
+    uni.$u.toast(nameErr);
     return;
   }
   if (!certForm.value.cert_number) {
