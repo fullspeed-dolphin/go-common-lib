@@ -24,7 +24,7 @@
       <view class="info-card">
         <view class="info-row" v-if="fscInfo">
           <text class="info-label">跑团</text>
-          <text class="info-value">{{ fscInfo.name }}</text>
+          <text class="info-value info-value-link" @click="$u.route(`pagesSub/runningTeam/teamDetail?group_id=${detail.fsc_id}`)">{{ fscInfo.name }} ›</text>
         </view>
         <view class="info-row" v-if="detail.contact">
           <text class="info-label">发起</text>
@@ -129,11 +129,26 @@
           </view>
           <view class="cert-row">
             <text class="cert-label">真实姓名</text>
-            <input class="cert-input" v-model="certForm.real_name" placeholder="请输入真实姓名" />
+            <input class="cert-input" :class="{ 'cert-input-error': nameError }" v-model="certForm.real_name" placeholder="请输入真实姓名" @blur="validateName" />
+            <text class="cert-error-text" v-if="nameError">{{ nameError }}</text>
           </view>
           <view class="cert-row">
             <text class="cert-label">证件号码</text>
-            <input class="cert-input" v-model="certForm.cert_number" placeholder="请输入证件号码" />
+            <input class="cert-input" v-model="certForm.cert_number" :placeholder="certForm.cert_type === 'HK_MA_PASS' ? '请输入回乡证号码' : '请输入身份证号码'" />
+          </view>
+          <view class="cert-row">
+            <text class="cert-label">手机号</text>
+            <text class="cert-hint">{{ certForm.cert_type === 'HK_MA_PASS' ? '请输入港澳手机号码' : '请输入大陆手机号码（不带区号）' }}</text>
+            <view class="cert-phone-wrap">
+              <text class="cert-phone-prefix">{{ certForm.cert_type === 'HK_MA_PASS' ? '+852' : '+86' }}</text>
+              <input
+                class="cert-input cert-phone-input"
+                v-model="certForm.contact_number"
+                type="number"
+                :placeholder="certForm.cert_type === 'HK_MA_PASS' ? '8位港澳手机号' : '11位大陆手机号'"
+                :maxlength="certForm.cert_type === 'HK_MA_PASS' ? 8 : 11"
+              />
+            </view>
           </view>
         </view>
         <view class="cert-actions">
@@ -147,12 +162,34 @@
       </view>
     </u-popup>
 
+    <!-- 自动入团成功弹窗 -->
+    <u-popup :show="showJoinGroupModal" mode="center" round="16" :closeOnClickOverlay="false">
+      <view class="join-group-modal">
+        <view class="join-group-icon">
+          <u-icon name="checkmark-circle-fill" color="#22C55E" size="48"></u-icon>
+        </view>
+        <text class="join-group-title">报名成功</text>
+        <view class="join-group-info" v-if="joinedGroupInfo">
+          <image
+            class="join-group-avatar"
+            :src="joinedGroupInfo.avatar_url ? joinedGroupInfo.avatar_url + '?x-oss-process=image/resize,w_120,h_120,m_fill' : '/static/images/user.png'"
+            mode="aspectFill"
+          />
+          <text class="join-group-text">已自动加入跑团</text>
+          <text class="join-group-name">{{ joinedGroupInfo.name }}</text>
+        </view>
+        <view class="join-group-btn" @click="showJoinGroupModal = false">
+          <text class="join-group-btn-text">我知道了</text>
+        </view>
+      </view>
+    </u-popup>
+
     <PhoneLogin ref="refPhoneLogin" />
   </view>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { onLoad, onUnload } from "@dcloudio/uni-app";
 import { useShare, buildPath } from "@/composables/useShare.js";
 import { useStore } from "vuex";
@@ -170,10 +207,25 @@ const activeTab = ref('intro');
 const isRegistered = ref(false);
 const isFull = ref(false);
 const showCertPopup = ref(false);
-const certForm = ref({ real_name: '', cert_type: 'CN_ID', cert_number: '' });
+const certForm = ref({ real_name: '', cert_type: 'CN_ID', cert_number: '', contact_number: '' });
+const nameError = ref('');
+const validateName = () => {
+  const name = certForm.value.real_name.trim();
+  if (!name) { nameError.value = ''; return; }
+  if (!/^[\u4e00-\u9fff\u3400-\u4dbf\uF900-\uFAFF]+$/.test(name)) { nameError.value = '姓名仅支持中文'; return; }
+  if (name.length < 2) { nameError.value = '姓名至少2个字'; return; }
+  nameError.value = '';
+};
 const memberList = ref([]);
+const showJoinGroupModal = ref(false);
+const joinedGroupInfo = ref(null);
 
 const userInfo = computed(() => store.state.userInfo);
+
+// 切换证件类型时清空手机号
+watch(() => certForm.value.cert_type, () => {
+  certForm.value.contact_number = '';
+});
 
 // 封面图（兼容单URL和JSON数组）
 const coverImages = computed(() => {
@@ -234,7 +286,8 @@ const getDetail = () => {
 
       // 时间格式化
       const time = isNaN(res.event_time) ? res.event_time : Number(res.event_time);
-      res.event_time = dayjs(time).format('M.DD HH:mm');
+      const t = dayjs(time);
+      res.event_time = t.year() !== dayjs().year() ? t.format('YYYY.M.DD HH:mm') : t.format('M.DD HH:mm');
 
       // 报名时间
       try {
@@ -351,9 +404,15 @@ const submitRegistration = () => {
     event_id: routerParams.value.id,
   }).then((res) => {
     uni.hideLoading();
-    uni.$u.toast('报名成功');
     isRegistered.value = true;
     getRegistrationList();
+    if (res.auto_joined_group) {
+      joinedGroupInfo.value = res.auto_joined_group;
+      showJoinGroupModal.value = true;
+      store.dispatch("getUserInfo");
+    } else {
+      uni.$u.toast('报名成功');
+    }
   }).catch((e) => {
     uni.hideLoading();
     const msg = e.msg || e.message || '报名失败';
@@ -363,12 +422,29 @@ const submitRegistration = () => {
 
 // 带证件信息报名
 const submitRegistrationWithCert = () => {
+  certForm.value.real_name = certForm.value.real_name.trim();
   if (!certForm.value.real_name) {
     uni.$u.toast('请输入真实姓名');
     return;
   }
+  if (certForm.value.real_name.length < 2 || !/^[\u4e00-\u9fff\u3400-\u4dbf\uF900-\uFAFF]+$/.test(certForm.value.real_name)) {
+    uni.$u.toast('姓名须为2个字以上的中文');
+    return;
+  }
   if (!certForm.value.cert_number) {
     uni.$u.toast('请输入证件号码');
+    return;
+  }
+  if (!certForm.value.contact_number) {
+    uni.$u.toast('请输入手机号');
+    return;
+  }
+  if (certForm.value.cert_type === 'CN_ID' && !/^1[3-9]\d{9}$/.test(certForm.value.contact_number)) {
+    uni.$u.toast('请输入正确的大陆手机号');
+    return;
+  }
+  if (certForm.value.cert_type === 'HK_MA_PASS' && !/^[4-9]\d{7}$/.test(certForm.value.contact_number)) {
+    uni.$u.toast('请输入正确的港澳手机号');
     return;
   }
 
@@ -378,12 +454,19 @@ const submitRegistrationWithCert = () => {
     real_name: certForm.value.real_name,
     cert_type: certForm.value.cert_type,
     cert_number: certForm.value.cert_number,
+    contact_number: certForm.value.contact_number,
   }).then((res) => {
     uni.hideLoading();
     showCertPopup.value = false;
-    uni.$u.toast('报名成功');
     isRegistered.value = true;
     getRegistrationList();
+    if (res.auto_joined_group) {
+      joinedGroupInfo.value = res.auto_joined_group;
+      showJoinGroupModal.value = true;
+      store.dispatch("getUserInfo");
+    } else {
+      uni.$u.toast('报名成功');
+    }
   }).catch((e) => {
     uni.hideLoading();
     const msg = e.msg || e.message || '报名失败';
@@ -704,12 +787,14 @@ const copyText = (txt) => {
   display: flex;
   flex-direction: column;
   gap: 24rpx;
+  overflow: visible;
 }
 
 .cert-row {
   display: flex;
   flex-direction: column;
   gap: 12rpx;
+  overflow: visible;
 }
 
 .cert-label {
@@ -721,6 +806,8 @@ const copyText = (txt) => {
 .cert-radios {
   display: flex;
   gap: 16rpx;
+  padding-bottom: 2rpx;
+  overflow: visible;
 }
 
 .cert-radio {
@@ -739,6 +826,36 @@ const copyText = (txt) => {
   }
 }
 
+.cert-hint {
+  font-size: 22rpx;
+  color: #FF8C00;
+}
+
+.cert-phone-wrap {
+  display: flex;
+  align-items: center;
+  background: #F6F7F8;
+  border-radius: 16rpx;
+  height: 80rpx;
+  padding: 0 24rpx;
+  gap: 12rpx;
+}
+
+.cert-phone-prefix {
+  font-size: 28rpx;
+  color: #9CA3AF;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.cert-phone-input {
+  flex: 1;
+  background: transparent !important;
+  padding: 0 !important;
+  height: 100% !important;
+  border-radius: 0 !important;
+}
+
 .cert-input {
   height: 80rpx;
   background: #F6F7F8;
@@ -746,6 +863,16 @@ const copyText = (txt) => {
   padding: 0 24rpx;
   font-size: 28rpx;
   color: #1A1A1A;
+}
+
+.cert-input-error {
+  border: 1rpx solid #EF4444;
+}
+
+.cert-error-text {
+  font-size: 22rpx;
+  color: #EF4444;
+  margin-top: 4rpx;
 }
 
 .cert-actions {
@@ -773,5 +900,70 @@ const copyText = (txt) => {
 .cert-btn-confirm {
   background: #FF8C00;
   color: #FFFFFF;
+}
+
+.join-group-modal {
+  width: 560rpx;
+  padding: 48rpx 40rpx 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.join-group-icon {
+  margin-bottom: 8rpx;
+}
+
+.join-group-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+
+.join-group-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+  margin: 16rpx 0;
+  padding: 24rpx;
+  background: #F9FAFB;
+  border-radius: 16rpx;
+  width: 100%;
+}
+
+.join-group-avatar {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+}
+
+.join-group-text {
+  font-size: 26rpx;
+  color: #9CA3AF;
+}
+
+.join-group-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.join-group-btn {
+  width: 100%;
+  height: 80rpx;
+  background: #FF8C00;
+  border-radius: 200rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8rpx;
+}
+
+.join-group-btn-text {
+  color: #FFFFFF;
+  font-size: 28rpx;
+  font-weight: 600;
 }
 </style>

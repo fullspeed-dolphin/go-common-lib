@@ -55,7 +55,7 @@
           </view>
           <view class="stat-item">
             <text class="stat-number">{{ detail.gender_ratio || '--' }}</text>
-            <text class="stat-label">男女比例</text>
+            <text class="stat-label">男:女</text>
           </view>
           <view class="stat-item">
             <text class="stat-number">{{ groupStats.avg_km_per_member ? groupStats.avg_km_per_member.toFixed(1) : '--' }}</text>
@@ -128,6 +128,11 @@
 
         <!-- 跑团活动 -->
         <view v-if="activeTab === 'events'" class="events-section">
+          <view class="sort-capsules">
+            <view class="capsule" :class="{ 'capsule-active': eventSortBy === 'event_time' }" @click="switchEventSort('event_time')">活动时间</view>
+            <view class="capsule" :class="{ 'capsule-active': eventSortBy === 'registration_count' }" @click="switchEventSort('registration_count')">报名人数</view>
+            <view class="capsule" :class="{ 'capsule-active': eventSortBy === 'created_at' }" @click="switchEventSort('created_at')">创建时间</view>
+          </view>
           <view class="event-card" v-for="(item, idx) in eventList" :key="idx"
             @click="$u.route(`pagesSub/runningTeam/teamEventDetail?id=${item.id || item.event_id}`)">
             <view class="event-card-top">
@@ -253,6 +258,7 @@ const isEmpty = ref(false);
 const pageLoading = ref(false);
 const detail = ref({});
 const routeParams = ref({});
+const eventSortBy = ref('event_time');
 const eventList = ref([]);
 const memberList = ref([]);
 const memberLeader = ref({});
@@ -283,7 +289,7 @@ const formatKm = (val) => {
 const getMonth = (time) => {
   if (!time) return '';
   const t = isNaN(time) ? dayjs(time) : dayjs(Number(time));
-  return t.format('M');
+  return t.year() !== dayjs().year() ? t.format('YYYY/M') : t.format('M');
 };
 
 const getDay = (time) => {
@@ -295,7 +301,7 @@ const getDay = (time) => {
 const formatEventTime = (time) => {
   if (!time) return '';
   const t = isNaN(time) ? dayjs(time) : dayjs(Number(time));
-  return t.format('MM/DD HH:mm');
+  return t.year() !== dayjs().year() ? t.format('YYYY/MM/DD HH:mm') : t.format('MM/DD HH:mm');
 };
 
 const getCoverUrl = (item) => {
@@ -430,13 +436,18 @@ const getMonthlyRanking = (loadMore = false) => {
 
 const getEvents = () => {
   if (!routeParams.value.group_id) return Promise.resolve();
-  return request.get(`/event-api/fsc_events?fsc_id=${routeParams.value.group_id}&status=ACT`)
+  return request.get(`/event-api/fsc_events?fsc_id=${routeParams.value.group_id}&status=ACT&sort_by=${eventSortBy.value}`)
     .then((res) => {
       const list = (res.fsc_events || []).filter(i => i.status !== 'DELETED');
-      // 后端已返回 registration_count，无需逐个请求
       list.forEach((item) => { item._regCount = item.registration_count || 0; });
       eventList.value = list;
     }).catch(() => {});
+};
+
+const switchEventSort = (sort) => {
+  if (eventSortBy.value === sort) return;
+  eventSortBy.value = sort;
+  getEvents();
 };
 
 const joinGroup = () => {
@@ -753,6 +764,25 @@ const showShareBtn = () => {
   display: flex;
   flex-direction: column;
   gap: 20rpx;
+}
+
+.sort-capsules {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 8rpx;
+}
+
+.capsule {
+  padding: 14rpx 32rpx;
+  border-radius: 200rpx;
+  font-size: 26rpx;
+  color: #6B7280;
+  background: #F3F4F6;
+}
+
+.capsule-active {
+  color: #FFFFFF;
+  background: #FF8C00;
 }
 
 .event-card {

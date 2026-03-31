@@ -56,7 +56,7 @@
 		</view>
 
 		<!-- 发布活动按钮（团长可见） -->
-		<view v-if="userInfo.running_group" class="publish-btn-wrapper">
+		<view v-if="myGroupRole === 'creator'" class="publish-btn-wrapper">
 			<view class="publish-btn" @click="onClickPublish">
 				<image class="publish-btn-icon" src="/static/icons/send.png" mode="aspectFit" />
 				<text class="publish-btn-text">发布活动</text>
@@ -84,6 +84,7 @@ useShare({
 	path: '/pages/event'
 });
 const userInfo = computed(() => store.state.userInfo);
+const myGroupRole = ref('');
 
 const { mescrollInit, downCallback, getMescroll } = useMescroll(onPageScroll, onReachBottom);
 
@@ -422,6 +423,16 @@ onLoad(() => {
 });
 
 onShow(() => {
+	// 获取用户在跑团中的角色
+	const gid = userInfo.value.running_group;
+	if (gid) {
+		request.get(`/running-group/api/v1/groups/info?group_id=${gid}`, null, { showError: false })
+			.then(res => { myGroupRole.value = res?.user_role || ''; })
+			.catch(() => { myGroupRole.value = ''; });
+	} else {
+		myGroupRole.value = '';
+	}
+
 	// 加载"我的跑团活动"
 	if (selectedType.value === 'mine') {
 		loadMyEvents();

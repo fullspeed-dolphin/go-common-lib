@@ -6,13 +6,13 @@
 			<view class="">点击下面的"添加报名卡"按钮进行添加</view>
 		</view>
 
-		<view class="">
+		<view style="padding-bottom: 160rpx;">
 			<view class="card-item" :class="{ 'card-item-selectable': isSelectMode }"
 				v-for="(item, index) in registrationCardList" :key="item.id || index"
 				@click="isSelectMode ? handleSelect(item) : null">
 				<view class="name">
 					<view class="name-text">{{ item.full_name }}</view>
-					<view class="name-owner" v-if="item.is_self">本人</view>
+					<view class="name-owner" v-if="item.is_self" :style="{ color: themeColor, backgroundColor: themeColor + '1A' }">本人</view>
 				</view>
 				<view class="id-card-number">
 					<view class="id-card-number-text">{{
@@ -254,10 +254,8 @@
 				display: flex;
 				align-items: center;
 				margin-left: 26rpx;
-				background: #f1ffde;
 				border-radius: 8rpx 8rpx 8rpx 8rpx;
 				font-size: 24rpx;
-				color: #8cc63e;
 				padding: 8rpx 16rpx;
 			}
 		}
@@ -314,6 +312,5 @@
 		border-top: 1rpx solid #e5e5e5;
 		text-align: center;
 		font-size: 26rpx;
-		color: #8cc63e;
 	}
 </style>

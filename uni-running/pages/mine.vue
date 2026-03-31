@@ -63,7 +63,7 @@
               </view>
             </template>
             <view class="menu-divider"></view>
-            <view class="menu-row" @click="routeTo('/pagesSub/registrationCard/list')">
+            <view class="menu-row" @click="goRegistrationCard">
               <view class="menu-icon-wrap">
                 <view class="iconfont icon-baomingka1 menu-icon"></view>
               </view>
@@ -232,6 +232,11 @@ const showLoading = () => {
   setTimeout(() => {
     uni.hideLoading();
   }, 300);
+};
+
+const goRegistrationCard = () => {
+  uni.removeStorageSync('eventThemeColor');
+  routeTo('/pagesSub/registrationCard/list');
 };
 
 const routeTo = (link) => {
