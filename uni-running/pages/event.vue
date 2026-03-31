@@ -654,6 +654,7 @@ onShow(() => {
 
 .card-title {
 	font-size: 30rpx;
+	line-height: 40rpx;
 	font-weight: 700;
 	color: #1A1A1A;
 	overflow: hidden;
