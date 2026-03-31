@@ -504,32 +504,37 @@ onUnmounted(() => {
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 28rpx;
       font-weight: bold;
-      font-size: 32rpx;
+      font-size: 28rpx;
       color: #000000;
+      
       .section-item {
         display: flex;
-        align-items: center;
         gap: 24rpx;
+        padding: 12rpx;
+        
+        // 单数行
+        &:nth-child(odd) {
+          background-color: #ffffff;
+        }
+        
+        // 双数行
+        &:nth-child(even) {
+          background-color: #f7f7f7;
+        }
+        
         .label {
           width: 280rpx;
           flex-shrink: 0;
           letter-spacing: 2rpx;
           line-height: 44rpx;
         }
+        
         .value {
           line-height: 44rpx;
-        }
-      }
-      // 长文本自动换行（地址、订单编号）
-      .address-item,
-      .order-no-item {
-        align-items: flex-start;
-        .value {
-          word-break: break-all;
-          white-space: normal;
-          flex: 1;
+          word-wrap: break-word;      // 允许长单词或URL换行
+          word-break: break-all;      // 允许在任意字符间换行
+          white-space: normal;        // 正常换行（默认值）
         }
       }
     }
