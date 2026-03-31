@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@lucky-canvas/uni": "^0.0.14",
     "@turf/turf": "^7.3.4",
     "dayjs": "^1.11.18"
   }
