@@ -70,7 +70,8 @@
 				{ "path": "pkEvent/teamList","style": { "navigationStyle": "custom", "navigationBarTitleText": "战队列表"} },
 				{ "path": "pkEvent/activeRule","style": { "navigationStyle": "custom", "navigationBarTitleText": "活动规则"} },
 				{ "path": "pkEvent/teamDetail","style": { "navigationStyle": "custom", "navigationBarTitleText": "战队详情"} },
-				{ "path": "pkEvent/personalInfo","style": { "navigationStyle": "custom", "navigationBarTitleText": "信息录入"} }
+				{ "path": "pkEvent/personalInfo","style": { "navigationStyle": "custom", "navigationBarTitleText": "信息录入"} },
+				{ "path": "pkEvent/lottery","style": { "navigationStyle": "custom", "navigationBarTitleText": "幸运大转盘"} }
 			]
 		},
     {

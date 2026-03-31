@@ -192,6 +192,12 @@
     </view>
 
     <UserLogin ref="refUserLogin" @success="onLoginSuccess" />
+
+    <PopupAd 
+      v-model="isShowPop" 
+      @click="nav2Lottery"
+      adImg="https://ccrun.oss-cn-guangzhou.aliyuncs.com/images/2026/02/09/a24e474e-8c8f-49d2-bcea-1e00eebedd38.png?x-oss-process=image/resize,w_90,h_90,m_fill"
+    />
   </view>
 </template>
 
@@ -210,6 +216,7 @@ import UserLogin from "@/components/UserLogin.vue";
 import PersonalRecord from "./personalRecord.vue";
 
 import { useStore } from "vuex";
+import PopupAd from "../../components/PopupAd.vue";
 const store = useStore();
 const userInfo = computed(() => store.state.userInfo);
 const pkEventTheme = computed(() => store.state.pkEventTheme);
@@ -466,6 +473,28 @@ const teamRankValue = (item) => {
   if (teamSortBy.value === 'completion') return Number(item.team_completion_rate).toFixed(2) + '%';
   return item.current_members + '人';
 };
+
+// 弹窗广告状态
+const isShowPop = ref(false)
+
+// 弹窗广告跳转抽奖页面
+const nav2Lottery = () => {
+  uni.navigateTo({
+    url: "/pagesDashboard/pkEvent/lottery",
+  });
+}
+
+// 倒计时1秒显示广告
+const countdown = () => {
+  setTimeout(() => {
+    isShowPop.value = true
+	}, 1000)
+}
+
+// 页面加载后
+onShow(() => {
+	countdown()
+})
 </script>
 
 <style lang="scss" scoped>
