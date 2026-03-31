@@ -134,7 +134,7 @@ export function getPackageData(tickets, res_capacity) {
 
           isMutliGroup: priceValue.signers > 1,  // 是否是多人组
           groups: [],
-          maxGroups: 20,  // 最多20个组
+          maxGroups: priceValue.max_groups || 20,  // 最多N个组，默认20
           groupSize: priceValue.signers  // 单个组报名人数
         };
 
