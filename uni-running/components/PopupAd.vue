@@ -4,16 +4,17 @@ const props = defineProps({
   adImg: String
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'click', 'close'])  // 新增 close 事件
 
 // 关闭弹窗时触发
 const closePop = () => {
   emit('update:modelValue', false)
+  emit('close')  // 通知父组件关闭事件
 }
 
 // 点击容器时触发
 const onContainerClick = () => {
-  emit('click')  // 向父组件发送 click 事件
+  emit('click')
 }
 </script>
 
