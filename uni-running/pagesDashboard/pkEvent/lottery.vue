@@ -203,8 +203,10 @@ const uatRequest = {
 }
 
 // 活动数据 TODO:
-const eventId = ref('01KH0WQX4H2C7Q4GJ217P8T922') // 测试活动ID
-const openid = ref('oEuZJvnRRBWDqYw4hXqLkg-C9Ka8')
+// const eventId = ref('01KH0WQX4H2C7Q4GJ217P8T922') // 测试活动ID
+// const openid = ref('oEuZJvnRRBWDqYw4hXqLkg-C9Ka8')
+const eventId = ref('') 
+const openid = ref(store?.state?.userInfo?.openid)
 const eventInfo = ref({
   event_status: 'ACTIVE',
   is_eligible: true,
@@ -473,11 +475,11 @@ const handleError = (error, context) => {
   }
 }
 
-// 使用 onLoad 生命周期获取页面参数 TODO:
+// 使用 onLoad 生命周期获取页面参数
 onLoad((options) => {
-  // if (options.eventId) {
-  //   eventId.value = options.eventId
-  // }
+  if (options.eventId) {
+    eventId.value = options.eventId
+  }
   // 获取数据
   getEventInfo()
   getPrizes()
@@ -540,7 +542,7 @@ const endCallBack = (prize) => {
 const getButtonText = () => {
   if (loading.drawing) return '抽奖中...'
   if (loading.prizes || loading.eventInfo) return '加载中...'
-  if (eventInfo.value.event_status !== 'ENDED') return '活动未结束'
+  if (eventInfo.value.event_status !== 'ENDED') return '开始抽奖'
   if (!eventInfo.value.is_eligible) return '暂无资格'
   if (eventInfo.value.has_drawn) return '已抽奖'
   if (eventInfo.value.all_prizes_sent) return '奖品已送完'
@@ -550,7 +552,7 @@ const getButtonText = () => {
 // 跳转到抽奖历史页面
 const nav2History = () => {
   uni.navigateTo({
-    url: "/pagesDashboard/pkEvent/lottery-history",
+    url: `/pagesDashboard/pkEvent/lottery-history?eventId=${eventId.value}`,
   });
 }
 </script>
