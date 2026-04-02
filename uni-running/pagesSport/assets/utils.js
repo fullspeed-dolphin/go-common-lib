@@ -256,20 +256,16 @@ export function generateSpeedPolylines(points, segmentLength = 50) {
   const list = [];
   if (!Array.isArray(points) || points.length < 2) return list;
 
+  // 转换所有速度，并做平滑处理
+  let speeds = points.map(p => convertSpeed(p.speed));
+  speeds = smoothSpeeds(speeds, 5);  // 增大窗口，更平滑
+
   // 计算数据范围
-  const speeds = [];
-  for (let i = 0; i < points.length - 1; i++) {
-    const p1 = points[i], p2 = points[i + 1];
-    if (!p1 || !p2) continue;
-    const s1 = convertSpeed(p1.speed), s2 = convertSpeed(p2.speed);
-    if (s1 > 0) speeds.push(s1);
-    if (s2 > 0) speeds.push(s2);
-  }
+  const validSpeeds = speeds.filter(s => s > 0);
+  if (validSpeeds.length === 0) return list;
   
-  if (speeds.length === 0) return list;
-  
-  let minSpeed = Math.min(...speeds);
-  let maxSpeed = Math.max(...speeds);
+  let minSpeed = Math.min(...validSpeeds);
+  let maxSpeed = Math.max(...validSpeeds);
   if (maxSpeed - minSpeed < 2) {
     minSpeed = Math.max(0, minSpeed - 1);
     maxSpeed = maxSpeed + 1;
@@ -281,36 +277,38 @@ export function generateSpeedPolylines(points, segmentLength = 50) {
     const p2 = points[i + 1];
     if (!p1 || !p2) continue;
 
-    const s1 = convertSpeed(p1.speed);
-    const s2 = convertSpeed(p2.speed);
+    const s1 = speeds[i];
+    const s2 = speeds[i + 1];
     if (s1 <= 0 && s2 <= 0) continue;
 
-    // 计算两点距离，决定插值数量
     const distance = calculateDistance(p1, p2);
     const numSegments = Math.max(1, Math.floor(distance / segmentLength));
     
-    // 在两点之间插值生成多个小段
     for (let j = 0; j < numSegments; j++) {
       const ratio1 = j / numSegments;
       const ratio2 = (j + 1) / numSegments;
       
-      // 插值坐标
+      // 坐标插值
       const lat1 = p1.latitude + (p2.latitude - p1.latitude) * ratio1;
       const lng1 = p1.longitude + (p2.longitude - p1.longitude) * ratio1;
       const lat2 = p1.latitude + (p2.latitude - p1.latitude) * ratio2;
       const lng2 = p1.longitude + (p2.longitude - p1.longitude) * ratio2;
       
-      // 插值速度（关键：让速度平滑过渡）
+      // 速度插值
       const speed1 = s1 + (s2 - s1) * ratio1;
       const speed2 = s1 + (s2 - s1) * ratio2;
-      const avgSpeed = (speed1 + speed2) / 2;
+      
+      // 段间颜色渐变
+      const color1 = getColorBySpeed(speed1, minSpeed, maxSpeed);
+      const color2 = getColorBySpeed(speed2, minSpeed, maxSpeed);
+      const avgColor = interpolateColor(color1, color2, 0.5);
 
       list.push({
         points: [
           { latitude: lat1, longitude: lng1 },
           { latitude: lat2, longitude: lng2 }
         ],
-        color: getColorBySpeed(avgSpeed, minSpeed, maxSpeed),
+        color: avgColor,
         arrowLine: true,
         width: 8
       });
@@ -320,7 +318,44 @@ export function generateSpeedPolylines(points, segmentLength = 50) {
   return list;
 }
 
-// 计算两点间距离（米）
+// 高斯平滑（窗口大小可调）
+function smoothSpeeds(speeds, windowSize = 5) {
+  if (speeds.length < windowSize) return speeds;
+  
+  const smoothed = [];
+  const halfWindow = Math.floor(windowSize / 2);
+  
+  for (let i = 0; i < speeds.length; i++) {
+    let sum = 0;
+    let count = 0;
+    
+    for (let j = -halfWindow; j <= halfWindow; j++) {
+      const idx = i + j;
+      if (idx >= 0 && idx < speeds.length) {
+        const weight = 1 - Math.abs(j) / (halfWindow + 1);
+        sum += speeds[idx] * weight;
+        count += weight;
+      }
+    }
+    
+    smoothed.push(count > 0 ? sum / count : speeds[i]);
+  }
+  
+  return smoothed;
+}
+
+// 颜色插值
+function interpolateColor(color1, color2, ratio) {
+  const rgb1 = color1.match(/\d+/g).map(Number);
+  const rgb2 = color2.match(/\d+/g).map(Number);
+  
+  const r = Math.round(rgb1[0] + (rgb2[0] - rgb1[0]) * ratio);
+  const g = Math.round(rgb1[1] + (rgb2[1] - rgb1[1]) * ratio);
+  const b = Math.round(rgb1[2] + (rgb2[2] - rgb1[2]) * ratio);
+  
+  return `rgb(${r},${g},${b})`;
+}
+
 function calculateDistance(p1, p2) {
   const R = 6371000;
   const lat1 = p1.latitude * Math.PI / 180;
@@ -332,7 +367,6 @@ function calculateDistance(p1, p2) {
             Math.cos(lat1) * Math.cos(lat2) *
             Math.sin(deltaLng/2) * Math.sin(deltaLng/2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
   return R * c;
 }
 
@@ -343,7 +377,7 @@ function getColorBySpeed(kmh, minSpeed, maxSpeed) {
   }
   
   const s = Math.max(minSpeed, Math.min(kmh, maxSpeed));
-  const ratio = (s - minSpeed) / (maxSpeed - minSpeed);
+  const ratio = Math.max(0, Math.min(1, (s - minSpeed) / (maxSpeed - minSpeed)));
   const index = ratio * (colorGradient.length - 1);
   const i = Math.floor(index);
   const nextI = Math.min(i + 1, colorGradient.length - 1);
@@ -452,7 +486,6 @@ function analyzeOrientationViaMid(start, mid, end) {
   const compEnd = getComponents(mid, end);
 
   // 3. 累加总的横向跨度和纵向跨度
-  // 这里我们关心的是整体覆盖的范围是横长还是竖长
   const totalHorizontalSpan = compStart.h + compEnd.h;
   const totalVerticalSpan = compStart.v + compEnd.v;
 
@@ -471,15 +504,4 @@ function analyzeOrientationViaMid(start, mid, end) {
       totalSpan: { h: totalHorizontalSpan, v: totalVerticalSpan }
     }
   };
-}
- // 计算两坐标点之间的距离
-function getDistance(lat1, lng1, lat2, lng2) {
-  let rad1 = lat1 * Math.PI / 180.0;
-  let rad2 = lat2 * Math.PI / 180.0;
-  let a = rad1 - rad2;
-  let b = lng1 * Math.PI / 180.0 - lng2 * Math.PI / 180.0;
-  let r = 6378137;
-  return (r * 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) + Math.cos(rad1) * Math.cos(rad2) * Math.pow(Math
-    .sin(b / 2), 2)))).toFixed(0)
-
 }
