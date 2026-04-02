@@ -105,22 +105,19 @@ export const createMarker = (latitude, longitude, strDistance) => {
     id: strDistance,
     latitude,
     longitude,
-    width: 28,
-    height: 28,
-    anchor: { x: 0.5, y: 0.5 },
+    width: 32,
+    height: 32,
+    anchorY: -25,
     label: {
-      borderRadius: 14,
-      borderWidth: 2,
-      padding: 4,
       content: String(strDistance),
-      fontSize: 10,
+      fontSize: 11,
       bgColor: "#000",
-      borderColor: "#fff",
       color: "#fff",
-      textAlign: 'center'
+      textAlign: 'center',
+      anchorY: -24,
     },
-    // 使用透明占位图避免显示平台默认红色图标（data URI 1x1 GIF）
-    iconPath: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=',
+    // 使用自定义定位图标
+    iconPath: 'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/location.png',
   };
 };
 
@@ -141,7 +138,7 @@ export const createTextMarker = (latitude, longitude, text, opts = {}) => {
     height: 24,
     anchor: { x: 0.5, y: 0.5 },
     // 隐藏默认红色图标，使用透明占位
-    iconPath: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=',
+    iconPath: 'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/transparent.png',
     label: {
       borderRadius: 18,
       borderWidth: 2,
@@ -167,68 +164,138 @@ export const getTime = (t) => {
   return `${h}:${m}:${s}`;
 };
 
-const speedConfig = [
-  { max: 6, color: '#7fba3a' },   // 慢
-  { max: 8, color: '#8dc645' },   // 轻松
-  { max: 10, color: '#9bbd3e' },  // 中速
-  { max: 12, color: '#aeb33e' },  // 速度
-  { max: 14, color: '#c6a636' },  // 快
-  { max: 99, color: '#f58b2d' }   // 冲刺
+// 2026.4.2 旧的轨迹颜色算法
+// const speedConfig = [
+//   { max: 6, color: '#7fba3a' },   // 慢
+//   { max: 8, color: '#8dc645' },   // 轻松
+//   { max: 10, color: '#9bbd3e' },  // 中速
+//   { max: 12, color: '#aeb33e' },  // 速度
+//   { max: 14, color: '#c6a636' },  // 快
+//   { max: 99, color: '#f58b2d' }   // 冲刺
+// ];
+
+// function getColorBySpeed(kmh) {
+//   if (kmh == null || isNaN(kmh) || kmh <= 0) return speedConfig[0].color;
+//   return speedConfig.find((it) => kmh <= it.max)?.color || speedConfig[speedConfig.length - 1].color;
+// }
+
+// // 速度转换 m/s -> km/h
+// function covertSpeed(ms) {
+//   if (ms == null || isNaN(ms) || ms <= 0) return 0;
+//   const kmh = (ms * 3600) / 1000;
+//   return Number(kmh.toFixed(2));
+// }
+
+// // 根据速度生成多段彩色轨迹
+// export function generateSpeedPolylines(points) {
+//   const list = [];
+//   if (!Array.isArray(points) || points.length < 2) return list;
+
+//   let segment = [];
+//   let segmentColor = null;
+
+//   for (let i = 0; i < points.length - 1; i++) {
+//     const p1 = points[i];
+//     const p2 = points[i + 1];
+//     if (!p1 || !p2) continue;
+
+//     const s1 = covertSpeed(p1.speed);
+//     const s2 = covertSpeed(p2.speed);
+//     if (s1 <= 0 && s2 <= 0) continue;
+
+//     const avgSpeed = (s1 + s2) / 2;
+//     const color = getColorBySpeed(avgSpeed);
+
+//     if (!segment.length) {
+//       segment = [{ latitude: p1.latitude, longitude: p1.longitude }, { latitude: p2.latitude, longitude: p2.longitude }];
+//       segmentColor = color;
+//     } else if (color === segmentColor) {
+//       segment.push({ latitude: p2.latitude, longitude: p2.longitude });
+//     } else {
+//       list.push({
+//         points: segment,
+//         color: segmentColor,
+//         arrowLine: true,
+//         width: 8
+//       });
+//       segment = [{ latitude: p1.latitude, longitude: p1.longitude }, { latitude: p2.latitude, longitude: p2.longitude }];
+//       segmentColor = color;
+//     }
+//   }
+
+//   if (segment.length > 1) {
+//     list.push({
+//       points: segment,
+//       color: segmentColor || speedConfig[0].color,
+//       arrowLine: true,
+//       width: 8
+//     });
+//   }
+
+//   return list;
+// }
+
+// 2026.4.2 新的轨迹颜色算法
+// 颜色插值点（针对 7-10 km/h 慢跑区间优化）
+const colorStops = [
+  { speed: 0,  r: 127, g: 186, b: 58 },
+  { speed: 7,  r: 127, g: 186, b: 58 },
+  { speed: 7.5, r: 107, g: 168, b: 46 },
+  { speed: 8,  r: 141, g: 178, b: 52 },
+  { speed: 8.5, r: 174, g: 179, b: 62 },
+  { speed: 9,  r: 198, g: 166, b: 54 },
+  { speed: 9.5, r: 222, g: 142, b: 48 },
+  { speed: 10, r: 245, g: 139, b: 45 },
+  { speed: 11, r: 231, g: 76,  b: 60 },
+  { speed: 99, r: 231, g: 76,  b: 60 },
 ];
 
 function getColorBySpeed(kmh) {
-  if (kmh == null || isNaN(kmh) || kmh <= 0) return speedConfig[0].color;
-  return speedConfig.find((it) => kmh <= it.max)?.color || speedConfig[speedConfig.length - 1].color;
+  if (kmh == null || isNaN(kmh) || kmh <= 0) return '#7fba3a';
+  if (kmh >= 99) return '#e74c3c';
+  
+  for (let i = 0; i < colorStops.length - 1; i++) {
+    const c1 = colorStops[i];
+    const c2 = colorStops[i + 1];
+    
+    if (kmh >= c1.speed && kmh <= c2.speed) {
+      const ratio = (kmh - c1.speed) / (c2.speed - c1.speed);
+      const r = Math.round(c1.r + (c2.r - c1.r) * ratio);
+      const g = Math.round(c1.g + (c2.g - c1.g) * ratio);
+      const b = Math.round(c1.b + (c2.b - c1.b) * ratio);
+      return `rgb(${r},${g},${b})`;
+    }
+  }
+  return '#e74c3c';
 }
 
-// 速度转换 m/s -> km/h
-function covertSpeed(ms) {
+function convertSpeed(ms) {
   if (ms == null || isNaN(ms) || ms <= 0) return 0;
   const kmh = (ms * 3600) / 1000;
   return Number(kmh.toFixed(2));
 }
 
-// 根据速度生成多段彩色轨迹
 export function generateSpeedPolylines(points) {
   const list = [];
   if (!Array.isArray(points) || points.length < 2) return list;
-
-  let segment = [];
-  let segmentColor = null;
 
   for (let i = 0; i < points.length - 1; i++) {
     const p1 = points[i];
     const p2 = points[i + 1];
     if (!p1 || !p2) continue;
 
-    const s1 = covertSpeed(p1.speed);
-    const s2 = covertSpeed(p2.speed);
+    const s1 = convertSpeed(p1.speed);
+    const s2 = convertSpeed(p2.speed);
     if (s1 <= 0 && s2 <= 0) continue;
 
     const avgSpeed = (s1 + s2) / 2;
-    const color = getColorBySpeed(avgSpeed);
-
-    if (!segment.length) {
-      segment = [{ latitude: p1.latitude, longitude: p1.longitude }, { latitude: p2.latitude, longitude: p2.longitude }];
-      segmentColor = color;
-    } else if (color === segmentColor) {
-      segment.push({ latitude: p2.latitude, longitude: p2.longitude });
-    } else {
-      list.push({
-        points: segment,
-        color: segmentColor,
-        arrowLine: true,
-        width: 8
-      });
-      segment = [{ latitude: p1.latitude, longitude: p1.longitude }, { latitude: p2.latitude, longitude: p2.longitude }];
-      segmentColor = color;
-    }
-  }
-
-  if (segment.length > 1) {
+    
     list.push({
-      points: segment,
-      color: segmentColor || speedConfig[0].color,
+      points: [
+        { latitude: p1.latitude, longitude: p1.longitude },
+        { latitude: p2.latitude, longitude: p2.longitude }
+      ],
+      color: getColorBySpeed(avgSpeed),
       arrowLine: true,
       width: 8
     });
