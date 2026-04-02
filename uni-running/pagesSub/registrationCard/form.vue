@@ -79,7 +79,7 @@
 					<template #label>
 						<view class="custom-address-label">
 							<view class="custom-label-wrapper">
-								<text class="label-text">手机号码</text>
+								<text class="label-text">详细地址</text>
 								<text class="required-star">*</text>
 
 								<view class="tips-icon-wrapper" @click.stop="showAddressTipModal">
