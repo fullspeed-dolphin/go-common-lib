@@ -17,6 +17,9 @@ const myLucky = ref(null)
 // const showPop = ref(false)
 const prizeRet = ref(null)
 
+// 计算属性
+const userInfo = computed(() => store.state.userInfo);
+
 const blocks = ref([
   {
     padding: '24rpx',
@@ -25,48 +28,6 @@ const blocks = ref([
   }
 ])
 
-const prizes = ref([
-  {
-    fonts: [{ text: '五周年提现红包', top: '15%', fontSize: '24rpx', fontColor: '#D2691E' }],
-    background: '#FFFFFF',
-    imgs: [{ src: '/static/icons/lottery-icon.png', width: '30%', top: '45%' }]
-  },
-  {
-    fonts: [{ text: '高级五周年红包', top: '15%', fontSize: '24rpx', fontColor: '#D2691E' }],
-    background: '#FFF8F0',
-    imgs: [{ src: '/static/icons/lottery-icon.png', width: '30%', top: '45%' }]
-  },
-  {
-    fonts: [{ text: '五周年提现红包*3', top: '15%', fontSize: '24rpx', fontColor: '#D2691E' }],
-    background: '#FFFFFF',
-    imgs: [{ src: '/static/icons/lottery-icon.png', width: '30%', top: '45%' }]
-  },
-  {
-    fonts: [{ text: '高级五周年红包', top: '15%', fontSize: '24rpx', fontColor: '#D2691E' }],
-    background: '#FFF8F0',
-    imgs: [{ src: '/static/icons/lottery-icon.png', width: '30%', top: '45%' }]
-  },
-  {
-    fonts: [{ text: '五周年提现红包', top: '15%', fontSize: '24rpx', fontColor: '#D2691E' }],
-    background: '#FFFFFF',
-    imgs: [{ src: '/static/icons/lottery-icon.png', width: '30%', top: '45%' }]
-  },
-  {
-    fonts: [{ text: '高级五周年红包', top: '15%', fontSize: '24rpx', fontColor: '#D2691E' }],
-    background: '#FFF8F0',
-    imgs: [{ src: '/static/icons/lottery-icon.png', width: '30%', top: '45%' }]
-  },
-  {
-    fonts: [{ text: '五周年提现红包', top: '15%', fontSize: '24rpx', fontColor: '#D2691E' }],
-    background: '#FFFFFF',
-    imgs: [{ src: '/static/icons/lottery-icon.png', width: '30%', top: '45%' }]
-  },
-  {
-    fonts: [{ text: '未中奖', top: '15%', fontSize: '24rpx', fontColor: '#D2691E' }],
-    background: '#FFF8F0',
-    imgs: [{ src: '/static/icons/lottery-icon.png', width: '30%', top: '45%' }]
-  },
-])
 
 const buttons = ref([
   // 第一层：外圈
@@ -104,24 +65,30 @@ const defaultStyle = ref({
   fontWeight: '500'
 })
 
+// 移除假数据，使用接口数据
+const prizes = ref([])
+
 const winners = ref([])
 
-// 临时 UAT 请求工具（仅用于此页面）- 生产环境标准
+// UAT环境配置
+// 简单的UAT请求工具，直接使用全局的token获取方式
 const uatRequest = {
   get: (url, params) => {
     return new Promise((resolve, reject) => {
       uni.request({
-        url: `https://uat.speexpay.com${url}`,
+        url: `https://uat.speexpay.com/event-api/api/gift${url}`,
         method: 'GET',
         data: params,
         header: {
-          'Content-Type': 'application/json'
+          Authorization: uni.getStorageSync('token'),
+          // Authorization: '5a4ecef41628100c272b764ea75f0d0d8fdf0b51d79b960edfec27a278eccf75',
+          'content-type': 'application/json',
         },
         success: (res) => {
           if (res.statusCode === 200) {
             if (res.data && res.data.code !== undefined) {
               // 业务状态码处理
-              if (res.data.code === 0) {
+              if (res.data.code === 200) {
                 resolve(res.data)
               } else {
                 console.warn(`API业务错误: ${url}`, res.data)
@@ -154,20 +121,23 @@ const uatRequest = {
       })
     })
   },
-  post: (url, data) => {
+  post: (url, data, headers = {}) => {
     return new Promise((resolve, reject) => {
       uni.request({
-        url: `https://uat.speexpay.com${url}`,
+        url: `https://uat.speexpay.com/event-api/api/gift${url}`,
         method: 'POST',
         data: data,
         header: {
-          'Content-Type': 'application/json'
+          Authorization: uni.getStorageSync('token'),
+          // Authorization: '5a4ecef41628100c272b764ea75f0d0d8fdf0b51d79b960edfec27a278eccf75',
+          'content-type': 'application/json',
+          ...headers
         },
         success: (res) => {
           if (res.statusCode === 200) {
             if (res.data && res.data.code !== undefined) {
               // 业务状态码处理
-              if (res.data.code === 0) {
+              if (res.data.code === 200) {
                 resolve(res.data)
               } else {
                 console.warn(`API业务错误: ${url}`, res.data)
@@ -204,7 +174,7 @@ const uatRequest = {
 
 // 活动数据 TODO:
 // const eventId = ref('01KH0WQX4H2C7Q4GJ217P8T922') // 测试活动ID
-// const openid = ref('oEuZJvnRRBWDqYw4hXqLkg-C9Ka8')
+// const openid = ref('oEuZJvoN4oia8LJ-2k5A15S9CVSM')
 const eventId = ref('') 
 const openid = ref(store?.state?.userInfo?.openid)
 const eventInfo = ref({
@@ -237,8 +207,10 @@ const getEventInfo = async () => {
   errors.value.eventInfo = null
 
   try {
-    const res = await uatRequest.get(`/event-api/api/v1/gift/event_info?event_id=${eventId.value}&openid=${openid.value}`)
-    if (res.code === 0) {
+    const res = await uatRequest.get('/event_info', {
+      event_id: eventId.value,
+    })
+    if (res.code === 200) {
       eventInfo.value = res.data
     }
   } catch (error) {
@@ -255,20 +227,26 @@ const getPrizes = async () => {
   errors.value.prizes = null
 
   try {
-    const res = await uatRequest.get(`/event-api/api/v1/gift/prizes?event_id=${eventId.value}`)
-    if (res.code === 0 && res.data.length > 0) {
+    const res = await uatRequest.get('/prizes', {
+      event_id: eventId.value
+    })
+    if (res.code === 200 && res.data.length > 0) {
       // 动态生成奖品数据，保持前端样式不变
       prizes.value = res.data.map((prize, index) => {
         const isEven = index % 2 === 0
-        return {
+        const ret = {
           fonts: [{ text: prize.prize_name, top: '15%', fontSize: '24rpx', fontColor: '#D2691E' }],
           background: isEven ? '#FFFFFF' : '#FFF8F0',
-          imgs: [{ src: prize.prize_image_url || '/static/icons/lottery-icon.png', width: '30%', top: '45%' }],
           prize_id: prize.id,
           prize_type: prize.prize_type
         }
+        if (prize.prize_image_url) {
+          ret.imgs = [{ src: prize.prize_image_url, width: '30%', top: '45%' }]
+        }
+        return ret
       })
-    } else if (res.code === 0 && res.data.length === 0) {
+      console.log('奖品列表加载成功:', prizes.value)
+    } else if (res.code === 200 && res.data.length === 0) {
       // 奖品列表为空
       errors.value.prizes = '暂无奖品信息'
     }
@@ -286,8 +264,12 @@ const getWinners = async () => {
   errors.value.winners = null
 
   try {
-    const res = await uatRequest.get(`/event-api/api/v1/gift/winners?event_id=${eventId.value}&page=1&page_size=20`)
-    if (res.code === 0) {
+    const res = await uatRequest.get('/winners', {
+      event_id: eventId.value,
+      page: 1,
+      page_size: 20
+    })
+    if (res.code === 200) {
       winners.value = res.data.list.map(item => ({
         username: item.nickname,
         phone: item.phone,
@@ -312,10 +294,10 @@ const drawLottery = async () => {
   if (loading.value.drawing) return // 防止重复点击
 
   // 活动状态检查
-  if (eventInfo.value.event_status !== 'ENDED') {
+  if (eventInfo.value.event_status !== 'ACTIVE') {
     const statusMap = {
       'NOT_STARTED': '活动尚未开始',
-      'ACTIVE': '活动进行中，结束后可抽奖'
+      'ENDED': '活动已结束'
     }
     uni.showToast({
       title: statusMap[eventInfo.value.event_status] || '活动状态异常',
@@ -370,12 +352,12 @@ const drawLottery = async () => {
   myLucky.value?.play()
 
   try {
-    const res = await uatRequest.post('/event-api/api/v1/gift/draw', {
+    const res = await uatRequest.post('/draw', {
       event_id: eventId.value,
       openid: openid.value
     })
 
-    if (res.code === 0) {
+    if (res.code === 200) {
       const result = res.data
 
       // 抽奖成功，找到对应奖品索引
@@ -444,7 +426,23 @@ const handleError = (error, context) => {
   console.error(`${context}错误:`, error)
 
   // 错误分类处理
-  if (error.type === 'network') {
+  if (error.type === 'auth') {
+    // 认证错误
+    uni.showModal({
+      title: '登录过期',
+      content: error.message || '请重新登录',
+      showCancel: false,
+      confirmText: '去登录',
+      success: (res) => {
+        if (res.confirm) {
+          // 跳转到登录页面
+          uni.navigateTo({
+            url: '/pages/login/index'
+          })
+        }
+      }
+    })
+  } else if (error.type === 'network') {
     uni.showToast({
       title: '网络连接失败',
       icon: 'none',
@@ -542,7 +540,13 @@ const endCallBack = (prize) => {
 const getButtonText = () => {
   if (loading.drawing) return '抽奖中...'
   if (loading.prizes || loading.eventInfo) return '加载中...'
-  if (eventInfo.value.event_status !== 'ENDED') return '开始抽奖'
+  if (eventInfo.value.event_status !== 'ACTIVE') {
+    const statusMap = {
+      'NOT_STARTED': '活动未开始',
+      'ENDED': '活动已结束'
+    }
+    return statusMap[eventInfo.value.event_status] || '活动状态异常'
+  }
   if (!eventInfo.value.is_eligible) return '暂无资格'
   if (eventInfo.value.has_drawn) return '已抽奖'
   if (eventInfo.value.all_prizes_sent) return '奖品已送完'
@@ -594,12 +598,31 @@ const nav2History = () => {
           @click="startCallBack"
           :class="{
             disabled: loading.drawing || loading.prizes || loading.eventInfo,
-            'event-not-ended': eventInfo.event_status !== 'ENDED',
+            'event-not-ended': eventInfo.event_status !== 'ACTIVE',
             'not-eligible': !eventInfo.is_eligible,
             'already-drawn': eventInfo.has_drawn
           }"
         >
           <text class="btn-text">{{ getButtonText() }}</text>
+        </view>
+      </view>
+
+      <view class="prizes-list" v-if="prizes.length > 0">
+        <view class="prizes-list-title">奖品列表</view>
+        <view class="prizes-list-items">
+          <view
+            v-for="(item, index) in prizes"
+            :key="index"
+            class="prize-item"
+          >
+            <view class="prize-index">{{ index + 1 }}</view>
+            <view class="prize-info">
+              <view class="prize-name-text">{{ item.fonts[0].text }}</view>
+              <view class="prize-type" :class="item.prize_type">
+                {{ item.prize_type === 'PHYSICAL' ? '实物奖品' : item.prize_type === 'NONE' ? '虚拟奖品' : '其他奖品' }}
+              </view>
+            </view>
+          </view>
         </view>
       </view>
 
@@ -678,16 +701,15 @@ const nav2History = () => {
 }
 
 .page {
-  flex: 1;
   overflow-y: auto;
   background: linear-gradient(
     to bottom,
     #ff7979 0%,    /* 浅红色 */
     #ffd4a3 50%,   /* 中间过渡色 */
-    #ffcc99 100%   /* 浅橙色 */
+    #ffffff 100% 
   );
-  display: flex;
-  flex-direction: column;
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .wheel-container {
@@ -697,17 +719,93 @@ const nav2History = () => {
   padding: 80rpx 0 50rpx 0;
 }
 
-.spacer {
+.prizes-list {
+  background-color: white;
+  padding: 30rpx 40rpx;
+  margin: 0 40rpx 40rpx;
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  display: block !important;
+  min-height: 100rpx;
+}
+
+.prizes-list-title {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
+.prizes-list-items {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.prize-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.prize-item:last-child {
+  border-bottom: none;
+}
+
+.prize-index {
+  width: 40rpx;
+  height: 40rpx;
+  background: linear-gradient(135deg, #ff6b6b, #ff4757);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24rpx;
+  font-weight: bold;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.prize-info {
   flex: 1;
+}
+
+.prize-name-text {
+  font-size: 30rpx;
+  color: #333;
+  font-weight: 500;
+  margin-bottom: 8rpx;
+}
+
+.prize-type {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.prize-type.PHYSICAL {
+  color: #4caf50;
+}
+
+.prize-type.NONE {
+  color: #999;
 }
 
 .winners-container {
   background-color: white;
   width: 100%;
   border-radius: 26rpx 26rpx 0 0;
-  margin-top: auto;
+  margin-top: 40rpx;
   padding-bottom: constant(safe-area-inset-bottom);
   padding-bottom: env(safe-area-inset-bottom);
+}
+
+.spacer {
+  min-height: 40rpx;
 }
 
 .winners-container-title {

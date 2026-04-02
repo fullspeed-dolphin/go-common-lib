@@ -40,32 +40,34 @@ const formRules = {
   ],
   address: [
     { required: true, message: '请输入详细地址', trigger: ['blur', 'change'] },
-    { min: 10, max: 200, message: '地址长度应在10-200个字符之间', trigger: ['blur', 'change'] }
+    { min: 5, max: 200, message: '地址长度应在5-200个字符之间', trigger: ['blur', 'change'] }
   ]
 }
 
 // 活动数据 TODO:
 // const eventId = ref('01KH0WQX4H2C7Q4GJ217P8T922') // 测试活动ID
-// const openid = ref('oEuZJvnRRBWDqYw4hXqLkg-C9Ka8')
+// const openid = ref('oEuZJvoN4oia8LJ-2k5A15S9CVSM')
 const eventId = ref('') 
 const openid = ref(store?.state?.userInfo?.openid)
 
-// 临时 UAT 请求工具（仅用于此页面）- 生产环境标准
+// 简单的UAT请求工具，直接使用全局的token获取方式
 const uatRequest = {
   get: (url, params) => {
     return new Promise((resolve, reject) => {
       uni.request({
-        url: `https://uat.speexpay.com${url}`,
+        url: `https://uat.speexpay.com/event-api/api/gift${url}`,
         method: 'GET',
         data: params,
         header: {
-          'Content-Type': 'application/json'
+          Authorization: uni.getStorageSync('token'),
+          // Authorization: '5a4ecef41628100c272b764ea75f0d0d8fdf0b51d79b960edfec27a278eccf75',
+          'content-type': 'application/json',
         },
         success: (res) => {
           if (res.statusCode === 200) {
             if (res.data && res.data.code !== undefined) {
               // 业务状态码处理
-              if (res.data.code === 0) {
+              if (res.data.code === 200) {
                 resolve(res.data)
               } else {
                 console.warn(`API业务错误: ${url}`, res.data)
@@ -101,18 +103,20 @@ const uatRequest = {
   post: (url, data, headers = {}) => {
     return new Promise((resolve, reject) => {
       uni.request({
-        url: `https://uat.speexpay.com${url}`,
+        url: `https://uat.speexpay.com/event-api/api/gift${url}`,
         method: 'POST',
         data: data,
         header: {
-          'Content-Type': 'application/json',
+          Authorization: uni.getStorageSync('token'),
+          // Authorization: '5a4ecef41628100c272b764ea75f0d0d8fdf0b51d79b960edfec27a278eccf75',
+          'content-type': 'application/json',
           ...headers
         },
         success: (res) => {
           if (res.statusCode === 200) {
             if (res.data && res.data.code !== undefined) {
               // 业务状态码处理
-              if (res.data.code === 0) {
+              if (res.data.code === 200) {
                 resolve(res.data)
               } else {
                 console.warn(`API业务错误: ${url}`, res.data)
@@ -154,22 +158,17 @@ const getList = async (mescroll) => {
 
   try {
     // 调用个人中奖记录接口
-    const res = await uatRequest.get('/event-api/api/v1/gift/my_records', {
+    const res = await uatRequest.get('/my_records', {
       event_id: eventId.value,
       openid: openid.value
     })
 
-    if (res.code === 0 && res.data) {
-      // 转换状态字段以适配前端展示
-      const transformedData = res.data.map(item => ({
-        ...item,
-        status: item.status === 'NOT_WIN' ? 'NOT_WIN' : 'WIN'
-      }))
-
-      records.value = mescroll.num == 1 ? transformedData : records.value.concat(transformedData)
+    if (res.code === 200 && res.data) {
+      // 直接使用接口返回的数据
+      records.value = mescroll.num == 1 ? res.data : records.value.concat(res.data)
 
       // 结束加载状态
-      mescroll.endSuccess(transformedData.length, transformedData.length >= mescroll.size)
+      mescroll.endSuccess(res.data.length, res.data.length >= mescroll.size)
     } else {
       mescroll.endErr()
     }
@@ -200,21 +199,90 @@ const formatTime = (time) => {
   return dayjs(time).format('MM-DD HH:mm')
 }
 
-// 点击记录项 - 处理待填地址状态
-const handleRecordClick = (record) => {
-  // 如果状态是待填地址，打开地址填写弹窗
-  if (record.status === 'PENDING_ADDRESS') {
-    addressForm.value.record_id = record.id
-    showAddressModal.value = true
+// 处理状态点击
+const handleStatusClick = (item) => {
+  // 默认未锁定状态为false
+  const isLocked = item.is_locked || false
+
+  // 只有已中奖且未锁定的才能点击
+  if ((item.status === 'PENDING_ADDRESS' || item.status === 'ADDRESS_FILLED') && !isLocked) {
+    openAddressModal(item)
+  } else if (item.status === 'ADDRESS_FILLED' && isLocked) {
+    uni.showToast({
+      title: '地址已锁定，不可修改',
+      icon: 'none',
+      duration: 2000
+    })
   }
 }
 
+// 获取状态光标样式
+const getStatusCursor = (item) => {
+  // 默认未锁定状态为false
+  const isLocked = item.is_locked || false
+  if ((item.status === 'PENDING_ADDRESS' || item.status === 'ADDRESS_FILLED') && !isLocked) {
+    return 'pointer'
+  }
+  return 'default'
+}
+
+// 弹窗标题
+const modalTitle = ref('填写收货地址')
+
+// 当前操作模式
+const operationMode = ref('create') // create or update
+
 // 打开地址弹窗
-const openAddressModal = () => {
+const openAddressModal = (record) => {
+  // 设置record_id
+  addressForm.value.record_id = record.id
+
+  // 根据状态设置标题和模式
+  if (record.status === 'ADDRESS_FILLED') {
+    modalTitle.value = '修改收货地址'
+    operationMode.value = 'update'
+  } else {
+    modalTitle.value = '填写收货地址'
+    operationMode.value = 'create'
+  }
+
+  // 如果已经填写过地址，加载已有数据
+  if (record.status === 'ADDRESS_FILLED') {
+    // 这里需要调用获取地址详情的接口
+    loadAddressDetail(record.id)
+  }
   showAddressModal.value = true
 }
 
-// 提交地址信息
+// 加载地址详情 - 简化版，直接模拟数据
+const loadAddressDetail = (recordId) => {
+  // 模拟已有地址数据
+  addressForm.value = {
+    record_id: recordId,
+    recipient_name: '张三',
+    contact_number: '13800138000',
+    address: '广东省广州市天河区xx路xx号'
+  }
+}
+
+// 关闭地址弹窗
+const closeAddressModal = () => {
+  showAddressModal.value = false
+  // 重置表单
+  if (formRef.value) {
+    formRef.value.resetFields()
+  }
+  addressForm.value = {
+    record_id: '',
+    recipient_name: '',
+    contact_number: '',
+    address: ''
+  }
+  // 重置操作模式
+  operationMode.value = 'create'
+}
+
+// 提交地址信息 - 简化版，只做前端交互
 const submitAddress = async () => {
   // 使用u-form进行校验
   if (!formRef.value) return
@@ -225,62 +293,68 @@ const submitAddress = async () => {
     // 验证通过后提交
     uni.showLoading({ title: '提交中...', mask: true })
 
-    // 获取用户token
-    const token = uni.getStorageSync('token') || ''
+    // 模拟接口延迟
+    setTimeout(() => {
+      uni.hideLoading()
 
-    // 调用保存收货地址接口
-    const res = await uatRequest.post('/event-api/api/v1/gift/address', {
-      record_id: addressForm.value.record_id,
-      recipient_name: addressForm.value.recipient_name,
-      contact_number: addressForm.value.contact_number,
-      address: addressForm.value.address
-    }, {
-      'Authorization': `Bearer ${token}`
-    })
-
-    uni.hideLoading()
-
-    if (res.code === 0) {
+      // 模拟提交成功
       uni.showToast({ title: '地址保存成功', icon: 'success' })
-      showAddressModal.value = false
-      // 重置表单
-      formRef.value.resetFields()
+      closeAddressModal()
+
+      // 更新本地记录状态
+      const recordIndex = records.value.findIndex(r => r.id === addressForm.value.record_id)
+      if (recordIndex !== -1) {
+        // 更新状态为已填写地址
+        records.value[recordIndex].status = 'ADDRESS_FILLED'
+
+        // 如果是修改操作，标记为已锁定
+        if (operationMode.value === 'update') {
+          records.value[recordIndex].is_locked = true
+        }
+      }
+
       // 刷新列表
       downCallback()
-    } else {
-      // 错误处理
-      const errorMessages = {
-        1006: '记录不存在或无权限',
-        1007: '非实物奖品无需填写地址',
-        1005: '地址已填写过，拒绝重复提交'
-      }
-      uni.showToast({
-        title: errorMessages[res.code] || res.message || '提交失败',
-        icon: 'none'
-      })
-    }
+    }, 1500)
+
   } catch (error) {
     uni.hideLoading()
 
-    // 错误处理
-    if (error.type === 'network') {
-      uni.showToast({ title: '网络连接失败', icon: 'none' })
-    } else if (error.type === 'business') {
-      const errorMessages = {
-        1006: '记录不存在或无权限',
-        1007: '非实物奖品无需填写地址',
-        1005: '地址已填写过，拒绝重复提交'
-      }
-      uni.showToast({
-        title: errorMessages[error.code] || error.message || '提交失败',
-        icon: 'none'
-      })
-    } else if (Array.isArray(error)) {
+    if (Array.isArray(error)) {
       // 表单校验失败
       uni.showToast({ title: error[0].message, icon: 'none' })
     }
   }
 }
+
+// 联系客服
+const openWeComChat = () => {
+  uni.showLoading({
+    mask: true,
+  });
+
+  setTimeout(() => {
+    uni.hideLoading();
+  }, 300);
+  // #ifdef MP-WEIXIN
+  wx.openCustomerServiceChat({
+    extInfo: {
+      url: "https://work.weixin.qq.com/kfid/kfcb41efa532f58830b"
+    },
+    corpId: 'wwaac238486eb8781e',
+    onOpen: (res) => {
+      console.log('success', res);
+    },
+    onError: (err) => {
+      console.error('fail', err);
+      uni.showModal({
+        content: '客服系统繁忙，请稍后重试或拨打热线电话',
+        showCancel: false
+      });
+    }
+  });
+  // #endif
+};
 
 // 使用 onLoad 生命周期获取页面参数
 onLoad((options) => {
@@ -303,31 +377,48 @@ onLoad((options) => {
         :up="{ auto: true, page: { size: 30 } }"
       >
         <!-- 收件信息提示栏 -->
-        <view class="address-notice" @click="openAddressModal">
-          <view class="notice-content">
-            <text class="notice-icon">📮</text>
-            <view class="notice-text">
-              <text class="notice-title">设置收货地址</text>
-              <text class="notice-desc">点击"待填地址"记录可直接填写收货信息</text>
-            </view>
-            <text class="notice-arrow">›</text>
-          </view>
+        <!-- 状态说明 -->
+        <view class="status-legend">
+          <text class="legend-item"><text class="legend-color pending">■</text>待填地址</text>
+          <text class="legend-item"><text class="legend-color filled">■</text>已填地址</text>
+          <text class="legend-item"><text class="legend-color locked">■</text>已锁定</text>
         </view>
 
+        <!-- <view class="status-legend">
+          <text class="legend-item"><text class="legend-color pending">■</text>待填地址</text>
+          <text class="legend-item"><text class="legend-color filled">■</text>已填地址</text>
+          <text class="legend-item"><text class="legend-color locked">■</text>已锁定</text>
+        </view> -->
+
         <view class="records-container">
+          <!-- 暂无记录占位 -->
+          <view v-if="records.length === 0" class="empty-placeholder">
+            <view class="empty-icon">🎁</view>
+            <view class="empty-text">暂无抽奖记录</view>
+            <view class="empty-desc">您还没有参与过抽奖活动</view>
+          </view>
+
+          <!-- 记录列表 -->
           <view
             v-for="(item, index) in records"
-            :key="index"
+            :key="item.id || index"
             class="item-container"
           >
             <view class="left-info">
-              <view class="prize-name" :class="{ 'win': item.status !== 'NOT_WIN' }">{{ item.prize_name }}</view>
+              <view class="prize-name" :class="{ 'win': item.status !== 'NOT_WIN' && item.status !== 'NONE' }">{{ item.prize_name }}</view>
               <view class="draw-time">{{ formatTime(item.draw_time) }}</view>
             </view>
-            <view class="right-status" :class="item.status">
+            <view
+              class="right-status"
+              :class="[item.status, { 'disabled': item.status === 'NOT_WIN' || item.status === 'NONE' || (item.is_locked || false) }]"
+              @click="handleStatusClick(item)"
+              :style="{ cursor: getStatusCursor(item) }"
+            >
               <text v-if="item.status === 'NOT_WIN'">未中奖</text>
               <text v-else-if="item.status === 'PENDING_ADDRESS'">待填地址</text>
-              <text v-else-if="item.status === 'ADDRESS_FILLED'">已填地址</text>
+              <text v-else-if="item.status === 'ADDRESS_FILLED'">{{ item.is_locked ? '已锁定' : '已填地址' }}</text>
+              <text v-else-if="item.status === 'WIN'">已中奖</text>
+              <text v-else-if="item.status === 'NONE'">谢谢参与</text>
               <text v-else>中奖</text>
             </view>
           </view>
@@ -338,18 +429,22 @@ onLoad((options) => {
     <!-- 地址填写弹窗 -->
     <u-popup
       :show="showAddressModal"
-      @close="showAddressModal = false"
+      @close="closeAddressModal"
       mode="center"
       :closeOnClickOverlay="true"
       :safeAreaInsetBottom="true"
     >
       <view class="address-modal">
         <view class="modal-header">
-          <text class="modal-title">填写收货地址</text>
-          <text class="modal-close" @click="showAddressModal = false">✕</text>
+          <text class="modal-title">{{ modalTitle }}</text>
+          <text class="modal-close" @click="closeAddressModal">✕</text>
         </view>
 
         <view class="modal-body">
+          <!-- 提示信息 -->
+          <view v-if="modalTitle === '修改收货地址'" class="modify-tip">
+            <text class="tip-text">⚠️ 地址只能修改一次，请仔细核对信息</text>
+          </view>
           <u-form ref="formRef" :model="addressForm" :rules="formRules">
             <view class="form-group">
               <view class="form-label">收件人姓名 <text class="required">*</text></view>
@@ -392,8 +487,8 @@ onLoad((options) => {
         </view>
 
         <view class="modal-footer">
-          <view class="btn-cancel" @click="showAddressModal = false">取消</view>
-          <view class="btn-submit" @click="submitAddress">提交</view>
+          <view class="btn-cancel" @click="closeAddressModal">取消</view>
+          <view class="btn-submit" @click="submitAddress">{{ operationMode === 'update' ? '修改' : '提交' }}</view>
         </view>
       </view>
     </u-popup>
@@ -408,7 +503,7 @@ onLoad((options) => {
     to bottom,
     #ff7979 0%,    /* 浅红色 */
     #ffd4a3 50%,   /* 中间过渡色 */
-    #ffcc99 100%   /* 浅橙色 */
+    #ffffff 100% 
   );
 }
 
@@ -416,6 +511,35 @@ onLoad((options) => {
   padding: 20rpx;
   padding-bottom: calc(20rpx + constant(safe-area-inset-bottom));
   padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  min-height: 500rpx;
+}
+
+/* 空数据占位样式 */
+.empty-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 40rpx;
+  color: #999;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 30rpx;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 32rpx;
+  font-weight: 500;
+  margin-bottom: 16rpx;
+  color: #666;
+}
+
+.empty-desc {
+  font-size: 26rpx;
+  color: #999;
 }
 
 .item-container {
@@ -479,7 +603,79 @@ onLoad((options) => {
   background-color: #4caf50;
 }
 
-/* 地址提示栏样式 */
+.right-status.ADDRESS_FILLED.disabled {
+  background-color: #9e9e9e;
+  cursor: not-allowed;
+}
+
+.right-status.NONE {
+  color: #999;
+  background-color: #f5f5f5;
+}
+
+.right-status.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 状态图例样式 */
+.status-legend {
+  display: flex;
+  justify-content: center;
+  gap: 30rpx;
+  padding: 16rpx 20rpx;
+  background-color: rgba(255, 255, 255, 0.95);
+  margin: 20rpx 20rpx 0;
+  border-radius: 12rpx;
+  font-size: 22rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  color: #666;
+}
+
+.legend-color {
+  font-size: 20rpx;
+}
+
+.legend-color.pending {
+  color: #ff9800;
+}
+
+.legend-color.filled {
+  color: #4caf50;
+}
+
+.legend-color.locked {
+  color: #9e9e9e;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  color: #666;
+}
+
+.legend-color {
+  font-size: 20rpx;
+}
+
+.legend-color.pending {
+  color: #ff9800;
+}
+
+.legend-color.filled {
+  color: #4caf50;
+}
+
+.legend-color.locked {
+  color: #9e9e9e;
+}
 .address-notice {
   margin: 20rpx;
   border-radius: 12rpx;
@@ -529,6 +725,21 @@ onLoad((options) => {
 }
 
 /* 地址弹窗样式 */
+
+/* 修改提示样式 */
+.modify-tip {
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8rpx;
+  padding: 20rpx;
+  margin-bottom: 30rpx;
+}
+
+.tip-text {
+  color: #856404;
+  font-size: 26rpx;
+  line-height: 1.5;
+}
 
 /* 自定义表单样式 */
 .form-group {
