@@ -552,14 +552,52 @@ const nav2Lottery = () => {
   });
 }
 
-// TODO: 金刚区完赛证书icon点击
+// 金刚区完赛证书icon点击
 const certIconOnClick = () => {
-  uni.showModal({
-    title: '提示',
-    content: '敬请期待',
-    showCancel: false,
-    confirmText: '知道了',
-  });
+  const confirmColor = detailInfo.value?.color_config?.solid || '#FF8C00'
+
+  // 未报名
+  if (!hasSignedUp.value) {
+    uni.showModal({
+      title: '提示',
+      content: '您未参加此活动',
+      showCancel: false,
+      confirmText: '知道了',
+      confirmColor,
+    })
+    return
+  }
+
+  // 活动未结束
+  if (detailInfo.value?.status !== 'exp') {
+    uni.showModal({
+      title: '提示',
+      content: '活动结束后可查看完赛证书',
+      showCancel: false,
+      confirmText: '知道了',
+      confirmColor,
+    })
+    return
+  }
+
+  // 活动已结束但未达标
+  const checkin = userCheckedInfo.value
+  if (!checkin?.required_checkins || checkin.total_qualified_sessions < checkin.required_checkins) {
+    uni.showModal({
+      title: '提示',
+      content: '您本次活动未达标，希望您能再接再厉哦',
+      showCancel: false,
+      confirmText: '知道了',
+      confirmColor,
+    })
+    return
+  }
+
+  // 达标，查看完赛证书
+  const certUrl = `https://speexpay.com/image-service/${activetyId.value}?openid=${userInfo.value?.openid || ''}`
+  uni.navigateTo({
+    url: `/pagesDashboard/pkEvent/certViewer?url=${encodeURIComponent(certUrl)}&eventName=${encodeURIComponent(detailInfo.value?.event_name || '完赛证书')}`,
+  })
 }
 
 const lotteryIconClick = () => {
