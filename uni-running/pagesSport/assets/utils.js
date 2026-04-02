@@ -236,49 +236,46 @@ export const getTime = (t) => {
 // }
 
 // 2026.4.2 新的轨迹颜色算法
-// 颜色插值点（针对 7-10 km/h 慢跑区间优化）
-const colorStops = [
-  { speed: 0,  r: 127, g: 186, b: 58 },
-  { speed: 7,  r: 127, g: 186, b: 58 },
-  { speed: 7.5, r: 107, g: 168, b: 46 },
-  { speed: 8,  r: 141, g: 178, b: 52 },
-  { speed: 8.5, r: 174, g: 179, b: 62 },
-  { speed: 9,  r: 198, g: 166, b: 54 },
-  { speed: 9.5, r: 222, g: 142, b: 48 },
-  { speed: 10, r: 245, g: 139, b: 45 },
-  { speed: 11, r: 231, g: 76,  b: 60 },
-  { speed: 99, r: 231, g: 76,  b: 60 },
+// 通用颜色梯度（从慢到快，固定12个色阶）
+const colorGradient = [
+  { r: 127, g: 186, b: 58 },
+  { r: 107, g: 168, b: 46 },
+  { r: 141, g: 178, b: 52 },
+  { r: 155, g: 189, b: 62 },
+  { r: 174, g: 179, b: 62 },
+  { r: 188, g: 172, b: 58 },
+  { r: 198, g: 166, b: 54 },
+  { r: 210, g: 155, b: 50 },
+  { r: 222, g: 145, b: 48 },
+  { r: 235, g: 140, b: 46 },
+  { r: 245, g: 139, b: 45 },
+  { r: 231, g: 76,  b: 60 },
 ];
 
-function getColorBySpeed(kmh) {
-  if (kmh == null || isNaN(kmh) || kmh <= 0) return '#7fba3a';
-  if (kmh >= 99) return '#e74c3c';
-  
-  for (let i = 0; i < colorStops.length - 1; i++) {
-    const c1 = colorStops[i];
-    const c2 = colorStops[i + 1];
-    
-    if (kmh >= c1.speed && kmh <= c2.speed) {
-      const ratio = (kmh - c1.speed) / (c2.speed - c1.speed);
-      const r = Math.round(c1.r + (c2.r - c1.r) * ratio);
-      const g = Math.round(c1.g + (c2.g - c1.g) * ratio);
-      const b = Math.round(c1.b + (c2.b - c1.b) * ratio);
-      return `rgb(${r},${g},${b})`;
-    }
-  }
-  return '#e74c3c';
-}
-
-function convertSpeed(ms) {
-  if (ms == null || isNaN(ms) || ms <= 0) return 0;
-  const kmh = (ms * 3600) / 1000;
-  return Number(kmh.toFixed(2));
-}
-
-export function generateSpeedPolylines(points) {
+export function generateSpeedPolylines(points, segmentLength = 50) {
   const list = [];
   if (!Array.isArray(points) || points.length < 2) return list;
 
+  // 计算数据范围
+  const speeds = [];
+  for (let i = 0; i < points.length - 1; i++) {
+    const p1 = points[i], p2 = points[i + 1];
+    if (!p1 || !p2) continue;
+    const s1 = convertSpeed(p1.speed), s2 = convertSpeed(p2.speed);
+    if (s1 > 0) speeds.push(s1);
+    if (s2 > 0) speeds.push(s2);
+  }
+  
+  if (speeds.length === 0) return list;
+  
+  let minSpeed = Math.min(...speeds);
+  let maxSpeed = Math.max(...speeds);
+  if (maxSpeed - minSpeed < 2) {
+    minSpeed = Math.max(0, minSpeed - 1);
+    maxSpeed = maxSpeed + 1;
+  }
+
+  // 密集插值生成轨迹
   for (let i = 0; i < points.length - 1; i++) {
     const p1 = points[i];
     const p2 = points[i + 1];
@@ -288,20 +285,82 @@ export function generateSpeedPolylines(points) {
     const s2 = convertSpeed(p2.speed);
     if (s1 <= 0 && s2 <= 0) continue;
 
-    const avgSpeed = (s1 + s2) / 2;
+    // 计算两点距离，决定插值数量
+    const distance = calculateDistance(p1, p2);
+    const numSegments = Math.max(1, Math.floor(distance / segmentLength));
     
-    list.push({
-      points: [
-        { latitude: p1.latitude, longitude: p1.longitude },
-        { latitude: p2.latitude, longitude: p2.longitude }
-      ],
-      color: getColorBySpeed(avgSpeed),
-      arrowLine: true,
-      width: 8
-    });
+    // 在两点之间插值生成多个小段
+    for (let j = 0; j < numSegments; j++) {
+      const ratio1 = j / numSegments;
+      const ratio2 = (j + 1) / numSegments;
+      
+      // 插值坐标
+      const lat1 = p1.latitude + (p2.latitude - p1.latitude) * ratio1;
+      const lng1 = p1.longitude + (p2.longitude - p1.longitude) * ratio1;
+      const lat2 = p1.latitude + (p2.latitude - p1.latitude) * ratio2;
+      const lng2 = p1.longitude + (p2.longitude - p1.longitude) * ratio2;
+      
+      // 插值速度（关键：让速度平滑过渡）
+      const speed1 = s1 + (s2 - s1) * ratio1;
+      const speed2 = s1 + (s2 - s1) * ratio2;
+      const avgSpeed = (speed1 + speed2) / 2;
+
+      list.push({
+        points: [
+          { latitude: lat1, longitude: lng1 },
+          { latitude: lat2, longitude: lng2 }
+        ],
+        color: getColorBySpeed(avgSpeed, minSpeed, maxSpeed),
+        arrowLine: true,
+        width: 8
+      });
+    }
   }
 
   return list;
+}
+
+// 计算两点间距离（米）
+function calculateDistance(p1, p2) {
+  const R = 6371000;
+  const lat1 = p1.latitude * Math.PI / 180;
+  const lat2 = p2.latitude * Math.PI / 180;
+  const deltaLat = (p2.latitude - p1.latitude) * Math.PI / 180;
+  const deltaLng = (p2.longitude - p1.longitude) * Math.PI / 180;
+
+  const a = Math.sin(deltaLat/2) * Math.sin(deltaLat/2) +
+            Math.cos(lat1) * Math.cos(lat2) *
+            Math.sin(deltaLng/2) * Math.sin(deltaLng/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+  return R * c;
+}
+
+function getColorBySpeed(kmh, minSpeed, maxSpeed) {
+  if (kmh == null || isNaN(kmh)) {
+    const c = colorGradient[0];
+    return `rgb(${c.r},${c.g},${c.b})`;
+  }
+  
+  const s = Math.max(minSpeed, Math.min(kmh, maxSpeed));
+  const ratio = (s - minSpeed) / (maxSpeed - minSpeed);
+  const index = ratio * (colorGradient.length - 1);
+  const i = Math.floor(index);
+  const nextI = Math.min(i + 1, colorGradient.length - 1);
+  const localRatio = index - i;
+  
+  const c1 = colorGradient[i];
+  const c2 = colorGradient[nextI];
+  const r = Math.round(c1.r + (c2.r - c1.r) * localRatio);
+  const g = Math.round(c1.g + (c2.g - c1.g) * localRatio);
+  const b = Math.round(c1.b + (c2.b - c1.b) * localRatio);
+  
+  return `rgb(${r},${g},${b})`;
+}
+
+function convertSpeed(ms) {
+  if (ms == null || isNaN(ms) || ms <= 0) return 0;
+  return Number(((ms * 3600) / 1000).toFixed(2));
 }
 
 // 获取计算地图缩放级别
