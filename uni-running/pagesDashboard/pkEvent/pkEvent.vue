@@ -514,6 +514,11 @@ const handlePopClose = () => {
 
 // 弹窗广告跳转抽奖页面
 const nav2Lottery = () => {
+  if (timer.value) {
+    clearTimeout(timer.value)
+    timer.value = null
+  }
+
   uni.navigateTo({
     url: `/pagesDashboard/pkEvent/lottery?eventId=${activetyId.value}`,
   });
