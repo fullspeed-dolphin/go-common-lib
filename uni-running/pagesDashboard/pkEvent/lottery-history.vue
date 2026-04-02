@@ -382,13 +382,9 @@ onLoad((options) => {
           <text class="legend-item"><text class="legend-color pending">■</text>待填地址</text>
           <text class="legend-item"><text class="legend-color filled">■</text>已填地址</text>
           <text class="legend-item"><text class="legend-color locked">■</text>已锁定</text>
-        </view>
 
-        <!-- <view class="status-legend">
-          <text class="legend-item"><text class="legend-color pending">■</text>待填地址</text>
-          <text class="legend-item"><text class="legend-color filled">■</text>已填地址</text>
-          <text class="legend-item"><text class="legend-color locked">■</text>已锁定</text>
-        </view> -->
+          <view class="contact-btn" @click="openWeComChat">联系客服</view>
+        </view>
 
         <view class="records-container">
           <!-- 暂无记录占位 -->
@@ -818,5 +814,12 @@ onLoad((options) => {
 .btn-submit {
   background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
   color: #fff;
+}
+
+.contact-btn {
+  background-color: #ff5c5c;
+  padding: 20rpx 30rpx;
+  border-radius: 20rpx;
+  color: #ffffff;
 }
 </style>
