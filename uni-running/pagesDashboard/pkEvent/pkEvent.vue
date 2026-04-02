@@ -515,7 +515,7 @@ const handlePopClose = () => {
 // 弹窗广告跳转抽奖页面
 const nav2Lottery = () => {
   uni.navigateTo({
-    url: "/pagesDashboard/pkEvent/lottery",
+    url: `/pagesDashboard/pkEvent/lottery?eventId=${activetyId.value}`,
   });
 }
 
