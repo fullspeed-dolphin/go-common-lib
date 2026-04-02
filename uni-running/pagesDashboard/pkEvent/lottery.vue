@@ -348,8 +348,7 @@ const drawLottery = async () => {
   loading.value.drawing = true
   errors.value.drawing = null
 
-  // 先开始旋转
-  myLucky.value?.play()
+
 
   try {
     const res = await uatRequest.post('/draw', {
@@ -362,6 +361,9 @@ const drawLottery = async () => {
 
       // 抽奖成功，找到对应奖品索引
       const prizeIndex = prizes.value.findIndex(p => p.prize_id === result.prize_id)
+      
+      // 先开始旋转
+      myLucky.value?.play()
 
       // 延迟停止，增加悬念
       setTimeout(() => {
@@ -380,7 +382,7 @@ const drawLottery = async () => {
       }
 
       // 停止转盘
-      myLucky.value?.stop(0)
+      // myLucky.value?.stop(0)
 
       // 显示具体错误原因
       uni.showToast({
@@ -394,7 +396,7 @@ const drawLottery = async () => {
     errors.value.drawing = error.message || '抽奖失败'
 
     // 停止转盘
-    myLucky.value?.stop(0)
+    // myLucky.value?.stop(0)
 
     // 网络错误处理
     if (error.type === 'network') {
