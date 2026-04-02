@@ -110,11 +110,11 @@ export const createMarker = (latitude, longitude, strDistance) => {
     anchorY: -25,
     label: {
       content: String(strDistance),
-      fontSize: 11,
+      fontSize: 10,
       bgColor: "#000",
       color: "#fff",
       textAlign: 'center',
-      anchorY: -24,
+      anchorY: -25,
     },
     // 使用自定义定位图标
     iconPath: 'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/location.png',
