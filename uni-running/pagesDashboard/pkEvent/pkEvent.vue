@@ -74,6 +74,19 @@
         <view class="iconfont flex-center icon-paihangbang" style="color:#FC9C15;background: #FEE8C2;"></view>
         <text class="func-text">排行榜</text>
       </view>
+      <!-- 2026.4.1 金刚区新增抽奖活动、完赛证书 -->
+      <view class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/lottery')">
+        <view class="kingkong-icon-wrapper" style="background: #d3f5f4;">
+          <image src="/static/icons/lottery-icon.png" class="kingkong-icon" mode="scaleToFill" />
+        </view>
+        <text class="func-text">抽奖活动</text>
+      </view>
+      <view class="func-item flex-col-center" @click="certIconOnClick">
+        <view class="kingkong-icon-wrapper" style="background: #f4dae5;">
+          <image src="/static/icons/cert-icon.png" class="kingkong-icon" mode="scaleToFill" />
+        </view>
+        <text class="func-text">完赛证书</text>
+      </view>
 
       <!-- <view class="func-item flex-col-center" @click="goto('/pagesSport/punchInUpload')">
         <view class="iconfont flex-center icon-lijidaka" style="color:#8515FC;background: #EBDBFE;"></view>
@@ -192,11 +205,18 @@
     </view>
 
     <UserLogin ref="refUserLogin" @success="onLoginSuccess" />
+
+    <PopupAd 
+      v-model="isShowPop"
+      @click="nav2Lottery"
+      @close="handlePopClose"
+      adImg="https://ccrun.oss-cn-guangzhou.aliyuncs.com/images/2026/02/09/a24e474e-8c8f-49d2-bcea-1e00eebedd38.png?x-oss-process=image/resize,w_90,h_90,m_fill"
+    />
   </view>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watchEffect } from "vue";
 import { onLoad, onShow, onReachBottom, onPageScroll } from "@dcloudio/uni-app";
 
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
@@ -210,6 +230,7 @@ import UserLogin from "@/components/UserLogin.vue";
 import PersonalRecord from "./personalRecord.vue";
 
 import { useStore } from "vuex";
+import PopupAd from "../../components/PopupAd.vue";
 const store = useStore();
 const userInfo = computed(() => store.state.userInfo);
 const pkEventTheme = computed(() => store.state.pkEventTheme);
@@ -284,6 +305,15 @@ const getEventData = () => {
       }
 
       detailInfo.value = res;
+
+      // 2026.4.1
+      const isExp = res.status.toLowerCase() === 'exp'
+      const isEnd = new Date(res.end_time) < new Date();
+      console.log("=========================isExp:", isExp)
+      console.log("=========================isEnd:", isEnd)
+      isShowPop.value = isExp && isEnd
+      console.log("=========================isExp && isEnd:", isExp && isEnd)
+
 
       store.commit('set', {
         type: 'pkEventTheme',
@@ -466,6 +496,47 @@ const teamRankValue = (item) => {
   if (teamSortBy.value === 'completion') return Number(item.team_completion_rate).toFixed(2) + '%';
   return item.current_members + '人';
 };
+
+// 弹窗广告状态
+const isShowPop = ref(false)
+// 存储定时器 ID
+const timer = ref(null)
+
+// 处理弹窗关闭（用户手动点击关闭）
+const handlePopClose = () => {
+  // 清除定时器，取消跳转
+  if (timer.value) {
+    clearTimeout(timer.value)
+    timer.value = null
+  }
+  console.log('用户手动关闭，取消跳转')
+}
+
+// 弹窗广告跳转抽奖页面
+const nav2Lottery = () => {
+  uni.navigateTo({
+    url: `/pagesDashboard/pkEvent/lottery?eventId=${activetyId.value}`,
+  });
+}
+
+// TODO: 金刚区完赛证书icon点击
+const certIconOnClick = () => {
+  uni.showModal({
+    title: '提示',
+    content: '敬请期待',
+    showCancel: false,
+    confirmText: '知道了',
+  });
+}
+
+// 3s倒计时自动跳转
+watchEffect(() => {
+  if (isShowPop.value) {
+    timer.value = setTimeout(() => {
+      nav2Lottery()
+    }, 3000)
+  }
+})
 </script>
 
 <style lang="scss" scoped>
@@ -816,5 +887,21 @@ const teamRankValue = (item) => {
   width: 100%;
   padding: 48rpx 0rpx;
   z-index: 10;
+}
+
+.kingkong-icon-wrapper {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 32rpx;
+  margin-bottom: 26rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  // background-color: #f4dae5;
+}
+
+.kingkong-icon {
+  width: 40rpx;
+  height: 40rpx;
 }
 </style>
