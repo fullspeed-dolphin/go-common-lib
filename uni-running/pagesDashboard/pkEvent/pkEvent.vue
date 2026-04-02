@@ -75,7 +75,7 @@
         <text class="func-text">排行榜</text>
       </view>
       <!-- 2026.4.1 金刚区新增抽奖活动、完赛证书 -->
-      <view class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/lottery')">
+      <view class="func-item flex-col-center" @click="lotteryIconClick">
         <view class="kingkong-icon-wrapper" style="background: #d3f5f4;">
           <image src="/static/icons/lottery-icon.png" class="kingkong-icon" mode="scaleToFill" />
         </view>
@@ -309,10 +309,8 @@ const getEventData = () => {
       // 2026.4.1
       const isExp = res.status.toLowerCase() === 'exp'
       const isEnd = new Date(res.end_time) < new Date();
-      console.log("=========================isExp:", isExp)
-      console.log("=========================isEnd:", isEnd)
       isShowPop.value = isExp && isEnd
-      console.log("=========================isExp && isEnd:", isExp && isEnd)
+      isLotteryAct.value = isExp && isEnd
 
 
       store.commit('set', {
@@ -499,6 +497,8 @@ const teamRankValue = (item) => {
 
 // 弹窗广告状态
 const isShowPop = ref(false)
+// 抽奖活动是否已经开始
+const isLotteryAct = ref(false)
 // 存储定时器 ID
 const timer = ref(null)
 
@@ -532,6 +532,19 @@ const certIconOnClick = () => {
     showCancel: false,
     confirmText: '知道了',
   });
+}
+
+const lotteryIconClick = () => {
+  if (isLotteryAct.value) {
+    goto('pagesDashboard/pkEvent/lottery')
+  } else {
+    uni.showModal({
+      title: '提示',
+      content: '活动尚未开始',
+      showCancel: false,
+      confirmText: '知道了',
+    });
+  } 
 }
 
 // 3s倒计时自动跳转
