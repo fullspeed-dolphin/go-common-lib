@@ -74,46 +74,29 @@
 
 			<view class="section-title">常住地址</view>
 			<view class="panel bgf">
-				<up-form-item label="国家/地区" prop="country">
-					<view @click="showCountryPicker = true">
-						<up-input :modelValue="countryDisplayName" placeholder="请选择" border="none" inputAlign="right" readonly>
-							<template #suffix>
-								<up-icon name="arrow-right" size="18" color="#999" />
-							</template>
-						</up-input>
-					</view>
-					<up-picker v-model="selectedCountry" :show="showCountryPicker" :columns="[countryOptions]"
-						:defaultIndex="countryIndex" keyName="name" valueName="id" cancelText="取消" confirmText="确认"
-						:confirmColor="themeColor" @confirm="onCountryConfirm" @cancel="showCountryPicker = false"
-						@close="showCountryPicker = false" />
-				</up-form-item>
-				<up-form-item label="省市区" prop="region" required>
-					<view @click="openProvincePicker">
-						<up-input :modelValue="regionDisplayName" placeholder="请选择" border="none" inputAlign="right" readonly>
-							<template #suffix>
-								<up-icon name="arrow-right" size="18" color="#999" />
-							</template>
-						</up-input>
-					</view>
-					<up-picker v-model="selectedProvince" :show="showProvincePicker" :columns="[provinceOptions]"
-						:defaultIndex="provinceIndex" keyName="name" valueName="code" cancelText="取消" confirmText="确认"
-						:confirmColor="themeColor" @confirm="onProvinceConfirm" @cancel="showProvincePicker = false"
-						@close="showProvincePicker = false" />
-					<up-picker v-model="selectedCity" :show="showCityPicker" :columns="[cityOptions]" :defaultIndex="cityIndex"
-						keyName="name" valueName="code" cancelText="取消" confirmText="确认" :confirmColor="themeColor"
-						@confirm="onCityConfirm" @cancel="showCityPicker = false" @close="showCityPicker = false" />
-					<up-picker v-model="selectedArea" :show="showAreaPicker" :columns="[areaOptions]" :defaultIndex="areaIndex"
-						keyName="name" valueName="code" cancelText="取消" confirmText="确认" :confirmColor="themeColor"
-						@confirm="onAreaConfirm" @cancel="showAreaPicker = false" @close="showAreaPicker = false" />
-				</up-form-item>
-				<up-form-item label="详细地址" prop="address" :tipsColor="themeColor" tips="邮寄需要" required>
-					<view class="address-input-wrapper">
-						<up-input v-model="form.address" placeholder="请填写详细地址" border="none" inputAlign="right" />
-						<view class="address-icon-wrapper" @click="handleChooseLocation">
-							<up-icon name="map" size="20" :color="themeColor" />
+
+				<up-form-item labelPosition="top" label="详细地址" prop="address" :tipsColor="themeColor" tips="邮寄需要" required>
+					<template #label>
+						<view class="custom-address-label">
+							<view class="custom-label-wrapper">
+								<text class="label-text">详细地址</text>
+								<text class="required-star">*</text>
+
+								<view class="tips-icon-wrapper" @click.stop="showAddressTipModal">
+									<up-icon name="info-circle" size="16" :color="themeColor" />
+                </view>
+							</view>
+							<view @click.stop="handleChooseLocation">
+								<up-icon name="map" size="20" :color="themeColor" />
+							</view>
 						</view>
+					</template>
+
+					<view class="address-input-wrapper">
+						<textarea v-model="form.address" placeholder="请填写详细地址" auto-height class="address-input" />
 					</view>
 				</up-form-item>
+
 			</view>
 
 			<view class="section-title">其他</view>
@@ -1201,15 +1184,19 @@
 				console.log("选择地址成功:", res);
 
 				// 获取完整地址字符串用于解析
-				const fullAddress = res.address || "";
+				// const fullAddress = res.address || "";
+				const fullAddress = `${res?.address}${res?.name}` || "";
 
 				// 将选择的地址填充到详细地址字段
 				// 优先使用 name（具体地点名称），如果没有则使用 address
-				if (res.name) {
-					form.address = res.name;
-				} else if (fullAddress) {
-					form.address = fullAddress;
-				}
+				// if (res.name) {
+				// 	form.address = res.name;
+				// } else if (fullAddress) {
+				// 	form.address = fullAddress;
+				// }
+
+				// 2026.3.31: 决定使用详细地址，取消使用国/地区、省市区picker
+				form.address = fullAddress;
 
 				// 根据地址解析省市区
 				if (fullAddress) {
@@ -1304,6 +1291,15 @@
 	onMounted(() => {
 		initRegionData();
 	});
+
+	const showAddressTipModal = () => {
+		uni.showModal({
+			title: '提示',
+			content: '邮寄需要',
+			showCancel: false,
+			confirmText: '知道了',
+		});
+	}
 </script>
 
 <style lang="scss" scoped>
@@ -1353,26 +1349,45 @@
 	}
 
 	.address-input-wrapper {
-		display: flex;
-		align-items: center;
+		margin-top: 20rpx;
 		width: 100%;
-		position: relative;
-		padding-right: 80rpx;
 	}
 
-	.address-icon-wrapper {
-		position: absolute;
-		right: 20rpx;
-		z-index: 10;
-		display: flex;
-		align-items: center;
-		height: 100%;
-		pointer-events: auto;
+	.address-input {
+		width: 100%;
 	}
 
 	::v-deep{
 		.u-form{
 			padding: 0 32rpx;
 		}
+	}
+
+  .custom-address-label {
+		display: flex;
+		justify-content: space-between;
+	}
+
+	.custom-label-wrapper {
+		display: flex;
+	}
+
+	.label-text {
+		font-weight: 500;
+    font-size: 30rpx;
+	}
+
+	.required-star {
+		color: #f56c6c;
+    line-height: 20px;
+    font-size: 24rpx;
+		margin-left: 4rpx;
+		position: relative;
+		top: -3px;
+	}
+
+	.tips-icon-wrapper {
+		position: relative;
+		top: -1px;
 	}
 </style>
