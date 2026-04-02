@@ -6,11 +6,17 @@
         <view>报名成功！</view>
         <view class="btn" @click="viewEventDetail()">赛事详情</view>
       </view>
-      <view v-if="countdownText">距离活动开始还有{{ countdownText }}</view>
-      <view v-else>距离活动开始还有--</view>
-      <view>
-        报名后开始运动才能算有效成绩。先报名后开跑，该赛事为线下赛，暂不支持历史完赛成绩
-      </view>
+      <template v-if="isOfflineEvent && eventStarted">
+        <view>活动已经结束，感谢您的参与</view>
+      </template>
+      <template v-else>
+        <view v-if="countdownText && !eventStarted">距离活动开始还有{{ countdownText }}</view>
+        <view v-else-if="eventStarted">活动已开始</view>
+        <view v-else>距离活动开始还有--</view>
+        <view>
+          报名后开始运动才能算有效成绩。先报名后开跑，该赛事为线下赛，暂不支持历史完赛成绩
+        </view>
+      </template>
     </view>
     <view class="section info" v-for="(signInfo, index) in detail.sign_info_list" :key="index">
       <view class="section-content">
@@ -158,6 +164,11 @@ const order_no = ref("");
 const loading = ref(false);
 const countdownText = ref("");
 let countdownTimer = null;
+
+// 是否为线下活动
+const isOfflineEvent = computed(() => detail.value.order_type !== 'online_events');
+// 活动是否已开始
+const eventStarted = computed(() => countdownText.value === '活动已开始');
 
 // 动态主题色（基于 color_config）
 const themeColor = computed(() => detail.value.event_info?.color_config?.solid || '#FF8C00');
@@ -504,32 +515,37 @@ onUnmounted(() => {
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 28rpx;
       font-weight: bold;
-      font-size: 32rpx;
+      font-size: 28rpx;
       color: #000000;
+      
       .section-item {
         display: flex;
-        align-items: center;
         gap: 24rpx;
+        padding: 12rpx;
+        
+        // 单数行
+        &:nth-child(odd) {
+          background-color: #ffffff;
+        }
+        
+        // 双数行
+        &:nth-child(even) {
+          background-color: #f7f7f7;
+        }
+        
         .label {
           width: 280rpx;
           flex-shrink: 0;
           letter-spacing: 2rpx;
           line-height: 44rpx;
         }
+        
         .value {
           line-height: 44rpx;
-        }
-      }
-      // 长文本自动换行（地址、订单编号）
-      .address-item,
-      .order-no-item {
-        align-items: flex-start;
-        .value {
-          word-break: break-all;
-          white-space: normal;
-          flex: 1;
+          word-wrap: break-word;      // 允许长单词或URL换行
+          word-break: break-all;      // 允许在任意字符间换行
+          white-space: normal;        // 正常换行（默认值）
         }
       }
     }

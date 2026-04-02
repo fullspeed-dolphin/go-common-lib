@@ -882,12 +882,28 @@
 	);
 
 
+	// 姓名校验：2-12个中文，允许间隔号·（新疆等少数民族姓名）
+	const validateChineseName = (rule, value, callback) => {
+		const name = (value || '').trim();
+		if (!name) return callback(new Error('请填写姓名'));
+		if (!/^[\u4e00-\u9fff\u3400-\u4dbf\uF900-\uFAFF\u00b7]+$/.test(name)) return callback(new Error('姓名仅支持中文和间隔号·'));
+		if (/^\u00b7|\u00b7$/.test(name)) return callback(new Error('间隔号不能在姓名首尾'));
+		if (/\u00b7{2}/.test(name)) return callback(new Error('间隔号不能连续使用'));
+		const chineseCount = name.replace(/\u00b7/g, '').length;
+		if (chineseCount < 2) return callback(new Error('姓名至少2个中文字'));
+		if (chineseCount > 12) return callback(new Error('姓名不能超过12个中文字'));
+		callback();
+	};
+
 	const rules = {
 		name: [{
 			required: true,
 			message: "请填写姓名",
 			trigger: ["blur", "change"]
-		}, ],
+		}, {
+			validator: validateChineseName,
+			trigger: ["blur"]
+		}],
 		gender: [{
 			required: true,
 			message: "请选择性别",

@@ -22,10 +22,7 @@
             </view>
           </view>
           <view class="user-info">
-            <image class="avatar" :src="
-			      routerParams?.avatar_url ||
-			      'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
-			    " mode="aspectFill"></image>
+            <image class="avatar" :src="routerParams?.avatar_url || '/static/images/user.png'" mode="aspectFill"></image>
             <view class="user-text">
               <view class="user-name">{{ routerParams?.nickname || "用户" }}</view>
               <view class="activity-time">{{ detail.start_time || "--" }}</view>

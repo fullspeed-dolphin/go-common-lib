@@ -128,6 +128,7 @@
         {"path": "runningTeam/teamSummary","style": {"navigationBarTitleText": "跑团数据"}},
         {"path": "runningTeam/teamMaps","style": {"navigationBarTitleText": "跑团地图库"}},
         {"path": "runningTeam/teamEventDetail","style": {"navigationBarTitleText": "详情", "navigationStyle": "custom"}},
+        {"path": "runningTeam/teamEventRegistrations","style": {"navigationStyle": "custom","navigationBarTitleText": "报名信息"}},
         {
           "path": "sportDetail",
           "style": {

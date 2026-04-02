@@ -13,7 +13,7 @@
     <section class="section-bottom">
       <view style="padding: 56rpx 54rpx 40rpx">
         <template v-if="deviceInfo.bound">
-          <u-button type="primary" shape="circle" @click="confirmAsync()">手动同步</u-button>
+          <u-button v-if="deviceInfo.platform === 'huawei'" type="primary" shape="circle" @click="confirmAsync()">手动同步</u-button>
           <view class="u-mt-30">
             <u-button type="primary" shape="circle" color="#ccc" @click="unDevice()">解除绑定</u-button>
           </view>

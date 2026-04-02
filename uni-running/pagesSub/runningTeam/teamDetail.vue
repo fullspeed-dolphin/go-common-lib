@@ -367,7 +367,7 @@ onShow(() => {
       loadAllData();
     }
   });
-  if (!isEmpty.value) getEvents();
+  if (!isEmpty.value) loadAllData();
 });
 
 const getDetail = () => {
@@ -462,7 +462,7 @@ const joinGroup = () => {
       if (res.confirm) {
         uni.showLoading({ mask: true });
         request.post(`/running-group/api/v1/groups/join`, { group_id: Number(detail.value.group_id) })
-          .then(() => { uni.hideLoading(); store.dispatch("getUserInfo"); getDetail(); uni.$u.toast("加入成功！"); })
+          .then(() => { uni.hideLoading(); store.dispatch("getUserInfo"); loadAllData(); uni.$u.toast("加入成功！"); })
           .catch(() => { uni.hideLoading(); });
       }
     },
@@ -481,7 +481,7 @@ const leaveGroup = () => {
             uni.hideLoading();
             uni.$u.toast("操作成功！");
             store.dispatch("getUserInfo");
-            getDetail();
+            uni.navigateBack();
           })
           .catch(() => { uni.hideLoading(); });
       }

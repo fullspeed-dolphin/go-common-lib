@@ -649,7 +649,7 @@ const submitOrder = async () => {
 
     const tempList = orderNoList.filter((i) => !!i);
     if (tempList.length) {
-      payOrder(orderNoList);
+      await payOrder(tempList);
     }
   } catch (e) {
     console.error(e);
@@ -740,18 +740,24 @@ const payOrder = async (reg_no) => {
     openid: userInfo.value.openid,
   };
 
-  uni.showLoading({
-    mask: true,
-  });
+  uni.showLoading({ mask: true });
 
-  request.post(`/pay/wechat/payment`, data).then((res) => {
+  try {
+    const res = await request.post(`/pay/wechat/payment`, data);
     if (res.free) {
       uni.hideLoading();
       uni.$u.route("pagesSub/orderSuccess?order_no=" + res.order_no);
     } else {
       wxPay(res);
     }
-  });
+  } catch (err) {
+    uni.hideLoading();
+    uni.showModal({
+      title: "提示",
+      content: err?.msg || "支付流程异常，请联系客服",
+      showCancel: false,
+    });
+  }
 };
 
 // 获取活动地址列表

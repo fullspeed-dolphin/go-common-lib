@@ -5,8 +5,7 @@
       	<view class="card-item" v-for="(item, index) in dataList" :key="index" @click="routeTo(item)">
       		<view class="img">
       			<up-lazy-load borderRadius="10" :image="
-      				(item.avatar_url ||
-      				'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png')  + '?x-oss-process=image/resize,w_110,h_110,m_fill'
+      				(item.avatar_url || '/static/images/user.png')  + '?x-oss-process=image/resize,w_110,h_110,m_fill'
       			" mode="aspectFill" />
       		</view>
       	  <view class="flex-col-center">

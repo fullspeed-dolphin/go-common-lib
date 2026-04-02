@@ -62,7 +62,7 @@ import { ref, nextTick, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 
-import { resolvePosterVisibility, buildPosterPaths, getCurrentPosterPath as _getCurrentPosterPath, ACTIVITY_EVENT_ID, DEFAULT_EVENT_ID } from "./posterUtils.js"
+import { resolvePosterVisibility, buildPosterPaths, getCurrentPosterPath as _getCurrentPosterPath, DEFAULT_EVENT_ID } from "./posterUtils.js"
 
 function getCheckinCount(checkinCounts, eventId) {
 	return checkinCounts?.[eventId] || 1
@@ -79,8 +79,10 @@ function changeSwiper({detail}) {
 const posterRef = ref(null);
 const posterRef1 = ref(null);
 
-const showPoster1 = ref(false); // 520活动海报
+const showPoster1 = ref(false); // 活动海报
 const showPoster2 = ref(false); // 跑币海报
+const activityPosterUrl = ref(''); // 活动海报背景图URL
+const activityEventId = ref(''); // 当前活动ID
 
 // 存储最终生成的海报图片URL
 const pictureImage = ref("");
@@ -123,8 +125,7 @@ const renderPoster = (posterData) => {
         css: {},
         views: [
           {
-            // src: '/static/poster/Rectangle 37@2x.min.png',
-						src: 'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/520_share.png',
+            src: activityPosterUrl.value,
             type: "image",
             css: {
               objectFit: "cover",
@@ -841,9 +842,11 @@ async function open(propsData) {
 
   show.value = true;
 
-	const visibility = resolvePosterVisibility(propsData.eventIds);
+	const visibility = resolvePosterVisibility(propsData.eventIds, propsData.events);
 	showPoster1.value = visibility.showPoster1;
 	showPoster2.value = visibility.showPoster2;
+	activityPosterUrl.value = visibility.posterUrl || '';
+	activityEventId.value = visibility.activityEventId || '';
 	swiperIndex.value = 0;
 	pictureImage.value = '';
 	pictureImage1.value = '';
@@ -857,7 +860,7 @@ async function open(propsData) {
 
   setTimeout(() => {
 		nextTick(() => {
-		  if (showPoster1.value) renderPoster({ ...propsData, checkinCount: getCheckinCount(propsData.checkinCounts, ACTIVITY_EVENT_ID) });
+		  if (showPoster1.value) renderPoster({ ...propsData, checkinCount: getCheckinCount(propsData.checkinCounts, activityEventId.value) });
 		  if (showPoster2.value) renderPoster1({ ...propsData, checkinCount: getCheckinCount(propsData.checkinCounts, DEFAULT_EVENT_ID) });
 		});
 	}, 100)
@@ -910,8 +913,11 @@ function saveImage() {
   });
 }
 
+const emit = defineEmits(['close']);
+
 function close() {
   show.value = false;
+  emit('close');
 }
 
 defineExpose({

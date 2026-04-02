@@ -8,10 +8,7 @@
       </section>
 
       <section class="section-sport">
-        <image class="avatar" :src="
-            userInfo.avatar_url ||
-            'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
-          " mode="aspectFill"></image>
+        <image class="avatar" :src="userInfo.avatar_url || '/static/images/user.png'" mode="aspectFill"></image>
         <view class="flex-between-center">
           <view class="">
             <view class="" style="font-size: 30rpx">总里程:</view>

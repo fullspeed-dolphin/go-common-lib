@@ -7,9 +7,7 @@
       <view class="hero-section">
         <view class="hero-content">
           <view class="hero-avatar-wrap" @click="handleUserClick">
-            <image class="hero-avatar" :src="userInfo.avatar_url ||
-              'https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/run.png'
-              " mode="aspectFill"></image>
+            <image class="hero-avatar" :src="userInfo.avatar_url || '/static/images/user.png'" mode="aspectFill"></image>
           </view>
           <block v-if="userInfo.id">
             <view class="hero-name-row" @click="handleUserClick">
