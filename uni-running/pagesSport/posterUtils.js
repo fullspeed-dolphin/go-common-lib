@@ -1,18 +1,26 @@
-/**
- * 根据用户勾选的活动ID列表，判断需要生成哪些海报
- * @param {string[]} eventIds - 用户勾选并打卡成功的活动ID列表
- * @returns {{ showPoster1: boolean, showPoster2: boolean }}
- */
-export const ACTIVITY_EVENT_ID = '01KH0WQX4H2C7Q4GJ217P8T922';
 export const DEFAULT_EVENT_ID = 'default';
 
-export function resolvePosterVisibility(eventIds) {
+/**
+ * 从打卡成功的活动中找到第一个有 checkin_poster_url 的活动
+ * @param {string[]} eventIds - 打卡成功的活动ID列表
+ * @param {Array} events - 后端返回的活动完整信息
+ * @returns {{ showPoster1: boolean, showPoster2: boolean, posterUrl: string|null, activityEventId: string|null }}
+ */
+export function resolvePosterVisibility(eventIds, events = []) {
   if (!eventIds || !eventIds.length) {
-    return { showPoster1: true, showPoster2: true };
+    return { showPoster1: false, showPoster2: true, posterUrl: null, activityEventId: null };
   }
+
+  const successSet = new Set(eventIds);
+  const matched = events.find(
+    (e) => successSet.has(e.id) && e.checkin_poster_url
+  );
+
   return {
-    showPoster1: eventIds.includes(ACTIVITY_EVENT_ID),
+    showPoster1: !!matched,
     showPoster2: eventIds.includes(DEFAULT_EVENT_ID),
+    posterUrl: matched?.checkin_poster_url || null,
+    activityEventId: matched?.id || null,
   };
 }
 

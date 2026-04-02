@@ -99,7 +99,7 @@
         请核对上方数据是否与截图一致
       </view>
       <view class="flex-center" style="position: fixed; bottom: 30rpx; width: 100%; padding: 0 30rpx;">
-        <u-button type="primary" custom-style="width:642rpx;" color="#ff8c00" shape="circle" @click="confirmToCheck()">提交数据</u-button>
+        <u-button type="primary" custom-style="width:642rpx;" color="#ff8c00" shape="circle" :loading="isChecking" :disabled="isChecking" @click="confirmToCheck()">提交数据</u-button>
       </view>
     </block>
 
@@ -111,7 +111,7 @@
       <view class="u-ml-10">后台核验成功</view>
     </view>
 
-    <SharePoster ref="refSharePoster" />
+    <SharePoster ref="refSharePoster" @close="onPosterClose" />
 
     <!-- 固定联系客服按钮 -->
     <button class="kefu-btn" open-type="contact">
@@ -223,6 +223,7 @@ const isSubmiting = ref(false);
 const isSuccess = ref(false);
 const isSuccessCheck = ref(false);
 const isSubmitted = ref(false); // 标记用户是否已提交数据
+const isChecking = ref(false); // 提交打卡中，防止重复点击
 
 // 删除已上传的图片
 const deleteUploadedImage = async (imageUrl) => {
@@ -262,6 +263,10 @@ function showModal({ title, content }) {
   modalTitle.value = title || "提示";
   modalErrorText.value = content || "请稍后重试";
   isShowModal.value = true;
+}
+
+function onPosterClose() {
+  uni.navigateBack();
 }
 
 // 图片上传成功后调用OCR识别
@@ -349,6 +354,8 @@ const ruleForm = ref({
 });
 
 function confirmToCheck() {
+  if (isChecking.value) return;
+  isChecking.value = true;
   request
     .post(
       "/ocr-api/checkin",
@@ -399,6 +406,7 @@ function confirmToCheck() {
           checkinCounts,
           checkinTime: dayjs().format("YYYY年MM月DD日 HH:mm"),
           eventIds: successEventIds,
+          events: res.data.events || [],
         });
       }
 
@@ -410,6 +418,7 @@ function confirmToCheck() {
     })
     .catch((err) => {
       console.log("err======>", err);
+      isChecking.value = false;
       showModal({
         title: "打卡失败",
         content: err?.msg || "请稍后重试",
