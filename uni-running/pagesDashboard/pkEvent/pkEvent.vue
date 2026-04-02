@@ -206,11 +206,13 @@
 
     <UserLogin ref="refUserLogin" @success="onLoginSuccess" />
 
-    <PopupAd 
+    <PopupAd
       v-model="isShowPop"
       @click="nav2Lottery"
       @close="handlePopClose"
-      adImg="https://ccrun.oss-cn-guangzhou.aliyuncs.com/images/2026/02/09/a24e474e-8c8f-49d2-bcea-1e00eebedd38.png?x-oss-process=image/resize,w_90,h_90,m_fill"
+      :themeColor="pkEventTheme?.solid"
+      :themeGradient="pkEventTheme?.gradient"
+      eventName="为爱奔跑520·第一期"
     />
   </view>
 </template>
@@ -309,7 +311,6 @@ const getEventData = () => {
       // 2026.4.1
       const isExp = res.status.toLowerCase() === 'exp'
       const isEnd = new Date(res.end_time) < new Date();
-      isShowPop.value = isExp && isEnd
       isLotteryAct.value = isExp && isEnd
 
 
@@ -339,7 +340,32 @@ const userCheckedInfo = ref({});
 function getuserCheckedInfo() {
   request.get("/user-api/user/getEventCheckins?event_id=" + activetyId.value, {}, { showError: false }).then((res) => {
     userCheckedInfo.value = res;
+    checkShowPop()
   }).catch(() => {});
+}
+
+// 获取抽奖活动状态
+const lotteryEventInfo = ref({})
+function getLotteryEventInfo() {
+  request.get("/event-api/lottery/info?event_id=" + activetyId.value, {}, { showError: false }).then((res) => {
+    lotteryEventInfo.value = res;
+    checkShowPop()
+  }).catch(() => {});
+}
+
+// 判断是否弹出抽奖弹窗：lottery_event 处于 ACT + 打卡达标（仅首次弹一次）
+const hasShownPop = ref(false)
+function checkShowPop() {
+  if (hasShownPop.value) return
+  const lottery = lotteryEventInfo.value
+  const checkin = userCheckedInfo.value
+  if (!lottery?.event_status || !checkin?.required_checkins) return
+  const isLotteryActive = lottery.event_status === 'ACT'
+  const isQualified = checkin.total_qualified_sessions >= checkin.required_checkins
+  if (isLotteryActive && isQualified) {
+    isShowPop.value = true
+    hasShownPop.value = true
+  }
 }
 
 const myEvents = ref([]);
@@ -423,6 +449,7 @@ onShow(() => {
   getUserStatus();
   getMyEvents();
   getuserCheckedInfo();
+  getLotteryEventInfo();
   if (!isFirstShow) {
     refreshList();
   }
@@ -518,6 +545,7 @@ const nav2Lottery = () => {
     clearTimeout(timer.value)
     timer.value = null
   }
+  isShowPop.value = false
 
   uni.navigateTo({
     url: `/pagesDashboard/pkEvent/lottery?eventId=${activetyId.value}`,

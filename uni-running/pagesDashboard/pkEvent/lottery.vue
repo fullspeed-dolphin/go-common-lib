@@ -1,87 +1,72 @@
 <script setup>
 import { computed, ref } from 'vue';
-import { onLoad } from "@dcloudio/uni-app";
+import { onLoad, onUnload } from "@dcloudio/uni-app";
 import { useStore } from "vuex";
-import LuckyWheel from '@lucky-canvas/uni/lucky-wheel'
 import dayjs from "dayjs";
+import request from "@/utils/request.js";
 
 const store = useStore();
 const pkEventTheme = computed(() => store.state.pkEventTheme);
+const themeColor = computed(() => pkEventTheme.value?.solid || '#ff5c5c')
+const themeGradient = computed(() => pkEventTheme.value?.gradient || ['#ff5c5c', '#ff5c5c'])
 const themeStyle = computed(() => ({
-  '--theme-color': pkEventTheme.value?.solid || '#ff5c5c',
-  '--theme-gradient': `linear-gradient(90deg, ${pkEventTheme.value?.gradient?.[0] || '#ff5c5c'}, ${pkEventTheme.value?.gradient?.[1] || '#ff5c5c'})`,
+  '--theme-color': themeColor.value,
+  '--theme-gradient': `linear-gradient(90deg, ${themeGradient.value[0]}, ${themeGradient.value[1]})`,
 }));
 
-// 组件引用
-const myLucky = ref(null)
-// const showPop = ref(false)
 const prizeRet = ref(null)
+// 用户的抽奖记录（已抽奖时获取）
+const myDrawRecord = ref(null)
 
 // 计算属性
 const userInfo = computed(() => store.state.userInfo);
 
-const blocks = ref([
-  {
-    padding: '24rpx',
-    background: '#F5E6D3',
-    borderRadius: '50%'
-  }
-])
+// 奖品列表
+const prizes = ref([])
+// 转盘旋转角度
+const wheelRotation = ref(0)
+// 是否正在旋转
+const isSpinning = ref(false)
 
+// 扇形交替颜色：纯白 / 米白
+const segmentColors = computed(() => ['#FFFFFF', '#FFF8F0'])
 
-const buttons = ref([
-  // 第一层：外圈
-  {
-    radius: '96rpx',
-    background: '#FDC291',
-    shadow: '0 0 30rpx rgba(255, 180, 70, 0.6)'
-  },
-  // 第二层：中间金色装饰环
-  {
-    radius: '84rpx',
-    background: '#FFA500',
-    border: '4rpx solid #FFD700'
-  },
-  // 第三层：核心抽奖按钮
-  {
-    radius: '72rpx',
-    background: '#E63E2E',
-    border: '6rpx solid #FFD700',
-    shadow: '0 8rpx 16rpx rgba(0,0,0,0.3)',
-    pointer: true,
-    fonts: [{
-      text: '抽奖',
-      top: '-12rpx',
-      fontSize: '36rpx',
-      fontColor: '#FFE484',
-      fontWeight: 'bold'
-    }]
-  }
-])
-
-const defaultStyle = ref({
-  fontColor: '#8B4513',
-  fontSize: '26rpx',
-  fontWeight: '500'
+// 生成转盘扇形背景
+const wheelBackground = computed(() => {
+  if (prizes.value.length === 0) return ''
+  const count = prizes.value.length
+  const [c1, c2] = segmentColors.value
+  const segments = prizes.value.map((p, i) => {
+    const color = i % 2 === 0 ? c1 : c2
+    const start = (i / count * 100).toFixed(4)
+    const end = ((i + 1) / count * 100).toFixed(4)
+    return `${color} ${start}% ${end}%`
+  })
+  return `conic-gradient(${segments.join(', ')})`
 })
 
-// 移除假数据，使用接口数据
-const prizes = ref([])
+// 奖品列表（不含感谢参与，用于下方列表展示）
+const displayPrizes = computed(() => prizes.value.filter(p => p.prize_type !== 'NONE'))
+
+// 分界线角度列表
+const dividerAngles = computed(() => {
+  const count = prizes.value.length
+  if (count === 0) return []
+  return Array.from({ length: count }, (_, i) => (i * 360) / count)
+})
 
 const winners = ref([])
 
-// UAT环境配置
-// 简单的UAT请求工具，直接使用全局的token获取方式
+// 抽奖专用请求工具
 const uatRequest = {
   get: (url, params) => {
     return new Promise((resolve, reject) => {
       uni.request({
-        url: `https://uat.speexpay.com/event-api/api/gift${url}`,
+        url: `https://speexpay.com/event-api/lottery${url}`,
         method: 'GET',
         data: params,
         header: {
           Authorization: uni.getStorageSync('token'),
-          // Authorization: '5a4ecef41628100c272b764ea75f0d0d8fdf0b51d79b960edfec27a278eccf75',
           'content-type': 'application/json',
         },
         success: (res) => {
@@ -124,12 +109,11 @@ const uatRequest = {
   post: (url, data, headers = {}) => {
     return new Promise((resolve, reject) => {
       uni.request({
-        url: `https://uat.speexpay.com/event-api/api/gift${url}`,
+        url: `https://speexpay.com/event-api/lottery${url}`,
         method: 'POST',
         data: data,
         header: {
           Authorization: uni.getStorageSync('token'),
-          // Authorization: '5a4ecef41628100c272b764ea75f0d0d8fdf0b51d79b960edfec27a278eccf75',
           'content-type': 'application/json',
           ...headers
         },
@@ -178,12 +162,12 @@ const uatRequest = {
 const eventId = ref('') 
 const openid = ref(store?.state?.userInfo?.openid)
 const eventInfo = ref({
-  event_status: 'ACTIVE',
-  is_eligible: true,
+  event_status: 'ACT',
   has_drawn: false,
-  qualified_checkins: 0,
   all_prizes_sent: false
 })
+const userCheckinInfo = ref({ total_qualified_sessions: 0, required_checkins: 0 })
+const notRegistered = ref(false)
 
 // 加载状态管理
 const loading = ref({
@@ -202,16 +186,20 @@ const errors = ref({
 })
 
 // 获取活动信息
-const getEventInfo = async () => {
+const getLotteryEventInfo = async () => {
   loading.value.eventInfo = true
   errors.value.eventInfo = null
 
   try {
-    const res = await uatRequest.get('/event_info', {
+    const res = await uatRequest.get('/info', {
       event_id: eventId.value,
     })
     if (res.code === 200) {
       eventInfo.value = res.data
+      // 已抽奖则获取用户的抽奖记录
+      if (res.data.has_drawn) {
+        getMyDrawRecord()
+      }
     }
   } catch (error) {
     handleError(error, '获取活动信息')
@@ -221,31 +209,52 @@ const getEventInfo = async () => {
   }
 }
 
+// 获取用户自己的抽奖记录
+const getMyDrawRecord = async () => {
+  try {
+    const res = await uatRequest.get('/my_records', {
+      event_id: eventId.value,
+    })
+    if (res.code === 200 && res.data && res.data.length > 0) {
+      myDrawRecord.value = res.data[0]
+    }
+  } catch (error) {
+    console.error('获取个人抽奖记录失败:', error)
+  }
+}
+
 // 获取奖品列表
 const getPrizes = async () => {
   loading.value.prizes = true
   errors.value.prizes = null
 
   try {
-    const res = await uatRequest.get('/prizes', {
+    const res = await uatRequest.get('/gift_list', {
       event_id: eventId.value
     })
     if (res.code === 200 && res.data.length > 0) {
-      // 动态生成奖品数据，保持前端样式不变
-      prizes.value = res.data.map((prize, index) => {
-        const isEven = index % 2 === 0
-        const ret = {
-          fonts: [{ text: prize.prize_name, top: '15%', fontSize: '24rpx', fontColor: '#D2691E' }],
-          background: isEven ? '#FFFFFF' : '#FFF8F0',
+      // 分离实物奖品和"感谢参与"
+      const physicals = res.data.filter(p => p.prize_type !== 'NONE')
+      const noneItem = res.data.find(p => p.prize_type === 'NONE')
+      const noneEntry = {
+        prize_id: noneItem ? noneItem.id : 'none',
+        prize_name: noneItem ? noneItem.prize_name : '感谢参与',
+        prize_type: 'NONE',
+        prize_image_url: ''
+      }
+
+      // 实物奖品和"感谢参与"交替排列，保证双数扇形
+      const list = []
+      physicals.forEach(prize => {
+        list.push({
           prize_id: prize.id,
-          prize_type: prize.prize_type
-        }
-        if (prize.prize_image_url) {
-          ret.imgs = [{ src: prize.prize_image_url, width: '30%', top: '45%' }]
-        }
-        return ret
+          prize_name: prize.prize_name,
+          prize_type: prize.prize_type,
+          prize_image_url: prize.prize_image_url
+        })
+        list.push({ ...noneEntry })
       })
-      console.log('奖品列表加载成功:', prizes.value)
+      prizes.value = list
     } else if (res.code === 200 && res.data.length === 0) {
       // 奖品列表为空
       errors.value.prizes = '暂无奖品信息'
@@ -288,16 +297,81 @@ const getWinners = async () => {
   }
 }
 
+// 获取全部抽奖记录（滚动展示用）
+const allRecords = ref([])
+const lastRecordTime = ref('')
+
+// 首次全量拉取
+const getAllRecords = async () => {
+  try {
+    const res = await uatRequest.get('/records', {
+      event_id: eventId.value,
+      page: 1,
+      page_size: 1000
+    })
+    if (res.code === 200) {
+      allRecords.value = res.data.list || []
+      if (allRecords.value.length > 0) {
+        lastRecordTime.value = allRecords.value[0].draw_time
+      }
+    }
+  } catch (error) {
+    console.error('获取抽奖记录失败:', error)
+  }
+}
+
+// 增量拉取新记录
+const getNewRecords = async () => {
+  if (!lastRecordTime.value) return getAllRecords()
+  try {
+    const res = await uatRequest.get('/records', {
+      event_id: eventId.value,
+      after_time: lastRecordTime.value
+    })
+    if (res.code === 200 && res.data.list && res.data.list.length > 0) {
+      allRecords.value = [...res.data.list, ...allRecords.value]
+      lastRecordTime.value = res.data.list[0].draw_time
+    }
+  } catch (error) {
+    console.error('获取新抽奖记录失败:', error)
+  }
+}
+
+// 获取用户打卡信息
+const getUserCheckinInfo = async () => {
+  try {
+    const res = await request.get('/user-api/user/getEventCheckins', { event_id: eventId.value }, { showError: false })
+    userCheckinInfo.value = res
+    notRegistered.value = false
+  } catch (error) {
+    if (error?.code === 404) {
+      notRegistered.value = true
+    }
+    console.error('获取打卡信息失败:', error)
+  }
+}
+
 // 执行抽奖
 const drawLottery = async () => {
   // 前置条件检查
   if (loading.value.drawing) return // 防止重复点击
 
-  // 活动状态检查
-  if (eventInfo.value.event_status !== 'ACTIVE') {
+  // 未报名检查
+  if (notRegistered.value) {
+    uni.showModal({
+      title: '提示',
+      content: `您未参加${userCheckinInfo.value.event_name || '此'}线上活动`,
+      showCancel: false,
+      confirmText: '知道了'
+    })
+    return
+  }
+
+  // 抽奖活动状态检查
+  if (eventInfo.value.event_status !== 'ACT') {
     const statusMap = {
-      'NOT_STARTED': '活动尚未开始',
-      'ENDED': '活动已结束'
+      'PND': '抽奖活动尚未开始',
+      'EXP': '抽奖活动已结束'
     }
     uni.showToast({
       title: statusMap[eventInfo.value.event_status] || '活动状态异常',
@@ -307,11 +381,11 @@ const drawLottery = async () => {
     return
   }
 
-  // 用户资格检查
-  if (!eventInfo.value.is_eligible) {
+  // 用户资格检查（基于 getEventCheckins 接口）
+  if (userCheckinInfo.value.total_qualified_sessions < userCheckinInfo.value.required_checkins) {
     uni.showModal({
       title: '提示',
-      content: `您需要完成10次打卡才能参与抽奖，当前已完成${eventInfo.value.qualified_checkins}次`,
+      content: `您需要完成${userCheckinInfo.value.required_checkins}次打卡才能参与抽奖，当前已完成${userCheckinInfo.value.total_qualified_sessions}次`,
       showCancel: false,
       confirmText: '知道了'
     })
@@ -320,17 +394,28 @@ const drawLottery = async () => {
 
   // 已抽奖检查
   if (eventInfo.value.has_drawn) {
-    uni.showModal({
-      title: '提示',
-      content: '您已参与过抽奖，每人仅可参与一次',
-      showCancel: false,
-      confirmText: '查看记录',
-      success: (res) => {
-        if (res.confirm) {
-          nav2History()
+    if (myDrawRecord.value?.is_winning) {
+      uni.showModal({
+        title: '恭喜你中奖了！',
+        content: '请前往抽奖记录页面填写收货地址，我们将很快为你发放奖品。',
+        showCancel: false,
+        confirmText: '去填写',
+        confirmColor: themeColor.value,
+        success: (res) => {
+          if (res.confirm) {
+            nav2History()
+          }
         }
-      }
-    })
+      })
+    } else {
+      uni.showModal({
+        title: '感谢参与',
+        content: '感谢你对全速体育的关注，期待您参加下次活动。',
+        showCancel: false,
+        confirmText: '知道了',
+        confirmColor: themeColor.value,
+      })
+    }
     return
   }
 
@@ -358,19 +443,26 @@ const drawLottery = async () => {
 
     if (res.code === 200) {
       const result = res.data
-
-      // 抽奖成功，找到对应奖品索引
       const prizeIndex = prizes.value.findIndex(p => p.prize_id === result.prize_id)
-      
-      // 先开始旋转
-      myLucky.value?.play()
+      const idx = prizeIndex >= 0 ? prizeIndex : 0
 
-      // 延迟停止，增加悬念
+      // 计算目标角度：转足够多圈 + 停到目标扇形中心
+      const count = prizes.value.length
+      const segmentAngle = 360 / count
+      const targetAngle = 360 - (idx * segmentAngle + segmentAngle / 2)
+      const totalRotation = 360 * 8 + targetAngle // 转8圈 + 目标角度
+
+      isSpinning.value = true
+      wheelRotation.value = totalRotation
+
+      // 动画结束后处理
       setTimeout(() => {
-        myLucky.value?.stop(prizeIndex >= 0 ? prizeIndex : 0)
-        // 更新用户状态
-        getEventInfo()
-      }, 1500)
+        isSpinning.value = false
+        getLotteryEventInfo()
+        getWinners()
+        getAllRecords()
+        endCallBack(prizes.value[idx])
+      }, 4000)
 
     } else {
       // 业务错误处理
@@ -481,9 +573,26 @@ onLoad((options) => {
     eventId.value = options.eventId
   }
   // 获取数据
-  getEventInfo()
+  getLotteryEventInfo()
   getPrizes()
   getWinners()
+  getUserCheckinInfo()
+  getAllRecords()
+
+  // 轮询抽奖记录，每 8 秒增量刷新
+  recordsPollingTimer = setInterval(() => {
+    getNewRecords()
+    getWinners()
+  }, 8000)
+})
+
+// 页面卸载时清除定时器
+let recordsPollingTimer = null
+onUnload(() => {
+  if (recordsPollingTimer) {
+    clearInterval(recordsPollingTimer)
+    recordsPollingTimer = null
+  }
 })
 
 // 2. 定义回调方法
@@ -509,27 +618,23 @@ const startCallBack = () => {
 // }
 
 const endCallBack = (prize) => {
-  // 抽奖结束回调，prize 是中奖的奖品对象
   prizeRet.value = prize
-  console.log('中奖结果:', prize)
-  
-  // 在这里处理中奖逻辑，例如：
-  // 1. 弹出中奖弹窗
-  // 2. 上报中奖数据
-  // 3. 更新用户奖品列表等
-  if (prize.fonts?.[0]?.text === "未中奖") {
+  loading.value.drawing = false
+
+  if (prize.prize_type === 'NONE') {
     uni.showModal({
-      // title: '提示',
-      content: "谢谢参与",
+      title: prize.prize_name || '感谢参与',
+      content: '感谢你对全速体育的关注，期待您参加下次活动。',
       showCancel: false,
       confirmText: '知道了',
+      confirmColor: themeColor.value,
     });
   } else {
     uni.showModal({
-      // title: '提示',
-      content: `恭喜您获得 ${prize.fonts?.[0]?.text || '奖品'}！`,
+      content: `恭喜您获得 ${prize.prize_name || '奖品'}！`,
       showCancel: false,
       confirmText: '知道了',
+      confirmColor: themeColor.value,
       success: (res) => {
         nav2History()
       }
@@ -542,15 +647,19 @@ const endCallBack = (prize) => {
 const getButtonText = () => {
   if (loading.drawing) return '抽奖中...'
   if (loading.prizes || loading.eventInfo) return '加载中...'
-  if (eventInfo.value.event_status !== 'ACTIVE') {
+  if (notRegistered.value) return '您未报名此活动'
+  if (eventInfo.value.event_status !== 'ACT') {
     const statusMap = {
-      'NOT_STARTED': '活动未开始',
-      'ENDED': '活动已结束'
+      'PND': '抽奖未开始',
+      'EXP': '抽奖已结束'
     }
     return statusMap[eventInfo.value.event_status] || '活动状态异常'
   }
-  if (!eventInfo.value.is_eligible) return '暂无资格'
-  if (eventInfo.value.has_drawn) return '已抽奖'
+  if (userCheckinInfo.value.total_qualified_sessions < userCheckinInfo.value.required_checkins) return '暂无资格'
+  if (eventInfo.value.has_drawn) {
+    if (myDrawRecord.value?.is_winning) return '恭喜中奖 🎉'
+    return '感谢参与'
+  }
   if (eventInfo.value.all_prizes_sent) return '奖品已送完'
   return '开始抽奖'
 }
@@ -565,102 +674,152 @@ const nav2History = () => {
 
 <template>
   <view class="page-outter" :style="themeStyle">
-    <u-navbar autoBack placeholder :title="detailInfo?.event_name || '幸运大转盘'" />
+    <u-navbar autoBack placeholder :title="eventInfo.event_name || '幸运大转盘'" />
 
     <view class="page">
-      <view class="history-wrapper">
-        <view class="history" @click="nav2History">查看记录</view>
-      </view>
-
       <view class="wheel-container">
-        <!-- 奖品加载状态 -->
         <view v-if="loading.prizes" class="loading-overlay">
           <view class="loading-content">
             <text class="loading-text">奖品加载中...</text>
           </view>
         </view>
 
-        <!-- 转盘主体 -->
-        <LuckyWheel
-          ref="myLucky"
-          width="600rpx"
-          height="600rpx"
-          :blocks="blocks"
-          :prizes="prizes"
-          :buttons="buttons"
-          :defaultStyle="defaultStyle"
-          @start="startCallBack"
-          @end="endCallBack"
-        />
+        <!-- 外圈装饰 -->
+        <view class="wheel-outer-ring" :style="{ background: themeColor }">
+          <!-- 转盘主体（旋转） -->
+          <view
+            class="wheel"
+            :style="{
+              background: wheelBackground,
+              transform: 'rotate(' + wheelRotation + 'deg)',
+              transition: isSpinning ? 'transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)' : 'none'
+            }"
+          >
+            <!-- 分界线 -->
+            <view
+              v-for="(angle, i) in dividerAngles"
+              :key="'d' + i"
+              class="wheel-divider"
+              :style="{ transform: 'rotate(' + angle + 'deg)' }"
+            ></view>
+
+            <!-- 奖品文字 -->
+            <view
+              v-for="(item, index) in prizes"
+              :key="'p' + index"
+              class="wheel-segment"
+              :style="{
+                transform: 'rotate(' + (index * 360 / prizes.length + 360 / prizes.length / 2) + 'deg)'
+              }"
+            >
+              <text class="wheel-segment-text">{{ item.prize_name }}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 中心指针 -->
+        <view class="wheel-center-pointer" @click="startCallBack">
+          <view class="wheel-center-arrow" :style="{ borderBottomColor: themeColor }"></view>
+          <view class="wheel-center-dot" :style="{ background: themeColor }"></view>
+        </view>
       </view>
 
-      <view class="capsule-wrapper">
+      <!-- 已抽奖：显示结果文字 -->
+      <view class="drawn-result" v-if="eventInfo.has_drawn && myDrawRecord">
+        <view v-if="myDrawRecord.is_winning" class="drawn-result-content winning">
+          <text class="drawn-result-icon">🎉</text>
+          <text class="drawn-result-text">恭喜中奖「{{ myDrawRecord.prize_name }}」</text>
+          <text class="drawn-result-sub">请前往抽奖记录页面填写收货地址，我们将很快为你发放奖品</text>
+        </view>
+        <view v-else class="drawn-result-content not-win">
+          <text class="drawn-result-text">感谢参与</text>
+          <text class="drawn-result-sub">感谢你对全速体育的关注，期待您参加下次活动</text>
+        </view>
+      </view>
+
+      <!-- 未抽奖：显示抽奖按钮 -->
+      <view class="capsule-wrapper" v-else>
         <view
           class="capsule-btn"
           @click="startCallBack"
           :class="{
             disabled: loading.drawing || loading.prizes || loading.eventInfo,
-            'event-not-ended': eventInfo.event_status !== 'ACTIVE',
-            'not-eligible': !eventInfo.is_eligible,
-            'already-drawn': eventInfo.has_drawn
+            'event-not-ended': eventInfo.event_status !== 'ACT',
+            'not-eligible': userCheckinInfo.total_qualified_sessions < userCheckinInfo.required_checkins,
           }"
         >
           <text class="btn-text">{{ getButtonText() }}</text>
         </view>
+        <view class="checkin-tip" v-if="!notRegistered && userCheckinInfo.total_qualified_sessions < userCheckinInfo.required_checkins">
+          <text class="checkin-tip-text">您未满足{{ userCheckinInfo.event_name || '此活动' }}设置的{{ userCheckinInfo.required_checkins }}次打卡要求，请再接再厉</text>
+        </view>
       </view>
 
-      <view class="prizes-list" v-if="prizes.length > 0">
-        <view class="prizes-list-title">奖品列表</view>
-        <view class="prizes-list-items">
-          <view
-            v-for="(item, index) in prizes"
-            :key="index"
-            class="prize-item"
-          >
-            <view class="prize-index">{{ index + 1 }}</view>
-            <view class="prize-info">
-              <view class="prize-name-text">{{ item.fonts[0].text }}</view>
-              <view class="prize-type" :class="item.prize_type">
-                {{ item.prize_type === 'PHYSICAL' ? '实物奖品' : item.prize_type === 'NONE' ? '虚拟奖品' : '其他奖品' }}
-              </view>
-            </view>
+      <view class="lottery-desc" v-if="eventInfo.description">
+        <view class="lottery-desc-title">抽奖说明</view>
+        <rich-text class="lottery-desc-content" :nodes="eventInfo.description"></rich-text>
+      </view>
+
+      <!-- 奖品列表（横向紧凑展示） -->
+      <view class="prizes-bar" v-if="displayPrizes.length > 0">
+        <text class="prizes-bar-label">奖品</text>
+        <view class="prizes-bar-items">
+          <view v-for="(item, index) in displayPrizes" :key="index" class="prizes-bar-tag">
+            <text class="prizes-bar-tag-text">{{ item.prize_name }}</text>
           </view>
         </view>
       </view>
 
-      <view class="spacer"></view>
-
-      <view class="winners-container">
-        <view class="winners-container-title">- 中奖名单 -</view>
-
-        <view class="winners-item-wrapper">
-          <view v-if="winners.length === 0" class="empty-winners">
-            <text class="empty-text">暂无中奖者，祝君好运</text>
+      <!-- 抽奖记录滚动区域 -->
+      <view class="records-ticker">
+        <view class="records-ticker-header">
+          <text class="records-ticker-title">抽奖动态</text>
+          <text class="records-ticker-count" v-if="allRecords.length > 0">共{{ allRecords.length }}条</text>
+        </view>
+        <scroll-view class="records-ticker-body" scroll-y v-if="allRecords.length > 0">
+          <view v-for="(item, index) in allRecords" :key="index" class="records-ticker-item">
+            <image v-if="item.avatar_url" :src="item.avatar_url" class="records-ticker-avatar" mode="aspectFill" />
+            <view v-else class="records-ticker-avatar-placeholder"></view>
+            <text class="records-ticker-name">{{ item.nickname || '用户' }}</text>
+            <text :class="['records-ticker-result', item.is_winning ? 'winning' : 'not-winning']">
+              {{ item.is_winning ? '获得了 ' + item.prize_name : '感谢参与' }}
+            </text>
           </view>
-          <view v-else>
-            <view v-for="(item, index) in winners" :key="index">
-              <view class="winners-item">
-                <view class="winners-item-left">
-                  <image :src="item.avatar" class="winner-avatar" mode="scaleToFill" />
+        </scroll-view>
+        <view v-else class="records-ticker-empty">
+          <text class="records-ticker-empty-text">暂无抽奖记录，等你来开启！</text>
+        </view>
+      </view>
 
-                  <view class="winner-user-info-wrapper">
-                    <view class="winner-user-info">
-                      <text class="winner-username">{{ item.username }}</text>
-                      <view class="time-container">{{ dayjs(item.time).format("YYYY-MM-DD") }}</view>
-                    </view>
-
-                    <text class="prize">获得了 {{ item.prize }} ！</text>
-                  </view>
-
-                </view>
-
-                <view class="winners-item-right">
-                  <!-- <image :src="item.prizeImg" class="prizeImg" mode="scaleToFill"/> -->
-                </view>
-              </view>
+      <!-- 中奖名单 -->
+      <view class="winners-section">
+        <view class="winners-section-title">🎉 中奖名单</view>
+        <view v-if="winners.length === 0" class="winners-section-empty">
+          <text class="winners-section-empty-text">暂无中奖记录，等你来开启！</text>
+        </view>
+        <view v-else class="winners-section-list">
+          <view v-for="(item, index) in winners" :key="index" class="winners-section-item">
+            <image v-if="item.avatar" :src="item.avatar" class="winners-section-avatar" mode="aspectFill" />
+            <view v-else class="winners-section-avatar-placeholder"></view>
+            <view class="winners-section-info">
+              <text class="winners-section-name">{{ item.username }}</text>
+              <text class="winners-section-prize">获得了 {{ item.prize }}</text>
             </view>
+            <text class="winners-section-time">{{ dayjs(item.time).format("MM-DD") }}</text>
           </view>
         </view>
+      </view>
+      <view class="bottom-spacer" v-if="eventInfo.has_drawn"></view>
+    </view>
+
+    <!-- 底部固定按钮：已抽奖时显示 -->
+    <view class="bottom-btn-wrapper" v-if="eventInfo.has_drawn">
+      <view
+        class="bottom-btn"
+        :style="{ background: `linear-gradient(90deg, ${themeGradient[0]}, ${themeGradient[1]})` }"
+        @click="nav2History"
+      >
+        <text class="bottom-btn-text">{{ myDrawRecord?.is_winning ? '填写收货地址' : '查看我的抽奖记录' }}</text>
       </view>
     </view>
   </view>
@@ -683,221 +842,419 @@ const nav2History = () => {
 
 <style scoped>
 .page-outter {
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.history-wrapper {
-  display: flex;
-  width: 100%;
-  justify-content: flex-end;
-}
-
-.history {
-  padding: 10rpx 20rpx;
-  background-color: #ff4757;
-  border-radius: 100rpx 0 0 100rpx;
-  color: #fff;
+  min-height: 100vh;
+  background: linear-gradient(
+    to bottom,
+    #ff7979 0%,
+    #ffd4a3 50%,
+    #ffffff 100%
+  );
 }
 
 .page {
-  overflow-y: auto;
-  background: linear-gradient(
-    to bottom,
-    #ff7979 0%,    /* 浅红色 */
-    #ffd4a3 50%,   /* 中间过渡色 */
-    #ffffff 100% 
-  );
   padding-bottom: constant(safe-area-inset-bottom);
   padding-bottom: env(safe-area-inset-bottom);
+}
+
+.checkin-tip {
+  margin: 44rpx 0 0;
+  padding: 20rpx 24rpx;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 12rpx;
+  text-align: center;
+}
+
+.checkin-tip-text {
+  font-size: 24rpx;
+  color: var(--theme-color, #ff5c5c);
+  line-height: 1.6;
+}
+
+/* 已抽奖结果展示 */
+.drawn-result {
+  padding: 40rpx;
+  display: flex;
+  justify-content: center;
+}
+
+.drawn-result-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.drawn-result-icon {
+  font-size: 56rpx;
+}
+
+.drawn-result-content.winning .drawn-result-text {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #E63E2E;
+}
+
+.drawn-result-content.not-win .drawn-result-text {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #999;
+}
+
+.drawn-result-sub {
+  font-size: 24rpx;
+  color: #999;
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* 底部固定按钮 */
+.bottom-btn-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 20rpx 0;
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+}
+
+.bottom-btn {
+  width: 686rpx;
+  height: 96rpx;
+  border-radius: 999rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bottom-btn-text {
+  color: #fff;
+  font-size: 34rpx;
+  font-weight: bold;
+  letter-spacing: 2rpx;
+}
+
+.bottom-spacer {
+  height: 160rpx;
+}
+
+.lottery-desc {
+  margin: 20rpx 40rpx 30rpx;
+  padding: 30rpx;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 20rpx;
+  border-left: 6rpx solid var(--theme-color, #ff5c5c);
+}
+
+.lottery-desc-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: var(--theme-color, #ff5c5c);
+  margin-bottom: 16rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 2rpx solid rgba(0, 0, 0, 0.06);
+}
+
+.lottery-desc-content {
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.8;
 }
 
 .wheel-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 80rpx 0 50rpx 0;
+  position: relative;
+  width: 600rpx;
+  height: 600rpx;
+  margin: 60rpx auto 20rpx;
 }
 
-.prizes-list {
-  background-color: white;
-  padding: 30rpx 40rpx;
-  margin: 0 40rpx 40rpx;
-  border-radius: 20rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
-  display: block !important;
-  min-height: 100rpx;
-}
-
-.prizes-list-title {
-  font-size: 32rpx;
-  color: #333;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 20rpx;
-  padding-bottom: 20rpx;
-  border-bottom: 2rpx solid #f0f0f0;
-}
-
-.prizes-list-items {
-  display: flex;
-  flex-direction: column;
-  gap: 20rpx;
-}
-
-.prize-item {
-  display: flex;
-  align-items: center;
-  padding: 20rpx 0;
-  border-bottom: 1rpx solid #f0f0f0;
-}
-
-.prize-item:last-child {
-  border-bottom: none;
-}
-
-.prize-index {
-  width: 40rpx;
-  height: 40rpx;
-  background: linear-gradient(135deg, #ff6b6b, #ff4757);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 24rpx;
-  font-weight: bold;
-  margin-right: 20rpx;
-  flex-shrink: 0;
-}
-
-.prize-info {
-  flex: 1;
-}
-
-.prize-name-text {
-  font-size: 30rpx;
-  color: #333;
-  font-weight: 500;
-  margin-bottom: 8rpx;
-}
-
-.prize-type {
-  font-size: 24rpx;
-  color: #999;
-}
-
-.prize-type.PHYSICAL {
-  color: #4caf50;
-}
-
-.prize-type.NONE {
-  color: #999;
-}
-
-.winners-container {
-  background-color: white;
+/* 外圈装饰环 */
+.wheel-outer-ring {
   width: 100%;
-  border-radius: 26rpx 26rpx 0 0;
-  margin-top: 40rpx;
-  padding-bottom: constant(safe-area-inset-bottom);
-  padding-bottom: env(safe-area-inset-bottom);
+  height: 100%;
+  border-radius: 50%;
+  padding: 16rpx;
+  box-sizing: border-box;
 }
 
-.spacer {
-  min-height: 40rpx;
-}
-
-.winners-container-title {
-  font-size: 40rpx;
-  color: #953F1A;
-  display: flex;
-  justify-content: center;
-  padding: 30rpx 0;
-  border-bottom: 1rpx solid #ededed;
-}
-
-.winners-item-wrapper {
-  padding: 40rpx;
-  display: flex;
-  flex-direction: column;
-  gap: 20rpx;
-  min-height: 200rpx;
-}
-
-.empty-winners {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 200rpx;
-}
-
-.empty-text {
-  color: #999;
-  font-size: 28rpx;
-  text-align: center;
-}
-
-.winners-item {
-  height: fit-content;
-  background-color: #FFF8F0;
-  border: 2rpx solid #F8F2EA;
-  padding: 40rpx;
-  border-radius: 16rpx;
-  display: flex;
-  justify-content: space-between;
-  gap: 20rpx;
-}
-
-.winners-item-left {
-  display: flex;
-  gap: 20rpx;
-}
-
-.winners-item-right {
-  height: 80rpx;
-  width: 80rpx;
+.wheel {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  position: relative;
   overflow: hidden;
 }
 
-.winner-avatar {
-  height: 80rpx;
-  width: 80rpx;
-  border-radius: 50%;
+.wheel-divider {
+  position: absolute;
+  width: 2rpx;
+  height: 50%;
+  top: 0;
+  left: 50%;
+  margin-left: -1rpx;
+  transform-origin: bottom center;
+  background-color: #E8D5C0;
 }
 
-.winner-user-info-wrapper {
+.wheel-segment {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.wheel-segment-text {
+  position: absolute;
+  top: 6%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #D2691E;
+  writing-mode: vertical-rl;
+  letter-spacing: 2rpx;
+  white-space: nowrap;
+}
+
+/* 中心指针 */
+.wheel-center-pointer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  align-items: center;
+  z-index: 5;
 }
 
-.winner-user-info {
+.wheel-center-arrow {
+  width: 0;
+  height: 0;
+  border-left: 18rpx solid transparent;
+  border-right: 18rpx solid transparent;
+  border-bottom: 36rpx solid;
+  margin-bottom: -6rpx;
+}
+
+.wheel-center-dot {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.3);
+}
+
+/* 奖品横向条 */
+.prizes-bar {
   display: flex;
   align-items: center;
-  gap: 10rpx;
+  margin: 0 40rpx 20rpx;
+  padding: 20rpx 24rpx;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 12rpx;
 }
 
-.winner-username {
+.prizes-bar-label {
+  font-size: 24rpx;
+  font-weight: bold;
   color: #953F1A;
-  font-size: 30rpx;
+  margin-right: 16rpx;
+  flex-shrink: 0;
 }
 
-.time-container {
+.prizes-bar-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.prizes-bar-tag {
+  padding: 8rpx 20rpx;
+  background: #FFF8F0;
+  border-radius: 8rpx;
+  border: 1rpx solid #F0E0D0;
+}
+
+.prizes-bar-tag-text {
+  font-size: 22rpx;
   color: #953F1A;
-  font-size: 20rpx;
-  background-color: #ffe1c3;
-  border-radius: 9999px;
-  padding: 10rpx;
+}
+
+/* 抽奖记录滚动区 */
+.records-ticker {
+  margin: 0 40rpx 40rpx;
+  background: white;
+  border-radius: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.records-ticker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 24rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.records-ticker-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.records-ticker-count {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.records-ticker-body {
+  max-height: 500rpx;
+}
+
+.records-ticker-item {
+  display: flex;
+  align-items: center;
+  padding: 18rpx 24rpx;
+  border-bottom: 1rpx solid #fafafa;
+}
+
+.records-ticker-avatar {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  margin-right: 14rpx;
+  flex-shrink: 0;
+}
+
+.records-ticker-avatar-placeholder {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  margin-right: 14rpx;
+  flex-shrink: 0;
+  background: #eee;
+}
+
+.records-ticker-name {
+  font-size: 24rpx;
+  color: #666;
+  margin-right: 12rpx;
+  flex-shrink: 0;
+}
+
+.records-ticker-result {
+  font-size: 24rpx;
+  flex: 1;
+}
+
+.records-ticker-result.winning {
+  color: #E63E2E;
+  font-weight: 500;
+}
+
+.records-ticker-result.not-winning {
+  color: #999;
+}
+
+.records-ticker-empty {
+  padding: 60rpx 0;
   display: flex;
   justify-content: center;
-  align-items: center;
 }
 
-.prize {
-  color: #C19E86;
+.records-ticker-empty-text {
+  font-size: 24rpx;
+  color: #ccc;
+}
+
+/* 中奖名单 */
+.winners-section {
+  margin: 0 40rpx 40rpx;
+  background: white;
+  border-radius: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.winners-section-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #E63E2E;
+  padding: 20rpx 24rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.winners-section-empty {
+  padding: 60rpx 0;
+  display: flex;
+  justify-content: center;
+}
+
+.winners-section-empty-text {
+  font-size: 24rpx;
+  color: #ccc;
+}
+
+.winners-section-list {
+  padding: 0 24rpx;
+}
+
+.winners-section-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #fafafa;
+}
+
+.winners-section-item:last-child {
+  border-bottom: none;
+}
+
+.winners-section-avatar {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.winners-section-avatar-placeholder {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+  background: #eee;
+}
+
+.winners-section-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.winners-section-name {
+  font-size: 26rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.winners-section-prize {
+  font-size: 24rpx;
+  color: #E63E2E;
+}
+
+.winners-section-time {
+  font-size: 22rpx;
+  color: #bbb;
+  flex-shrink: 0;
 }
 
 .prizeImg {
@@ -907,10 +1264,11 @@ const nav2History = () => {
 
 .capsule-wrapper {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 40rpx;
-  margin-bottom: 50rpx;
+  margin-bottom: 30rpx;
 }
 
 .capsule-btn {

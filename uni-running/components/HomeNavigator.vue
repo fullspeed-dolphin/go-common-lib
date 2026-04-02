@@ -30,9 +30,15 @@ function getNavList() {
   });
 }
 
+const tabBarPages = ['pages/index', 'pages/runClub', 'pages/sport', 'pages/mine'];
+
 function routeTo(item) {
   if (!item.path) return uni.$u.toast("功能筹备中，敬请期待...");
-  uni.$u.route(item.path);
+  if (tabBarPages.includes(item.path)) {
+    uni.switchTab({ url: '/' + item.path });
+  } else {
+    uni.$u.route(item.path);
+  }
 }
 </script>
 

@@ -50,17 +50,16 @@ const formRules = {
 const eventId = ref('') 
 const openid = ref(store?.state?.userInfo?.openid)
 
-// 简单的UAT请求工具，直接使用全局的token获取方式
+// 抽奖专用请求工具
 const uatRequest = {
   get: (url, params) => {
     return new Promise((resolve, reject) => {
       uni.request({
-        url: `https://uat.speexpay.com/event-api/api/gift${url}`,
+        url: `https://speexpay.com/event-api/lottery${url}`,
         method: 'GET',
         data: params,
         header: {
           Authorization: uni.getStorageSync('token'),
-          // Authorization: '5a4ecef41628100c272b764ea75f0d0d8fdf0b51d79b960edfec27a278eccf75',
           'content-type': 'application/json',
         },
         success: (res) => {
@@ -103,12 +102,11 @@ const uatRequest = {
   post: (url, data, headers = {}) => {
     return new Promise((resolve, reject) => {
       uni.request({
-        url: `https://uat.speexpay.com/event-api/api/gift${url}`,
+        url: `https://speexpay.com/event-api/lottery${url}`,
         method: 'POST',
         data: data,
         header: {
           Authorization: uni.getStorageSync('token'),
-          // Authorization: '5a4ecef41628100c272b764ea75f0d0d8fdf0b51d79b960edfec27a278eccf75',
           'content-type': 'application/json',
           ...headers
         },
@@ -382,8 +380,6 @@ onLoad((options) => {
           <text class="legend-item"><text class="legend-color pending">■</text>待填地址</text>
           <text class="legend-item"><text class="legend-color filled">■</text>已填地址</text>
           <text class="legend-item"><text class="legend-color locked">■</text>已锁定</text>
-
-          <view class="contact-btn" @click="openWeComChat">联系客服</view>
         </view>
 
         <view class="records-container">
@@ -399,28 +395,38 @@ onLoad((options) => {
             v-for="(item, index) in records"
             :key="item.id || index"
             class="item-container"
+            :class="{ 'item-winning': item.is_winning, 'item-not-winning': !item.is_winning }"
           >
-            <view class="left-info">
-              <view class="prize-name" :class="{ 'win': item.status !== 'NOT_WIN' && item.status !== 'NONE' }">{{ item.prize_name }}</view>
-              <view class="draw-time">{{ formatTime(item.draw_time) }}</view>
-            </view>
-            <view
-              class="right-status"
-              :class="[item.status, { 'disabled': item.status === 'NOT_WIN' || item.status === 'NONE' || (item.is_locked || false) }]"
-              @click="handleStatusClick(item)"
-              :style="{ cursor: getStatusCursor(item) }"
-            >
-              <text v-if="item.status === 'NOT_WIN'">未中奖</text>
-              <text v-else-if="item.status === 'PENDING_ADDRESS'">待填地址</text>
-              <text v-else-if="item.status === 'ADDRESS_FILLED'">{{ item.is_locked ? '已锁定' : '已填地址' }}</text>
-              <text v-else-if="item.status === 'WIN'">已中奖</text>
-              <text v-else-if="item.status === 'NONE'">谢谢参与</text>
-              <text v-else>中奖</text>
+            <view class="item-badge" v-if="item.is_winning">🎉 中奖</view>
+            <view class="item-badge not-win" v-else>未中奖</view>
+            <view class="item-body">
+              <view class="left-info">
+                <view class="prize-name" :class="{ 'win': item.is_winning }">{{ item.prize_name }}</view>
+                <view class="event-label">为爱奔跑520·第一期抽奖</view>
+                <view class="draw-time">{{ formatTime(item.draw_time) }}</view>
+              </view>
+              <view
+                v-if="item.is_winning"
+                class="right-status"
+                :class="[item.status, { 'disabled': item.is_locked || false }]"
+                @click="handleStatusClick(item)"
+                :style="{ cursor: getStatusCursor(item) }"
+              >
+                <text v-if="item.status === 'PENDING_ADDRESS'">待填地址</text>
+                <text v-else-if="item.status === 'ADDRESS_FILLED'">{{ item.is_locked ? '已锁定' : '已填地址' }}</text>
+                <text v-else>已中奖</text>
+              </view>
             </view>
           </view>
         </view>
       </mescroll-body>
     </view>
+
+    <!-- 悬浮联系客服按钮 -->
+    <button class="kefu-float-btn" open-type="contact">
+      <text class="kefu-float-icon">💬</text>
+      <text class="kefu-float-label">客服</text>
+    </button>
 
     <!-- 地址填写弹窗 -->
     <u-popup
@@ -539,16 +545,41 @@ onLoad((options) => {
 }
 
 .item-container {
-  background-color: #FFF8F0;
-  border: 1px solid #F8F2EA;
-  padding: 30rpx;
   border-radius: 16rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.item-container.item-winning {
+  background: linear-gradient(135deg, #FFF8F0, #FFFFFF);
+  border: none;
+}
+
+.item-container.item-not-winning {
+  background: #f9f9f9;
+  border: none;
+}
+
+.item-badge {
+  padding: 16rpx 30rpx;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(90deg, #ff6b6b, #E8453C);
+  letter-spacing: 2rpx;
+}
+
+.item-badge.not-win {
+  background: #bbb;
+  font-size: 26rpx;
+}
+
+.item-body {
+  padding: 30rpx 30rpx 36rpx;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
 }
 
 .left-info {
@@ -556,19 +587,25 @@ onLoad((options) => {
 }
 
 .prize-name {
-  font-size: 32rpx;
+  font-size: 36rpx;
   font-weight: bold;
   color: #333;
-  margin-bottom: 10rpx;
+  margin-bottom: 12rpx;
 }
 
 .prize-name.win {
-  color: #ff5c5c;
+  color: #E8453C;
+}
+
+.event-label {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 10rpx;
 }
 
 .draw-time {
   font-size: 24rpx;
-  color: #999;
+  color: #bbb;
 }
 
 .right-status {
@@ -816,10 +853,37 @@ onLoad((options) => {
   color: #fff;
 }
 
-.contact-btn {
-  background-color: #ff5c5c;
-  padding: 20rpx 30rpx;
-  border-radius: 20rpx;
-  color: #ffffff;
+/* 悬浮客服按钮 */
+.kefu-float-btn {
+  position: fixed;
+  right: 30rpx;
+  bottom: 200rpx;
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 999rpx;
+  background: #18b566;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  box-shadow: 0 6rpx 18rpx rgba(24, 181, 102, 0.25);
+  padding: 0;
+  border: none;
+  line-height: 1;
+}
+
+.kefu-float-btn::after {
+  border: none;
+}
+
+.kefu-float-icon {
+  font-size: 36rpx;
+}
+
+.kefu-float-label {
+  font-size: 18rpx;
+  color: #fff;
+  margin-top: 4rpx;
 }
 </style>
