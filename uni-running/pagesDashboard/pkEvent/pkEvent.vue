@@ -209,7 +209,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watchEffect } from "vue";
+import { ref, computed, watch } from "vue";
 import { onLoad, onShow, onReachBottom, onPageScroll } from "@dcloudio/uni-app";
 
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
@@ -605,6 +605,15 @@ const certIconOnClick = () => {
 }
 
 const lotteryIconClick = () => {
+  // 如果弹窗正在显示，先关闭并清除定时器，防止重复跳转
+  if (isShowPop.value) {
+    isShowPop.value = false
+    if (timer.value) {
+      clearTimeout(timer.value)
+      timer.value = null
+    }
+  }
+
   if (isLotteryAct.value) {
     goto('pagesDashboard/pkEvent/lottery')
   } else {
@@ -614,15 +623,20 @@ const lotteryIconClick = () => {
       showCancel: false,
       confirmText: '知道了',
     });
-  } 
+  }
 }
 
-// 3s倒计时自动跳转
-watchEffect(() => {
-  if (isShowPop.value) {
+// 3s倒计时自动跳转：弹窗关闭时清除定时器
+watch(isShowPop, (val) => {
+  if (val) {
     timer.value = setTimeout(() => {
       nav2Lottery()
     }, 3000)
+  } else {
+    if (timer.value) {
+      clearTimeout(timer.value)
+      timer.value = null
+    }
   }
 })
 </script>

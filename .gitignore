@@ -8,3 +8,14 @@ debug*
 活动列表设计/
 node_modules/
 *.md
+
+# 测试脚本和敏感数据
+batch-find-tokens.sh
+eligible-phones.txt
+found_openid.sh
+lottery-test-result.log
+phone-tokens.csv
+test-fake-records-v2.sh
+test-fake-records.sh
+test-lottery-probability.sh
+test-real-lottery.sh

@@ -278,7 +278,7 @@ const getWinners = async () => {
     const res = await uatRequest.get('/winners', {
       event_id: eventId.value,
       page: 1,
-      page_size: 20
+      page_size: 100
     })
     if (res.code === 200) {
       winners.value = res.data.list.map(item => ({
