@@ -4,6 +4,7 @@ import { onLoad, onUnload } from "@dcloudio/uni-app";
 import { useStore } from "vuex";
 import dayjs from "dayjs";
 import request from "@/utils/request.js";
+import { baseLink } from "@/utils/config.js";
 
 const store = useStore();
 const pkEventTheme = computed(() => store.state.pkEventTheme);
@@ -62,7 +63,7 @@ const uatRequest = {
   get: (url, params) => {
     return new Promise((resolve, reject) => {
       uni.request({
-        url: `https://speexpay.com/event-api/lottery${url}`,
+        url: `${baseLink}/event-api/lottery${url}`,
         method: 'GET',
         data: params,
         header: {
@@ -109,7 +110,7 @@ const uatRequest = {
   post: (url, data, headers = {}) => {
     return new Promise((resolve, reject) => {
       uni.request({
-        url: `https://speexpay.com/event-api/lottery${url}`,
+        url: `${baseLink}/event-api/lottery${url}`,
         method: 'POST',
         data: data,
         header: {
