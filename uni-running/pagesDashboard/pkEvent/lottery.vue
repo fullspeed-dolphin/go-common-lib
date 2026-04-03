@@ -68,6 +68,7 @@ const uatRequest = {
         data: params,
         header: {
           Authorization: uni.getStorageSync('token'),
+          // Authorization: '5a4ecef41628100c272b764ea75f0d0d8fdf0b51d79b960edfec27a278eccf75',
           'content-type': 'application/json',
         },
         success: (res) => {
@@ -115,6 +116,7 @@ const uatRequest = {
         data: data,
         header: {
           Authorization: uni.getStorageSync('token'),
+          // Authorization: '5a4ecef41628100c272b764ea75f0d0d8fdf0b51d79b960edfec27a278eccf75',
           'content-type': 'application/json',
           ...headers
         },
@@ -159,6 +161,8 @@ const uatRequest = {
 
 const eventId = ref('') 
 const openid = ref(store?.state?.userInfo?.openid)
+// const eventId = ref("01KH0WQX4H2C7Q4GJ217P8T922") 
+// const openid = ref("oEuZJvoN4oia8LJ-2k5A15S9CVSM")
 const eventInfo = ref({
   event_status: 'ACT',
   has_drawn: false,

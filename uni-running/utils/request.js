@@ -21,6 +21,7 @@ function fetch(options) {
 			sslVerify: false,
 			header: {
 				Authorization: uni.getStorageSync('token'),
+				// Authorization: '5a4ecef41628100c272b764ea75f0d0d8fdf0b51d79b960edfec27a278eccf75',
 				'content-type': 'application/json',
 			},
 			method: options.method || 'post',

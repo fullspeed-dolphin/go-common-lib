@@ -351,20 +351,10 @@ function checkShowPop() {
   if (hasShownPop.value) return
   const lottery = lotteryEventInfo.value
   const checkin = userCheckedInfo.value
-
   if (!lottery?.event_status || !checkin?.required_checkins) return
   const isLotteryActive = lottery.event_status === 'ACT'
-
   const isQualified = checkin.total_qualified_sessions >= checkin.required_checkins
-
-  // 抽过奖就不用再弹窗了
-  if (lottery?.has_drawn) return
-  // 库存为0就不要弹窗了
-  if (lottery?.all_prizes_sent) return
-  // 活动不是ACT的话就不要弹窗了
-  if (eventIsEnd.value) return
-
-  if (isLotteryActive && isQualified.value) {
+  if (isLotteryActive && isQualified) {
     isShowPop.value = true
     hasShownPop.value = true
   }
@@ -586,6 +576,11 @@ const certIconOnClick = () => {
 
   // 活动已结束但未达标
   const checkin = userCheckedInfo.value
+
+  console.log("=========")
+  console.log("=========checkin.total_qualified_sessions", checkin.total_qualified_sessions)
+  console.log("=========checkin.required_checkins", checkin.required_checkins)
+  console.log("=========")
 
   if (!checkin?.required_checkins || checkin.total_qualified_sessions < checkin.required_checkins) {
     uni.showModal({
