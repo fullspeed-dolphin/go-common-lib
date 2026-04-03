@@ -74,7 +74,6 @@
         <view class="iconfont flex-center icon-paihangbang" style="color:#FC9C15;background: #FEE8C2;"></view>
         <text class="func-text">排行榜</text>
       </view>
-      <!-- 2026.4.1 金刚区新增抽奖活动、完赛证书 -->
       <view class="func-item flex-col-center" @click="lotteryIconClick">
         <view class="kingkong-icon-wrapper" style="background: #d3f5f4;">
           <image src="/static/icons/lottery-icon.png" class="kingkong-icon" mode="scaleToFill" />
@@ -210,7 +209,7 @@
 
 <script setup>
 import { ref, computed, watch } from "vue";
-import { onLoad, onShow, onReachBottom, onPageScroll } from "@dcloudio/uni-app";
+import { onLoad, onShow, onReachBottom, onPageScroll, onUnload } from "@dcloudio/uni-app";
 
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 const { mescrollInit, downCallback, getMescroll } = useMescroll(onPageScroll, onReachBottom);
@@ -299,11 +298,9 @@ const getEventData = () => {
 
       detailInfo.value = res;
 
-      const isExp = res.status.toLowerCase() === 'exp'
-      const isEnd = new Date(res.end_time) > new Date();
-      eventIsEnd.value = isEnd
-      isLotteryAct.value = isExp && !isEnd
-
+      const isExp = res.status.toLowerCase() === 'exp' // 接口返回的是“EXP”, 但是上面的res = {...}里面有前人做了status: res.status.toLowerCase()这个操作导致EXP变成exp，为了保险，再加一次toLowerCase()
+      const isEnd = new Date(res.end_time) < new Date();
+      eventIsEnd.value = isEnd && isExp
 
       store.commit('set', {
         type: 'pkEventTheme',
@@ -346,7 +343,6 @@ function getLotteryEventInfo() {
 
 // 判断是否弹出抽奖弹窗：lottery_event 处于 ACT + 打卡达标（仅首次弹一次）
 const hasShownPop = ref(false)
-// TODO: 
 function checkShowPop() {
   if (hasShownPop.value) return
   const lottery = lotteryEventInfo.value
@@ -520,12 +516,10 @@ const teamRankValue = (item) => {
 
 // 弹窗广告状态
 const isShowPop = ref(false)
-// 抽奖活动是否已经开始
-const isLotteryAct = ref(false)
 // 存储定时器 ID
 const timer = ref(null)
 // 活动已经结束
-const eventIsEnd = ref(true)
+const eventIsEnd = ref(false)
 
 // 处理弹窗关闭（用户手动点击关闭）
 const handlePopClose = () => {
@@ -581,11 +575,6 @@ const certIconOnClick = () => {
   // 活动已结束但未达标
   const checkin = userCheckedInfo.value
 
-  console.log("=========")
-  console.log("=========checkin.total_qualified_sessions", checkin.total_qualified_sessions)
-  console.log("=========checkin.required_checkins", checkin.required_checkins)
-  console.log("=========")
-
   if (!checkin?.required_checkins || checkin.total_qualified_sessions < checkin.required_checkins) {
     uni.showModal({
       title: '提示',
@@ -614,8 +603,25 @@ const lotteryIconClick = () => {
     }
   }
 
-  if (isLotteryAct.value) {
+  // 抽奖活动状态："PND"=未开始，"ACT"=进行中，"EXP"=已结束
+  const eventStatus = lotteryEventInfo.value?.event_status
+
+  if (eventStatus === "ACT") {
     goto('pagesDashboard/pkEvent/lottery')
+  } else if (eventStatus === "PND") {
+    uni.showModal({
+      title: '提示',
+      content: '活动尚未开始',
+      showCancel: false,
+      confirmText: '知道了',
+    });
+  } else if (eventStatus === "EXP") {
+    uni.showModal({
+      title: '提示',
+      content: '活动已经结束',
+      showCancel: false,
+      confirmText: '知道了',
+    });
   } else {
     uni.showModal({
       title: '提示',
@@ -637,6 +643,14 @@ watch(isShowPop, (val) => {
       clearTimeout(timer.value)
       timer.value = null
     }
+  }
+})
+
+// 页面卸载后清除定时器，防止滑动返回后还会跳转到抽奖页
+onUnload(() => {
+  if (timer.value) {
+    clearTimeout(timer.value)
+    timer.value = null
   }
 })
 </script>
