@@ -157,9 +157,6 @@ const uatRequest = {
   }
 }
 
-// 活动数据 TODO:
-// const eventId = ref('01KH0WQX4H2C7Q4GJ217P8T922') // 测试活动ID
-// const openid = ref('oEuZJvoN4oia8LJ-2k5A15S9CVSM')
 const eventId = ref('') 
 const openid = ref(store?.state?.userInfo?.openid)
 const eventInfo = ref({
@@ -602,22 +599,6 @@ const startCallBack = () => {
   drawLottery()
 }
 
-// // 2. 定义回调方法
-// const startCallBack = () => {
-//   // 先开始旋转
-//   myLucky.value?.play()
-  
-//   // 模拟请求接口获取中奖结果
-//   // 实际项目中替换为真实的 API 请求
-//   setTimeout(() => {
-//     // 假设后端返回的中奖索引是 0（根据实际情况修改）
-//     // 注意：索引对应 prizes 数组的位置，从 0 开始
-//     const index = 1
-//     // 调用 stop 停止旋转并传递中奖索引
-//     myLucky.value?.stop(index)
-//   }, 3000)
-// }
-
 const endCallBack = (prize) => {
   prizeRet.value = prize
   loading.value.drawing = false
@@ -640,7 +621,6 @@ const endCallBack = (prize) => {
         nav2History()
       }
     });
-    // showPop.value = true
   }
 }
 
@@ -794,7 +774,10 @@ const nav2History = () => {
 
       <!-- 中奖名单 -->
       <view class="winners-section">
-        <view class="winners-section-title">🎉 中奖名单</view>
+        <view class="records-ticker-header">
+          <view class="winners-section-title">🎉 中奖名单</view>
+          <text class="records-ticker-count" v-if="winners.length > 0">共{{ winners.length }}条</text>
+        </view>
         <view v-if="winners.length === 0" class="winners-section-empty">
           <text class="winners-section-empty-text">暂无中奖记录，等你来开启！</text>
         </view>
@@ -911,7 +894,7 @@ const nav2History = () => {
 /* 底部固定按钮 */
 .bottom-btn-wrapper {
   position: fixed;
-  bottom: 0;
+  bottom: 40rpx;
   left: 0;
   width: 100%;
   padding: 20rpx 0;
@@ -1187,8 +1170,6 @@ const nav2History = () => {
   font-size: 28rpx;
   font-weight: bold;
   color: #E63E2E;
-  padding: 20rpx 24rpx;
-  border-bottom: 1rpx solid #f5f5f5;
 }
 
 .winners-section-empty {

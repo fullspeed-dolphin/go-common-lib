@@ -33,7 +33,6 @@ const formRef = ref(null)
 const formRules = {
   recipient_name: [
     { required: true, message: '请输入收件人姓名', trigger: ['blur', 'change'] },
-    { min: 2, max: 20, message: '姓名长度应在2-20个字符之间', trigger: ['blur', 'change'] }
   ],
   contact_number: [
     { required: true, message: '请输入联系电话', trigger: ['blur', 'change'] },
@@ -45,9 +44,6 @@ const formRules = {
   ]
 }
 
-// 活动数据 TODO:
-// const eventId = ref('01KH0WQX4H2C7Q4GJ217P8T922') // 测试活动ID
-// const openid = ref('oEuZJvoN4oia8LJ-2k5A15S9CVSM')
 const eventId = ref('') 
 const openid = ref(store?.state?.userInfo?.openid)
 
@@ -200,15 +196,12 @@ const formatTime = (time) => {
 
 // 处理状态点击
 const handleStatusClick = (item) => {
-  // 默认未锁定状态为false
-  const isLocked = item.is_locked || false
-
-  // 只有已中奖且未锁定的才能点击
-  if ((item.status === 'PENDING_ADDRESS' || item.status === 'ADDRESS_FILLED') && !isLocked) {
+  // 根据后端状态值判断
+  if (item.status === 'PENDING_ADDRESS') {
     openAddressModal(item)
-  } else if (item.status === 'ADDRESS_FILLED' && isLocked) {
+  } else if (item.status === 'ADDRESS_FILLED') {
     uni.showToast({
-      title: '地址已锁定，不可修改',
+      title: '地址已锁定，请联系客服处理',
       icon: 'none',
       duration: 2000
     })
@@ -217,9 +210,8 @@ const handleStatusClick = (item) => {
 
 // 获取状态光标样式
 const getStatusCursor = (item) => {
-  // 默认未锁定状态为false
-  const isLocked = item.is_locked || false
-  if ((item.status === 'PENDING_ADDRESS' || item.status === 'ADDRESS_FILLED') && !isLocked) {
+  // 只有待填写和可编辑状态才能点击
+  if (item.status === 'PENDING_ADDRESS' || item.status === 'ADDRESS_EDITABLE') {
     return 'pointer'
   }
   return 'default'
@@ -232,12 +224,12 @@ const modalTitle = ref('填写收货地址')
 const operationMode = ref('create') // create or update
 
 // 打开地址弹窗
-const openAddressModal = (record) => {
+const openAddressModal = async (record) => {
   // 设置record_id
   addressForm.value.record_id = record.id
 
   // 根据状态设置标题和模式
-  if (record.status === 'ADDRESS_FILLED') {
+  if (record.status === 'ADDRESS_EDITABLE') {
     modalTitle.value = '修改收货地址'
     operationMode.value = 'update'
   } else {
@@ -246,21 +238,37 @@ const openAddressModal = (record) => {
   }
 
   // 如果已经填写过地址，加载已有数据
-  if (record.status === 'ADDRESS_FILLED') {
-    // 这里需要调用获取地址详情的接口
-    loadAddressDetail(record.id)
+  if (record.status === 'ADDRESS_EDITABLE') {
+    // 加载地址详情
+    await loadAddressDetail(record.id)
   }
   showAddressModal.value = true
 }
 
-// 加载地址详情 - 简化版，直接模拟数据
-const loadAddressDetail = (recordId) => {
-  // 模拟已有地址数据
-  addressForm.value = {
-    record_id: recordId,
-    recipient_name: '张三',
-    contact_number: '13800138000',
-    address: '广东省广州市天河区xx路xx号'
+// 加载地址详情
+const loadAddressDetail = async (recordId) => {
+  try {
+    // 调用获取我的地址接口
+    const res = await uatRequest.get('/gift/my_addresses')
+
+    if (res.code === 200 && res.data) {
+      // 查找对应记录的地址信息
+      const addressInfo = res.data.find(item => item.record_id === recordId)
+
+      if (addressInfo) {
+        // 填充表单数据
+        addressForm.value = {
+          record_id: recordId,
+          id: addressInfo.id, // 保存地址ID，用于修改操作
+          recipient_name: addressInfo.recipient_name,
+          contact_number: addressInfo.contact_number,
+          address: addressInfo.address
+        }
+      }
+    }
+  } catch (error) {
+    console.error('加载地址详情失败:', error)
+    // 静默处理错误，用户可以继续填写新地址
   }
 }
 
@@ -281,7 +289,7 @@ const closeAddressModal = () => {
   operationMode.value = 'create'
 }
 
-// 提交地址信息 - 简化版，只做前端交互
+// 提交地址信息
 const submitAddress = async () => {
   // 使用u-form进行校验
   if (!formRef.value) return
@@ -292,29 +300,76 @@ const submitAddress = async () => {
     // 验证通过后提交
     uni.showLoading({ title: '提交中...', mask: true })
 
-    // 模拟接口延迟
-    setTimeout(() => {
-      uni.hideLoading()
-
-      // 模拟提交成功
-      uni.showToast({ title: '地址保存成功', icon: 'success' })
-      closeAddressModal()
-
-      // 更新本地记录状态
-      const recordIndex = records.value.findIndex(r => r.id === addressForm.value.record_id)
-      if (recordIndex !== -1) {
-        // 更新状态为已填写地址
-        records.value[recordIndex].status = 'ADDRESS_FILLED'
-
-        // 如果是修改操作，标记为已锁定
-        if (operationMode.value === 'update') {
-          records.value[recordIndex].is_locked = true
-        }
+    try {
+      // 构建请求数据
+      const requestData = {
+        record_id: addressForm.value.record_id,
+        recipient_name: addressForm.value.recipient_name,
+        contact_number: addressForm.value.contact_number,
+        address: addressForm.value.address
       }
 
-      // 刷新列表
-      downCallback()
-    }, 1500)
+      // 如果是修改操作，添加id字段
+      if (operationMode.value === 'update' && addressForm.value.id) {
+        requestData.id = addressForm.value.id
+      }
+
+      // 调用保存地址接口
+      const res = await uatRequest.post('/address', requestData)
+
+      uni.hideLoading()
+
+      if (res.code === 200) {
+        // 显示成功提示
+        uni.showToast({
+          title: operationMode.value === 'update' ? '地址修改成功' : '地址保存成功',
+          icon: 'success'
+        })
+
+        // 关闭弹窗
+        closeAddressModal()
+
+        // 更新本地记录状态
+        const recordIndex = records.value.findIndex(r => r.id === addressForm.value.record_id)
+        if (recordIndex !== -1) {
+          // 根据操作模式更新状态
+          if (operationMode.value === 'create') {
+            // 新增地址后状态变为可编辑
+            records.value[recordIndex].status = 'ADDRESS_EDITABLE'
+          } else if (operationMode.value === 'update') {
+            // 修改地址后状态变为不可编辑（锁定）
+            records.value[recordIndex].status = 'ADDRESS_UNEDITABLE'
+          }
+        }
+
+        // 刷新列表
+        downCallback()
+      } else {
+        // 处理业务错误
+        let errorMsg = '操作失败'
+        switch (res.code) {
+          case 1005:
+            errorMsg = '地址已填写过，请勿重复提交'
+            break
+          case 1006:
+            errorMsg = '记录不存在或无权限'
+            break
+          case 1007:
+            errorMsg = '非实物奖品无需填写地址'
+            break
+          case 1008:
+            errorMsg = '当前状态不允许填写地址'
+            break
+          default:
+            errorMsg = res.message || '操作失败，请稍后重试'
+        }
+        uni.showToast({ title: errorMsg, icon: 'none' })
+      }
+    } catch (error) {
+      uni.hideLoading()
+      console.error('保存地址失败:', error)
+      uni.showToast({ title: '网络错误，请检查网络连接', icon: 'none' })
+    }
 
   } catch (error) {
     uni.hideLoading()
@@ -409,12 +464,13 @@ onLoad((options) => {
               <view
                 v-if="item.is_winning"
                 class="right-status"
-                :class="[item.status, { 'disabled': item.is_locked || false }]"
+                :class="[item.status]"
                 @click="handleStatusClick(item)"
                 :style="{ cursor: getStatusCursor(item) }"
               >
                 <text v-if="item.status === 'PENDING_ADDRESS'">待填地址</text>
-                <text v-else-if="item.status === 'ADDRESS_FILLED'">{{ item.is_locked ? '已锁定' : '已填地址' }}</text>
+                <text v-else-if="item.status === 'ADDRESS_FILLED'">已填地址</text>
+                <text v-else-if="item.status === 'ADDRESS_UNEDITABLE'">已锁定</text>
                 <text v-else>已中奖</text>
               </view>
             </view>
@@ -632,12 +688,14 @@ onLoad((options) => {
   cursor: pointer;
 }
 
-.right-status.ADDRESS_FILLED {
+.right-status.ADDRESS_EDITABLE {
   color: #fff;
   background-color: #4caf50;
+  cursor: pointer;
 }
 
-.right-status.ADDRESS_FILLED.disabled {
+.right-status.ADDRESS_UNEDITABLE {
+  color: #fff;
   background-color: #9e9e9e;
   cursor: not-allowed;
 }
