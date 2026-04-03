@@ -89,7 +89,6 @@
       </view>
     </section>
 
-    <!-- 2026.4.3 -->
     <view v-if="userStatusInfo.in_team && hasSignedUp && !eventIsEnd" class="section-btn flex-center" @click="goto('/pagesSport/punchInUpload')">
     	<view class="iconfont flex-center icon-lijidaka u-mr-10" style="color:#fff;font-size:42rpx;"></view>
     	立即打卡
@@ -347,14 +346,19 @@ function getLotteryEventInfo() {
 
 // 判断是否弹出抽奖弹窗：lottery_event 处于 ACT + 打卡达标（仅首次弹一次）
 const hasShownPop = ref(false)
+// TODO: 
 function checkShowPop() {
   if (hasShownPop.value) return
   const lottery = lotteryEventInfo.value
   const checkin = userCheckedInfo.value
   if (!lottery?.event_status || !checkin?.required_checkins) return
   const isLotteryActive = lottery.event_status === 'ACT'
-  const isQualified = checkin.total_qualified_sessions >= checkin.required_checkins
-  if (isLotteryActive && isQualified) {
+  // const isQualified = checkin.total_qualified_sessions >= checkin.required_checkins
+  
+  // 已经抽过奖的就不用弹窗了
+  if (lottery?.has_drawn) return
+
+  if (isLotteryActive && lottery?.qualified) {
     isShowPop.value = true
     hasShownPop.value = true
   }
