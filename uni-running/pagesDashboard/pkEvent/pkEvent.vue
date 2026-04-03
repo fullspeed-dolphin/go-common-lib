@@ -77,13 +77,13 @@
       <!-- 2026.4.1 金刚区新增抽奖活动、完赛证书 -->
       <view class="func-item flex-col-center" @click="lotteryIconClick">
         <view class="kingkong-icon-wrapper" style="background: #d3f5f4;">
-          <image src="/static/icons/lottery-icon.png" class="kingkong-icon" mode="scaleToFill" />
+          <image src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/lottery-icon.png" class="kingkong-icon" mode="scaleToFill" />
         </view>
         <text class="func-text">抽奖活动</text>
       </view>
       <view class="func-item flex-col-center" @click="certIconOnClick">
         <view class="kingkong-icon-wrapper" style="background: #f4dae5;">
-          <image src="/static/icons/cert-icon.png" class="kingkong-icon" mode="scaleToFill" />
+          <image src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/cert-icon.png" class="kingkong-icon" mode="scaleToFill" />
         </view>
         <text class="func-text">完赛证书</text>
       </view>
