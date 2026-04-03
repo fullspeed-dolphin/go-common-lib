@@ -87,18 +87,10 @@
         </view>
         <text class="func-text">完赛证书</text>
       </view>
-
-      <!-- <view class="func-item flex-col-center" @click="goto('/pagesSport/punchInUpload')">
-        <view class="iconfont flex-center icon-lijidaka" style="color:#8515FC;background: #EBDBFE;"></view>
-        <text class="func-text">立即打卡</text>
-      </view> -->
-      <!-- <view class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/pkRankList')">
-			  <view class="iconfont flex-center icon-zhengshu" style="color:#EE2061;background: #FEDBE6;"></view>
-			  <text class="func-text">完赛证书</text>
-			</view> -->
     </section>
 
-    <view v-if="userStatusInfo.in_team && hasSignedUp" class="section-btn flex-center" @click="goto('/pagesSport/punchInUpload')">
+    <!-- 2026.4.3 -->
+    <view v-if="userStatusInfo.in_team && hasSignedUp && !eventIsEnd" class="section-btn flex-center" @click="goto('/pagesSport/punchInUpload')">
     	<view class="iconfont flex-center icon-lijidaka u-mr-10" style="color:#fff;font-size:42rpx;"></view>
     	立即打卡
     </view>
@@ -308,10 +300,10 @@ const getEventData = () => {
 
       detailInfo.value = res;
 
-      // 2026.4.1
       const isExp = res.status.toLowerCase() === 'exp'
-      const isEnd = new Date(res.end_time) < new Date();
-      isLotteryAct.value = isExp && isEnd
+      const isEnd = new Date(res.end_time) > new Date();
+      eventIsEnd.value = isEnd
+      isLotteryAct.value = isExp && !isEnd
 
 
       store.commit('set', {
@@ -370,9 +362,9 @@ function checkShowPop() {
   // 库存为0就不要弹窗了
   if (lottery?.all_prizes_sent) return
   // 活动不是ACT的话就不要弹窗了
-  if (!isLotteryActive) return
+  if (eventIsEnd.value) return
 
-  if (isLotteryActive && isQualified) {
+  if (isLotteryActive && isQualified.value) {
     isShowPop.value = true
     hasShownPop.value = true
   }
@@ -538,6 +530,8 @@ const isShowPop = ref(false)
 const isLotteryAct = ref(false)
 // 存储定时器 ID
 const timer = ref(null)
+// 活动已经结束
+const eventIsEnd = ref(true)
 
 // 处理弹窗关闭（用户手动点击关闭）
 const handlePopClose = () => {
@@ -592,6 +586,7 @@ const certIconOnClick = () => {
 
   // 活动已结束但未达标
   const checkin = userCheckedInfo.value
+
   if (!checkin?.required_checkins || checkin.total_qualified_sessions < checkin.required_checkins) {
     uni.showModal({
       title: '提示',
@@ -604,7 +599,7 @@ const certIconOnClick = () => {
   }
 
   // 达标，查看完赛证书
-  const certUrl = `https://speexpay.com/image-service/${activetyId.value}?openid=${userInfo.value?.openid || ''}`
+  const certUrl = `https://ccrun.oss-cn-guangzhou.aliyuncs.com/image-service/${activetyId.value}/${userInfo.value?.openid}.png`
   uni.navigateTo({
     url: `/pagesDashboard/pkEvent/certViewer?url=${encodeURIComponent(certUrl)}&eventName=${encodeURIComponent(detailInfo.value?.event_name || '完赛证书')}`,
   })
