@@ -593,7 +593,10 @@ const certIconOnClick = () => {
   })
 }
 
+// 金刚区抽奖活动icon点击
 const lotteryIconClick = () => {
+  const confirmColor = detailInfo.value?.color_config?.solid || '#FF8C00'
+
   // 如果弹窗正在显示，先关闭并清除定时器，防止重复跳转
   if (isShowPop.value) {
     isShowPop.value = false
@@ -610,6 +613,7 @@ const lotteryIconClick = () => {
       content: '您未参加此活动',
       showCancel: false,
       confirmText: '知道了',
+      confirmColor
     });
     return
   }
@@ -625,6 +629,7 @@ const lotteryIconClick = () => {
       content: '活动尚未开始',
       showCancel: false,
       confirmText: '知道了',
+      confirmColor
     });
   } else if (eventStatus === "EXP") {
     uni.showModal({
@@ -632,6 +637,7 @@ const lotteryIconClick = () => {
       content: '活动已经结束',
       showCancel: false,
       confirmText: '知道了',
+      confirmColor
     });
   } else {
     uni.showModal({
@@ -639,6 +645,7 @@ const lotteryIconClick = () => {
       content: '活动尚未开始',
       showCancel: false,
       confirmText: '知道了',
+      confirmColor
     });
   }
 }
