@@ -512,7 +512,7 @@ onLoad((options) => {
                   v-model="addressForm.recipient_name"
                   placeholder="请输入收件人姓名"
                   border="surround"
-                  maxlength="20"
+                  maxlength="12"
                 />
               </u-form-item>
             </view>
