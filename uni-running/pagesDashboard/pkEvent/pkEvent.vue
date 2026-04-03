@@ -332,8 +332,8 @@ function getuserCheckedInfo() {
   }).catch(() => {});
 }
 
-// 获取抽奖活动状态
-const lotteryEventInfo = ref({})
+// 获取抽奖活动状态 
+const lotteryEventInfo = ref() // 原先初始化一个{}对象，但是我后面要需要null/undefined来做判断有没有值，所以去掉初始化
 function getLotteryEventInfo() {
   request.get("/event-api/lottery/info?event_id=" + activetyId.value, {}, { showError: false }).then((res) => {
     lotteryEventInfo.value = res;
@@ -601,6 +601,17 @@ const lotteryIconClick = () => {
       clearTimeout(timer.value)
       timer.value = null
     }
+  }
+
+  // /lottery/info 接口返回401
+  if (!lotteryEventInfo.value) {
+    uni.showModal({
+      title: '提示',
+      content: '您未参加此活动',
+      showCancel: false,
+      confirmText: '知道了',
+    });
+    return
   }
 
   // 抽奖活动状态："PND"=未开始，"ACT"=进行中，"EXP"=已结束
