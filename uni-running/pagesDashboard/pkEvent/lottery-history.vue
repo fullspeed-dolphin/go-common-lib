@@ -200,22 +200,16 @@ const formatTime = (time) => {
 
 // 处理状态点击
 const handleStatusClick = (item) => {
-  // 根据后端状态值判断
-  if (item.status === 'PENDING_ADDRESS') {
+  // 无论待填写还是已填写，都可以打开弹窗
+  if (item.status === 'PENDING_ADDRESS' || item.status === 'ADDRESS_FILLED') {
     openAddressModal(item)
-  } else if (item.status === 'ADDRESS_FILLED') {
-    uni.showToast({
-      title: '地址已锁定，请联系客服处理',
-      icon: 'none',
-      duration: 2000
-    })
   }
 }
 
 // 获取状态光标样式
 const getStatusCursor = (item) => {
-  // 只有待填写和可编辑状态才能点击
-  if (item.status === 'PENDING_ADDRESS' || item.status === 'ADDRESS_EDITABLE') {
+  // 待填写和已填写状态都可以点击
+  if (item.status === 'PENDING_ADDRESS' || item.status === 'ADDRESS_FILLED') {
     return 'pointer'
   }
   return 'default'
@@ -232,20 +226,12 @@ const openAddressModal = async (record) => {
   // 设置record_id
   addressForm.value.record_id = record.id
 
-  // 根据状态设置标题和模式
-  if (record.status === 'ADDRESS_EDITABLE') {
-    modalTitle.value = '修改收货地址'
-    operationMode.value = 'update'
-  } else {
-    modalTitle.value = '填写收货地址'
-    operationMode.value = 'create'
-  }
+  // 默认模式为创建
+  modalTitle.value = '填写收货地址'
+  operationMode.value = 'create'
 
-  // 如果已经填写过地址，加载已有数据
-  if (record.status === 'ADDRESS_EDITABLE') {
-    // 加载地址详情
-    await loadAddressDetail(record.id)
-  }
+  // 无论状态如何，都尝试加载地址详情（如果有的话）
+  await loadAddressDetail(record.id)
   showAddressModal.value = true
 }
 
@@ -253,20 +239,26 @@ const openAddressModal = async (record) => {
 const loadAddressDetail = async (recordId) => {
   try {
     // 调用获取我的地址接口
-    const res = await uatRequest.get('/gift/my_addresses')
+    const res = await uatRequest.get('/my_addresses')
 
     if (res.code === 200 && res.data) {
       // 查找对应记录的地址信息
       const addressInfo = res.data.find(item => item.record_id === recordId)
 
       if (addressInfo) {
-        // 填充表单数据
+        // 填充表单数据 - 正确获取id和record_id
         addressForm.value = {
           record_id: recordId,
-          id: addressInfo.id, // 保存地址ID，用于修改操作
+          id: addressInfo.id, // 正确的id字段
           recipient_name: addressInfo.recipient_name,
           contact_number: addressInfo.contact_number,
           address: addressInfo.address
+        }
+
+        // 如果地址已填写，设置为更新模式
+        if (addressInfo.status === 'ADDRESS_FILLED') {
+          operationMode.value = 'update'
+          modalTitle.value = '修改收货地址'
         }
       }
     }
@@ -285,6 +277,7 @@ const closeAddressModal = () => {
   }
   addressForm.value = {
     record_id: '',
+    id: '', // 重置id字段
     recipient_name: '',
     contact_number: '',
     address: ''
@@ -313,9 +306,10 @@ const submitAddress = async () => {
         address: addressForm.value.address
       }
 
-      // 如果是修改操作，添加id字段
+      // 如果是修改操作，同时传递id和record_id
       if (operationMode.value === 'update' && addressForm.value.id) {
-        requestData.id = addressForm.value.id
+        requestData.id = addressForm.value.id // 使用record_id作为id
+        // record_id已经在requestData中
       }
 
       // 调用保存地址接口
@@ -333,17 +327,11 @@ const submitAddress = async () => {
         // 关闭弹窗
         closeAddressModal()
 
-        // 更新本地记录状态
+        // 更新本地记录状态 - 无论新建还是修改，状态都保持为可编辑
         const recordIndex = records.value.findIndex(r => r.id === addressForm.value.record_id)
         if (recordIndex !== -1) {
-          // 根据操作模式更新状态
-          if (operationMode.value === 'create') {
-            // 新增地址后状态变为可编辑
-            records.value[recordIndex].status = 'ADDRESS_EDITABLE'
-          } else if (operationMode.value === 'update') {
-            // 修改地址后状态变为不可编辑（锁定）
-            records.value[recordIndex].status = 'ADDRESS_UNEDITABLE'
-          }
+          // 地址填写或修改后，保持为已填写状态，允许再次修改
+          records.value[recordIndex].status = 'ADDRESS_FILLED'
         }
 
         // 刷新列表
@@ -439,7 +427,6 @@ onLoad((options) => {
         <view class="status-legend">
           <text class="legend-item"><text class="legend-color pending">■</text>待填地址</text>
           <text class="legend-item"><text class="legend-color filled">■</text>已填地址</text>
-          <text class="legend-item"><text class="legend-color locked">■</text>已锁定</text>
         </view>
 
         <view class="records-container">
@@ -474,7 +461,6 @@ onLoad((options) => {
               >
                 <text v-if="item.status === 'PENDING_ADDRESS'">待填地址</text>
                 <text v-else-if="item.status === 'ADDRESS_FILLED'">已填地址</text>
-                <text v-else-if="item.status === 'ADDRESS_UNEDITABLE'">已锁定</text>
                 <text v-else>已中奖</text>
               </view>
             </view>
@@ -504,10 +490,6 @@ onLoad((options) => {
         </view>
 
         <view class="modal-body">
-          <!-- 提示信息 -->
-          <view v-if="modalTitle === '修改收货地址'" class="modify-tip">
-            <text class="tip-text">⚠️ 地址只能修改一次，请仔细核对信息</text>
-          </view>
           <u-form ref="formRef" :model="addressForm" :rules="formRules">
             <view class="form-group">
               <view class="form-label">收件人姓名 <text class="required">*</text></view>
