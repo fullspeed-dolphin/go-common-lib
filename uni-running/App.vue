@@ -1,8 +1,9 @@
 <script setup>
 import { onLaunch, onShow, onHide, onPageScroll } from "@dcloudio/uni-app";
 
-onLaunch(() => {
-  // 检测小程序更新
+onLaunch(() => {});
+
+onShow(() => {
   checkUpdate();
 });
 

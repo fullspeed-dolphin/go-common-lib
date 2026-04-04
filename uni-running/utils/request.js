@@ -21,7 +21,6 @@ function fetch(options) {
 			sslVerify: false,
 			header: {
 				Authorization: uni.getStorageSync('token'),
-				// Authorization: '5a4ecef41628100c272b764ea75f0d0d8fdf0b51d79b960edfec27a278eccf75',
 				'content-type': 'application/json',
 			},
 			method: options.method || 'post',
@@ -54,14 +53,7 @@ function fetch(options) {
 					
 					// 没有权限，清除 token，重定向登录页
 					if (response?.code == 401 || res.statusCode == 401) {
-						// clearUserInfo();
-						
-						// setTimeout(() => {
-						// 	uni.redirectTo({
-						// 		url: '/pagesSub/login'
-						// 	})
-						// }, 300)
-						
+						clearUserInfo();
 						return false;
 					}
 					return reject(response)

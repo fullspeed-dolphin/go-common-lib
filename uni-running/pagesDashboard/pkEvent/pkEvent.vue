@@ -150,10 +150,10 @@
                 <text style="font-size:40rpx;">{{ item.required_checkins ? Math.round(item.total_qualified_sessions / item.required_checkins * 100) : 0 }}%</text>
               </template>
               <template v-else>
-                <text style="font-size:40rpx;">{{ item.total_distance_km }}</text>km
+                <text style="font-size:40rpx;">{{ Math.round(item.total_distance_km) }}</text>km
               </template>
             </text>
-            <text v-if="personalSortBy === 'completion'" style="font-size:24rpx;color:#999;font-weight:normal;">{{ item.total_distance_km }}km</text>
+            <text v-if="personalSortBy === 'completion'" style="font-size:24rpx;color:#999;font-weight:normal;">{{ Math.round(item.total_distance_km) }}km</text>
             <text style="font-size:24rpx;color:#999;font-weight:normal;">{{ item.total_qualified_sessions }}/{{ item.required_checkins }}次打卡</text>
           </view>
         </view>
@@ -465,7 +465,6 @@ useShare(() => ({
 
 const refreshList = () => {
   getMescroll().resetUpScroll();
-  getMescroll().scrollTo(0, 0);
 };
 
 const rankList = ref([]);
@@ -515,7 +514,7 @@ const switchTeamSort = (sort) => {
 
 // 战队显示字符
 const teamRankValue = (item) => {
-  if (teamSortBy.value === 'distance') return item.total_distance_km + 'km';
+  if (teamSortBy.value === 'distance') return Math.round(item.total_distance_km) + 'km';
   if (teamSortBy.value === 'completion') return Number(item.team_completion_rate).toFixed(2) + '%';
   return item.current_members + '人';
 };
@@ -552,6 +551,12 @@ const nav2Lottery = () => {
 
 // 金刚区完赛证书icon点击
 const certIconOnClick = () => {
+  if (!userInfo.value.id) {
+    loginCallAction.value = ''
+    refUserLogin.value.open()
+    return
+  }
+
   const confirmColor = detailInfo.value?.color_config?.solid || '#FF8C00'
 
   // 未报名
