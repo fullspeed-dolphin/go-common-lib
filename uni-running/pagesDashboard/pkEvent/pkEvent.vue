@@ -334,11 +334,17 @@ function getuserCheckedInfo() {
 
 // 获取抽奖活动状态 
 const lotteryEventInfo = ref() // 原先初始化一个{}对象，但是我后面要需要null/undefined来做判断有没有值，所以去掉初始化
+const lotteryNotFound = ref(false)
 function getLotteryEventInfo() {
+  lotteryNotFound.value = false
   request.get("/event-api/lottery/info?event_id=" + activetyId.value, {}, { showError: false }).then((res) => {
     lotteryEventInfo.value = res;
     checkShowPop()
-  }).catch(() => {});
+  }).catch((err) => {
+    if (err?.code === 404) {
+      lotteryNotFound.value = true
+    }
+  });
 }
 
 // 判断是否弹出抽奖弹窗：lottery_event 处于 ACT + 打卡达标（仅首次弹一次）
@@ -606,11 +612,10 @@ const lotteryIconClick = () => {
     }
   }
 
-  // /lottery/info 接口返回401
   if (!lotteryEventInfo.value) {
     uni.showModal({
       title: '提示',
-      content: '您未参加此活动',
+      content: lotteryNotFound.value ? '暂无抽奖活动' : '您未参加此活动',
       showCancel: false,
       confirmText: '知道了',
       confirmColor
