@@ -13,7 +13,7 @@
           <text class="rank-label flex-center">NO.2</text>
           <text class="name">{{ currentIndex === 0 ? topList[1].real_name : topList[1].team_name }}</text>
           <text class="distance">{{ currentIndex === 0 ? personalRankValue(topList[1]) : teamRankValue(topList[1]) }}</text>
-          <text v-if="currentIndex === 0 && personalSortBy === 'completion'" class="distance" style="font-size:20rpx;">{{ topList[1].total_distance_km }}km</text>
+          <text v-if="currentIndex === 0 && personalSortBy === 'completion'" class="distance" style="font-size:20rpx;">{{ Math.round(topList[1].total_distance_km) }}km</text>
         </view>
 
         <!-- NO.1 -->
@@ -22,7 +22,7 @@
           <text class="rank-label flex-center">NO.1</text>
           <text class="name">{{ currentIndex === 0 ? topList[0].real_name : topList[0].team_name }}</text>
           <text class="distance">{{ currentIndex === 0 ? personalRankValue(topList[0]) : teamRankValue(topList[0]) }}</text>
-          <text v-if="currentIndex === 0 && personalSortBy === 'completion'" class="distance" style="font-size:20rpx;">{{ topList[0].total_distance_km }}km</text>
+          <text v-if="currentIndex === 0 && personalSortBy === 'completion'" class="distance" style="font-size:20rpx;">{{ Math.round(topList[0].total_distance_km) }}km</text>
         </view>
 
         <!-- NO.3 -->
@@ -31,7 +31,7 @@
           <text class="rank-label flex-center">NO.3</text>
           <text class="name">{{ currentIndex === 0 ? topList[2].real_name : topList[2].team_name }}</text>
           <text class="distance">{{ currentIndex === 0 ? personalRankValue(topList[2]) : teamRankValue(topList[2]) }}</text>
-          <text v-if="currentIndex === 0 && personalSortBy === 'completion'" class="distance" style="font-size:20rpx;">{{ topList[2].total_distance_km }}km</text>
+          <text v-if="currentIndex === 0 && personalSortBy === 'completion'" class="distance" style="font-size:20rpx;">{{ Math.round(topList[2].total_distance_km) }}km</text>
         </view>
       </view>
     </section>
@@ -79,7 +79,7 @@
             <text class="progress-percent">
               <text style="font-size:36rpx;">{{ personalRankValue(item) }}</text>
             </text>
-            <text v-if="personalSortBy === 'completion'" style="font-size:20rpx;color:#999;font-weight:normal;">{{ item.total_distance_km }}km</text>
+            <text v-if="personalSortBy === 'completion'" style="font-size:20rpx;color:#999;font-weight:normal;">{{ Math.round(item.total_distance_km) }}km</text>
           </view>
         </view>
       </template>
@@ -185,12 +185,12 @@ const switchTeamSort = (sort) => {
 const personalRankValue = (item) => {
   return personalSortBy.value === 'completion'
     ? (item.required_checkins ? Math.round(item.total_qualified_sessions / item.required_checkins * 100) : 0) + '%'
-    : item.total_distance_km + 'km';
+    : Math.round(item.total_distance_km) + 'km';
 };
 
 // 战队排行榜显示值：按人数排显示人数，按跑量排显示跑量
 const teamRankValue = (item) => {
-  if (teamSortBy.value === 'distance') return item.total_distance_km + 'km';
+  if (teamSortBy.value === 'distance') return Math.round(item.total_distance_km) + 'km';
   if (teamSortBy.value === 'completion') return Number(item.team_completion_rate).toFixed(2) + '%';
   return item.current_members + '人';
 };

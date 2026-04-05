@@ -5,7 +5,7 @@
 
       <div class="flex-row u-mt-20">
         <view class="flex-1 flex-col-center">
-          <view class="b u-mb-20" style="font-size:34rpx;color:#1e2939;">{{userCheckedInfo.total_distance_km}} 
+          <view class="b u-mb-20" style="font-size:34rpx;color:#1e2939;">{{userCheckedInfo.total_distance_km}}
             <text class="c6 fs24">km</text>
           </view>
           <text class="c6 fs24">跑步总量</text>
@@ -23,41 +23,36 @@
 
     <!-- 弹窗显示记录列表 -->
     <u-popup :show="popupVisible" mode="bottom" z-index="20" :closeable="true" @close="popupVisible = false">
-      <view class="popup-content">
-        <view class="popup-header">
-          <text class="popup-title">打卡记录列表</text>
+      <view class="checkin-popup-content">
+        <view class="checkin-popup-header">
+          <text class="checkin-popup-title">我的打卡记录</text>
+          <text class="checkin-popup-subtitle">共 {{ userCheckedInfo.checkins?.length || 0 }} 条记录</text>
         </view>
-        <scroll-view scroll-y class="record-list">
-          <view v-for="record in userCheckedInfo.checkins" :key="record.id" class="record-item">
-            <view class="record-row">
-              <text class="label">日期：</text>
-              <text>{{ new Date(record.check_date).toLocaleDateString() }}</text>
+        <scroll-view scroll-y class="checkin-record-list">
+          <view v-for="(record, idx) in userCheckedInfo.checkins" :key="record.id" class="checkin-record-card">
+            <view class="checkin-card-top">
+              <text class="checkin-card-index">{{ new Date(record.check_date).toLocaleDateString() }} 第 {{ getDailyIndex(idx) }} 次打卡</text>
             </view>
-            <view class="record-row">
-              <text class="label">距离：</text>
-              <text>{{ record.km }} km</text>
+            <view class="checkin-card-body">
+              <view class="checkin-stat">
+                <text class="checkin-stat-value">{{ record.km }}</text>
+                <text class="checkin-stat-label">公里</text>
+              </view>
+              <view class="checkin-stat">
+                <text class="checkin-stat-value">{{ record.time }}</text>
+                <text class="checkin-stat-label">时长</text>
+              </view>
+              <view class="checkin-stat">
+                <text class="checkin-stat-value">{{ record.speed }}</text>
+                <text class="checkin-stat-label">配速</text>
+              </view>
             </view>
-            <view class="record-row">
-              <text class="label">时间：</text>
-              <text>{{ record.time }}</text>
+            <view v-if="record.image_url" class="checkin-card-image" @click="previewImage(record.image_url)">
+              <up-lazy-load height="180" borderRadius="12" :is-effect="false" :image="
+                record.image_url + '?x-oss-process=image/resize,w_600,h_180,m_fill'
+              " mode="aspectFill"/>
+              <text class="checkin-image-tip">点击查看大图</text>
             </view>
-            <view class="record-row">
-              <text class="label">速度：</text>
-              <text>{{ record.speed }}</text>
-            </view>
-            <view v-if="record.image_url" class="record-row">
-              <text class="label">图片：</text>
-							<view class="record-image" @click="previewImage(record.image_url)">
-								<up-lazy-load height="110" borderRadius="14" :is-effect="false" :image="
-								  (record.image_url)  + '?x-oss-process=image/resize,w_110,h_110,m_fill'
-								" mode="aspectFill"/>
-							</view>
-              <!-- <image :src="record.image_url" class="record-image" @click="previewImage(record.image_url)" /> -->
-            </view>
-            <!-- <view class="record-row">
-              <text class="label">创建时间：</text>
-              <text>{{ new Date(record.created_at).toLocaleString() }}</text>
-            </view> -->
           </view>
         </scroll-view>
       </view>
@@ -87,11 +82,23 @@ function getuserCheckedInfo() {
   }).catch(() => {});
 }
 
+function getDailyIndex(idx) {
+  const records = userCheckedInfo.value.checkins || [];
+  const currentDate = new Date(records[idx].check_date).toLocaleDateString();
+  let count = 1;
+  for (let i = 0; i < idx; i++) {
+    if (new Date(records[i].check_date).toLocaleDateString() === currentDate) {
+      count++;
+    }
+  }
+  return count;
+}
+
 function previewImage(url) {
-  uni.previewImage({
-    urls: [url],
-    current: url
-  });
+  const urls = (userCheckedInfo.value.checkins || [])
+    .filter(r => r.image_url)
+    .map(r => r.image_url);
+  uni.previewImage({ urls, current: url });
 }
 
 watch(() => props.activetyId, (newVal) => {
@@ -128,48 +135,102 @@ watch(() => props.activetyId, (newVal) => {
   color: #364153;
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
 }
+</style>
 
-.popup-content {
-    height: 80vh;
-    background-color: white;
-    border-radius: 24rpx 24rpx 0 0;
-    padding: 40rpx;
+<!-- 弹窗样式不能 scoped，因为 u-popup 内容渲染在组件 DOM 树之外 -->
+<style lang="scss">
+.checkin-popup-content {
+  height: 80vh;
+  background-color: #f5f5f5;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 0 30rpx;
 
-    .popup-header {
-      text-align: center;
+  .checkin-popup-header {
+    text-align: center;
+    padding: 36rpx 0 24rpx;
+
+    .checkin-popup-title {
+      display: block;
+      font-size: 34rpx;
+      font-weight: 600;
+      color: #1e2939;
+    }
+
+    .checkin-popup-subtitle {
+      display: block;
+      font-size: 24rpx;
+      color: #999;
+      margin-top: 8rpx;
+    }
+  }
+
+  .checkin-record-list {
+    height: calc(80vh - 120rpx);
+
+    .checkin-record-card {
+      background: #fff;
+      border-radius: 20rpx;
+      padding: 28rpx 30rpx;
       margin-bottom: 20rpx;
+      box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+    }
 
-      .popup-title {
-        font-size: 36rpx;
-        font-weight: 500;
-        color: #222;
+    .checkin-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24rpx;
+
+      .checkin-card-index {
+        font-size: 26rpx;
+        font-weight: 600;
+        color: var(--theme-color, #ff5c5c);
       }
     }
 
-    .record-list {
-      height: calc(80vh - 120rpx);
+    .checkin-card-body {
+      display: flex;
+      justify-content: space-around;
+      padding: 16rpx 0 24rpx;
+      border-top: 1rpx solid #f0f0f0;
+      border-bottom: 1rpx solid #f0f0f0;
+    }
 
-      .record-item {
-        border-bottom: 1rpx solid #eee;
-        padding: 20rpx 0;
+    .checkin-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8rpx;
 
-        .record-row {
-          display: flex;
-          margin-bottom: 10rpx;
+      .checkin-stat-value {
+        font-size: 32rpx;
+        font-weight: 600;
+        color: #1e2939;
+      }
 
-          .label {
-            font-weight: 500;
-            color: #666;
-            min-width: 120rpx;
-          }
-        }
+      .checkin-stat-label {
+        font-size: 22rpx;
+        color: #999;
+      }
+    }
 
-        .record-image {
-          width: 100rpx;
-          height: 100rpx;
-          border-radius: 8rpx;
-        }
+    .checkin-card-image {
+      margin-top: 24rpx;
+      border-radius: 12rpx;
+      overflow: hidden;
+      position: relative;
+
+      .checkin-image-tip {
+        position: absolute;
+        right: 12rpx;
+        bottom: 12rpx;
+        font-size: 20rpx;
+        color: #fff;
+        background: rgba(0, 0, 0, 0.45);
+        padding: 4rpx 16rpx;
+        border-radius: 8rpx;
       }
     }
   }
+}
 </style>

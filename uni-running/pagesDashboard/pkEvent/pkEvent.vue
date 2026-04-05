@@ -120,7 +120,7 @@
     <view class="rank-list">
       <!-- 个人排行榜 -->
       <template v-if="tabIndex === 0">
-        <view v-for="(item, index) in rankList" :key="item.wechat_openid" class="rank-item">
+        <view v-for="(item, index) in rankList" :key="item.wechat_openid" class="rank-item" @click="viewUserCheckins(item)">
           <view class="rank-number flex-center">
             {{ item.rank <= 3 ? 'NO.' + item.rank : item.rank }}
           </view>
@@ -155,6 +155,7 @@
             </text>
             <text v-if="personalSortBy === 'completion'" style="font-size:24rpx;color:#999;font-weight:normal;">{{ Math.round(item.total_distance_km) }}km</text>
             <text style="font-size:24rpx;color:#999;font-weight:normal;">{{ item.total_qualified_sessions }}/{{ item.required_checkins }}次打卡</text>
+            <text v-if="activetyId !== '01KH0WQX4H2C7Q4GJ217P8T922'" class="view-checkin-link">查看打卡记录</text>
           </view>
         </view>
       </template>
@@ -195,6 +196,49 @@
     </view>
 
     <UserLogin ref="refUserLogin" @success="onLoginSuccess" />
+
+    <!-- 查看他人打卡记录弹窗 -->
+    <u-popup :show="checkinPopupVisible" mode="bottom" z-index="20" :closeable="true" @close="checkinPopupVisible = false">
+      <view class="checkin-popup-content">
+        <view class="checkin-popup-header">
+          <text class="checkin-popup-title">{{ checkinPopupUser.real_name }} 的打卡记录</text>
+          <text class="checkin-popup-subtitle">共 {{ checkinPopupRecords.length }} 条记录</text>
+        </view>
+        <scroll-view scroll-y class="checkin-record-list">
+          <view v-if="checkinPopupLoading" style="text-align:center;padding:80rpx 0;">
+            <u-loading-icon></u-loading-icon>
+          </view>
+          <view v-else-if="!checkinPopupRecords.length" style="text-align:center;padding:80rpx 0;color:#999;font-size:28rpx;">
+            暂无打卡记录
+          </view>
+          <view v-for="(record, idx) in checkinPopupRecords" :key="record.id" class="checkin-record-card">
+            <view class="checkin-card-top">
+              <text class="checkin-card-index">{{ new Date(record.check_date).toLocaleDateString() }} 第 {{ getDailyIndex(idx) }} 次打卡</text>
+            </view>
+            <view class="checkin-card-body">
+              <view class="checkin-stat">
+                <text class="checkin-stat-value">{{ record.km }}</text>
+                <text class="checkin-stat-label">公里</text>
+              </view>
+              <view class="checkin-stat">
+                <text class="checkin-stat-value">{{ record.time }}</text>
+                <text class="checkin-stat-label">时长</text>
+              </view>
+              <view class="checkin-stat">
+                <text class="checkin-stat-value">{{ record.speed }}</text>
+                <text class="checkin-stat-label">配速</text>
+              </view>
+            </view>
+            <view v-if="record.image_url" class="checkin-card-image" @click="previewCheckinImage(record.image_url)">
+              <up-lazy-load height="180" borderRadius="12" :is-effect="false" :image="
+                record.image_url + '?x-oss-process=image/resize,w_600,h_180,m_fill'
+              " mode="aspectFill"/>
+              <text class="checkin-image-tip">点击查看大图</text>
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+    </u-popup>
 
     <PopupAd
       v-model="isShowPop"
@@ -519,6 +563,50 @@ const teamRankValue = (item) => {
   return item.current_members + '人';
 };
 
+// --- 查看他人打卡记录弹窗 ---
+const checkinPopupVisible = ref(false);
+const checkinPopupUser = ref({});
+const checkinPopupRecords = ref([]);
+const checkinPopupLoading = ref(false);
+
+function viewUserCheckins(item) {
+  if (activetyId.value === '01KH0WQX4H2C7Q4GJ217P8T922') return;
+  checkinPopupUser.value = item;
+  checkinPopupVisible.value = true;
+  checkinPopupLoading.value = true;
+  checkinPopupRecords.value = [];
+
+  request.get('/user-api/user/getEventCheckins', {
+    event_id: activetyId.value,
+    openid: item.wechat_openid
+  }, { showError: false }).then((res) => {
+    checkinPopupRecords.value = res.checkins || [];
+  }).catch(() => {
+    checkinPopupRecords.value = [];
+  }).finally(() => {
+    checkinPopupLoading.value = false;
+  });
+}
+
+function getDailyIndex(idx) {
+  const records = checkinPopupRecords.value;
+  const currentDate = new Date(records[idx].check_date).toLocaleDateString();
+  let count = 1;
+  for (let i = 0; i < idx; i++) {
+    if (new Date(records[i].check_date).toLocaleDateString() === currentDate) {
+      count++;
+    }
+  }
+  return count;
+}
+
+function previewCheckinImage(url) {
+  const urls = checkinPopupRecords.value
+    .filter(r => r.image_url)
+    .map(r => r.image_url);
+  uni.previewImage({ urls, current: url });
+}
+
 // 弹窗广告状态
 const isShowPop = ref(false)
 // 存储定时器 ID
@@ -729,9 +817,12 @@ onUnload(() => {
 }
 
 .status-bar {
+  position: absolute;
+  top: 220rpx;
+  right: 0;
+  z-index: 2;
   font-size: 24rpx;
   color: #fff;
-  margin-bottom: 26rpx;
   .bar {
     height: 48rpx;
     padding: 0 10rpx;
@@ -973,6 +1064,13 @@ onUnload(() => {
     flex-direction: column;
     align-items: flex-end;
   }
+
+  .view-checkin-link {
+    font-size: 22rpx;
+    color: #155dfc;
+    font-weight: normal;
+    margin-top: 4rpx;
+  }
 }
 
 .category-tags {
@@ -1047,5 +1145,106 @@ onUnload(() => {
 .kingkong-icon {
   width: 40rpx;
   height: 40rpx;
+}
+
+// 查看他人打卡记录弹窗
+.checkin-popup-content {
+  height: 80vh;
+  background-color: #f5f5f5;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 0 30rpx;
+
+  .checkin-popup-header {
+    text-align: center;
+    padding: 36rpx 0 24rpx;
+
+    .checkin-popup-title {
+      display: block;
+      font-size: 34rpx;
+      font-weight: 600;
+      color: #1e2939;
+    }
+
+    .checkin-popup-subtitle {
+      display: block;
+      font-size: 24rpx;
+      color: #999;
+      margin-top: 8rpx;
+    }
+  }
+
+  .checkin-record-list {
+    height: calc(80vh - 120rpx);
+
+    .checkin-record-card {
+      background: #fff;
+      border-radius: 20rpx;
+      padding: 28rpx 30rpx;
+      margin-bottom: 20rpx;
+      box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+    }
+
+    .checkin-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24rpx;
+
+      .checkin-card-index {
+        font-size: 26rpx;
+        font-weight: 600;
+        color: var(--theme-color, #ff5c5c);
+      }
+
+      .checkin-card-date {
+        font-size: 24rpx;
+        color: #999;
+      }
+    }
+
+    .checkin-card-body {
+      display: flex;
+      justify-content: space-around;
+      padding: 16rpx 0 24rpx;
+      border-top: 1rpx solid #f0f0f0;
+      border-bottom: 1rpx solid #f0f0f0;
+    }
+
+    .checkin-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8rpx;
+
+      .checkin-stat-value {
+        font-size: 32rpx;
+        font-weight: 600;
+        color: #1e2939;
+      }
+
+      .checkin-stat-label {
+        font-size: 22rpx;
+        color: #999;
+      }
+    }
+
+    .checkin-card-image {
+      margin-top: 24rpx;
+      border-radius: 12rpx;
+      overflow: hidden;
+      position: relative;
+
+      .checkin-image-tip {
+        position: absolute;
+        right: 12rpx;
+        bottom: 12rpx;
+        font-size: 20rpx;
+        color: #fff;
+        background: rgba(0, 0, 0, 0.45);
+        padding: 4rpx 16rpx;
+        border-radius: 8rpx;
+      }
+    }
+  }
 }
 </style>
