@@ -82,6 +82,7 @@ const posterRef1 = ref(null);
 const showPoster1 = ref(false); // 活动海报
 const showPoster2 = ref(false); // 跑币海报
 const activityPosterUrl = ref(''); // 活动海报背景图URL
+const activityQrcodeUrl = ref(''); // 活动小程序码URL
 const activityEventId = ref(''); // 当前活动ID
 
 // 存储最终生成的海报图片URL
@@ -408,11 +409,12 @@ const renderPoster = (posterData) => {
             },
             views: [
               {
-								src: "/static/poster/小程序二维码@2x.png",
+								src: activityQrcodeUrl.value || "/static/poster/小程序码.png",
 								type: "image",
                 css: {
-                  width: "116rpx",
-                  height: "116rpx",
+                  width: "130rpx",
+                  height: "130rpx",
+                  borderRadius: "65rpx",
                 },
               },
 							{
@@ -846,6 +848,7 @@ async function open(propsData) {
 	showPoster1.value = visibility.showPoster1;
 	showPoster2.value = visibility.showPoster2;
 	activityPosterUrl.value = visibility.posterUrl || '';
+	activityQrcodeUrl.value = visibility.qrcodeUrl || '';
 	activityEventId.value = visibility.activityEventId || '';
 	swiperIndex.value = 0;
 	pictureImage.value = '';
