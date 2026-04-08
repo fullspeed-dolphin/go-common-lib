@@ -953,11 +953,10 @@
 			message: "请填写紧急联系人姓名",
 			trigger: ["blur", "change"]
 		}],
-		emergencyPhone: [{
-			required: true,
-			message: "请填写紧急联系人手机号码",
-			trigger: ["blur", "change"]
-		}],
+		emergencyPhone: [
+			{ required: true, message: "请填写紧急联系人手机号码", trigger: ["blur", "change"] },
+			{ pattern: /^1[3-9]\d{9}$/, message: "请输入正确的中国大陆手机号", trigger: ["blur", "change"] }
+		],
 	};
 
 	const birthdayTimestamp = computed(() => {
