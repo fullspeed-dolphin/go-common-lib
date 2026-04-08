@@ -93,7 +93,7 @@
 					</template>
 
 					<view class="address-input-wrapper">
-						<textarea v-model="form.address" placeholder="请填写详细地址" auto-height class="address-input" />
+						<textarea v-model="form.address" placeholder="请填写详细地址" auto-height class="address-input" @blur="handleAddressBlur" />
 					</view>
 				</up-form-item>
 
@@ -1299,6 +1299,16 @@
 			showCancel: false,
 			confirmText: '知道了',
 		});
+	}
+
+	const handleAddressBlur = () => {
+		if (formRef.value) {
+			formRef.value.validateField('address', (errors) => {
+				if (errors) {
+					console.log('地址校验失败', errors)
+				}
+			})
+		}
 	}
 </script>
 
