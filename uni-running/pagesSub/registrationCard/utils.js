@@ -146,50 +146,47 @@ export function useRegionData() {
 
 // 校验18位身份证最后一位校验码（ISO 7064:1983.MOD 11-2）
 export function checkIdCardCode(idCard) {
-  const weights = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2]
-  const codes = ['1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2']
+  if (idCard.length !== 18) return false;
+  const weights = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2];
+  const codes = ['1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'];
   
-  let sum = 0
+  let sum = 0;
   for (let i = 0; i < 17; i++) {
-      sum += parseInt(idCard[i]) * weights[i]
+    const num = idCard.charCodeAt(i) - 48; // '0'->48
+    if (num < 0 || num > 9) return false; // 非数字
+    sum += num * weights[i];
   }
   
-  const lastCode = codes[sum % 11]
-  return idCard[17].toUpperCase() === lastCode
+  const lastCode = codes[sum % 11];
+  return idCard[17].toUpperCase() === lastCode;
 }
 
-// 校验身份证（支持15位和18位）
+// 校验身份证
 export function validateIdCard(rule, value, callback) {
-  // 15位身份证正则
-  const reg15 = /^[1-9]\d{5}\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{2}$/
-  // 18位身份证正则
-  const reg18 = /^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/
+  if (!value) return callback();
   
-  if (!value) {
-      return callback() // 交给 required 处理
+  const len = value.length;
+  if (len !== 18) {
+    return callback(new Error('只支持18位身份证号码'));
   }
   
-  const len = value.length
-  
-  // 长度校验
-  if (len !== 15 && len !== 18) {
-      return callback(new Error('身份证号码长度应为15位或18位'))
+  const reg18 = /^[1-9]\d{5}(18|19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[0-9Xx]$/;
+  if (!reg18.test(value)) {
+    return callback(new Error('身份证号码格式不正确'));
   }
   
-  // 格式校验
-  if (len === 15) {
-      if (!reg15.test(value)) {
-          return callback(new Error('15位身份证号码格式不正确'))
-      }
-  } else {
-      if (!reg18.test(value)) {
-          return callback(new Error('18位身份证号码格式不正确'))
-      }
-      // 18位校验最后一位校验码
-      if (!checkIdCardCode(value)) {
-          return callback(new Error('身份证号码校验码错误'))
-      }
+  // 日期真实性校验
+  const year = parseInt(value.slice(6, 10), 10);
+  const month = parseInt(value.slice(10, 12), 10);
+  const day = parseInt(value.slice(12, 14), 10);
+  const date = new Date(year, month - 1, day);
+  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+    return callback(new Error('身份证出生日期无效'));
   }
   
-  callback()
+  if (!checkIdCardCode(value)) {
+    return callback(new Error('身份证校验码错误'));
+  }
+  
+  callback();
 }
