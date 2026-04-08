@@ -107,7 +107,7 @@
 
 				<up-form-item label="参赛服尺寸" prop="clothesSize" :tipsColor="themeColor" tips="参赛服尺码仅为参赛者个人信息，活动是否包含参赛服以具体活动宣发为准，详询活动组织方，如活动或课程不提供参赛服则选择'无参赛服'。" required>
 					<view @click="showOnceTip">
-						<PickerCell v-model="form.clothesSize" :disabled="isReadOnlyClothSize" :border="false" :columns="tshirtSizeOptions" />
+						<PickerCell v-model="form.clothesSize" :disabled="isReadOnlyClothSize" :border="false" :columns="tshirtSizeOptions" @change="onClothesSizeChange" />
 					</view>
 				</up-form-item>
 
@@ -1309,6 +1309,16 @@
 				}
 			})
 		}
+	}
+
+	// 参赛服尺寸选择变化处理
+	const onClothesSizeChange = (value, field) => {
+		// 手动触发该字段的验证
+		nextTick(() => {
+			if (formRef.value) {
+				formRef.value.validateField('clothesSize', () => {}, 'change');
+			}
+		});
 	}
 </script>
 
