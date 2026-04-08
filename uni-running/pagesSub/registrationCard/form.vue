@@ -149,6 +149,7 @@
 </template>
 
 <script setup>
+	import { validateIdCard } from './utils.js'
 	import {
 		reactive,
 		ref,
@@ -901,7 +902,11 @@
 			required: true,
 			message: "请填写证件号码",
 			trigger: ["blur", "change"]
-		}, ],
+    },
+		{
+			validator: validateIdCard,
+			trigger: ["blur"]
+    }],
 		birthday1: [{
 			required: true,
 			message: "请选择出生日期",
