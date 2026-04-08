@@ -190,3 +190,36 @@ export function validateIdCard(rule, value, callback) {
   
   callback();
 }
+
+/**
+ * 判断身份证主人是否已满18周岁
+ * @param {string} idCard - 18位身份证号码
+ * @returns {boolean} - 成年返回true，未成年或无效返回false
+ */
+export function isAdult(idCard) {
+  // 参数校验
+  if (!idCard || typeof idCard !== 'string') return false;
+  if (idCard.length !== 18) return false;
+  
+  // 提取出生日期
+  const year = parseInt(idCard.slice(6, 10), 10);
+  const month = parseInt(idCard.slice(10, 12), 10);
+  const day = parseInt(idCard.slice(12, 14), 10);
+  
+  // 数值有效性校验
+  if (isNaN(year) || isNaN(month) || isNaN(day)) return false;
+  if (month < 1 || month > 12) return false;
+  if (day < 1 || day > 31) return false;
+  
+  // 计算年龄
+  const today = new Date();
+  let age = today.getFullYear() - year;
+  
+  // 今年生日还没过，年龄减1
+  if (today.getMonth() < month - 1 || 
+      (today.getMonth() === month - 1 && today.getDate() < day)) {
+    age--;
+  }
+  
+  return age >= 18;
+}

@@ -19,7 +19,7 @@
             formatIdCard(item.cert_number || "")
           }}</view>
 					<view class="id-card-number-separator">|</view>
-					<view class="id-card-number-type"> 成人 </view>
+					<view class="id-card-number-type">{{ isAdult(item.cert_number) ? "成人" : "未成年人" }}</view>
 				</view>
 				<view class="card-item-actions">
 					<view class="card-item-actions-item" @click.stop="handleSetAsOwner(item)">
@@ -63,6 +63,7 @@
 		showRequestError
 	} from "./utils.js";
 	import { useShare } from "@/composables/useShare.js";
+	import { isAdult } from './utils.js'
 
 	// 分享配置
 	useShare({
