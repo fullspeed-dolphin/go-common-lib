@@ -20,6 +20,7 @@ export function resolvePosterVisibility(eventIds, events = []) {
     showPoster1: !!matched,
     showPoster2: eventIds.includes(DEFAULT_EVENT_ID),
     posterUrl: matched?.checkin_poster_url || null,
+    qrcodeUrl: matched?.qrcode_url || null,
     activityEventId: matched?.id || null,
   };
 }
