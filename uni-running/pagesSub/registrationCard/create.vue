@@ -54,9 +54,14 @@ function formToApi(formData) {
     birthday: formData.birthday,
     phone_number: formData.mobile,
     email: formData.email,
-    country: formData.country,
-    state: state,
-    city: city,
+    // 2026.4.9 https://speexpay.com/booking-api/registration/createSignerInfo
+    // 接口必须传“country”、“state”、“city”, 然而目前报名卡已经没有省市区picker了，所以这几个字段在前端是空的，过不了接口，紧急处理
+    // country: formData.country,
+    // state: state,
+    // city: city,
+    country: "中国",
+    state: "广东省",
+    city: "广州市",
     address: formData.address,
     blood_type: formData.bloodType,
     tshirt_size: formData.clothesSize,

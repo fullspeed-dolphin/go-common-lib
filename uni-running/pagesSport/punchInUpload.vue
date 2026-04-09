@@ -236,7 +236,7 @@ const deleteUploadedImage = async (imageUrl) => {
         url: baseLink + "/basic-service/file/delete",
         method: "POST",
         header: {
-          Authorization: uploadToken,
+          "X-API-KEY": uploadToken,
           "content-type": "application/json",
         },
         data: { url: imageUrl },
