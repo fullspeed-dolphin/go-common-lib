@@ -64,9 +64,8 @@ function startCountdown() {
 
 function enterAlbum() {
 	if (timer) clearInterval(timer)
-	uni.$u.route({
-		url: 'pagesDashboard/eventAlbum/albumDetail',
-		params: { event_id: eventId.value }
+	uni.redirectTo({
+		url: `/pagesDashboard/eventAlbum/albumDetail?event_id=${eventId.value}`
 	})
 }
 

@@ -51,9 +51,15 @@
     <div class="sign-button-container flex-col-center" v-if="selectedEvent.id">
 			<view
 				:class="{
-					[punchInStatus]: true,
 					disableButton: !canSign
-				}">
+				}"
+				:style="canSign ? {
+					'--btn-bg': punchInStatus === 'success'
+						? '#8CC63E'
+						: `linear-gradient(135deg, ${themeColor.gradient[0]}, ${themeColor.gradient[1]})`,
+					'--btn-shadow': 'transparent',
+					'--btn-border': 'transparent',
+				} : {}">
 			  <u-button
 					:disabled="!canSign"
 			    type="primary"
@@ -77,26 +83,13 @@
 			</view>
 
 			<view v-if="selectedEvent.id" class="flex-center" style="margin-top:20px;color:#999;min-height:40rpx;">
-				<template v-if="isInCheckTime">
-					<template v-if="!locationGranted">未获取定位权限</template>
-					<template v-else>{{isInPunchArea ? '在签到范围' : '不在签到范围'}}</template>
-				</template>
+				<template v-if="!isInCheckTime && selectedEvent.checkin_start_time">不在签到时间</template>
 			</view>
 		</div>
 
-		<!-- 底部二维码签到按钮 -->
-		<view v-if="participants.length && isInCheckTime" class="bottom-qrcode-btn">
-			<view :class="['qrcode-btn-wrap', { 'is-pressed': showQrcodePopup }]">
-				<u-button
-					type="primary"
-					shape="circle"
-					:color="isInCheckTime ? '#FF8C00' : '#CCCCCC'"
-					customStyle="height: 80rpx; width: 312rpx;"
-					@click="handleQrcodeSign"
-				>
-					二维码签到
-				</u-button>
-			</view>
+		<!-- 底部人工签到入口 -->
+		<view v-if="participants.length && isInCheckTime" class="bottom-manual-link" @click="handleQrcodeSign">
+			无法签到？<text :style="{ color: themeColor.solid }">点此人工签到</text>
 		</view>
 		
 		<!-- 二维码弹窗 -->
@@ -118,7 +111,7 @@
 				<u-button
 					type="primary"
 					shape="circle"
-					color="#FF8C00"
+					:color="themeColor.solid"
 					@click="showQrcodePopup = false"
 				>
 					关闭
@@ -148,11 +141,9 @@ import { ref, onMounted, computed, nextTick } from 'vue'
 import UserLogin from "@/components/UserLogin.vue";
 import request from "@/utils/request.js"
 import { asyncAlls } from "@/utils/util.js"
-import { checkLocationPermission, getUserAreaScope } from './assets/location.js'
 import {
 	onLoad,
 	onUnload,
-	onShow
 } from "@dcloudio/uni-app";
 
 	import {
@@ -189,7 +180,6 @@ const showQrcodePopup = ref(false)
 const qrcodeData = ref('')
 const qrcodeVal = ref('')
 const qrcodeRef = ref(null)
-const locationGranted = ref(false)  // 位置权限是否已授予
 
 const currentTime = ref('')
 
@@ -239,15 +229,34 @@ function get_isInCheckTime() {
 	isInCheckTime.value = (isBefore && isAfter)
 }
 
-// 按钮是否可用：在签到时间内 + 已授权定位 + 在签到范围
-const canSign = computed(() => isInCheckTime.value && locationGranted.value && isInPunchArea.value)
+// 按钮是否可用：仅判断签到时间
+const canSign = computed(() => isInCheckTime.value)
 
 // 按钮不可用的原因提示
 const disableReason = computed(() => {
 	if (!isInCheckTime.value) return '不在签到时间'
-	if (!locationGranted.value) return '未授权定位'
-	if (!isInPunchArea.value) return '不在签到范围'
 	return ''
+})
+
+// hex 转 rgba
+function hexToRgba(hex, alpha) {
+	hex = hex.replace('#', '')
+	if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2]
+	const r = parseInt(hex.substring(0,2), 16)
+	const g = parseInt(hex.substring(2,4), 16)
+	const b = parseInt(hex.substring(4,6), 16)
+	return `rgba(${r},${g},${b},${alpha})`
+}
+
+// 活动主题色
+const themeColor = computed(() => {
+	const cc = selectedEvent.value?.color_config
+	const solid = cc?.solid || '#FF8C00'
+	return {
+		solid,
+		gradient: cc?.gradient || [solid, solid],
+		shadow: hexToRgba(solid, 0.35),
+	}
 })
 
 function selectSigner(item) {
@@ -276,7 +285,6 @@ function changeEvent(e) {
 
 	get_isInCheckTime()  // 立即检测时间状态
 	getCurrentEventSigners()
-	handleCheckLocation()
 	isShowEventModal.value = false
 	punchInStatus.value = 'pending'
 }
@@ -372,65 +380,6 @@ async function onQrcodePopupOpen() {
 		}
 	}, 300)
 }
-
-const isInPunchArea = ref(false)
-async function getUserLocation (userLat, userLng) {
-	if (!userLat) {
-		return uni.$u.toast('获取不到用户定位信息')
-	}
-	
-	const { checkin_address } =  selectedEvent.value
-	
-	if (!checkin_address.lat) {
-		return console.error('获取不到活动经纬度信息')
-	}
-	
-	const { lat, long } = checkin_address
-	
-	const UserAreaScope = getUserAreaScope(userLat, userLng, lat, long)
-	if (UserAreaScope.isInRange) {
-		console.log("✅ 在打卡范围内（≤500米）");
-		// 触发打卡逻辑
-		isInPunchArea.value = true;
-	} else {
-		isInPunchArea.value = false;
-		const dist = UserAreaScope.distance;
-		console.log(`❌ 距离打卡点 ${dist.toFixed(1)} 米，不在范围内`);
-	}
-}
-
-const handleCheckLocation = async () => {
-  try {
-    const result = await checkLocationPermission()
-    console.log('定位权限状态:', result)
-
-    if (result.status === 'granted') {
-      console.log('✅ 定位可用，坐标:', result.location)
-      locationGranted.value = true
-      // 执行打卡、地图等逻辑
-      getUserLocation(result.location.latitude, result.location.longitude)
-    } else {
-      // 用户拒绝或未授权
-      locationGranted.value = false
-      isInPunchArea.value = false
-    }
-  } catch (error) {
-    console.error('定位检测异常:', error)
-    locationGranted.value = false
-    isInPunchArea.value = false
-    uni.showToast({ title: '定位功能异常', icon: 'error' })
-  }
-}
-
-// 用户跳出页面开启定位后返回，直接再检查定位
-let isPageLoaded = false
-onShow(() => {
-	if (isPageLoaded) {
-		handleCheckLocation()
-	}
-	
-	isPageLoaded = true
-})
 
 onLoad(() => {
 	getEvents()
@@ -555,29 +504,12 @@ onUnload(() => {
 			width: 272rpx;
 			height: 272rpx;
 			border-radius: 999px;
-			background: #FF8C00;
-			box-shadow: 0rpx 6rpx 12rpx 2rpx #FF8C00;
+			background: var(--btn-bg, #FF8C00);
+			border-color: var(--btn-border, #FF8C00);
+			box-shadow: 0rpx 6rpx 16rpx 0rpx var(--btn-shadow, rgba(255,140,0,0.35));
 		}
 	}
-	.pending{
-		::v-deep{
-			.u-button{
-				border-color: #FF8C00;
-				background: #FF8C00;
-				box-shadow: 0rpx 6rpx 12rpx 2rpx #FF8C00;
-			}
-		}
-	}
-	.success{
-		::v-deep{
-			.u-button{
-				border-color: #8CC63E;
-				background: #8CC63E;
-				box-shadow: 0rpx 6rpx 12rpx 2rpx #8CC63E;
-			}
-		}
-	}
-	
+
 	.disableButton{
 		::v-deep{
 			.u-button{
@@ -618,24 +550,15 @@ onUnload(() => {
   }
 }
 
-.bottom-qrcode-btn {
+.bottom-manual-link {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 20rpx 34rpx;
-  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
-  background: #f8f8f8;
-  display: flex;
-  justify-content: center;
-}
-
-.qrcode-btn-wrap {
-  &.is-pressed {
-    ::v-deep .u-button {
-      filter: brightness(0.85);
-      transform: scale(0.98);
-    }
-  }
+  padding: 24rpx 0;
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  text-align: center;
+  font-size: 26rpx;
+  color: #999;
 }
 </style>

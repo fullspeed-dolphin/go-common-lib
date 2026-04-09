@@ -17,7 +17,7 @@
 		
 		<view style="position: fixed;width:100%;bottom: 100rpx;">
 			<u-button type="primary" @click="startScan()"
-			customStyle="width:642rpx; margin: 0rpx auto" color="#FF8C00"
+			customStyle="width:642rpx; margin: 0rpx auto" :color="themeColor"
 				shape="circle">
 				点击扫码
 			</u-button>
@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import dayjs from "dayjs";
 import {
 	onLoad,
@@ -57,6 +57,11 @@ function get_isInCheckTime() {
 
 const isShowEventModal = ref(false)
 const selectedEvent = ref({})
+
+const themeColor = computed(() => {
+	const cc = selectedEvent.value?.color_config
+	return cc?.solid || '#FF8C00'
+})
 
 function changeEvent(e) {
 	console.log(e)
