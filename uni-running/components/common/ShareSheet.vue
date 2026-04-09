@@ -47,7 +47,10 @@
 import { ref, nextTick } from "vue";
 import SharePoster from "./SharePoster.vue";
 import request from "@/utils/request.js";
-
+import {
+		useStore
+	} from "vuex";
+  const store = useStore()
 const routeParams = ref("");
 // 弹出分享按钮
 const isShowModal = ref(false);
@@ -60,13 +63,40 @@ function close() {
 // 二维码分享
 const qrCodeSrc = ref("");
 const qrCodeShow = ref(false);
+const pkEventTheme = computed(() => store.state.pkEventTheme)
+	console.log('pkEventTheme===111',pkEventTheme)
 const shareQRCode = () => {
   qrCodeImg();
 };
+function hexToRgb(hex) {
+    // 去除可能的'#'字符
+    hex = hex.replace('#', '');
+
+    // 确保十六进制字符串长度为6
+    if (hex.length === 3) {
+        hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+    }
+
+    // 解析每个部分并转换为十进制
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+
+    return { r, g, b };
+}
+
+// console.log(hexToRgb('#FFFFFF')); // 输出: { r: 255, g: 255, b: 255 }
+
 const qrCodeImg = (type = "qrcode") => {
   let data = {
     // path: `pagesSub/runningTeam/teamDetail?group_id=${routeParams.value.group_id}`
     path: routeParams.value,
+		"width": 430,
+    "env_version": "release",
+    "auto_color": false,
+    "line_color": hexToRgb(pkEventTheme.value?.solid || '#ff5c5c'),
+    "is_hyaline": true
+
   };
   request.post(`/image-service/wxacode`, data).then((res) => {
     if (type == "poster") {

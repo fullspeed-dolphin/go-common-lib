@@ -134,6 +134,7 @@ import UserLogin from "@/components/UserLogin.vue";
 import AccessUser from "@/components/common/AccessUser.vue";
 import SharePoster from "./SharePoster.vue";
 import request from "../utils/request";
+import { baseLink, uploadToken } from "@/utils/config";
 import { useShare } from "@/composables/useShare.js";
 import dayjs from "dayjs";
 import { useStore } from "vuex";
@@ -230,13 +231,19 @@ const deleteUploadedImage = async (imageUrl) => {
   if (!imageUrl) return;
 
   try {
-    await request.post(
-      "/basic-service/file/delete",
-      {
-        url: imageUrl,
-      },
-      { showError: false }
-    );
+    await new Promise((resolve, reject) => {
+      uni.request({
+        url: baseLink + "/basic-service/file/delete",
+        method: "POST",
+        header: {
+          Authorization: uploadToken,
+          "content-type": "application/json",
+        },
+        data: { url: imageUrl },
+        success: () => resolve(),
+        fail: (e) => reject(e),
+      });
+    });
     console.log("已删除上传的图片:", imageUrl);
   } catch (error) {
     console.error("删除图片失败:", error);
