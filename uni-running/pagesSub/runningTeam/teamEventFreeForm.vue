@@ -251,7 +251,7 @@ const uploadImage = async (filePath) => {
       filePath: compressed,
       name: "image",
       header: {
-        Authorization: uploadToken,
+        "X-API-KEY": uploadToken,
         "content-type": "application/json",
       },
       success: (res) => {

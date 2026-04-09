@@ -148,7 +148,7 @@
 				filePath: compressedPath,
 				name: 'image',
 				header: {
-					Authorization: uploadToken,
+					"X-API-KEY": uploadToken,
 					'content-type': 'application/json'
 				},
 				success(res) {

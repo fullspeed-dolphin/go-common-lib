@@ -350,7 +350,7 @@ const uploadFile = async (file) => {
       name: "image",
       formData: additional ? { path: additional } : {},
       header: {
-        Authorization: uploadToken,
+        "X-API-KEY": uploadToken,
         "content-type": "application/json",
       },
       success(res) {
