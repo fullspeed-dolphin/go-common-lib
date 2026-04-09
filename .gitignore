@@ -9,6 +9,30 @@ debug*
 node_modules/
 *.md
 
+# IDE
+.idea/
+
+# 子项目目录
+basic-service/
+booking-api/
+ccrun/
+event-api/
+ocr-api/
+other-source/
+payment-gateway/
+sport-api/
+tripitaka-resource-api/
+user-api/
+wallet-api/
+docs/
+
+# 旧项目根目录残留文件
+package.json
+package-lock.json
+upload.js
+static/
+uni-running/
+
 # 测试脚本和敏感数据
 batch-find-tokens.sh
 eligible-phones.txt
