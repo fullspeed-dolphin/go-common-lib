@@ -44,7 +44,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick } from "vue";
+import { ref, nextTick,computed } from "vue";
 import SharePoster from "./SharePoster.vue";
 import request from "@/utils/request.js";
 import {
