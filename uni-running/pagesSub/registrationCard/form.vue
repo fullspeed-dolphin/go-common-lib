@@ -50,13 +50,13 @@
 					<up-input v-model="form.idCardNumber" placeholder="请填写证件号码" border="none" inputAlign="right" />
 				</up-form-item>
 
-				<up-form-item label="出生日期" prop="birthday">
+				<up-form-item v-if="birthdayTimestamp || form.idType !== '身份证'" label="出生日期" prop="birthday">
 					<up-datetime-picker hasInput v-model="birthdayTimestamp" mode="date" cancelText="取消" confirmText="确认"
 						:confirmColor="themeColor" :minDate="startDate" :maxDate="endDate" :disabled="form.idType === '身份证'" @confirm="onBirthdayConfirm">
 						<template #trigger="{ value }">
 							<up-input :modelValue="value || ''" placeholder="请选择" border="none" inputAlign="right" readonly>
 								<template #suffix>
-									<up-icon name="arrow-right" size="18" color="#999" />
+									<up-icon v-if="form.idType !== '身份证'" name="arrow-right" size="18" color="#999" />
 								</template>
 							</up-input>
 						</template>
