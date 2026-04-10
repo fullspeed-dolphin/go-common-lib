@@ -206,7 +206,19 @@
 	}
 
 	function handleImg(link, index) {
-		refPreviewMedia.value.openModal(link, index, 'photo')
+		// 直接用系统原生查看器，顶部显示 "当前/总数" 指示器
+		// 优先用全量 URL，让用户能滑完整个相册；否则降级到分页已加载的 album_data
+		const allUrls = store.state.album_all_urls || []
+		const urls = allUrls.length > 0 ? allUrls : store.state.album_data
+
+		if (!urls || urls.length === 0) return
+
+		uni.previewImage({
+			urls,
+			current: link, // 传 URL 定位，比 index 更可靠
+			indicator: 'number',
+			loop: false,
+		})
 	}
 
 	onLoad((options) => {
