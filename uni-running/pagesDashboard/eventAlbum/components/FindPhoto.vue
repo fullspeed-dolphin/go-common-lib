@@ -85,7 +85,10 @@
 				</section>
 			</view>
 			
-			<view style="font-size: 24rpx;color:#999;margin-top: 20rpx;text-align: center;">由易联支付AI平台强势驱动</view>
+			<view class="brand-bar">
+				<image class="brand-logo" src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/brand/fullspeed-logo.png" mode="aspectFit" />
+				<text>由全速科技AI平台强势驱动</text>
+			</view>
 		</view>
 	</up-popup>
 </template>
@@ -426,6 +429,21 @@
 		font-size: 24rpx;
 		color: #979797;
 		padding: 0 26rpx;
+	}
+
+	.brand-bar {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-top: 20rpx;
+		font-size: 24rpx;
+		color: #999;
+	}
+
+	.brand-logo {
+		width: 36rpx;
+		height: 36rpx;
+		margin-right: 8rpx;
 	}
 
 	::v-deep {

@@ -123,7 +123,7 @@
         </view>
         <view class="title">
           {{ originIndex + 1 }}
-          <text class="c9">/{{ originList.length }}(总{{ album_total }})</text>
+          <text class="c9"> / {{ album_total || originList.length }}</text>
         </view>
       </view>
 
@@ -165,6 +165,7 @@ const store = useStore();
 const album_total = computed(() => store.state.album_total);
 const album_data = computed(() => store.state.album_data);
 const album_info = computed(() => store.state.album_info);
+const album_all_urls = computed(() => store.state.album_all_urls);
 
 function addViewCount() {
   const eventId = album_info.value?.event_id
@@ -842,11 +843,26 @@ function openShare() {
 
 // 加载高清图
 function loadHDimage() {
-  lookIdStatus.value = true
-  // uni.previewImage({
-  //   urls: originList.value,
-  //   current: originList.value[originIndex.value],
-  // })
+  const allUrls = album_all_urls.value || []
+  const currentUrl = originList.value[originIndex.value]
+
+  // 优先用全量 URL：根据当前图在全量中定位下标
+  if (allUrls.length > 0 && currentUrl) {
+    const fullIndex = allUrls.indexOf(currentUrl)
+    if (fullIndex !== -1) {
+      uni.previewImage({
+        urls: allUrls,
+        current: allUrls[fullIndex],
+      })
+      return
+    }
+  }
+
+  // 降级：全量未就绪或找不到时，用当前已加载的 originList
+  uni.previewImage({
+    urls: originList.value,
+    current: currentUrl,
+  })
 }
 
 function downloadPicture() {
@@ -910,7 +926,7 @@ defineExpose({
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: transparent;
+  background: #000;
 }
 
 .slides-container {
@@ -996,6 +1012,8 @@ defineExpose({
   justify-content: center;
   align-items: center;
   color: #fff;
+  margin-top: 20rpx;
+  font-size: 26rpx;
 }
 
 .bottom-info {

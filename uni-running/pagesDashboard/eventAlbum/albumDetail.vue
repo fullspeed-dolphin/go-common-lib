@@ -1,6 +1,6 @@
 <!-- UI 参考 https://m.alltuu.com/album/3102256506/?menu=live -->
 <template>
-	<view class="albumDetail-page" v-show="pageShow">
+	<view class="albumDetail-page">
 		<u-navbar autoBack placeholder :title="album_info?.name || '详情'" />
 		<zPaging ref="paging" use-virtual-list cell-height-mode="fixed" :virtual-list-col="4"
 			:inner-list-style="{'display':'flex','flex-wrap':'wrap'}" fixed-cell-height="180rpx" :default-page-size="60"
@@ -65,8 +65,7 @@
 	} from "vuex";
 	import {
 		onLoad,
-		onHide,
-		onShow,
+		onUnload,
 	} from "@dcloudio/uni-app";
 	import { useShare, buildPath } from "@/composables/useShare.js";
 	const store = useStore();
@@ -122,6 +121,11 @@
 	function changeTab(type) {
 		displayType.value = type;
 		paging.value.reload();
+		// 切换 photo/video 时重新拉全量 URL
+		store.dispatch('getAllAlbumUrls', {
+			event_id: currentEvent.value.event_id,
+			displayType: type
+		})
 	}
 
 	async function loadingMore(index) {
@@ -205,19 +209,19 @@
 		refPreviewMedia.value.openModal(link, index, 'photo')
 	}
 
-	const pageShow = ref(false)
 	onLoad((options) => {
 		console.log("========",options)
 		currentEvent.value = options
+		// 后台预取全量 URL（不阻塞主流程），供"查看高清图"时使用
+		store.dispatch('getAllAlbumUrls', {
+			event_id: options.event_id,
+			displayType: 'photo'
+		})
 	})
-	onHide(()=>{
-		console.log("========页面隐藏了===")
-		pageShow.value = false
-	}) 
-	onShow(()=>{
-		console.log("========页面显示了===")
-		pageShow.value = true
-	}) 
+	onUnload(() => {
+		// 离开页面清空全量 URL，避免占内存
+		store.commit('set', { type: 'album_all_urls', data: [] })
+	})
 	
 </script>
 

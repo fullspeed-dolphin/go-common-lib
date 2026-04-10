@@ -455,11 +455,6 @@ const handleEdit = () => {
   
 	const showShareBtn = () =>{
 		refShare.value.open(
-    //   {
-    //   imgUrl:detailInfo.value.team_avatar_url,
-    //   title:detailInfo.value.team_name,
-    //   time:userInfo.value.nickname+'邀请你加入团队',
-    // },
     {
 			avatar_url:detailInfo.value.team_avatar_url,
 			name:detailInfo.value.team_name,
