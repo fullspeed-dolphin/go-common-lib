@@ -69,9 +69,9 @@
 					<view class="flex-row flex-wrap">
 						<template v-if="!isFscEvent">
 							<view class="event-item flex-center tag-self">自营活动</view>
-							<view class="event-item flex-center" :class="isPaidEvent ? 'tag-paid' : 'tag-free'">
+							<!-- <view class="event-item flex-center" :class="isPaidEvent ? 'tag-paid' : 'tag-free'">
 								{{ isPaidEvent ? '付费' : '免费' }}
-							</view>
+							</view> -->
 						</template>
 						<template v-else>
 							<view class="event-item flex-center tag-fsc">跑团活动</view>
@@ -172,7 +172,7 @@
 	const detail = ref({});
 	const isLoadedPage = ref(false);
 	const routerParams = ref({});
-	const isPaidEvent = ref(false); // 普通活动是否为付费活动
+	// const isPaidEvent = ref(false); // 普通活动是否为付费活动
 
 	// 动态主题色（基于 color_config）
 	const themeColor = computed(() => detail.value?.color_config?.solid || '#43A047');
@@ -304,9 +304,9 @@
 				isLoadedPage.value = true;
 
 				// 普通活动：通过 /user/price 接口判断是否付费
-				if (!routerParams.value.fsc_id) {
-					checkEventPrice();
-				}
+				// if (!routerParams.value.fsc_id) {
+				// 	checkEventPrice();
+				// }
 			})
 			.catch((err) => {
 				// 未登录时弹出登录框，登录成功后重新获取数据
@@ -318,27 +318,27 @@
 	};
 
 	// 检查普通活动是否付费：遍历 tickets，任一 price != 0 即为付费
-	const checkEventPrice = () => {
-		request.post('/booking-api/user/price', {
-			event_id: routerParams.value.id
-		})
-			.then((res) => {
-				const tickets = res?.tickets;
-				if (!tickets) {
-					isPaidEvent.value = false;
-					return;
-				}
-				isPaidEvent.value = tickets.some(ticket =>
-					Object.values(ticket?.price || {}).some(pkg => {
-						const p = typeof pkg === 'object' ? pkg.price : pkg;
-						return p != 0;
-					})
-				);
-			})
-			.catch(() => {
-				isPaidEvent.value = false;
-			});
-	};
+	// const checkEventPrice = () => {
+	// 	request.post('/booking-api/user/price', {
+	// 		event_id: routerParams.value.id
+	// 	})
+	// 		.then((res) => {
+	// 			const tickets = res?.tickets;
+	// 			if (!tickets) {
+	// 				isPaidEvent.value = false;
+	// 				return;
+	// 			}
+	// 			isPaidEvent.value = tickets.some(ticket =>
+	// 				Object.values(ticket?.price || {}).some(pkg => {
+	// 					const p = typeof pkg === 'object' ? pkg.price : pkg;
+	// 					return p != 0;
+	// 				})
+	// 			);
+	// 		})
+	// 		.catch(() => {
+	// 			isPaidEvent.value = false;
+	// 		});
+	// };
 
 	const routeTo = () => {
 		if (!userInfo.value.id) {
