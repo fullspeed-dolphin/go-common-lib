@@ -13,11 +13,9 @@
 				class="result-img"
 				:src="url + ossPar250"
 				mode="aspectFill"
-				@click="previewImage(url, index)"
+				@click="previewImage(url)"
 			/>
 		</view>
-		<!-- 轮播图 -->
-		<PreviewMedia ref="refPreviewImage"/>
 	</view>
 </template>
 
@@ -25,7 +23,6 @@
 import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { useShare } from "@/composables/useShare.js";
-import PreviewMedia from "./components/PreviewMedia.vue"
 import store from '../../utils/store';
 
 // 分享配置
@@ -35,7 +32,6 @@ useShare({
 });
 
 const ossPar250  = '?x-oss-process=image/resize,w_250/quality,q_80/format,webp'
-const refPreviewImage = ref(null);
 const imageList = ref([]);
 const image750List = ref([]);
 
@@ -60,9 +56,13 @@ onLoad(() => {
 	}
 });
 
-const previewImage = (url, index) => {
-	// refPreviewImage.value.open(url);
-	refPreviewImage.value.openModal(url, index, imageList.value)
+const previewImage = (url) => {
+	uni.previewImage({
+		urls: imageList.value,
+		current: url,
+		indicator: 'number',
+		loop: false,
+	})
 };
 </script>
 
@@ -79,41 +79,4 @@ const previewImage = (url, index) => {
 	padding: 5rpx;
 	box-sizing: border-box;
 }
-
-.SwiperSection{
-		.section-btns{
-			.u-button{
-				border:none;
-				margin:0;
-				padding:0;
-				background-color: transparent;
-				display: flex;
-				flex-direction: column;
-				justify-content: center;
-				align-items: center;
-				font-size: 20rpx;
-				font-weight: 400;
-				.u-icon{
-					margin-bottom: 10rpx;
-					display: block!important;
-				}
-			}
-		}
-	}
-	.PreviewMedia {
-		.u-popup__content__close {
-			top: 300rpx !important;
-			width: 36px !important;
-			height: 36px !important;
-			background: rgba(34, 34, 34, 0.8) !important;
-			border-radius: 999px;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-	
-			.u-icon__icon {
-				color: #fff !important;
-			}
-		}
-	}
 </style>

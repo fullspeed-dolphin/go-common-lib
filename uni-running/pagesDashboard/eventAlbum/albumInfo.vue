@@ -89,11 +89,11 @@
 						@click="handleImg(item.item,item.zp_index)"/>
 				</block>
 				<block v-if="displayType === 'video'">
-					<view 
+					<view
 						class="card-video"
 						v-for="(item, index) in virtualList"
 						:id="'zp-id-' + item.zp_index" :key="item.zp_index"
-						@click="$refs.refPreviewVideo.openModal(item.item)">
+						@click="handleVideo(item.item)">
 						<view class="iconfont icon-bofang"></view>
 						<image class="img" :src="item.item + snapshot" mode="aspectFill" ></image>
 						<view class="ellipsis2 u-p-10">
@@ -104,10 +104,7 @@
 			</view>
 		</zPaging>
 		
-		<!-- 轮播图 -->
-		<PreviewMedia ref="refPreviewMedia" @loadingMore="loadingMore"/>
 		<FindPhoto ref="refFindPhoto" />
-		<PreviewVideo ref="refPreviewVideo" />
 	</view>
 </template>
 
@@ -115,8 +112,6 @@
 	import zPaging from "./components/z-paging/components/z-paging/z-paging.vue"
 	import request from "@/utils/request.js"
 	import FindPhoto from "./components/FindPhoto.vue"
-	import PreviewVideo from "./components/PreviewVideo.vue"
-	import PreviewMedia from "./components/PreviewMedia.vue"
 	import store from '@/utils/store.js'
 	import { addUnit, getPx, getWindowInfo } from '@/uni_modules/uview-plus/libs/function/index.js';
 	
@@ -133,7 +128,7 @@
 	
 	export default {
 		components: {
-			zPaging, FindPhoto, PreviewMedia, PreviewVideo
+			zPaging, FindPhoto
 		},
 		data() {
 			return {
@@ -155,7 +150,9 @@
 				swiperPageNo:0,
 				swiperPageSize: 10,
 				isloading:false,
-				isNextLevel: false
+				isNextLevel: false,
+				// uni.previewMedia 单次最多 50 个 sources，本次访问内是否已提示过该限制
+				hasShownVideoLimitTip: false,
 			}
 		},
 		computed: {
@@ -172,13 +169,11 @@
 			changeTab(type) {
 				this.displayType = type;
 				this.$refs.paging.reload();
-			},
-			async loadingMore(index) {
-				// console.log('albumDetail的触发')
-				this.isNextLevel = true
-				const res = await this.queryList(this.swiperPageNo+1, this.swiperPageSize)
-				// console.log('albumDetail的触发res====',res)
-				this.$refs.refPreviewMedia.openModal('',index,this.virtualList2, this.totalNumber)
+				// 切 photo/video 时重新拉全量 URL，供 uni.previewImage / uni.previewMedia 滑完整个相册
+				store.dispatch('getAllAlbumUrls', {
+					event_id: this.currentEvent.event_id,
+					displayType: type
+				})
 			},
 			onListScroll(e) {
 				this.isScrolling = true;
@@ -281,8 +276,52 @@
 					}, 150)
 				})
 			},
-			handleImg(link,index) {
-				this.$refs.refPreviewMedia.openModal(link,index,this.virtualList2, this.totalNumber)
+			handleImg(link, index) {
+				// 直接用系统原生查看器，顶部显示 "当前/总数" 指示器
+				// 优先用全量照片 URL，让用户能滑完整个相册；否则降级到当前已加载的 virtualList2
+				const allUrls = store.state.album_all_urls?.photo || []
+				const urls = allUrls.length > 0 ? allUrls : (this.virtualList2 || [])
+				if (!urls || urls.length === 0) return
+				uni.previewImage({
+					urls,
+					current: link, // 传 URL 定位，比 index 更可靠
+					indicator: 'number',
+					loop: false,
+				})
+			},
+			handleVideo(link) {
+				// 用微信原生预览器，支持视频左右滑切换、自带"保存到相册"菜单
+				// 只读 video 字段，避免竞态下拿到照片的全量 URL
+				const allUrls = store.state.album_all_urls?.video || []
+				const urls = allUrls.length > 0 ? allUrls : (this.virtualList2 || [])
+				if (!urls || urls.length === 0) return
+				// wx.previewMedia 限制 sources 最多 50 个，以当前视频为中心截一个 50 大小的窗口
+				const MAX = 50
+				const idx = Math.max(0, urls.indexOf(link))
+				const start = Math.min(
+					Math.max(0, idx - Math.floor(MAX / 2)),
+					Math.max(0, urls.length - MAX)
+				)
+				const sources = urls.slice(start, start + MAX).map(url => ({
+					url,
+					type: 'video',
+					poster: url + '?x-oss-process=video/snapshot,t_5,f_jpg,w_720'
+				}))
+				const open = () => uni.previewMedia({ sources, current: idx - start })
+
+				// 视频总数超过 50 时，本次访问首次点击需告知限制
+				if (urls.length > MAX && !this.hasShownVideoLimitTip) {
+					this.hasShownVideoLimitTip = true
+					uni.showModal({
+						title: '提示',
+						content: `相册视频较多（${urls.length} 个），受微信限制单次预览最多 50 个。如需查看其他视频，请退出预览后再次点击对应视频。`,
+						showCancel: false,
+						confirmText: '知道了',
+						success: open
+					})
+				} else {
+					open()
+				}
 			},
 			openPreview(index) {
 				if (!this.$refs.preview) return;
@@ -294,11 +333,20 @@
 			this.currentEvent = options
 			this.getDetail()
 			this.addVistAmount()
-			
+			// 后台预取全量 URL（不阻塞主流程），供"查看高清图"时使用
+			store.dispatch('getAllAlbumUrls', {
+				event_id: options.event_id,
+				displayType: 'photo'
+			})
+
 			wx?.showShareMenu?.({
 				withShareTicket: true,
 				menus: ['shareAppMessage', 'shareTimeline']
 			});
+		},
+		onUnload() {
+			// 离开页面清空全量 URL，避免占内存
+			store.commit('set', { type: 'album_all_urls', data: { photo: [], video: [] } })
 		},
 		onShareAppMessage() {
 			return {
@@ -327,21 +375,6 @@
 		}
 	}
 	.albumDetail-page{
-		.PreviewMedia{
-			.u-popup__content__close {
-				top: 300rpx!important;
-				width: 36px !important;
-				height: 36px !important;
-				background: rgba(34, 34, 34, 0.8) !important;
-				border-radius: 999px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				.u-icon__icon{
-					color: #fff!important;
-				}
-			}
-		}
 		.back-to-top{
 			position: fixed;
 			top: 240px;
