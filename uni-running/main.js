@@ -58,7 +58,7 @@ export function createApp() {
 	app.use(store)
 
 	// 注册全局分享 mixin
-	app.mixin(globalShareMixin)
+	// app.mixin(globalShareMixin)
 
 	app.use(uviewPlus, () => {
 		return {

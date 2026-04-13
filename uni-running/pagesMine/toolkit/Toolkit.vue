@@ -9,16 +9,7 @@
 <script setup>
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
-import { useShare, buildPath } from "@/composables/useShare.js";
-
-// 路由参数
 const routeRole = ref('');
-
-// 分享配置
-useShare(() => ({
-	title: routeRole.value || '工具箱',
-	path: buildPath('/pagesMine/toolkit/Toolkit', { role: routeRole.value })
-}));
 
 // 页面加载
 onLoad((options) => {

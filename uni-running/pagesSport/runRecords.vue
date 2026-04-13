@@ -109,13 +109,6 @@ import request from "@/utils/request.js";
 import PickerCell from "@/components/common/PickerCell.vue";
 import dayjs from "dayjs";
 import { formatDuration, formatDistance, calculatePaceFromMeters, getTypeSum } from "./assets/utils.js";
-// import { useShare } from "@/composables/useShare.js";
-
-// // 分享配置
-// useShare({
-//   title: '运动记录',
-//   path: '/pagesSub/sport/list'
-// });
 
 const todaySummaryData = ref({})
 function getSoprtRecords() {

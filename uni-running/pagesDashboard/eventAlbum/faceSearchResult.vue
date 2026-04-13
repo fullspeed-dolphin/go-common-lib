@@ -22,14 +22,7 @@
 <script setup>
 import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
-import { useShare } from "@/composables/useShare.js";
 import store from '../../utils/store';
-
-// 分享配置
-useShare({
-  title: '人脸搜索结果',
-  path: '/pagesDashboard/eventAlbum/faceSearchResult'
-});
 
 const ossPar250  = '?x-oss-process=image/resize,w_250/quality,q_80/format,webp'
 const imageList = ref([]);

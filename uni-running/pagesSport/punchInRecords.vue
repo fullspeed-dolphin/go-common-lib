@@ -104,13 +104,6 @@ import { ref, computed, onMounted } from "vue";
 import { staticBaseUrl } from "@/utils/config";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
-import { useShare } from "@/composables/useShare.js";
-
-// 分享配置
-useShare({
-  title: '运动打卡记录',
-  path: '/pagesSub/sport/checkIn'
-});
 
 // 日历相关
 const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
