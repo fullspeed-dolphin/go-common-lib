@@ -498,14 +498,14 @@ onShow(() => {
   isFirstShow = false;
 });
 
-// useShare(() => ({
-//   title: detailInfo.value?.event_name
-//     ? `${detailInfo.value.event_name}·线上跑`
-//     : "线上跑活动",
-//   path: buildPath("/pagesDashboard/pkEvent/pkEvent", {
-//     id: activetyId.value,
-//   }),
-// }));
+useShare(() => ({
+  title: detailInfo.value?.event_name
+    ? `${detailInfo.value.event_name}·线上跑`
+    : "线上跑活动",
+  path: buildPath("/pagesDashboard/pkEvent/pkEvent", {
+    id: activetyId.value,
+  }),
+}));
 
 const refreshList = () => {
   getMescroll().resetUpScroll();
