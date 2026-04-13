@@ -79,10 +79,10 @@ import { useShare } from "@/composables/useShare.js";
 const store = useStore();
 
 // 分享配置
-useShare({
-	title: '跑团活动',
-	path: '/pages/event'
-});
+// useShare({
+// 	title: '跑团活动',
+// 	path: '/pages/event'
+// });
 const userInfo = computed(() => store.state.userInfo);
 const myGroupRole = ref('');
 

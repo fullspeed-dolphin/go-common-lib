@@ -94,10 +94,10 @@
 	const store = useStore();
 
 	// 分享配置
-	useShare({
-		title: '运动排行榜',
-		path: '/pagesSub/sport/top'
-	});
+	// useShare({
+	// 	title: '运动排行榜',
+	// 	path: '/pagesSub/sport/top'
+	// });
 
 	// 模板引用
 	const mescrollRef = ref(null);

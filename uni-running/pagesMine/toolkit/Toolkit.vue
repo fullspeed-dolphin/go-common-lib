@@ -15,10 +15,10 @@ import { useShare, buildPath } from "@/composables/useShare.js";
 const routeRole = ref('');
 
 // 分享配置
-useShare(() => ({
-	title: routeRole.value || '工具箱',
-	path: buildPath('/pagesMine/toolkit/Toolkit', { role: routeRole.value })
-}));
+// useShare(() => ({
+// 	title: routeRole.value || '工具箱',
+// 	path: buildPath('/pagesMine/toolkit/Toolkit', { role: routeRole.value })
+// }));
 
 // 页面加载
 onLoad((options) => {

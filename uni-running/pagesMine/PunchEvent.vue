@@ -155,10 +155,10 @@ import { useShare } from "@/composables/useShare.js";
 const store = useStore();
 
 // 分享配置
-useShare({
-	title: '活动签到',
-	path: '/pagesMine/PunchEvent'
-});
+// useShare({
+// 	title: '活动签到',
+// 	path: '/pagesMine/PunchEvent'
+// });
 const refUserLogin = ref(null);
 
 // 待执行的操作（登录成功后继续执行）

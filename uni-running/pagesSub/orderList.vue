@@ -127,10 +127,10 @@ import request from "@/utils/request.js";
 import { useShare } from "@/composables/useShare.js";
 
 // 分享配置
-useShare({
-	title: '我的订单',
-	path: '/pagesSub/orderList'
-});
+// useShare({
+// 	title: '我的订单',
+// 	path: '/pagesSub/orderList'
+// });
 
 const {
 	mescrollInit,
