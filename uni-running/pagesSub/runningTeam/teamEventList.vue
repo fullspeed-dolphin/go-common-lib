@@ -60,6 +60,9 @@
               <!-- <u-button v-if="!['EXP', 'ACT'].includes(item.status)" type="primary" size="mini" shape="circle" color="#2979ff"
                 customStyle="margin:0;width:120rpx;height:52rpx;font-size:22rpx;"
                 @click.stop="editEvent(item)">更新</u-button> -->
+                 <u-button v-if="item.is_free == 1" type="primary" size="mini" shape="circle" color="#2979ff"
+                customStyle="margin:0;width:120rpx;height:52rpx;font-size:22rpx;"
+                @click.stop="editEvent(item)">更新</u-button>
               <u-button type="error" size="mini" shape="circle" color="#f56c6c"
                 customStyle="margin:0;width:120rpx;height:52rpx;font-size:22rpx;"
                 @click.stop="removeItem(item)">删除</u-button>
@@ -223,7 +226,8 @@ const createEvent = () => {
 };
 
 const editEvent = (item) => {
-  uni.$u.route(`pagesSub/runningTeam/teamEventForm?id=${item.id}&group_id=${group_id.value}`);
+  // uni.$u.route(`pagesSub/runningTeam/teamEventForm?id=${item.id}&group_id=${group_id.value}`);
+  uni.$u.route(`pagesSub/runningTeam/teamEventFreeForm?id=${item.id}&group_id=${group_id.value}`);
 };
 
 const viewRegistrations = (item) => {

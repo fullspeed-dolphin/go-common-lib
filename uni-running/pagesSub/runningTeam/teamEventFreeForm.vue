@@ -1,6 +1,6 @@
 <template>
   <view class="page-container">
-    <u-navbar title="发布免费活动" autoBack placeholder></u-navbar>
+    <u-navbar :title="event_id ? `更新免费活动` : '发布免费活动'" autoBack placeholder></u-navbar>
 
     <view class="form-content">
       <!-- 活动图片 -->
@@ -92,7 +92,7 @@
     <view class="section-bottom">
       <view class="btn-publish" @click="submitForm">
         <image class="btn-publish-icon" src="/static/icons/send.png" mode="aspectFit" />
-        <text class="btn-publish-text">{{ isSubmitting ? '提交中...' : '发布活动' }}</text>
+        <text class="btn-publish-text">{{ isSubmitting ? '提交中...' : event_id ? '更新活动' : '发布活动' }}</text>
       </view>
     </view>
 
@@ -117,6 +117,7 @@ import { uploadToken } from "@/utils/config";
 import dayjs from "dayjs";
 
 const group_id = ref("");
+const event_id = ref("");
 const isSubmitting = ref(false);
 const showTimePicker = ref(false);
 const pickerTime = ref(Date.now());
@@ -190,7 +191,31 @@ const form = ref({
 });
 
 onLoad((options) => {
+  console.log("Received options:=====11", options);
   group_id.value = options.group_id;
+  if(options.id) {
+    event_id.value = options.id;
+    // 编辑模式，加载活动详情
+    request.get(`/event-api/fsc_events/${options.id}`).then((res) => {
+      form.value.name = res.name || "";
+      form.value.event_time = res.event_time ? String(new Date(res.event_time).getTime()) : "";
+      form.value.event_location = res.event_location || "";
+      form.value.need_insurance = res.need_insurance || 0;
+      form.value.description = res.description || "";
+      if (res.background_image_url) {
+        try {
+          const urls = JSON.parse(res.background_image_url);
+          if (Array.isArray(urls)) {
+            imageList.value = urls;
+          }
+        } catch (e) {
+          console.log("Failed to parse background_image_url", e);
+        }
+      }
+    }).catch((e) => {
+      uni.$u.toast(e.msg || "加载活动详情失败");
+    });
+  }
 });
 
 const formatTime = (ts) => {
@@ -315,24 +340,47 @@ const submitForm = async () => {
     visibility: "private",
     background_image_url: imageList.value.length > 0 ? JSON.stringify(imageList.value) : undefined,
   };
-
-  try {
-    const res = await request.post("/event-api/fsc_events", data);
-    // 创建成功后，自动为创建者报名（团长即第一个参与人员）
-    if (res?.id) {
-      await request.post("/booking-api/fsc_events/registration", {
-        event_id: res.id,
-      }).catch(() => {});
+  if(event_id.value) {
+    data.event_id = event_id.value;
+    data.status = "ACT";
+    try {
+      const res = await request.post("/event-api/fsc_events/update", data);
+      // 创建成功后，自动为创建者报名（团长即第一个参与人员）
+      // if (res?.id) {
+      //   await request.post("/booking-api/fsc_events/registration", {
+      //     event_id: res.id,
+      //   }).catch(() => {});
+      // }
+      uni.hideLoading();
+      uni.$u.toast("更新成功");
+      uni.$emit("updateList", { isChange: true });
+      setTimeout(() => uni.navigateBack({ delta: 2 }), 500);
+    } catch (e) {
+      uni.hideLoading();
+      uni.$u.toast(e.msg || "更新失败");
+    } finally {
+      isSubmitting.value = false;
     }
-    uni.hideLoading();
-    uni.$u.toast("发布成功");
-    uni.$emit("updateList", { isChange: true });
-    setTimeout(() => uni.navigateBack({ delta: 2 }), 500);
-  } catch (e) {
-    uni.hideLoading();
-    uni.$u.toast(e.msg || "发布失败");
-  } finally {
-    isSubmitting.value = false;
+  } else {
+
+    try {
+      const res = await request.post("/event-api/fsc_events", data);
+      // 创建成功后，自动为创建者报名（团长即第一个参与人员）
+      if (res?.id) {
+        await request.post("/booking-api/fsc_events/registration", {
+          event_id: res.id,
+        }).catch(() => {});
+      }
+      uni.hideLoading();
+      uni.$u.toast("发布成功");
+      uni.$emit("updateList", { isChange: true });
+      setTimeout(() => uni.navigateBack({ delta: 2 }), 500);
+    } catch (e) {
+      uni.hideLoading();
+      uni.$u.toast(e.msg || "发布失败");
+    } finally {
+      isSubmitting.value = false;
+    }
   }
 };
 </script>
