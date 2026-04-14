@@ -207,10 +207,21 @@
 
 	function handleImg(link, index) {
 		const allUrls = store.state.album_all_urls?.photo || []
-		const urls = allUrls.length > 0 ? allUrls : store.state.album_data
-		if (!urls || urls.length === 0) return
+		let urls = allUrls
+		let idx = allUrls.indexOf(link)
+		if (idx === -1) {
+			urls = store.state.album_data
+			idx = urls.indexOf(link)
+		}
+		if (idx === -1 || !urls || urls.length === 0) return
+		const MAX = 1000
+		const start = Math.min(
+			Math.max(0, idx - Math.floor(MAX / 2)),
+			Math.max(0, urls.length - MAX)
+		)
+		const slice = urls.slice(start, start + MAX)
 		uni.previewImage({
-			urls,
+			urls: slice,
 			current: link,
 			indicator: 'number',
 			loop: false,

@@ -63,7 +63,7 @@ export default createStore({
 					{
 						event_id: params.event_id,
 						pageIndex: 0,
-						pageSize: 1000,
+						pageSize: 20000,
 						displayType: type
 					}
 				)
