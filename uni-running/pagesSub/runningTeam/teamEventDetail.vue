@@ -91,9 +91,11 @@
     </view>
 
     <!-- 悬浮分享按钮 -->
-    <button v-if="detail.status === 'ACT'" class="float-share-btn" open-type="share">
+    <view v-if="detail.status === 'ACT'" class="float-share-btn" @click="showShareBtn">
       <u-icon name="share" color="#fff" size="18"></u-icon>
-    </button>
+    </view>
+
+    <ShareSheet ref="refShare" />
 
     <!-- 底部按钮 -->
     <view class="section-bottom">
@@ -194,6 +196,7 @@ import { onLoad, onUnload, onShow } from "@dcloudio/uni-app";
 import { useShare, buildPath } from "@/composables/useShare.js";
 import { useStore } from "vuex";
 import PhoneLogin from "@/components/common/PhoneLogin.vue";
+import ShareSheet from "@/components/common/ShareSheet.vue";
 import dayjs from "dayjs";
 import request from "@/utils/request.js";
 
@@ -503,6 +506,18 @@ const showMore = () => {
 
 const copyText = (txt) => {
   uni.setClipboardData({ data: String(txt) });
+};
+
+const refShare = ref(null);
+const showShareBtn = () => {
+  refShare.value.open(
+    {
+      avatar_url: coverImages.value[0] || '',
+      name: detail.value.name,
+      establish_time: detail.value.event_time
+    },
+    `pagesSub/runningTeam/teamEventDetail?id=${routerParams.value.id}`
+  );
 };
 </script>
 

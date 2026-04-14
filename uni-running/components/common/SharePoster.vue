@@ -38,7 +38,7 @@ const renderPoster = (imageUrl) => {
     css: {
       width: "750rpx",
       paddingBottom: "40rpx",
-      background: "linear-gradient(,#000 0%, #ff8c00 100%)",
+      background: "#fff",
     },
     views: [
       {
