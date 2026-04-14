@@ -85,6 +85,7 @@ const goForm = (isFree) => {
     uni.$u.route(`pagesSub/runningTeam/teamEventFreeForm?group_id=${group_id.value}`);
   } else {
     // 收费活动 → 原有表单
+    return uni.$u.toast("功能筹备中，敬请期待...");
     uni.$u.route(`pagesSub/runningTeam/teamEventForm?group_id=${group_id.value}&is_free=1`);
   }
 };

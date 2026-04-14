@@ -309,7 +309,7 @@ const submitForm = async () => {
     capacity: form.value.capacity ? Number(form.value.capacity) : undefined,
     contact: form.value.contact || undefined,
     description: form.value.description || undefined,
-    is_free: 0,
+    is_free: 1,
     need_insurance: form.value.need_insurance,
     status: "PND",
     visibility: "private",
