@@ -434,7 +434,10 @@ const viewCertificate = (signInfo) => {
   if (!signInfo?.certificate_url) {
     return uni.$u.toast("暂无完赛证书");
   }
-  uni.$u.route(`pagesSub/settings/webView?link=${signInfo.certificate_url}`);
+  uni.previewImage({
+    urls: [signInfo.certificate_url],
+    current: signInfo.certificate_url,
+  });
 };
 
 const viewEventDetail = () => {
