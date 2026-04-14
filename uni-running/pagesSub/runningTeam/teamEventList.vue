@@ -57,10 +57,7 @@
             </view>
             <!-- Action Buttons -->
             <view class="card-actions">
-              <!-- <u-button v-if="!['EXP', 'ACT'].includes(item.status)" type="primary" size="mini" shape="circle" color="#2979ff"
-                customStyle="margin:0;width:120rpx;height:52rpx;font-size:22rpx;"
-                @click.stop="editEvent(item)">更新</u-button> -->
-              <u-button v-if="item.is_free == 1" type="primary" size="mini" shape="circle" color="#2979ff"
+              <u-button v-if="!['EXP', 'ACT'].includes(item.status)" type="primary" size="mini" shape="circle" color="#2979ff"
                 customStyle="margin:0;width:120rpx;height:52rpx;font-size:22rpx;"
                 @click.stop="editEvent(item)">更新</u-button>
               <u-button type="error" size="mini" shape="circle" color="#f56c6c"
