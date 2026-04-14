@@ -14,8 +14,8 @@
     </view>
 
     <!-- 内容区域 -->
-    <view class="content-wrapper" :style="{ paddingTop: (statusBarHeight + 44 + 50) + 'px' }" @touchstart="onTouchStart" @touchend="onTouchEnd">
-      <mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" :top="0">
+    <view class="content-wrapper" @touchstart="onTouchStart" @touchend="onTouchEnd">
+      <mescroll-body ref="mescrollRef" @init="mescrollInit" @down="downCallback" @up="getList" :top="88">
         <view class="event-list" :class="['list-transition', listAnimationClass]">
           <view class="u-mb-20" v-for="(item, index) in filteredList" :key="index">
             <EventItem :item="item" :key="index" height="474rpx" />

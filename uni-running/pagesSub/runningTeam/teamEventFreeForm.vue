@@ -43,7 +43,7 @@
         <view class="form-row" @click="focusInput('name')">
           <text class="form-label">活动主题</text>
           <view class="form-value-row">
-            <input class="form-input" v-model="form.name" placeholder="请输入活动主题" placeholder-class="placeholder" />
+            <input class="form-input" v-model="form.name" placeholder="请输入活动主题" placeholder-style="color: #D1D5DB;" />
           </view>
         </view>
         <view class="form-row">
@@ -601,9 +601,6 @@ const submitForm = async () => {
   font-weight: 500;
   flex: 1;
   text-align: right;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .desc-box {
