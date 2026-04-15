@@ -253,7 +253,7 @@
 
 <script setup>
 import { ref, computed, watch } from "vue";
-import { onLoad, onShow, onReachBottom, onPageScroll, onUnload } from "@dcloudio/uni-app";
+import { onLoad, onShow, onReachBottom, onPageScroll, onUnload, onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
 
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 const { mescrollInit, downCallback, getMescroll } = useMescroll(onPageScroll, onReachBottom);
@@ -483,6 +483,14 @@ const goto = (url) => {
 onLoad((options) => {
   console.log(options);
   activetyId.value = options.id || "01KH0WQX4H2C7Q4GJ217P8T922";
+  // useShare(() => ({
+  //   title: detailInfo.value?.event_name
+  //     ? `${detailInfo.value.event_name}·线上跑`
+  //     : "线上跑活动",
+  //   path: buildPath("/pagesDashboard/pkEvent/pkEvent", {
+  //     id: activetyId.value,
+  //   }),
+  // }));
 });
 
 let isFirstShow = true;
