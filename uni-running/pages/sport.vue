@@ -103,7 +103,7 @@
 </template>
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import { onShow } from "@dcloudio/uni-app";
+import { onShow,onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
 import { useStore } from "vuex";
 import Tabbar from "@/components/tabBar.vue";
 import UserLogin from "@/components/UserLogin.vue";

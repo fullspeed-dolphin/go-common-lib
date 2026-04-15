@@ -116,6 +116,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useShare } from '@/composables/useShare.js';
+import { onShow,onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
 import tabbar from '@/components/tabBar.vue';
 
 useShare({ title: '全速运动 - 训练', path: '/pages/training' });

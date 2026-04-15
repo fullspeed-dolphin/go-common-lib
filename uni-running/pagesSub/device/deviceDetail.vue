@@ -46,7 +46,7 @@
 </template>
 <script setup>
 import { ref, computed } from "vue";
-import { onLoad, onShow } from "@dcloudio/uni-app";
+import { onLoad, onShow,onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
 import CommonDialog from "@/components/common/CommonDialog.vue";
 import { gaoChi, huaWei, jiaMing } from "./deviceUtils.js";
 import request from "@/utils/request.js";

@@ -87,9 +87,7 @@
 	import {
 		ref
 	} from "vue";
-	import {
-		onLoad
-	} from "@dcloudio/uni-app";
+	import { onLoad,onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
 	import { useStore } from "vuex";
 	import PickerCell from "@/components/common/PickerCell.vue";
 	import request from "../utils/request";

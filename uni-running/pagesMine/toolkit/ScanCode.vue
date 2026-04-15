@@ -35,7 +35,8 @@ import { ref, computed } from 'vue'
 import dayjs from "dayjs";
 import {
 	onLoad,
-	onUnload
+	onUnload,
+	onShareAppMessage, onShareTimeline
 } from "@dcloudio/uni-app";
 import { asyncAlls } from "@/utils/util.js"
 import request from "@/utils/request.js"

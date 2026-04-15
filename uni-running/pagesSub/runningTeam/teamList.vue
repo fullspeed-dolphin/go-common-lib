@@ -54,7 +54,8 @@
 		onMounted
 	} from "vue";
 	import {
-		onShow
+		onShow,
+		onShareAppMessage, onShareTimeline
 	} from "@dcloudio/uni-app";
 	import { onPageScroll, onReachBottom } from '@dcloudio/uni-app';
 	import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";

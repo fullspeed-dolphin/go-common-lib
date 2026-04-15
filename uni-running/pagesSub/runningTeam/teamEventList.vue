@@ -95,7 +95,7 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { onLoad, onShow } from "@dcloudio/uni-app";
+import { onLoad, onShow,onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
 import { onPageScroll, onReachBottom } from "@dcloudio/uni-app";

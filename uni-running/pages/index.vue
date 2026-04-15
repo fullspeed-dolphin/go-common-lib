@@ -66,7 +66,7 @@
 </template>
 <script setup>
 import { ref, onMounted, computed, nextTick, watch } from "vue";
-import { onLoad, onShow, onPageScroll } from "@dcloudio/uni-app";
+import { onLoad, onShow, onPageScroll,onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
 import { useShare } from "@/composables/useShare.js";
 import { useTabAnimation } from "@/composables/useTabAnimation.js";
 import { useStore } from "vuex";

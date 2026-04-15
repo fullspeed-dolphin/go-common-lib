@@ -225,7 +225,7 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { onLoad, onUnload, onShow } from "@dcloudio/uni-app";
+import { onLoad, onUnload, onShow,onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
 import { useStore } from "vuex";
 import UserLogin from "@/components/UserLogin.vue";
 import MemberDetail from "./memberDetail.vue";

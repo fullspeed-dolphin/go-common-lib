@@ -5,7 +5,7 @@
 </template>
 <script setup>
 import { ref } from 'vue'
-import { onLoad } from '@dcloudio/uni-app'
+import { onLoad,onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app'
 import request from "@/utils/request.js"
 import agree_signUp from "../utils/agree_signUp.js"
 import agree_privy from "../utils/agree_privy.js"

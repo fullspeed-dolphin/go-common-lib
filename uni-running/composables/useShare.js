@@ -29,6 +29,15 @@ import { onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app';
  * }));
  */
 export function useShare(config) {
+	
+	// #ifdef MP-WEIXIN
+	// 启用分享菜单（分享给好友 + 分享到朋友圈）
+	// wx.showShareMenu({
+	// 	withShareTicket: true,
+	// 	menus: ['shareAppMessage', 'shareTimeline']
+	// });
+	// #endif
+
 	// 获取当前组件实例，设置 $shareConfig 供全局 mixin 读取
 	const instance = getCurrentInstance();
 	console.log('设置分享配置======:', instance);
@@ -55,15 +64,6 @@ export function useShare(config) {
 		};
 			
 	})
-	// #ifdef MP-WEIXIN
-	// 启用分享菜单（分享给好友 + 分享到朋友圈）
-	// wx.showShareMenu({
-	// 	withShareTicket: true,
-	// 	menus: ['shareAppMessage', 'shareTimeline']
-	// });
-	// #endif
-
-	
 	onShareTimeline(() => {
 		console.log('onShareAppMessage called, shareConfig:========333', instance);
 		if (instance.proxy.$shareConfig) {

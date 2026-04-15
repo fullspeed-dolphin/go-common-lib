@@ -65,6 +65,7 @@
 	import {
 		onLoad,
 		onUnload,
+		onShareAppMessage, onShareTimeline
 	} from "@dcloudio/uni-app";
 	import { useShare, buildPath } from "@/composables/useShare.js";
 	const store = useStore();
