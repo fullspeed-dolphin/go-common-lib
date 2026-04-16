@@ -38,7 +38,7 @@
 	import {
 		ref
 	} from "vue";
-	import { onPageScroll, onReachBottom,onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app';
+	import { onPageScroll, onReachBottom } from '@dcloudio/uni-app';
 	import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 	const { mescrollInit, downCallback } = useMescroll(onPageScroll, onReachBottom)
 
@@ -46,10 +46,10 @@
 	import { useShare } from "@/composables/useShare.js";
 
 	// 分享配置
-	useShare({
-		title: '跑币排行榜',
-		path: '/pagesSub/runCoin/coinRanks'
-	});
+	// useShare({
+	// 	title: '跑币排行榜',
+	// 	path: '/pagesSub/runCoin/coinRanks'
+	// });
 
 	const searchTxt = ref("")
 

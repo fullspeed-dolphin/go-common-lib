@@ -67,7 +67,7 @@
 
 <script setup>
 import { ref, computed, nextTick } from "vue";
-import { onLoad, onShow, onPageScroll, onReachBottom } from "@dcloudio/uni-app";
+import { onLoad, onShow, onPageScroll, onReachBottom,onShareAppMessage,onShareTimeline } from "@dcloudio/uni-app";
 import { useStore } from "vuex";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
@@ -79,10 +79,10 @@ import { useShare } from "@/composables/useShare.js";
 const store = useStore();
 
 // 分享配置
-// useShare({
-// 	title: '跑团活动',
-// 	path: '/pages/event'
-// });
+useShare({
+	title: '跑团活动',
+	path: '/pages/event'
+});
 const userInfo = computed(() => store.state.userInfo);
 const myGroupRole = ref('');
 
