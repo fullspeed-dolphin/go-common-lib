@@ -14,15 +14,8 @@ import {
 		useStore
 } from "vuex";
 import request from "@/utils/request.js"
-import { useShare } from "@/composables/useShare.js";
 
 const store = useStore();
-
-// 分享配置
-useShare({
-	title: '角色选择',
-	path: '/pagesMine/toolkit/UserRole'
-});
 
 const options = ref([
 	{label: '我是摄影师', value: ''},

@@ -54,13 +54,13 @@
 import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { onPageScroll, onReachBottom } from '@dcloudio/uni-app';
-import { useShare } from "@/composables/useShare.js";
+// import { useShare } from "@/composables/useShare.js";
 
 // 分享配置
-useShare({
-	title: '我的跑币',
-	path: '/pagesSub/runCoin/myCoin'
-});
+// useShare({
+// 	title: '我的跑币',
+// 	path: '/pagesSub/runCoin/myCoin'
+// });
 
 	import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 	const { mescrollInit, downCallback } = useMescroll(onPageScroll, onReachBottom)

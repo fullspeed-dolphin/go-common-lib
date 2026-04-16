@@ -116,6 +116,7 @@
 		onLoad,
 		onUnload,
 		onPageScroll,
+		onShareAppMessage, onShareTimeline
 	} from "@dcloudio/uni-app";
 	import {
 		useStore

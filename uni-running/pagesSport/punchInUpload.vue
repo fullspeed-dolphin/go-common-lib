@@ -127,7 +127,7 @@
 </template>
 <script setup>
 import { ref, computed, nextTick } from "vue";
-import { onLoad, onUnload } from "@dcloudio/uni-app";
+import { onLoad, onUnload,onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
 import FileUpload from "@/components/common/FileUpload.vue";
 import PickerCell from "@/components/common/PickerCell.vue";
 import UserLogin from "@/components/UserLogin.vue";

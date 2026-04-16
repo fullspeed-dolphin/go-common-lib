@@ -1,5 +1,5 @@
 import { getCurrentInstance } from 'vue';
-
+import { onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app';
 /**
  * 分享功能 Composable
  *
@@ -29,19 +29,64 @@ import { getCurrentInstance } from 'vue';
  * }));
  */
 export function useShare(config) {
+	
 	// #ifdef MP-WEIXIN
 	// 启用分享菜单（分享给好友 + 分享到朋友圈）
-	wx.showShareMenu({
-		withShareTicket: true,
-		menus: ['shareAppMessage', 'shareTimeline']
-	});
+	// wx.showShareMenu({
+	// 	withShareTicket: true,
+	// 	menus: ['shareAppMessage', 'shareTimeline']
+	// });
 	// #endif
 
 	// 获取当前组件实例，设置 $shareConfig 供全局 mixin 读取
 	const instance = getCurrentInstance();
+	console.log('设置分享配置======:', instance);
 	if (instance && instance.proxy) {
 		instance.proxy.$shareConfig = config;
 	}
+	onShareAppMessage(() => {
+		console.log('onShareAppMessage called, shareConfig:========222', instance);
+		if (instance.proxy.$shareConfig) {
+			console.log('onShareAppMessage called, shareConfig22:', instance.proxy);
+			const currentConfig = typeof instance.proxy.$shareConfig === 'function'
+					? instance.proxy.$shareConfig()
+					: instance.proxy.$shareConfig;
+			return {
+				title: currentConfig.title || '全速运动',
+				path: currentConfig.path || '/pages/index',
+				imageUrl: currentConfig.imageUrl || ''
+			};
+		} 
+		return {
+			title: '全速运动',
+			query: '',
+			imageUrl: ''
+		};
+			
+	})
+	onShareTimeline(() => {
+		console.log('onShareAppMessage called, shareConfig:========333', instance);
+		if (instance.proxy.$shareConfig) {
+			const currentConfig = typeof instance.proxy.$shareConfig === 'function'
+				? instance.proxy.$shareConfig()
+				: instance.proxy.$shareConfig;
+			// 从 path 中提取 query
+			const path = currentConfig.path || '';
+			const queryIndex = path.indexOf('?');
+			const query = queryIndex > -1 ? path.substring(queryIndex + 1) : '';
+			return {
+				title: currentConfig.title || '全速运动',
+				query: query,
+				imageUrl: currentConfig.imageUrl || ''
+			};
+		}
+		// 默认分享配置
+		return {
+			title: '全速运动',
+			query: '',
+			imageUrl: ''
+		};
+	})
 }
 
 /**

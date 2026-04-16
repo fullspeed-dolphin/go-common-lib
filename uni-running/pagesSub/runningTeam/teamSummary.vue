@@ -72,7 +72,6 @@
 		onUnload,
 		onShow,
 	} from "@dcloudio/uni-app";
-	import { useShare, buildPath } from "@/composables/useShare.js";
 
 	import {
 		useStore
@@ -96,12 +95,6 @@
 	const rankedMembers = ref([]);
 
 	const userInfo = computed(() => store.state.userInfo);
-
-	// 分享配置
-	useShare(() => ({
-		title: `${detail.value.name || '跑团'}数据汇总`,
-		path: buildPath('/pagesSub/runningTeam/teamSummary', { group_id: routeParams.value.group_id })
-	}));
 
 	const formatKm = (val) => {
 		if (!val) return '0.00';

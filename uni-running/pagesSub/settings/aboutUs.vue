@@ -173,8 +173,15 @@ border: 1rpx solid rgba(0,0,0,0.05);">
 </template>
 <script setup>
 import { ref } from 'vue'
-import { onLoad, onPageScroll } from '@dcloudio/uni-app'
+import { onLoad, onPageScroll, onShareAppMessage,onShareTimeline } from '@dcloudio/uni-app'
+import { useShare } from "@/composables/useShare.js";
 
+
+// 分享配置
+useShare({
+	title: '关于我们-全速运动',
+	path: '/pagesSub/settings/aboutUs'
+});
 const isShowTitle = ref(true);
 let timer = null;
 onPageScroll((e) => {

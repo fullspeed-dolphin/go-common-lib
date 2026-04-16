@@ -5,7 +5,7 @@
 </template>
 <script setup>
 import { ref } from 'vue'
-import { onLoad } from '@dcloudio/uni-app'
+import { onLoad,onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app'
 import { pouchInRule, failUpload, coinRule } from "./assets/rules.js"
 import { useShare, buildPath } from "@/composables/useShare.js"
 

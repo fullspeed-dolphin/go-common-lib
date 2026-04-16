@@ -124,13 +124,6 @@ import {
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 import { useTabAnimation } from "@/composables/useTabAnimation.js";
 import request from "@/utils/request.js";
-import { useShare } from "@/composables/useShare.js";
-
-// 分享配置
-useShare({
-	title: '我的订单',
-	path: '/pagesSub/orderList'
-});
 
 const {
 	mescrollInit,

@@ -33,7 +33,7 @@
 
 <script setup>
 import { ref, computed, nextTick, onMounted } from "vue";
-import { onLoad, onShow } from "@dcloudio/uni-app";
+import { onLoad, onShow,onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
 import { onPageScroll, onReachBottom } from "@dcloudio/uni-app";
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 const { mescrollInit, downCallback, getMescroll } = useMescroll(

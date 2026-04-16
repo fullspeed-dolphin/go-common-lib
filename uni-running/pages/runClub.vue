@@ -187,7 +187,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { onShow, onReachBottom } from '@dcloudio/uni-app';
+import { onShow, onReachBottom,onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app';
 import { useStore } from 'vuex';
 import { useShare } from '@/composables/useShare.js';
 import request from '@/utils/request.js';

@@ -142,7 +142,6 @@ import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import CommonDialog from "@/components/common/CommonDialog.vue";
 import dayjs from "dayjs";
-import { useShare, buildPath } from "@/composables/useShare.js";
 
 const refundDialogRef = ref(null);
 
@@ -178,12 +177,6 @@ const themeGradient = computed(() => {
   return null;
 });
 const headerBg = computed(() => themeGradient.value || themeColor.value);
-
-// 分享配置
-useShare(() => ({
-	title: `我报名成功了！${detail.value.event_info?.name || ''}`,
-	path: buildPath('/pagesSub/orderSuccess', { order_no: routeOrderNo.value })
-}));
 
 // 获取退款有效时间（小时），默认24小时
 const refundValidHour = computed(() => {

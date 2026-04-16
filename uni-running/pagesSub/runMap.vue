@@ -158,6 +158,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import request from "@/utils/request.js";
+import { onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
 import { useShare } from "@/composables/useShare.js";
 
 // 分享配置

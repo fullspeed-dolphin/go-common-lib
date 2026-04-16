@@ -142,7 +142,7 @@
 </template>
 <script setup>
 import { ref, computed } from "vue";
-import { onShow } from "@dcloudio/uni-app";
+import { onShow,onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
 import { useStore } from "vuex";
 import { clearUserInfo } from "@/utils/util.js";
 import tabbar from "@/components/tabBar.vue";

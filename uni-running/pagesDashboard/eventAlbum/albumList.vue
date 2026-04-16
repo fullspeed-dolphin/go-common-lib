@@ -52,10 +52,10 @@
 	import { useShare } from "@/composables/useShare.js";
 
 	// 分享配置
-	useShare({
-		title: '活动相册',
-		path: '/pagesDashboard/eventAlbum/albumList'
-	});
+	// useShare({
+	// 	title: '活动相册',
+	// 	path: '/pagesDashboard/eventAlbum/albumList'
+	// });
 
 	function getCardStyle(item) {
 		const cc = item.color_config

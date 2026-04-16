@@ -19,7 +19,7 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { onLoad } from "@dcloudio/uni-app";
+import { onLoad,onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
 import { useShare, buildPath } from "@/composables/useShare.js";
 import request from "@/utils/request.js";
 

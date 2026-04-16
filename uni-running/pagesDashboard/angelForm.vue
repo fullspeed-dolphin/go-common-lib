@@ -87,9 +87,7 @@
 	import {
 		ref
 	} from "vue";
-	import {
-		onLoad
-	} from "@dcloudio/uni-app";
+	import { onLoad} from "@dcloudio/uni-app";
 	import { useStore } from "vuex";
 	import PickerCell from "@/components/common/PickerCell.vue";
 	import request from "../utils/request";
@@ -99,10 +97,10 @@
 	const store = useStore();
 
 	// 分享配置
-	useShare({
-		title: '全速天使招募',
-		path: '/pagesDashboard/angelForm'
-	});
+	// useShare({
+	// 	title: '全速天使招募',
+	// 	path: '/pagesDashboard/angelForm'
+	// });
 	
 	const selected = ref('wechat') // 默认微信支付
 	const isAgree = ref(false)

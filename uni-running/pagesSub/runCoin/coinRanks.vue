@@ -46,10 +46,10 @@
 	import { useShare } from "@/composables/useShare.js";
 
 	// 分享配置
-	useShare({
-		title: '跑币排行榜',
-		path: '/pagesSub/runCoin/coinRanks'
-	});
+	// useShare({
+	// 	title: '跑币排行榜',
+	// 	path: '/pagesSub/runCoin/coinRanks'
+	// });
 
 	const searchTxt = ref("")
 

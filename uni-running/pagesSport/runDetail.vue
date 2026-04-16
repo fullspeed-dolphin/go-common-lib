@@ -116,7 +116,7 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { onLoad } from "@dcloudio/uni-app";
+import { onLoad,onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
 import * as turf from "@turf/turf";

@@ -75,7 +75,6 @@ import { onPageScroll, onReachBottom } from "@dcloudio/uni-app";
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
 const { mescrollInit, downCallback } = useMescroll(onPageScroll, onReachBottom);
 import MemberDetail from "./memberDetail.vue";
-import { useShare, buildPath } from "@/composables/useShare.js";
 
 const dataList = ref([]);
 const group_id = ref("");
@@ -85,12 +84,6 @@ const searchKeyword = ref('');
 const clubTypeName = computed(() => {
   return detail.value.club_type === 'cycling' ? '车队' : '跑团';
 });
-
-// 分享配置
-useShare(() => ({
-  title: '跑团成员列表',
-  path: buildPath('/pagesSub/runningTeam/teamMemberList', { group_id: group_id.value })
-}));
 
 // 头像颜色池
 const avatarColors = [

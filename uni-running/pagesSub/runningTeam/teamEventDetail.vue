@@ -192,7 +192,7 @@
 
 <script setup>
 import { ref, computed, watch } from "vue";
-import { onLoad, onUnload, onShow } from "@dcloudio/uni-app";
+import { onLoad, onUnload, onShow,onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
 import { useShare, buildPath } from "@/composables/useShare.js";
 import { useStore } from "vuex";
 import PhoneLogin from "@/components/common/PhoneLogin.vue";

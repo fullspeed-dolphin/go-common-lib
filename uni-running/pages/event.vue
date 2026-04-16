@@ -67,7 +67,7 @@
 
 <script setup>
 import { ref, computed, nextTick } from "vue";
-import { onLoad, onShow, onPageScroll, onReachBottom } from "@dcloudio/uni-app";
+import { onLoad, onShow, onPageScroll, onReachBottom,onShareAppMessage,onShareTimeline } from "@dcloudio/uni-app";
 import { useStore } from "vuex";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
