@@ -9,7 +9,7 @@
 				style="width: 84rpx;font-size: 47rpx;font-family: 500;color:#707070;">
 			</view> -->
 		</section>
-		<mescroll-body @init="mescrollInit" @down="downCallback" @up="getList" top="0">
+		<mescroll-body @init="mescrollInit" @down="downCallback" @up="getList" top="0" ref="mescroll">
 			<view class="card-list">
 				<view class="card-item" v-for="item in dataList" :key="item.event_id" :style="getCardStyle(item)" @click="viewDetail(item)">
 					<image class="card-cover"
@@ -40,11 +40,12 @@
 
 <script setup>
 	import {
-		ref
+		ref,
+		nextTick
 	} from "vue";
 	import { onPageScroll, onReachBottom } from '@dcloudio/uni-app';
 	import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
-	const { mescrollInit, downCallback } = useMescroll(onPageScroll, onReachBottom)
+	const { mescrollInit, downCallback,getMescroll } = useMescroll(onPageScroll, onReachBottom)
 
 	const cacheKey = Date.now()
 	import request from "@/utils/request.js";
@@ -90,9 +91,12 @@
 	
 	let mescroll = ref(null);
 	const refreshList = () => {
+		console.log("刷新列表")
 		nextTick(() => {
-			mescroll.value.resetUpScroll(); // 重置列表数据为第一页
-			mescroll.value.scrollTo(0, 0); // 重置列表数据为第一页时,建议把滚动条也重置到顶部,避免无法再次翻页的问题
+			getMescroll().resetUpScroll();
+			getMescroll().scrollTo(0, 0);
+			// mescroll.value?.resetUpScroll(); // 重置列表数据为第一页
+			// mescroll.value?.scrollTo(0, 0); // 重置列表数据为第一页时,建议把滚动条也重置到顶部,避免无法再次翻页的问题
 		});
 	};
 
