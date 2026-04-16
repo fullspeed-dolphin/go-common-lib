@@ -162,19 +162,17 @@
 
 		// console.log('scrollTop====>',  distanceToBottom, scrollHeight , scrollTop , screenHeight)
 
-		const itemHeight = displayType.value === 'photo' ? 180 : 200; // 卡片高度
+		const itemHeight = displayType.value === 'photo' ? uni.upx2px(180) : uni.upx2px(200); // 卡片高度，使用固定 rpx 高度转换为 px
 		const lanes = displayType.value === 'photo' ? 4 : 2; // 列数
 
 		if (distanceToBottom <= itemHeight * 5 && !isLoadingMore.value) {
 			loadMoreData()
 		}
 
-		// 计算滚动到第几张图片位置, 图片高度 90px, 视频高度 100px
-		const photoIndex = Math.floor(scrollTop / (itemHeight / 2)) * lanes + (lanes * 2);
+		// 计算滚动到第几张图片位置
+		const photoIndex = Math.floor(scrollTop / itemHeight) * lanes;
 		currentImageIndex.value = Math.min(photoIndex, album_total.value);
 	}, 120)
-
-
 	function virtualListChange(vList) {
 		console.log('vList=======>', vList)
 		virtualList.value = vList;
@@ -207,6 +205,7 @@
 	}
 
 	function handleImg(link, index) {
+		console.log('handleImg=====>', link, index)
 		const allUrls = store.state.album_all_urls?.photo || []
 		let urls = allUrls
 		let idx = allUrls.indexOf(link)

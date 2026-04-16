@@ -40,14 +40,14 @@ export function useShare(config) {
 
 	// 获取当前组件实例，设置 $shareConfig 供全局 mixin 读取
 	const instance = getCurrentInstance();
-	console.log('设置分享配置======:', instance);
+	// console.log('设置分享配置======:', instance);
 	if (instance && instance.proxy) {
 		instance.proxy.$shareConfig = config;
 	}
 	onShareAppMessage(() => {
-		console.log('onShareAppMessage called, shareConfig:========222', instance);
+		// console.log('onShareAppMessage called, shareConfig:========222', instance);
 		if (instance.proxy.$shareConfig) {
-			console.log('onShareAppMessage called, shareConfig22:', instance.proxy);
+			// console.log('onShareAppMessage called, shareConfig22:', instance.proxy);
 			const currentConfig = typeof instance.proxy.$shareConfig === 'function'
 					? instance.proxy.$shareConfig()
 					: instance.proxy.$shareConfig;
@@ -65,7 +65,7 @@ export function useShare(config) {
 			
 	})
 	onShareTimeline(() => {
-		console.log('onShareAppMessage called, shareConfig:========333', instance);
+		// console.log('onShareAppMessage called, shareConfig:========333', instance);
 		if (instance.proxy.$shareConfig) {
 			const currentConfig = typeof instance.proxy.$shareConfig === 'function'
 				? instance.proxy.$shareConfig()
