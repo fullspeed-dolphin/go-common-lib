@@ -19,11 +19,11 @@
             formatIdCard(item.cert_number || "")
           }}</view>
 					<view class="id-card-number-separator">|</view>
-					<view class="id-card-number-type"> 成人 </view>
+					<view class="id-card-number-type">{{ isAdult(item.cert_number) ? "成人" : "儿童" }}</view>
 				</view>
 				<view class="card-item-actions">
 					<view class="card-item-actions-item" @click.stop="handleSetAsOwner(item)">
-						<up-checkbox shape="circle" :activeColor="themeColor" :checked="item.is_self == 1" size="14"></up-checkbox>
+						<up-checkbox @change="handleCheckboxChange($event, item)" usedAlone v-model:checked="item.is_self" shape="circle" :activeColor="themeColor"  size="14"  />
 						设为本人
 					</view>
 					<view class="card-item-actions-item-group">
@@ -62,6 +62,14 @@
 	import {
 		showRequestError
 	} from "./utils.js";
+	import { useShare } from "@/composables/useShare.js";
+	import { isAdult } from './utils.js'
+
+	// 分享配置
+	useShare({
+		title: '我的报名卡',
+		path: '/pagesSub/registrationCard/list'
+	});
 
 	// 响应式数据
 	const registrationCardList = ref([]);
@@ -115,6 +123,35 @@
 			await request.post("/booking-api/registration/updateSignerInfo", {
 				id: id,
 				is_self: item.is_self == 1 ? 0 : 1,
+			});
+
+			uni.showToast({
+				title: "设置成功",
+				icon: "success"
+			});
+			// 刷新列表
+			getRegistrationCardList();
+		} catch (error) {
+			console.error("设置失败:", error);
+			showRequestError(error, "设置失败");
+		}
+	};
+
+	// checkbox 状态变化时设为本人
+	const handleCheckboxChange = async (isChecked, item) => {
+		try {
+			const id = item.id;
+			if (!id) {
+				uni.showToast({
+					title: "数据异常",
+					icon: "none"
+				});
+				return;
+			}
+
+			await request.post("/booking-api/registration/updateSignerInfo", {
+				id: id,
+				is_self: isChecked ? 1 : 0,
 			});
 
 			uni.showToast({
