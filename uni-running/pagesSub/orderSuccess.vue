@@ -138,7 +138,7 @@
 
 <script setup>
 import { ref, onUnmounted, watch, computed } from "vue";
-import { onLoad } from "@dcloudio/uni-app";
+import { onLoad, onShow } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import CommonDialog from "@/components/common/CommonDialog.vue";
 import dayjs from "dayjs";
@@ -288,28 +288,40 @@ onLoad((options) => {
   if (order_no.value) {
     getOrderDetail();
   } else {
-    // 兼容旧逻辑：从存储中获取
+    // 兼容旧逻辑：没有 order_no 时从存储中获取
     const storedDetail = uni.getStorageSync("orderDetail");
     if (storedDetail) {
       detail.value = storedDetail;
 
       // 兼容新旧数据结构
+      let infoList = [];
       if (
         storedDetail.sign_info_list &&
         Array.isArray(storedDetail.sign_info_list)
       ) {
-        detail.value.sign_info_list = storedDetail.sign_info_list;
+        infoList = storedDetail.sign_info_list;
       } else if (storedDetail.sign_info) {
-        detail.value.sign_info_list = [storedDetail.sign_info];
-      } else {
-        detail.value.sign_info_list = [];
+        infoList = [storedDetail.sign_info];
       }
+      // 剔除证书 / 号码布 URL，避免显示过期快照（会在 onShow 重新拉接口时覆盖）
+      detail.value.sign_info_list = infoList.map((info) => ({
+        ...info,
+        certificate_url: "",
+        bib_url: "",
+      }));
 
       // 如果存储的数据中有事件时间，启动倒计时
       if (storedDetail.event_info?.event_time) {
         startCountdown();
       }
     }
+  }
+});
+
+// 每次页面显示（包括从证书预览/号码布返回）都刷新一次，保证 certificate_url 最新
+onShow(() => {
+  if (order_no.value) {
+    getOrderDetail();
   }
 });
 
@@ -427,9 +439,12 @@ const viewCertificate = (signInfo) => {
   if (!signInfo?.certificate_url) {
     return uni.$u.toast("暂无完赛证书");
   }
+  // 拼时间戳禁用图片缓存：证书内容可能更新但 URL 不变，强制每次拉新
+  const sep = signInfo.certificate_url.includes('?') ? '&' : '?';
+  const url = `${signInfo.certificate_url}${sep}v=${Date.now()}`;
   uni.previewImage({
-    urls: [signInfo.certificate_url],
-    current: signInfo.certificate_url,
+    urls: [url],
+    current: url,
   });
 };
 

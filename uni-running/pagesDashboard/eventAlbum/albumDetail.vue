@@ -2,8 +2,10 @@
 <template>
 	<view class="albumDetail-page">
 		<u-navbar autoBack placeholder :title="album_info?.name || '详情'" />
-		<zPaging ref="paging" use-virtual-list cell-height-mode="fixed" :virtual-list-col="4"
-			:inner-list-style="{'display':'flex','flex-wrap':'wrap'}" fixed-cell-height="180rpx" :default-page-size="60"
+		<zPaging ref="paging" use-virtual-list cell-height-mode="fixed"
+			:virtual-list-col="displayType === 'photo' ? 4 : 2"
+			:fixed-cell-height="displayType === 'photo' ? '180rpx' : '200rpx'"
+			:inner-list-style="{'display':'flex','flex-wrap':'wrap'}" :default-page-size="60"
 			:force-close-inner-list="true" @virtualListChange="e => virtualList = e" @query="queryList" @scroll="onListScroll">
 
 			<AlbumInfo :event-id="currentEvent.event_id" />
@@ -232,11 +234,16 @@
 		// 用微信原生预览器，支持视频左右滑切换、自带"保存到相册"菜单
 		// 只读 video 字段，避免竞态下拿到照片的全量 URL
 		const allUrls = store.state.album_all_urls?.video || []
-		const urls = allUrls.length > 0 ? allUrls : store.state.album_data
-		if (!urls || urls.length === 0) return
+		// 不能用 Math.max(0, -1) 兜底 indexOf：那样 idx 永远是 0，预览窗口永远切在前 50 个
+		let urls = allUrls
+		let idx = allUrls.indexOf(link)
+		if (idx === -1) {
+			urls = store.state.album_data
+			idx = urls.indexOf(link)
+		}
+		if (idx === -1 || !urls || urls.length === 0) return
 		// wx.previewMedia 限制 sources 最多 50 个，以当前视频为中心截一个 50 大小的窗口
 		const MAX = 50
-		const idx = Math.max(0, urls.indexOf(link))
 		const start = Math.min(
 			Math.max(0, idx - Math.floor(MAX / 2)),
 			Math.max(0, urls.length - MAX)
