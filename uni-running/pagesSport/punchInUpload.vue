@@ -149,7 +149,7 @@
 </template>
 <script setup>
 import { ref, computed, nextTick } from "vue";
-import { onLoad, onUnload,onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
+import { onLoad, onUnload, onShow, onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
 import FileUpload from "@/components/common/FileUpload.vue";
 import PickerCell from "@/components/common/PickerCell.vue";
 import UserLogin from "@/components/UserLogin.vue";
@@ -175,6 +175,46 @@ const activeTab = ref('screenshot');
 
 function switchToDeviceTab() {
   activeTab.value = 'device';
+  if (!deviceTabInited.value) {
+    fetchDeviceData();
+  }
+}
+
+// 获取设备绑定状态和今日记录
+async function fetchDeviceData() {
+  if (!userInfo.value.id) {
+    loginCallBack.value = () => {
+      activeTab.value = 'device';
+      fetchDeviceData();
+    };
+    nextTick(() => {
+      refUserLogin.value.open();
+    });
+    return;
+  }
+
+  deviceLoading.value = true;
+  try {
+    // 1. 检查是否绑定了设备
+    const bindRes = await request.get("/sport-api/api/platform/bindings", {}, { showError: false });
+    const bindings = (bindRes?.bindings || []).filter((b) => b.platform !== 'honor');
+    hasDeviceBinding.value = bindings.length > 0;
+
+    if (!hasDeviceBinding.value) {
+      deviceTabInited.value = true;
+      deviceLoading.value = false;
+      return;
+    }
+
+    // 2. 获取今日可打卡的设备记录
+    const records = await request.get("/sport-api/api/checkin/device-records", {}, { showError: false });
+    deviceRecords.value = records || [];
+  } catch (error) {
+    console.error("获取设备数据失败:", error);
+    uni.showToast({ title: "获取设备数据失败", icon: "none" });
+  }
+  deviceTabInited.value = true;
+  deviceLoading.value = false;
 }
 
 const refUserLogin = ref(null);
@@ -198,6 +238,14 @@ const refSharePoster = ref(null);
 const routerParams = ref({});
 const options_events_screenshot = ref([]);
 const options_events_device = ref([]);
+
+// ===== 设备打卡状态 =====
+const deviceRecords = ref([]);
+const deviceLoading = ref(false);
+const hasDeviceBinding = ref(false);
+const deviceTabInited = ref(false);
+const deviceCheckinLoading = ref({});
+
 const myEvents = ref([]);
 function getMyEvents() {
 	if (!userInfo.value.id) {
@@ -291,6 +339,14 @@ const deleteUploadedImage = async (imageUrl) => {
 onLoad((options) => {
   routerParams.value = options;
   getMyEvents();
+});
+
+onShow(() => {
+  // 从设备绑定页返回后，重新拉取设备数据
+  if (activeTab.value === 'device' && deviceTabInited.value) {
+    deviceTabInited.value = false;
+    fetchDeviceData();
+  }
 });
 
 // 页面卸载时检查是否需要删除图片
