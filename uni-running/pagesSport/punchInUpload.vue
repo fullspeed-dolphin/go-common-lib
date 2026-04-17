@@ -30,7 +30,7 @@
         <view class="u-mt-20" style="color: #6A7282;">记录每一次汗水，赢取跑币奖励</view>
 
         <div class="u-flex-row u-flex-wrap">
-          <view class="event-item" :class="{ 'active': item.checked }" :style="item.checked && item.gradient ? { background: `linear-gradient(90deg, ${item.gradient[0]}, ${item.gradient[1]})`, borderColor: item.gradient[0], color: '#fff' } : item.gradient ? { borderColor: item.gradient[0], color: item.gradient[0] } : {}" @click="selectEvent(item)" v-for="(item,index) in options_events" :key="index">
+          <view class="event-item" :class="{ 'active': item.checked }" :style="item.checked && item.gradient ? { background: `linear-gradient(90deg, ${item.gradient[0]}, ${item.gradient[1]})`, borderColor: item.gradient[0], color: '#fff' } : item.gradient ? { borderColor: item.gradient[0], color: item.gradient[0] } : {}" @click="selectEvent(item)" v-for="(item,index) in options_events_screenshot" :key="index">
             {{item.label}}
           </view>
         </div>
@@ -196,7 +196,8 @@ useShare({
 const refSharePoster = ref(null);
 
 const routerParams = ref({});
-const options_events = ref([]);
+const options_events_screenshot = ref([]);
+const options_events_device = ref([]);
 const myEvents = ref([]);
 function getMyEvents() {
 	if (!userInfo.value.id) {
@@ -215,7 +216,7 @@ function getMyEvents() {
       return now.isAfter(dayjs(i.start_time)) && now.isBefore(dayjs(i.end_time));
     });
 
-    options_events.value = [
+    const buildEventList = () => [
       ...activeEvents.map((i) => ({
         label: i.event_name,
         value: i.event_id,
@@ -229,7 +230,8 @@ function getMyEvents() {
       },
     ];
 
-    console.log("options_events", options_events.value);
+    options_events_screenshot.value = buildEventList();
+    options_events_device.value = buildEventList();
   });
 }
 
@@ -238,7 +240,7 @@ function selectEvent(item) {
 }
 
 const hasCheckedEvent = computed(() =>
-  options_events.value.some((i) => i.checked)
+  options_events_screenshot.value.some((i) => i.checked)
 );
 
 function checkBeforeUpload() {
@@ -404,7 +406,7 @@ function confirmToCheck() {
       "/ocr-api/checkin",
       {
         token: verifyToken,
-        event_ids: options_events.value
+        event_ids: options_events_screenshot.value
           .filter((i) => i.checked)
           .map((i) => i.value),
       },
