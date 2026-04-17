@@ -133,6 +133,71 @@
     </view>
     <!-- ===== /截图打卡 Tab ===== -->
 
+    <!-- ===== 设备打卡 Tab ===== -->
+    <view v-show="activeTab === 'device'">
+      <!-- 活动标签选择区 -->
+      <section class="u-pl-30 u-pt-40">
+        <div class="u-flex-row u-flex-wrap">
+          <view class="event-item" :class="{ 'active': item.checked }"
+            :style="item.checked && item.gradient ? { background: `linear-gradient(90deg, ${item.gradient[0]}, ${item.gradient[1]})`, borderColor: item.gradient[0], color: '#fff' } : item.gradient ? { borderColor: item.gradient[0], color: item.gradient[0] } : {}"
+            @click="item.checked = !item.checked" v-for="(item,index) in options_events_device" :key="index">
+            {{item.label}}
+          </view>
+        </div>
+      </section>
+
+      <!-- 加载中 -->
+      <view v-if="deviceLoading" class="device-empty flex-col-center" style="margin-top: 200rpx;">
+        <up-loading-icon mode="circle" color="#FF8C00"></up-loading-icon>
+        <view style="color: #99A1AF; margin-top: 20rpx; font-size: 28rpx;">加载中...</view>
+      </view>
+
+      <!-- 未绑定设备 -->
+      <view v-else-if="!hasDeviceBinding" class="device-empty flex-col-center">
+        <view class="iconfont icon-device-empty" style="font-size: 120rpx; color: #D1D5DC; margin-bottom: 30rpx;"></view>
+        <view style="font-size: 32rpx; font-weight: 600; color: #1A1A1A; margin-bottom: 16rpx;">还没有绑定运动设备</view>
+        <view style="font-size: 26rpx; color: #99A1AF; margin-bottom: 50rpx;">绑定后可自动同步运动数据</view>
+        <u-button type="primary" color="#FF8C00" shape="circle" custom-style="width: 320rpx;" @click="$u.route('/pagesSub/device/deviceList')">去绑定设备</u-button>
+      </view>
+
+      <!-- 已绑定但今日无记录 -->
+      <view v-else-if="deviceRecords.length === 0" class="device-empty flex-col-center">
+        <view style="font-size: 120rpx; margin-bottom: 30rpx;">🏃</view>
+        <view style="font-size: 32rpx; font-weight: 600; color: #1A1A1A; margin-bottom: 16rpx;">今日暂无运动记录</view>
+        <view style="font-size: 26rpx; color: #99A1AF;">去运动吧！</view>
+      </view>
+
+      <!-- 设备记录列表 -->
+      <view v-else class="device-list">
+        <view class="device-card" :class="{ 'device-card--disabled': item.already_checked_in }" v-for="item in deviceRecords" :key="item.record_id">
+          <view class="device-card__header">
+            <view class="device-card__type">
+              <text>{{ item.activity_name || '跑步' }}</text>
+            </view>
+            <view class="device-card__platform">{{ item.platform_display }}</view>
+          </view>
+          <view class="device-card__distance">{{ item.km }} km</view>
+          <view class="device-card__meta">
+            <view class="device-card__meta-item">
+              <text class="device-card__meta-icon">⏱</text>
+              <text>{{ item.time }}</text>
+            </view>
+            <view class="device-card__meta-item">
+              <text class="device-card__meta-icon">⚡</text>
+              <text>{{ item.speed }}</text>
+            </view>
+          </view>
+          <view class="device-card__time">📅 {{ item.record_time }}</view>
+          <u-button v-if="item.already_checked_in" type="info" shape="circle" disabled custom-style="margin-top: 24rpx;">
+            ✅ 已打卡
+          </u-button>
+          <u-button v-else type="primary" color="#FF8C00" shape="circle" :loading="deviceCheckinLoading[item.record_id]" :disabled="deviceCheckinLoading[item.record_id]" custom-style="margin-top: 24rpx;" @click="doDeviceCheckin(item)">
+            打 卡
+          </u-button>
+        </view>
+      </view>
+    </view>
+
     <SharePoster ref="refSharePoster" @close="onPosterClose" />
 
     <!-- 固定联系客服按钮 -->
@@ -786,5 +851,77 @@ $c3: #9CA3AF;
   text-align: center;
   color: rgba(255, 140, 0, 0.75);
   font-size: 28rpx;
+}
+
+.device-empty {
+  margin-top: 200rpx;
+  padding: 0 60rpx;
+}
+
+.device-list {
+  padding: 30rpx;
+}
+
+.device-card {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 36rpx;
+  margin-bottom: 24rpx;
+  border: 2rpx solid #F3F4F6;
+
+  &--disabled {
+    opacity: 0.55;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20rpx;
+  }
+
+  &__type {
+    font-size: 30rpx;
+    font-weight: 600;
+    color: #1A1A1A;
+  }
+
+  &__platform {
+    font-size: 24rpx;
+    color: #99A1AF;
+    background: #F3F4F6;
+    padding: 6rpx 16rpx;
+    border-radius: 8rpx;
+  }
+
+  &__distance {
+    font-size: 56rpx;
+    font-weight: 800;
+    color: #1A1A1A;
+    margin-bottom: 16rpx;
+  }
+
+  &__meta {
+    display: flex;
+    gap: 40rpx;
+    margin-bottom: 12rpx;
+    font-size: 28rpx;
+    color: #6A7282;
+  }
+
+  &__meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8rpx;
+  }
+
+  &__meta-icon {
+    font-size: 28rpx;
+  }
+
+  &__time {
+    font-size: 24rpx;
+    color: #99A1AF;
+  }
 }
 </style>
