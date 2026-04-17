@@ -1,10 +1,11 @@
 <template>
-	<u-navbar :title="detail.name || '活动详情'" bgColor="#fff" placeholder></u-navbar>
+	<u-navbar :title="null" bgColor="transparent"></u-navbar>
 	
 	<view class="u-pb-30" style="background: #f5f5f5" :class="{
+      isFixedNavbar: isFixedNavbar,
       isLoadedPage: isLoadedPage,
     }">
-		<view class="event-status flex-center" v-if="detail.status === 'ACT'" :style="themeColor !== '#43A047' ? { background: themeColor } : {}">
+		<view class="event-status flex-center" v-if="detail.status === 'ACT'">
 			活动进行中
 		</view>
 
@@ -14,14 +15,14 @@
 		</section>
 
 		<view class="container">
-			<section class="section-event panel bgf" style="position: relative; z-index: 10;">
-				<view class="h2" :style="themeColor !== '#43A047' ? { color: themeColor } : {}">
+			<section class="section-event panel bgf" style="position: relative; z-index: 10">
+				<view class="h2">
 					<view class="ellipsis2">
 						{{ detail.name }}
 					</view>
 				</view>
 
-				<view class="panel-item" :style="themePanelItemStyle">
+				<view class="panel-item">
 					<view class="label">
 						<image class="icon" :src="staticBaseUrl + '/images/icon-event-time@2x.png'" mode="aspectFill"></image>
 						<text>报名时间：</text>
@@ -29,16 +30,16 @@
 					<view class="value">{{ detail.registration_time }}</view>
 				</view>
 
-				<view class="panel-item" :style="themePanelItemStyle">
+				<view class="panel-item">
 					<view class="label">
 						<image class="icon" :src="staticBaseUrl + '/images/icon-event-date@2x.png'" mode="aspectFill"></image>
-						<text>{{ isCourseEvent ? '课程开始时间：' : '活动开始时间：' }}</text>
+						<text>活动开始时间：</text>
 					</view>
 					<view class="value">{{
             dayjs(detail.event_time).format("YYYY-MM-DD HH:mm")
           }}</view>
 				</view>
-				<view class="panel-item" :style="themePanelItemStyle">
+				<view class="panel-item">
 					<view class="label">
 						<image class="icon" :src="staticBaseUrl + '/images/icon-event-location@2x.png'" mode="aspectFill"></image>
 						<text>活动地点：</text>
@@ -48,49 +49,24 @@
           }}</view>
 				</view>
 
-				<view class="panel-item" :style="themePanelItemStyle">
+				<view class="cell flex-row1 u-pl-20">
 					<view class="label">
 						<image class="icon" :src="staticBaseUrl + '/images/icon-event-item@2x.png'" mode="aspectFill"></image>
 						<text>活动项目：</text>
 					</view>
 					<view class="flex-row flex-wrap">
-						<view class="event-item flex-center" v-for="(item, index) in detail.eventItems" :key="index"
-							:style="themeGradient ? { background: themeGradient } : {}">
+						<view class="event-item flex-center" v-for="(item, index) in detail.eventItems" :key="index">
 							{{ item }}
 						</view>
-					</view>
-				</view>
-
-				<view class="panel-item" :style="themePanelItemStyle">
-					<view class="label">
-						<image class="icon" :src="staticBaseUrl + '/images/icon-event-item@2x.png'" mode="aspectFill"></image>
-						<text>活动性质：</text>
-					</view>
-					<view class="flex-row flex-wrap">
-						<template v-if="!isFscEvent">
-							<view class="event-item flex-center tag-self">自营活动</view>
-							<!-- <view class="event-item flex-center" :class="isPaidEvent ? 'tag-paid' : 'tag-free'">
-								{{ isPaidEvent ? '付费' : '免费' }}
-							</view> -->
-						</template>
-						<template v-else>
-							<view class="event-item flex-center tag-fsc">跑团活动</view>
-							<view class="event-item flex-center tag-visibility" v-if="detail.visibility">
-								{{ visibilityMap[detail.visibility] || detail.visibility }}
-							</view>
-							<view class="event-item flex-center" :class="Number(detail.is_free) === 1 ? 'tag-free' : 'tag-paid'">
-								{{ Number(detail.is_free) === 1 ? '免费' : '付费' }}
-							</view>
-						</template>
 					</view>
 				</view>
 
 				<view class="cell flex-start u-pl-20 customer-phone">
 					<view class="label">联系电话：</view>
 					<view class="value flex-start">
-						<view :style="{ color: themeColor, marginRight: '10rpx' }" @click="callPhone(detail.contact)">{{detail.contact}}</view>
+						<view style="color: #43a047; margin-right: 10rpx" @click="callPhone(detail.contact)">{{detail.contact}}</view>
 					</view>
-					<u-button type="primary" :color="themeColor" shape="circle" size="mini" @click="copyText(detail.contact)"
+					<u-button type="primary" color="#43A047" shape="circle" size="mini" @click="copyText(detail.contact)"
 						class="copy-btn"
 						customStyle="min-width: 76rpx; width: 76rpx;height: 34rpx; padding: 0; margin-left: 20rpx; font-weight: bold;font-size: 24rpx;color: #FFFFFF;">
 						复制
@@ -110,23 +86,22 @@
 				  {{isSignUp ? '取消' : ''}}报名截止：2025.09.30 9:00
 			  </view> -->
 				<view class="u-border-top1" :class="{ isSignUp: isSignUp }">
-					<u-button type="primary" :color="themeBtnColor" shape="circle" customStyle="height: 80rpx;" @click="routeTo()">
-						<block v-if="Number(detail.is_free) === 1">进入活动</block>
-						<block v-else-if="detail.status === 'ACT'">{{
-              isSignUp ? "取消报名" : (isCourseEvent ? "立即报班" : "活动报名")
+					<u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 80rpx;" @click="routeTo()">
+						<block v-if="detail.status === 'ACT'">{{
+              isSignUp ? "取消报名" : "活动报名"
             }}</block>
-						<block v-else-if="detail.status === 'PND'">活动暂未开始</block>
-						<block v-else-if="detail.status === 'EXP'">查看报名详情</block>
+						<block v-if="detail.status === 'PND'">活动暂未开始</block>
+						<block v-if="detail.status === 'EXP'">查看报名详情</block>
 					</u-button>
 				</view>
 			</view>
 		</view>
 
-		<button class="share-btn flex-center" :class="{ active: isScroll }" :style="themeGradient ? { background: themeGradient, borderColor: 'transparent' } : {}" open-type="share">
+		<button class="share-btn flex-center" :class="{ active: isScroll }" open-type="share">
 			<u-icon name="share" color="#fff" size="18"></u-icon>
 		</button>
 
-		<UserLogin ref="refUserLogin" @success="onLoginSuccess" />
+		<PhoneLogin ref="refPhoneLogin" />
 	</view>
 </template>
 <script setup>
@@ -146,7 +121,7 @@
 	import {
 		useStore
 	} from "vuex";
-	import UserLogin from "@/components/UserLogin.vue";
+	import PhoneLogin from "@/components/common/PhoneLogin.vue";
 	import dayjs from "dayjs";
 	import request from "@/utils/request.js"
 	import { useShare, buildPath } from "@/composables/useShare.js";
@@ -154,100 +129,26 @@
 	const store = useStore();
 
 	// 模板引用
-	const refUserLogin = ref(null);
-
-	// 待执行的操作（登录成功后继续执行）
-	const pendingAction = ref(null);
-
-	// 登录成功回调
-	const onLoginSuccess = () => {
-		if (pendingAction.value) {
-			pendingAction.value();
-			pendingAction.value = null;
-		}
-	};
+	const refPhoneLogin = ref(null);
 
 	// 响应式数据
 	const isScroll = ref(false);
 	const isSignUp = ref(false);
 	const detail = ref({});
+	const isFixedNavbar = ref(true);
 	const isLoadedPage = ref(false);
 	const routerParams = ref({});
-	// const isPaidEvent = ref(false); // 普通活动是否为付费活动
-
-	// 动态主题色（基于 color_config）
-	const themeColor = computed(() => detail.value?.color_config?.solid || '#43A047');
-	const themeGradient = computed(() => {
-		const g = detail.value?.color_config?.gradient;
-		if (g?.length === 2) return `linear-gradient(90deg, ${g[0]}, ${g[1]})`;
-		return null;
-	});
-	const themeBtnColor = computed(() => {
-		const g = detail.value?.color_config?.gradient;
-		return g?.length === 2 ? g[0] : '#FF8C00';
-	});
-	// 信息卡片浅色背景（主题色 10% 透明度）
-	const themePanelItemStyle = computed(() => {
-		if (!detail.value?.color_config?.solid) return {};
-		const c = detail.value.color_config.solid;
-		// hex to rgba with 0.08 opacity
-		const r = parseInt(c.slice(1, 3), 16);
-		const g = parseInt(c.slice(3, 5), 16);
-		const b = parseInt(c.slice(5, 7), 16);
-		return { background: `rgba(${r}, ${g}, ${b}, 0.08)` };
-	});
 
 	// 计算属性
 	const userInfo = computed(() => store.state.userInfo);
 
-	// 特定活动ID硬编码：课程类活动
-	const COURSE_EVENT_ID = '01KFDCDMWB682FDW00A2W7C0AK';
-	const isCourseEvent = computed(() => routerParams.value.id === COURSE_EVENT_ID);
-
-	// 判断是否为跑团活动（fsc_event）
-	const isFscEvent = computed(() => !!routerParams.value.fsc_id);
-
-	// visibility 映射
-	const visibilityMap = {
-		private: '全速俱乐部',
-		rg_member_only: '跑团内部可见',
-		public: '全平台可见'
-	};
-
 	// 定时器
 	let timer = null;
-	// 轮询活动状态（30秒间隔）
-	let statusTimer = null;
-	const pollStatus = () => {
-		const id = routerParams.value.id;
-		if (!id) return;
-		const url = routerParams.value.fsc_id
-			? `/event-api/fsc_events/${id}/status`
-			: `/event-api/api/v1/events/${id}/status`;
-		request.get(url).then((res) => {
-			if (res?.status && res.status !== detail.value.status) {
-				detail.value.status = res.status;
-			}
-		}).catch(() => {});
-	};
-	const startStatusPolling = () => {
-		stopStatusPolling();
-		statusTimer = setInterval(pollStatus, 30000);
-	};
-	const stopStatusPolling = () => {
-		if (statusTimer) {
-			clearInterval(statusTimer);
-			statusTimer = null;
-		}
-	};
 
 	// 分享配置
 	useShare(() => ({
 		title: detail.value.name || '活动详情',
-		path: buildPath('/pagesSub/eventDetail', {
-			id: routerParams.value.id,
-			fsc_id: routerParams.value.fsc_id
-		}),
+		path: buildPath('/pagesSub/eventDetail', { id: routerParams.value.id }),
 		imageUrl: detail.value.background_image_url || ''
 	}));
 
@@ -255,23 +156,30 @@
 	onLoad((options) => {
 		routerParams.value = options;
 		getDetail();
-		startStatusPolling();
 	});
 
 	// 页面卸载
 	onUnload(() => {
-		stopStatusPolling();
 		isLoadedPage.value = false;
 		uni.removeStorageSync("eventDetail");
 	});
 	
+	const navBarBg = ref('transparent');
 	onPageScroll((e) => {
+		isFixedNavbar.value = parseInt(e.scrollTop) < 30;
+
 		isScroll.value = true;
 
 		clearTimeout(timer);
 		timer = setTimeout(() => {
 			isScroll.value = false;
 		}, 100);
+
+		if (e.scrollTop  >= 5) {
+		  navBarBg.value = "#ffffff";
+		} else {
+		  navBarBg.value = 'transparent';
+		}
 	});
 
 	// 方法定义
@@ -284,18 +192,11 @@
 		uni.showLoading({
 			mask: true,
 		});
-		let url = routerParams.value.fsc_id ? '/event-api/fsc_events/' : '/event-api/api/v1/events/';
-		request.get(`${url}${routerParams.value.id}`)
+		request.get(`/event-api/api/v1/events/${routerParams.value.id}`)
 			.then((res) => {
 				res.text = `<img src="${res.long_image_url}?x-oss-process=image/resize,w_500" style="max-width:100%;" />`;
 				res.eventItems = res.event_projects.split("、");
 
-				try {
-					const list = JSON.parse(res.registration_time)
-					res.registration_time = `${dayjs(list[0]).format('YYYY-MM-DD HH:mm')} 至 ${dayjs(list[1]).format('YYYY-MM-DD HH:mm').slice(5)}`
-				} catch (e) {
-					console.error(e)
-				}
 				// test
 				// res.status = "ACT";
 				console.log("res", res);
@@ -303,63 +204,12 @@
 				detail.value = res;
 
 				isLoadedPage.value = true;
-
-				// 普通活动：通过 /user/price 接口判断是否付费
-				// if (!routerParams.value.fsc_id) {
-				// 	checkEventPrice();
-				// }
-			})
-			.catch((err) => {
-				// 未登录时弹出登录框，登录成功后重新获取数据
-				if (err?.code === 401) {
-					pendingAction.value = () => getDetail();
-					refUserLogin.value.open();
-				}
 			});
 	};
 
-	// 检查普通活动是否付费：遍历 tickets，任一 price != 0 即为付费
-	// const checkEventPrice = () => {
-	// 	request.post('/booking-api/user/price', {
-	// 		event_id: routerParams.value.id
-	// 	})
-	// 		.then((res) => {
-	// 			const tickets = res?.tickets;
-	// 			if (!tickets) {
-	// 				isPaidEvent.value = false;
-	// 				return;
-	// 			}
-	// 			isPaidEvent.value = tickets.some(ticket =>
-	// 				Object.values(ticket?.price || {}).some(pkg => {
-	// 					const p = typeof pkg === 'object' ? pkg.price : pkg;
-	// 					return p != 0;
-	// 				})
-	// 			);
-	// 		})
-	// 		.catch(() => {
-	// 			isPaidEvent.value = false;
-	// 		});
-	// };
-
 	const routeTo = () => {
 		if (!userInfo.value.id) {
-			pendingAction.value = () => routeTo();
-			return refUserLogin.value.open();
-		}
-
-		// 免费活动跳转到活动详情页（带 token）
-		if (Number(detail.value.is_free) === 1) {
-			if (detail.value.event_detail_url) {
-				const token = uni.getStorageSync("token");
-				const separator = detail.value.event_detail_url.includes('?') ? '&' : '?';
-				const url = `${detail.value.event_detail_url}${separator}token=${token}`;
-				uni.$u.route(
-					`pagesSub/settings/webView?link=${encodeURIComponent(url)}`
-				);
-			} else {
-				uni.$u.toast("活动详情链接不存在");
-			}
-			return;
+			return refPhoneLogin.value.open();
 		}
 
 		if (detail.value.status === "EXP" && !!detail.value.event_detail_url) {
@@ -367,10 +217,6 @@
 				`pagesSub/settings/webView?link=${detail.value.event_detail_url}`
 			);
 			return;
-		}
-
-		if (detail.value.status === "PND") {
-			return uni.$u.toast("报名时间未到\n感谢你的关注");
 		}
 
 		if (detail.value.status !== "ACT") {
@@ -440,32 +286,11 @@
 
 	.event-item {
 		color: #fff;
-		background: #FF8C00;
+		background: #f66761;
 		padding: 18rpx 26rpx;
 		margin: 20rpx 20rpx 0rpx 0;
 		border-radius: 16rpx;
 		font-size: 32rpx;
-
-		// 活动性质 tag 颜色
-		&.tag-self {
-			background: #3b82f6; // 自营活动 - 蓝色
-		}
-
-		&.tag-fsc {
-			background: #22c55e; // 跑团活动 - 绿色
-		}
-
-		&.tag-visibility {
-			background: #f59e0b; // visibility - 橙色
-		}
-
-		&.tag-free {
-			background: #10b981; // 免费 - 翠绿色
-		}
-
-		&.tag-paid {
-			background: #ef4444; // 付费 - 红色
-		}
 	}
 
 	.panel-item {
@@ -600,16 +425,26 @@
 				border-color: #f2f2f2;
 			}
 		}
+
+		.isFixedNavbar {
+			.up-navbar--fixed {
+				background: none !important;
+
+				.navbar-badge {
+					background: #fff;
+				}
+			}
+		}
 	}
 
 	.event-status {
 		position: absolute;
 		top: 200rpx;
-		right: 0rpx;
+		right: 40rpx;
 		z-index: 2;
-		background: rgba(25, 190, 107, .8);
+		background: #19be6b;
 		color: #fff;
-		border-radius: 99rpx 0 0 99rpx;
+		border-radius: 888rpx;
 		padding: 20rpx 30rpx;
 	}
 

@@ -12,7 +12,8 @@ export default createStore({
 			album_data: [],
 			album_total: 0,
 			album_info: {},
-			album_all_urls: [], // 全量 URL，仅供 uni.previewImage 查看全量图使用
+			// 全量 URL，按类型分开存储避免竞态污染（photo/video dispatch 异步切换时互不覆盖）
+			album_all_urls: { photo: [], video: [] },
 			// 战队活动主题
 			pkEventTheme: {},
 			pkEventRule: null,
@@ -52,23 +53,31 @@ export default createStore({
 				throw error
 			}
 		},
-		// 一次性拉全量 URL，只用于 uni.previewImage 查看高清图
-		async getAllAlbumUrls({commit}, params) {
+		// 一次性拉全量 URL，用于 uni.previewImage / uni.previewMedia 查看全量
+		// 按 displayType 只更新对应字段，不覆盖另一类型的数据
+		async getAllAlbumUrls({commit, state}, params) {
+			const type = params.displayType // 'photo' | 'video'
 			try {
 				const res = await request.get(
-					`/image-service/${params.displayType === 'photo' ? 'oss' : 'videos'}`,
+					`/image-service/${type === 'photo' ? 'oss' : 'videos'}`,
 					{
 						event_id: params.event_id,
 						pageIndex: 0,
 						pageSize: 20000,
-						displayType: params.displayType
+						displayType: type
 					}
 				)
 				const urls = res.urls || []
-				commit('set', { type: 'album_all_urls', data: urls })
+				commit('set', {
+					type: 'album_all_urls',
+					data: { ...state.album_all_urls, [type]: urls }
+				})
 				return urls
 			} catch (error) {
-				commit('set', { type: 'album_all_urls', data: [] })
+				commit('set', {
+					type: 'album_all_urls',
+					data: { ...state.album_all_urls, [type]: [] }
+				})
 				return []
 			}
 		},

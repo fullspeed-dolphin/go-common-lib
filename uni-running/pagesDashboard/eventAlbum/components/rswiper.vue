@@ -157,7 +157,8 @@ import request from "@/utils/request.js"
 import {
   ref,
   watch,
-  computed
+  computed,
+  onMounted
 } from 'vue';
 import { useStore } from "vuex";
 const store = useStore();
@@ -166,6 +167,10 @@ const album_total = computed(() => store.state.album_total);
 const album_data = computed(() => store.state.album_data);
 const album_info = computed(() => store.state.album_info);
 const album_all_urls = computed(() => store.state.album_all_urls);
+
+// 打开时快照：全量 URL 已就绪则锁定为全量模式，之后不再跟分页数据变动
+const allUrlsSnapshot = album_all_urls.value?.photo || album_all_urls.value || []
+const useAllUrls = ref(Array.isArray(allUrlsSnapshot) && allUrlsSnapshot.length > 0)
 
 function addViewCount() {
   const eventId = album_info.value?.event_id
@@ -310,6 +315,7 @@ const nextImage = computed(() => {
 watch(
   () => album_data.value,
   (val) => {
+    if (useAllUrls.value) return // 全量模式不跟分页数据变动
     console.log("album_data变化===", val.length);
     originList.value = val;
     originIndex.value = props.originIndex;
@@ -322,6 +328,22 @@ watch(
   },
   { immediate: true }
 );
+
+// 全量模式：mount 时用全量 URL 初始化 originList，一次性滑完整个相册
+onMounted(() => {
+  if (!useAllUrls.value) return
+  const urls = album_all_urls.value?.photo || album_all_urls.value || []
+  if (!Array.isArray(urls) || urls.length === 0) {
+    useAllUrls.value = false
+    return
+  }
+  originList.value = urls
+  originIndex.value = Number(props.originIndex) || 0
+  isloading.value = false
+  originIndexArr.value[0] = originIndex.value
+  translateX.value = -screenWidth.value
+  updateThumbScroll()
+});
 
 // ==================== originIndex watch ====================
 watch(
@@ -843,11 +865,11 @@ function openShare() {
 
 // 加载高清图
 function loadHDimage() {
-  const allUrls = album_all_urls.value || []
+  const allUrls = album_all_urls.value?.photo || album_all_urls.value || []
   const currentUrl = originList.value[originIndex.value]
 
   // 优先用全量 URL：根据当前图在全量中定位下标
-  if (allUrls.length > 0 && currentUrl) {
+  if (Array.isArray(allUrls) && allUrls.length > 0 && currentUrl) {
     const fullIndex = allUrls.indexOf(currentUrl)
     if (fullIndex !== -1) {
       uni.previewImage({

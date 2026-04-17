@@ -2,8 +2,10 @@
 <template>
 	<view class="albumDetail-page">
 		<u-navbar autoBack placeholder :title="album_info?.name || '详情'" />
-		<zPaging ref="paging" use-virtual-list cell-height-mode="fixed" :virtual-list-col="4"
-			:inner-list-style="{'display':'flex','flex-wrap':'wrap'}" fixed-cell-height="180rpx" :default-page-size="60"
+		<zPaging ref="paging" use-virtual-list cell-height-mode="fixed"
+			:virtual-list-col="displayType === 'photo' ? 4 : 2"
+			:fixed-cell-height="displayType === 'photo' ? '180rpx' : '200rpx'"
+			:inner-list-style="{'display':'flex','flex-wrap':'wrap'}" :default-page-size="60"
 			:force-close-inner-list="true" @virtualListChange="e => virtualList = e" @query="queryList" @scroll="onListScroll">
 
 			<AlbumInfo :event-id="currentEvent.event_id" />
@@ -41,7 +43,7 @@
 				
 				<block v-if="displayType === 'video'">
 					<view class="card-video" v-for="(item, index) in virtualList" :id="'zp-id-' + item.zp_index"
-						:key="item.zp_index" @click="$refs.refPreviewMedia.openModal(item.item, item.zp_index, 'video')">
+						:key="item.zp_index" @click="handleVideo(item.item)">
 						<view class="iconfont icon-bofang"></view>
 						<image class="img" :src="item.item + '?x-oss-process=video/snapshot,t_5,f_jpg,w_720'" mode="aspectFill"></image>
 					</view>
@@ -49,9 +51,8 @@
 			</view>
 		</zPaging>
 
-		<!-- 轮播图 -->
+		<!-- 照片查看器（自定义 swiper，每次滑动触发 addViewCount 统计浏览量） -->
 		<PreviewMedia ref="refPreviewMedia" @loadingMore="loadingMore" />
-		<PreviewVideo ref="refPreviewVideo" />
 	</view>
 </template>
 
@@ -66,6 +67,7 @@
 	import {
 		onLoad,
 		onUnload,
+		onShareAppMessage, onShareTimeline
 	} from "@dcloudio/uni-app";
 	import { useShare, buildPath } from "@/composables/useShare.js";
 	const store = useStore();
@@ -76,7 +78,6 @@
 
 	import zPaging from "./components/z-paging/components/z-paging/z-paging.vue"
 	import request from "@/utils/request.js"
-	import PreviewVideo from "./components/PreviewVideo.vue"
 	import PreviewMedia from "./components/PreviewMedia.vue"
 	import AlbumInfo from "./components/AlbumInfo.vue"
 	import {
@@ -117,11 +118,13 @@
 	const displayType = ref('photo')
 	const virtualList = ref([])
 	const currentPageData = ref([])
+	// uni.previewMedia 单次最多 50 个 sources，本次访问内是否已提示过该限制
+	const hasShownVideoLimitTip = ref(false)
 
 	function changeTab(type) {
 		displayType.value = type;
 		paging.value.reload();
-		// 切换 photo/video 时重新拉全量 URL
+		// 切换 photo/video 时重新拉全量 URL，供 uni.previewImage / uni.previewMedia 滑完整个相册
 		store.dispatch('getAllAlbumUrls', {
 			event_id: currentEvent.value.event_id,
 			displayType: type
@@ -130,7 +133,7 @@
 
 	async function loadingMore(index) {
 		await loadMoreData()
-		refPreviewMedia.value.openModal('', index, displayType.value === 'video' ? 'video' : 'photo')
+		refPreviewMedia.value.openModal('', index, 'photo')
 	}
 
 	const scrollTimer = ref(null)
@@ -161,19 +164,17 @@
 
 		// console.log('scrollTop====>',  distanceToBottom, scrollHeight , scrollTop , screenHeight)
 
-		const itemHeight = displayType.value === 'photo' ? 180 : 200; // 卡片高度
+		const itemHeight = displayType.value === 'photo' ? uni.upx2px(180) : uni.upx2px(200); // 卡片高度，使用固定 rpx 高度转换为 px
 		const lanes = displayType.value === 'photo' ? 4 : 2; // 列数
 
 		if (distanceToBottom <= itemHeight * 5 && !isLoadingMore.value) {
 			loadMoreData()
 		}
 
-		// 计算滚动到第几张图片位置, 图片高度 90px, 视频高度 100px
-		const photoIndex = Math.floor(scrollTop / (itemHeight / 2)) * lanes + (lanes * 2);
+		// 计算滚动到第几张图片位置
+		const photoIndex = Math.floor(scrollTop / itemHeight) * lanes;
 		currentImageIndex.value = Math.min(photoIndex, album_total.value);
 	}, 120)
-
-
 	function virtualListChange(vList) {
 		console.log('vList=======>', vList)
 		virtualList.value = vList;
@@ -206,19 +207,67 @@
 	}
 
 	function handleImg(link, index) {
-		// 直接用系统原生查看器，顶部显示 "当前/总数" 指示器
-		// 优先用全量 URL，让用户能滑完整个相册；否则降级到分页已加载的 album_data
-		const allUrls = store.state.album_all_urls || []
-		const urls = allUrls.length > 0 ? allUrls : store.state.album_data
-
-		if (!urls || urls.length === 0) return
-
+		console.log('handleImg=====>', link, index)
+		const allUrls = store.state.album_all_urls?.photo || []
+		let urls = allUrls
+		let idx = allUrls.indexOf(link)
+		if (idx === -1) {
+			urls = store.state.album_data
+			idx = urls.indexOf(link)
+		}
+		if (idx === -1 || !urls || urls.length === 0) return
+		const MAX = 1000
+		const start = Math.min(
+			Math.max(0, idx - Math.floor(MAX / 2)),
+			Math.max(0, urls.length - MAX)
+		)
+		const slice = urls.slice(start, start + MAX)
 		uni.previewImage({
-			urls,
-			current: link, // 传 URL 定位，比 index 更可靠
+			urls: slice,
+			current: link,
 			indicator: 'number',
 			loop: false,
 		})
+	}
+
+	function handleVideo(link) {
+		// 用微信原生预览器，支持视频左右滑切换、自带"保存到相册"菜单
+		// 只读 video 字段，避免竞态下拿到照片的全量 URL
+		const allUrls = store.state.album_all_urls?.video || []
+		// 不能用 Math.max(0, -1) 兜底 indexOf：那样 idx 永远是 0，预览窗口永远切在前 50 个
+		let urls = allUrls
+		let idx = allUrls.indexOf(link)
+		if (idx === -1) {
+			urls = store.state.album_data
+			idx = urls.indexOf(link)
+		}
+		if (idx === -1 || !urls || urls.length === 0) return
+		// wx.previewMedia 限制 sources 最多 50 个，以当前视频为中心截一个 50 大小的窗口
+		const MAX = 50
+		const start = Math.min(
+			Math.max(0, idx - Math.floor(MAX / 2)),
+			Math.max(0, urls.length - MAX)
+		)
+		const sources = urls.slice(start, start + MAX).map(url => ({
+			url,
+			type: 'video',
+			poster: url + '?x-oss-process=video/snapshot,t_5,f_jpg,w_720'
+		}))
+		const open = () => uni.previewMedia({ sources, current: idx - start })
+
+		// 视频总数超过 50 时，本次访问首次点击需告知限制
+		if (urls.length > MAX && !hasShownVideoLimitTip.value) {
+			hasShownVideoLimitTip.value = true
+			uni.showModal({
+				title: '提示',
+				content: `相册视频较多（${urls.length} 个），受微信限制单次预览最多 50 个。如需查看其他视频，请退出预览后再次点击对应视频。`,
+				showCancel: false,
+				confirmText: '知道了',
+				success: open
+			})
+		} else {
+			open()
+		}
 	}
 
 	onLoad((options) => {
@@ -232,7 +281,7 @@
 	})
 	onUnload(() => {
 		// 离开页面清空全量 URL，避免占内存
-		store.commit('set', { type: 'album_all_urls', data: [] })
+		store.commit('set', { type: 'album_all_urls', data: { photo: [], video: [] } })
 	})
 	
 </script>
@@ -249,26 +298,6 @@
 			background: none;
 		}
 	}
-	.SwiperSection{
-		.section-btns{
-			.u-button{
-				border:none;
-				margin:0;
-				padding:0;
-				background-color: transparent;
-				display: flex;
-				flex-direction: column;
-				justify-content: center;
-				align-items: center;
-				font-size: 20rpx;
-				font-weight: 400;
-				.u-icon{
-					margin-bottom: 10rpx;
-					display: block!important;
-				}
-			}
-		}
-	}
 	.PreviewMedia {
 		.u-popup__content__close {
 			top: 300rpx !important;
@@ -279,13 +308,12 @@
 			display: flex;
 			align-items: center;
 			justify-content: center;
-	
+
 			.u-icon__icon {
 				color: #fff !important;
 			}
 		}
 	}
-	
 	.albumDetail-page {
 		.back-to-top {
 			position: fixed;
