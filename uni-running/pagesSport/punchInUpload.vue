@@ -1,6 +1,25 @@
 <template>
   <view class="">
-    <u-navbar autoBack placeholder title="运动截图打卡"></u-navbar>
+    <!-- 导航栏白色背景 -->
+    <view class="nav-bg" :style="{ height: navSpacerHeight + 'px' }"></view>
+
+    <!-- 左上角 Tab 切换 -->
+    <view class="nav-tabs" :style="{ top: navTop + 'px', height: navHeight + 'px' }">
+      <view :class="['tab', activeTab === 'screenshot' ? 'tab--active' : 'tab--inactive']" @click="activeTab = 'screenshot'">
+        <text :class="['tab__text', activeTab === 'screenshot' ? 'tab__text--active' : 'tab__text--inactive']">截图打卡</text>
+        <view v-if="activeTab === 'screenshot'" class="tab__line"></view>
+      </view>
+      <view :class="['tab', activeTab === 'device' ? 'tab--active' : 'tab--inactive']" @click="switchToDeviceTab">
+        <text :class="['tab__text', activeTab === 'device' ? 'tab__text--active' : 'tab__text--inactive']">设备打卡</text>
+        <view v-if="activeTab === 'device'" class="tab__line"></view>
+      </view>
+    </view>
+
+    <!-- 占位高度 -->
+    <view :style="{ height: navSpacerHeight + 'px' }"></view>
+
+    <!-- ===== 截图打卡 Tab ===== -->
+    <view v-show="activeTab === 'screenshot'">
 
     <block v-if="pageIndex === 0 || !ruleForm.picture">
       <section class="u-pl-30 u-pt-40" style="margin-bottom: 140rpx;">
@@ -111,6 +130,9 @@
       <view class="u-ml-10">后台核验成功</view>
     </view>
 
+    </view>
+    <!-- ===== /截图打卡 Tab ===== -->
+
     <SharePoster ref="refSharePoster" @close="onPosterClose" />
 
     <!-- 固定联系客服按钮 -->
@@ -140,6 +162,20 @@ import dayjs from "dayjs";
 import { useStore } from "vuex";
 const store = useStore();
 const userInfo = computed(() => store.state.userInfo);
+
+// ===== 导航栏定位（与胶囊按钮对齐）=====
+const statusBarHeight = uni.getSystemInfoSync().statusBarHeight || 0;
+const menuBtn = uni?.getMenuButtonBoundingClientRect?.() || {};
+const navTop = menuBtn.top || (statusBarHeight + 6);
+const navHeight = menuBtn.height || 32;
+const navSpacerHeight = navTop + navHeight + 8;
+
+// ===== Tab 切换 =====
+const activeTab = ref('screenshot');
+
+function switchToDeviceTab() {
+  activeTab.value = 'device';
+}
 
 const refUserLogin = ref(null);
 
@@ -435,6 +471,57 @@ function confirmToCheck() {
 </script>
 
 <style lang="scss" scoped>
+$primary: #FF8C00;
+$c1: #1A1A1A;
+$c3: #9CA3AF;
+
+.nav-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  z-index: 90;
+}
+
+.nav-tabs {
+  position: fixed;
+  left: 0;
+  padding-left: 32rpx;
+  z-index: 91;
+  display: flex;
+  align-items: center;
+  gap: 32rpx;
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &--active { gap: 6rpx; }
+  &--inactive { justify-content: center; }
+
+  &__text--active {
+    font-size: 40rpx;
+    font-weight: 700;
+    color: $c1;
+  }
+
+  &__text--inactive {
+    font-size: 32rpx;
+    font-weight: 500;
+    color: $c3;
+  }
+
+  &__line {
+    width: 48rpx;
+    height: 6rpx;
+    background: $primary;
+    border-radius: 4rpx;
+  }
+}
+
 .event-item {
   padding: 15rpx 20rpx;
   border: 1px solid #ff8c00;
