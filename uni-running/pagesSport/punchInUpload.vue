@@ -122,14 +122,6 @@
       </view>
     </block>
 
-    <view v-if="isSuccessCheck" class="check flex-center b" style="width: 344rpx;
-			height: 96rpx; position: fixed; left: 50%;top: 50%; transform: translate(-50%, -50%);
-			background: #404040; color: #fff;font-size: 32rpx;
-			border-radius: 46rpx 46rpx 46rpx 46rpx;">
-      <up-icon name="checkmark-circle" size="40rpx" color="#00C950" />
-      <view class="u-ml-10">后台核验成功</view>
-    </view>
-
     </view>
     <!-- ===== /截图打卡 Tab ===== -->
 
@@ -196,6 +188,14 @@
           </u-button>
         </view>
       </view>
+    </view>
+
+    <view v-if="isSuccessCheck" class="check flex-center b" style="width: 344rpx;
+				height: 96rpx; position: fixed; left: 50%;top: 50%; transform: translate(-50%, -50%);
+				background: #404040; color: #fff;font-size: 32rpx;
+				border-radius: 46rpx 46rpx 46rpx 46rpx;">
+      <up-icon name="checkmark-circle" size="40rpx" color="#00C950" />
+      <view class="u-ml-10">后台核验成功</view>
     </view>
 
     <SharePoster ref="refSharePoster" @close="onPosterClose" />
@@ -280,6 +280,78 @@ async function fetchDeviceData() {
   }
   deviceTabInited.value = true;
   deviceLoading.value = false;
+}
+
+// 设备数据打卡
+function doDeviceCheckin(item) {
+  const checkedEvents = options_events_device.value.filter((i) => i.checked);
+  if (checkedEvents.length === 0) {
+    return uni.showToast({ title: "请至少选择一个活动", icon: "none" });
+  }
+
+  deviceCheckinLoading.value = { ...deviceCheckinLoading.value, [item.record_id]: true };
+
+  request
+    .post(
+      "/ocr-api/device-checkin",
+      {
+        record_id: item.record_id,
+        event_ids: checkedEvents.map((i) => i.value),
+      },
+      { showError: false, includeResponse: true }
+    )
+    .then((res) => {
+      // 标记已打卡
+      item.already_checked_in = true;
+
+      // 显示核验成功浮层
+      isSuccessCheck.value = true;
+
+      // 提取跑币数量
+      function extractNumbers(str) {
+        const matches = str.match(/\d+/g);
+        return matches ? matches.map(Number)?.[0] : "";
+      }
+
+      // 合并打卡次数
+      const checkinCounts = {};
+      res.data.events?.forEach((e) => {
+        if (e.checkin_count != null) checkinCounts[e.id] = e.checkin_count;
+      });
+      res.data.results?.forEach((r) => {
+        if (r.checkin_count != null) checkinCounts[r.event_id] = r.checkin_count;
+      });
+
+      // 只为成功的活动生成海报
+      const successEventIds = (res.data.results || [])
+        .filter((r) => r.success)
+        .map((r) => r.event_id);
+
+      if (successEventIds.length) {
+        refSharePoster.value.open({
+          ...userInfo.value,
+          distance: parseFloat(res.data.km),
+          duration: res.data.time,
+          pace: res.data.speed,
+          coinAmount: extractNumbers(res?.msg || ""),
+          coinAmountMsg: res?.msg,
+          checkinCounts,
+          checkinTime: dayjs().format("YYYY年MM月DD日 HH:mm"),
+          eventIds: successEventIds,
+          events: res.data.events || [],
+        });
+      }
+    })
+    .catch((err) => {
+      console.error("设备打卡失败:", err);
+      showModal({
+        title: "打卡失败",
+        content: err?.msg || "请稍后重试",
+      });
+    })
+    .finally(() => {
+      deviceCheckinLoading.value = { ...deviceCheckinLoading.value, [item.record_id]: false };
+    });
 }
 
 const refUserLogin = ref(null);
@@ -432,7 +504,12 @@ function showModal({ title, content }) {
 }
 
 function onPosterClose() {
-  uni.navigateBack();
+  if (activeTab.value === 'device') {
+    isSuccessCheck.value = false;
+    // 留在当前页面，用户可以继续打卡其他记录
+  } else {
+    uni.navigateBack();
+  }
 }
 
 // 图片上传成功后调用OCR识别
