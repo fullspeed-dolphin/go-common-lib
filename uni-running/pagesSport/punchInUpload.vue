@@ -127,8 +127,8 @@
 
     <!-- ===== 设备打卡 Tab ===== -->
     <view v-show="activeTab === 'device'">
-      <!-- 活动标签选择区 -->
-      <section class="u-pl-30 u-pt-40">
+      <!-- 活动标签选择区（仅在有记录时显示） -->
+      <section v-if="hasDeviceBinding && deviceRecords.length > 0 && !deviceLoading" class="u-pl-30 u-pt-40">
         <div class="u-flex-row u-flex-wrap">
           <view class="event-item" :class="{ 'active': item.checked }"
             :style="item.checked && item.gradient ? { background: `linear-gradient(90deg, ${item.gradient[0]}, ${item.gradient[1]})`, borderColor: item.gradient[0], color: '#fff' } : item.gradient ? { borderColor: item.gradient[0], color: item.gradient[0] } : {}"
@@ -207,7 +207,7 @@
     </button>
 
     <up-modal :show="isShowModal" open-type="contact" :title="modalTitle" :content="modalErrorText" cancelText="联系客服" confirmText="知道了" contentTextAlign="center" cancelColor="rgb(41, 121, 255)" confirmColor="#ff8c00"
-      @confirm="() => uni.navigateBack()" showCancelButton :asyncClose="true" />
+      @confirm="onModalConfirm" showCancelButton :asyncClose="true" />
 
     <UserLogin ref="refUserLogin" @success="onLoginSuccess" />
   </view>
@@ -266,8 +266,6 @@ async function fetchDeviceData() {
     hasDeviceBinding.value = bindings.length > 0;
 
     if (!hasDeviceBinding.value) {
-      deviceTabInited.value = true;
-      deviceLoading.value = false;
       return;
     }
 
@@ -277,9 +275,10 @@ async function fetchDeviceData() {
   } catch (error) {
     console.error("获取设备数据失败:", error);
     uni.showToast({ title: "获取设备数据失败", icon: "none" });
+  } finally {
+    deviceTabInited.value = true;
+    deviceLoading.value = false;
   }
-  deviceTabInited.value = true;
-  deviceLoading.value = false;
 }
 
 // 设备数据打卡
@@ -340,6 +339,9 @@ function doDeviceCheckin(item) {
           eventIds: successEventIds,
           events: res.data.events || [],
         });
+      } else {
+        // 无成功活动时，2秒后自动清除核验成功浮层
+        setTimeout(() => { isSuccessCheck.value = false; }, 2000);
       }
     })
     .catch((err) => {
@@ -501,6 +503,15 @@ function showModal({ title, content }) {
   modalTitle.value = title || "提示";
   modalErrorText.value = content || "请稍后重试";
   isShowModal.value = true;
+}
+
+function onModalConfirm() {
+  isShowModal.value = false;
+  if (activeTab.value === 'device') {
+    // 设备 Tab 留在当前页面
+  } else {
+    uni.navigateBack();
+  }
 }
 
 function onPosterClose() {
