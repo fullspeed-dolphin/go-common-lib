@@ -127,15 +127,14 @@
 
     <!-- ===== 设备打卡 Tab ===== -->
     <view v-show="activeTab === 'device'">
-      <!-- 品牌区 + 活动标签（仅在有记录时显示） -->
+      <!-- 品牌区 + 活动标签（仅在有记录时显示，结构与截图Tab一致） -->
       <section v-if="hasDeviceBinding && deviceRecords.length > 0 && !deviceLoading" class="u-pl-30 u-pt-40">
         <view class="u-flex-y-center" style="font-weight: 800;font-size: 48rpx;">
           <view class="iconfont icon-pulse-fill" style="color:#FF8C00;font-size: 48rpx;margin-right: 18rpx;"></view>
           全速运动
         </view>
         <view class="u-mt-20" style="color: #6A7282;">记录每一次汗水，赢取跑币奖励</view>
-      </section>
-      <section v-if="hasDeviceBinding && deviceRecords.length > 0 && !deviceLoading" class="u-pl-30 u-pt-20">
+
         <div class="u-flex-row u-flex-wrap">
           <view class="event-item" :class="{ 'active': item.checked }"
             :style="item.checked && item.gradient ? { background: `linear-gradient(90deg, ${item.gradient[0]}, ${item.gradient[1]})`, borderColor: item.gradient[0], color: '#fff' } : item.gradient ? { borderColor: item.gradient[0], color: item.gradient[0] } : {}"
