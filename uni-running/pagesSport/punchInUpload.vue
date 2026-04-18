@@ -366,7 +366,7 @@ function onLoginSuccess() {
 
 // 分享配置
 useShare({
-  title: "运动截图打卡",
+  title: "运动打卡",
   path: "/pagesSport/punchInUpload",
 });
 
