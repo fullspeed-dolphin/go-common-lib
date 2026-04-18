@@ -162,7 +162,7 @@ onShow(() => {
 
 // 方法定义
 const clickSwiper = (item) => {
-  if (!ensureLogin(() => clickSwiper(item))) return;
+  // if (!ensureLogin(() => clickSwiper(item))) return;
 
   if (
     item.id === "01KA8MPFAF0VBY1G35CVCNC1CW" ||
@@ -188,7 +188,7 @@ const clickSwiper = (item) => {
     });
     return;
   }
-
+	
   if (item.is_online && item.event_id) {
     uni.$u.route(`pagesDashboard/pkEvent/pkEvent`, { id: item.event_id });
     return;
