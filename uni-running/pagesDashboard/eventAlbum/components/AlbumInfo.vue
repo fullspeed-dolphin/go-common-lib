@@ -49,6 +49,7 @@ import { ref, computed, onMounted, watch } from "vue";
 import { useStore } from "vuex";
 import request from "@/utils/request.js"
 import FindPhoto from "./FindPhoto.vue"
+import dayjs from "dayjs";
 
 const store = useStore();
 
@@ -119,7 +120,7 @@ function onBannerLoad(e) {
 function getDetail (){
 	uni.showLoading({ mask: true });
 	request.get(`/image-service/albums/detail`, { event_id: routeParams.value.event_id }).then((res) => {
-		res.event_time = res.event_time?.slice(0, 10)
+		res.event_time = res.event_time ? dayjs(res.event_time).format('YYYY-MM-DD') : ''
 		detail.value = res
 
 		store.commit('set', {
