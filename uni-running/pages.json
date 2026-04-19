@@ -27,6 +27,10 @@
       "style": { "navigationBarTitleText": "运动" }
     },
     {
+      "path": "pages/punchInUpload",
+      "style": { "navigationStyle": "custom", "navigationBarTitleText": "运动截图打卡" }
+    },
+    {
       "path": "pages/mine",
       "style": { "navigationBarTitleText": "个人中心" }
     }
@@ -35,7 +39,6 @@
 		{
 		  "root": "pagesSport",
 		  "pages": [
-				{ "path": "punchInUpload","style": { "navigationStyle": "custom", "navigationBarTitleText": "运动截图打卡"} },
 				{ "path": "recognizeSuccess","style": { "navigationStyle": "custom", "navigationBarTitleText": "运动截图打卡"} },
 				{ "path": "runRankList","style": { "navigationStyle": "custom", "navigationBarTitleText": "跑量排行榜"} },
 				{ "path": "punchInRecords","style": { "navigationStyle": "custom", "navigationBarTitleText": "运动记录"} },
@@ -243,6 +246,10 @@
       {
         "text": "",
         "pagePath": "pages/runClub"
+      },
+      {
+        "text": "",
+        "pagePath": "pages/punchInUpload"
       },
       {
         "text": "",

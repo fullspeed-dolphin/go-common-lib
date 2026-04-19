@@ -88,7 +88,7 @@
       </view>
     </section>
 
-    <view v-if="userStatusInfo.in_team && hasSignedUp && !eventIsEnd" class="section-btn flex-center" @click="goto('/pagesSport/punchInUpload')">
+    <view v-if="userStatusInfo.in_team && hasSignedUp && !eventIsEnd" class="section-btn flex-center" @click="goToPunchIn">
     	<view class="iconfont flex-center icon-lijidaka u-mr-10" style="color:#fff;font-size:42rpx;"></view>
     	立即打卡
     </view>
@@ -294,6 +294,11 @@ function onLoginSuccess () {
 		return;
 	}
 	
+	if (loginCallAction.value === 'goToPunchIn') {
+		loginCallBack?.value?.()
+		return;
+	}
+
 	if (loginCallAction.value.includes('routeTo')) {
 		loginCallBack?.value?.(loginCallAction.value.replace('routeTo', ''))
 		return;
@@ -465,6 +470,17 @@ function goToSignEvent(item) {
     teamId: item?.id || "",
   });
 }
+
+// 跳转到打卡 tab 页（tab 页必须 switchTab，不能 navigateTo）
+const goToPunchIn = () => {
+  if (!userInfo.value.id) {
+    loginCallAction.value = 'goToPunchIn'
+    loginCallBack.value = goToPunchIn;
+    refUserLogin.value.open();
+    return;
+  }
+  uni.switchTab({ url: "/pages/punchInUpload" });
+};
 
 // 跳转
 const goto = (url) => {

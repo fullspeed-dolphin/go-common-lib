@@ -48,7 +48,7 @@
 <script setup>
 import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
-import { getRandomMotivation } from "./assets/rules.js"
+import { getRandomMotivation } from "@/components/SharePoster/rules.js"
 
 const routerParems = ref('')
 const motivationText = ref(getRandomMotivation())

@@ -54,7 +54,7 @@ const tabList = ref([
   {
     text: "打卡",
     name: "punchInUpload",
-    pagePath: "/pagesSport/punchInUpload",
+    pagePath: "/pages/punchInUpload",
     icon: "icon-rili",
     normal:
       "https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/tab_00.png",
@@ -86,11 +86,6 @@ const tabList = ref([
 // 方法定义
 const onChange = (detail) => {
   if (detail === props.type) return;
-
-  if (detail === 'punchInUpload') {
-    uni.$u.route('/pagesSport/punchInUpload')
-    return;
-  }
 
   uni.switchTab({
     url: "/pages/" + detail,

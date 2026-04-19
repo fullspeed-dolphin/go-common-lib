@@ -1,17 +1,15 @@
 <template>
-  <view class="">
+  <view class="page">
     <!-- 导航栏白色背景 -->
     <view class="nav-bg" :style="{ height: navSpacerHeight + 'px' }"></view>
 
     <!-- 左上角 Tab 切换 -->
     <view class="nav-tabs" :style="{ top: navTop + 'px', height: navHeight + 'px' }">
-      <view :class="['tab', activeTab === 'screenshot' ? 'tab--active' : 'tab--inactive']" @click="activeTab = 'screenshot'">
-        <text :class="['tab__text', activeTab === 'screenshot' ? 'tab__text--active' : 'tab__text--inactive']">截图打卡</text>
-        <view v-if="activeTab === 'screenshot'" class="tab__line"></view>
-      </view>
-      <view :class="['tab', activeTab === 'device' ? 'tab--active' : 'tab--inactive']" @click="switchToDeviceTab">
-        <text :class="['tab__text', activeTab === 'device' ? 'tab__text--active' : 'tab__text--inactive']">设备打卡</text>
-        <view v-if="activeTab === 'device'" class="tab__line"></view>
+      <view v-for="item in tabList" :key="item.key"
+        :class="['tab', activeTab === item.key ? 'tab--active' : 'tab--inactive']"
+        @click="switchTab(item.key)">
+        <text :class="['tab__text', activeTab === item.key ? 'tab__text--active' : 'tab__text--inactive']">{{ item.label }}</text>
+        <view v-if="activeTab === item.key" class="tab__line"></view>
       </view>
     </view>
 
@@ -138,7 +136,7 @@
         <div class="u-flex-row u-flex-wrap">
           <view class="event-item" :class="{ 'active': item.checked }"
             :style="item.checked && item.gradient ? { background: `linear-gradient(90deg, ${item.gradient[0]}, ${item.gradient[1]})`, borderColor: item.gradient[0], color: '#fff' } : item.gradient ? { borderColor: item.gradient[0], color: item.gradient[0] } : {}"
-            @click="item.checked = !item.checked" v-for="(item,index) in options_events_device" :key="index">
+            @click="toggleDeviceEvent(item)" v-for="(item,index) in options_events_device" :key="index">
             {{item.label}}
           </view>
         </div>
@@ -177,17 +175,28 @@
           <view class="device-card__distance">{{ item.km }} km</view>
           <view class="device-card__meta">
             <view class="device-card__meta-item">
-              <text class="device-card__meta-icon">⏱</text>
-              <text>{{ item.time }}</text>
+              <text class="device-card__meta-label">时长</text>
+              <text class="device-card__meta-value">{{ item.time }}</text>
             </view>
             <view class="device-card__meta-item">
-              <text class="device-card__meta-icon">⚡</text>
-              <text>{{ item.speed }}</text>
+              <text class="device-card__meta-label">配速</text>
+              <text class="device-card__meta-value">{{ item.speed }}</text>
             </view>
           </view>
-          <view class="device-card__time">📅 {{ item.record_time }}</view>
+          <view class="device-card__time">开始于 {{ formatStartTime(item.record_time) }}</view>
+
+          <view v-if="!item.already_checked_in && recordWarnings(item).length" class="device-card__warnings">
+            <view v-for="w in recordWarnings(item)" :key="w.event_id" class="device-card__warning-item">
+              <view class="device-card__warning-dot"></view>
+              <text class="device-card__warning-text">{{ w.label }}：{{ w.reason }}</text>
+            </view>
+          </view>
+
           <u-button v-if="item.already_checked_in" type="info" shape="circle" disabled custom-style="margin-top: 24rpx;">
-            ✅ 已打卡
+            已打卡
+          </u-button>
+          <u-button v-else-if="recordWarnings(item).length" type="info" shape="circle" disabled custom-style="margin-top: 24rpx;">
+            暂无法打卡
           </u-button>
           <u-button v-else type="primary" color="#FF8C00" shape="circle" :loading="deviceCheckinLoading[item.record_id]" :disabled="deviceCheckinLoading[item.record_id]" custom-style="margin-top: 24rpx;" @click="doDeviceCheckin(item)">
             打 卡
@@ -216,6 +225,8 @@
       @confirm="onModalConfirm" showCancelButton :asyncClose="true" />
 
     <UserLogin ref="refUserLogin" @success="onLoginSuccess" />
+
+    <Tabbar type="punchInUpload" />
   </view>
 </template>
 <script setup>
@@ -225,8 +236,9 @@ import FileUpload from "@/components/common/FileUpload.vue";
 import PickerCell from "@/components/common/PickerCell.vue";
 import UserLogin from "@/components/UserLogin.vue";
 import AccessUser from "@/components/common/AccessUser.vue";
-import SharePoster from "./SharePoster.vue";
-import request from "../utils/request";
+import SharePoster from "@/components/SharePoster/SharePoster.vue";
+import request from "@/utils/request";
+import Tabbar from "@/components/tabBar.vue";
 import { baseLink, uploadToken } from "@/utils/config";
 import { useShare } from "@/composables/useShare.js";
 import dayjs from "dayjs";
@@ -244,16 +256,31 @@ const navSpacerHeight = navTop + navHeight + 8;
 // ===== Tab 切换 =====
 const activeTab = ref('screenshot');
 
-function switchToDeviceTab() {
-  activeTab.value = 'device';
-  if (!deviceTabInited.value) {
+// 绑定设备的人优先看到设备打卡
+const tabList = computed(() => {
+  const screenshot = { key: 'screenshot', label: '截图打卡' };
+  const device = { key: 'device', label: '设备打卡' };
+  return hasDeviceBinding.value ? [device, screenshot] : [screenshot, device];
+});
+
+function switchTab(key) {
+  activeTab.value = key;
+  if (key === 'device' && !deviceTabInited.value) {
     fetchDeviceData();
   }
 }
 
+// 按手机本地时区展示运动开始时间（忽略上游的时区偏移标记）
+function formatStartTime(s) {
+  if (!s) return '';
+  return dayjs(s).format('M月D日 HH:mm');
+}
+
 // 获取设备绑定状态和今日记录
-async function fetchDeviceData() {
+// silent: onLoad 自动探测时用，未登录或失败都不弹 UI
+async function fetchDeviceData(silent = false) {
   if (!userInfo.value.id) {
+    if (silent) return;
     loginCallBack.value = () => {
       activeTab.value = 'device';
       fetchDeviceData();
@@ -278,13 +305,84 @@ async function fetchDeviceData() {
     // 2. 获取今日可打卡的设备记录
     const records = await request.get("/sport-api/api/checkin/device-records", {}, { showError: false });
     deviceRecords.value = records || [];
+    lastDeviceFetchTime.value = Date.now();
+
+    // 3. 对拉到的记录并发跑预检（不阻塞主流程；失败也不影响数据展示）
+    runValidation(deviceRecords.value);
   } catch (error) {
     console.error("获取设备数据失败:", error);
-    uni.showToast({ title: "获取设备数据失败", icon: "none" });
+    if (!silent) uni.showToast({ title: "获取设备数据失败", icon: "none" });
   } finally {
     deviceTabInited.value = true;
     deviceLoading.value = false;
   }
+}
+
+// 对一组设备记录 × 当前勾选的活动做预检，结果写入 validateMap
+// 并发发送 N 个请求（N 通常 1-3 条），最慢一个决定整体等待时长
+async function runValidation(records) {
+  if (!records || !records.length) {
+    validateMap.value = {};
+    return;
+  }
+  if (!userInfo.value.id) return;
+
+  const selectedIds = options_events_device.value
+    .filter((i) => i.checked)
+    .map((i) => i.value);
+  if (!selectedIds.length) {
+    validateMap.value = {};
+    return;
+  }
+
+  try {
+    const results = await Promise.all(
+      records.map((r) =>
+        request.post(
+          "/ocr-api/validate-checkin",
+          { event_ids: selectedIds, km: r.km, speed: r.speed },
+          { showError: false },
+        ).catch((err) => {
+          console.error("预检失败 record_id=", r.record_id, err);
+          return null;
+        }),
+      ),
+    );
+
+    const next = {};
+    records.forEach((r, idx) => {
+      const arr = Array.isArray(results[idx]) ? results[idx] : [];
+      const byEvent = {};
+      arr.forEach((item) => {
+        byEvent[item.event_id] = item;
+      });
+      next[r.record_id] = byEvent;
+    });
+    validateMap.value = next;
+  } catch (e) {
+    console.error("批量预检异常:", e);
+  }
+}
+
+// 切换设备 tab 的活动勾选：翻转 checked + 重跑预检（只对已有 records，不重拉）
+function toggleDeviceEvent(item) {
+  item.checked = !item.checked;
+  runValidation(deviceRecords.value);
+}
+
+// 查询某条 record 在当前勾选活动里有几个不通过，返回 [{event_id, reason, label}]
+function recordWarnings(record) {
+  const byEvent = validateMap.value[record.record_id];
+  if (!byEvent) return [];
+  const result = [];
+  for (const item of options_events_device.value) {
+    if (!item.checked || item.value === "default") continue;
+    const r = byEvent[item.value];
+    if (r && !r.ok) {
+      result.push({ event_id: item.value, reason: r.reason, label: item.label });
+    }
+  }
+  return result;
 }
 
 // 设备数据打卡
@@ -375,7 +473,7 @@ function onLoginSuccess() {
 // 分享配置
 useShare({
   title: "运动打卡",
-  path: "/pagesSport/punchInUpload",
+  path: "/pages/punchInUpload",
 });
 
 const refSharePoster = ref(null);
@@ -390,6 +488,10 @@ const deviceLoading = ref(false);
 const hasDeviceBinding = ref(false);
 const deviceTabInited = ref(false);
 const deviceCheckinLoading = ref({});
+// 预检结果：record_id -> { event_id: { ok, reason } }
+const validateMap = ref({});
+// 上次拉 device-records 的时间戳，用于 onShow 节流（60s 内不重拉）
+const lastDeviceFetchTime = ref(0);
 
 const myEvents = ref([]);
 function getMyEvents() {
@@ -481,16 +583,26 @@ const deleteUploadedImage = async (imageUrl) => {
   }
 };
 
-onLoad((options) => {
+onLoad(async (options) => {
   routerParams.value = options;
   getMyEvents();
+  // 已登录时静默探测设备绑定，有绑定则默认切到设备打卡 tab
+  if (userInfo.value.id) {
+    await fetchDeviceData(true);
+    if (hasDeviceBinding.value) {
+      activeTab.value = 'device';
+    }
+  }
 });
 
 onShow(() => {
-  // 从设备绑定页返回后，重新拉取设备数据
+  // 距上次拉取超过 60s 才重拉（避免频繁切后台 → 回前台时反复请求）
   if (activeTab.value === 'device' && deviceTabInited.value) {
-    deviceTabInited.value = false;
-    fetchDeviceData();
+    const elapsed = Date.now() - lastDeviceFetchTime.value;
+    if (elapsed > 60000) {
+      deviceTabInited.value = false;
+      fetchDeviceData();
+    }
   }
 });
 
@@ -691,6 +803,10 @@ function confirmToCheck() {
 $primary: #FF8C00;
 $c1: #1A1A1A;
 $c3: #9CA3AF;
+
+.page {
+  min-height: 100vh;
+}
 
 .nav-bg {
   position: fixed;
@@ -997,25 +1113,64 @@ $c3: #9CA3AF;
 
   &__meta {
     display: flex;
-    gap: 40rpx;
-    margin-bottom: 12rpx;
-    font-size: 28rpx;
-    color: #6A7282;
+    gap: 48rpx;
+    margin-bottom: 16rpx;
   }
 
   &__meta-item {
     display: flex;
-    align-items: center;
-    gap: 8rpx;
+    flex-direction: column;
+    gap: 6rpx;
   }
 
-  &__meta-icon {
-    font-size: 28rpx;
+  &__meta-label {
+    font-size: 22rpx;
+    color: #99A1AF;
+    line-height: 1;
+  }
+
+  &__meta-value {
+    font-size: 30rpx;
+    font-weight: 600;
+    color: #1A1A1A;
+    line-height: 1;
   }
 
   &__time {
     font-size: 24rpx;
     color: #99A1AF;
+    margin-top: 4rpx;
+  }
+
+  &__warnings {
+    margin-top: 20rpx;
+    padding: 18rpx 20rpx;
+    background: #FEF3E7;
+    border-radius: 12rpx;
+    display: flex;
+    flex-direction: column;
+    gap: 10rpx;
+  }
+
+  &__warning-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12rpx;
+  }
+
+  &__warning-dot {
+    width: 10rpx;
+    height: 10rpx;
+    margin-top: 12rpx;
+    border-radius: 50%;
+    background: #FF8C00;
+    flex: none;
+  }
+
+  &__warning-text {
+    font-size: 24rpx;
+    color: #92400E;
+    line-height: 1.5;
   }
 }
 </style>

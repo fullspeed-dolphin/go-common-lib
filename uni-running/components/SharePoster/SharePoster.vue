@@ -67,7 +67,7 @@ import { resolvePosterVisibility, buildPosterPaths, getCurrentPosterPath as _get
 function getCheckinCount(checkinCounts, eventId) {
 	return checkinCounts?.[eventId] || 1
 }
-import { getRandomMotivation } from "./assets/rules.js"
+import { getRandomMotivation } from "./rules.js"
 const motivationText = ref(getRandomMotivation().join(''))
 
 const swiperIndex = ref(0)
