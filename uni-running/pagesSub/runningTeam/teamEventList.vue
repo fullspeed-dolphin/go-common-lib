@@ -349,7 +349,7 @@ onShow(() => {
 
 .status-tag {
   flex-shrink: 0;
-  padding: 4rpx 14rpx;
+  padding: 4rpx 20rpx;
   border-radius: 8rpx;
   font-size: 20rpx;
   font-weight: 500;
@@ -407,7 +407,7 @@ onShow(() => {
 
 .card-chevron {
   position: absolute;
-  right: 28rpx;
+  right: 20rpx;
   top: 28rpx;
 }
 
