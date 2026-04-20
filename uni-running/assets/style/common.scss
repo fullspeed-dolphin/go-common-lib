@@ -373,3 +373,17 @@ cover-view {
 .gap-20 {
   gap: 20rpx;
 }
+
+// tabBar.vue 容器：padding-top 30rpx + u-tabbar 默认 100rpx（不含安全区）
+$tabbar-content-height: 130rpx;
+
+// 自定义 tabbar 主页里"固定底部操作按钮"场景专用，避免按钮被 tabbar 盖住
+.fixed-above-tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(#{$tabbar-content-height} + env(safe-area-inset-bottom) + 10rpx);
+  padding: 0 30rpx;
+  display: flex;
+  justify-content: center;
+}

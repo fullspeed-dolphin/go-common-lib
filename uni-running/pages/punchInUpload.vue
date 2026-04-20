@@ -115,7 +115,7 @@
       <view class="flex-center" style="color:#99A1AF;margin-top:30rpx;font-size: 24rpx;">
         请核对上方数据是否与截图一致
       </view>
-      <view class="flex-center" style="position: fixed; bottom: 30rpx; width: 100%; padding: 0 30rpx;">
+      <view class="fixed-above-tabbar">
         <u-button type="primary" custom-style="width:642rpx;" color="#ff8c00" shape="circle" :loading="isChecking" :disabled="isChecking" @click="confirmToCheck()">提交数据</u-button>
       </view>
     </block>
@@ -596,6 +596,10 @@ onLoad(async (options) => {
 });
 
 onShow(() => {
+  // 上次已打完卡（海报可能被系统直接关掉，没走 onPosterClose）再回到本页时，重置回初始上传界面
+  if (isSubmitted.value) {
+    resetScreenshotTab();
+  }
   // 距上次拉取超过 60s 才重拉（避免频繁切后台 → 回前台时反复请求）
   if (activeTab.value === 'device' && deviceTabInited.value) {
     const elapsed = Date.now() - lastDeviceFetchTime.value;
@@ -632,12 +636,22 @@ function onModalConfirm() {
   }
 }
 
+// 重置截图打卡 Tab 到初始上传界面（用于关海报后、再次进入页面时）
+function resetScreenshotTab() {
+  isSuccess.value = false;
+  isSubmitted.value = false;
+  isSuccessCheck.value = false;
+  isChecking.value = false;
+  pageIndex.value = 0;
+  ruleForm.value.picture = "";
+  exerciseInfo.value = { distance: "", duration: "", pace: "" };
+  verifyToken = "";
+}
+
 function onPosterClose() {
-  if (activeTab.value === 'device') {
-    isSuccessCheck.value = false;
-    // 留在当前页面，用户可以继续打卡其他记录
-  } else {
-    uni.navigateBack();
+  isSuccessCheck.value = false;
+  if (activeTab.value === 'screenshot') {
+    resetScreenshotTab();
   }
 }
 
@@ -744,6 +758,7 @@ function confirmToCheck() {
       isSubmitted.value = true;
       // 显示"后台核验成功"弹窗
       isSuccessCheck.value = true;
+      isChecking.value = false;
 
       uni.setStorageSync("punchInUploadResult", res);
 
