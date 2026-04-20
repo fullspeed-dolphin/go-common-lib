@@ -108,8 +108,16 @@
 		}
 	};
 
-	// 设为本人
-	const handleSetAsOwner = async (item) => {
+	// 更新是否为本人
+	const updateIsSelf = async (item, isSelf) => {
+		// 判断当前是否已有设置的本人
+		const currentSelf = registrationCardList.value.find(card => card.is_self == 1);
+		if (currentSelf && currentSelf.id !== item.id) {
+			await request.post("/booking-api/registration/updateSignerInfo", {
+				id: currentSelf.id,
+				is_self: 0,
+			});
+		}
 		try {
 			const id = item.id;
 			if (!id) {
@@ -122,7 +130,7 @@
 
 			await request.post("/booking-api/registration/updateSignerInfo", {
 				id: id,
-				is_self: item.is_self == 1 ? 0 : 1,
+				is_self: isSelf,
 			});
 
 			uni.showToast({
@@ -137,33 +145,14 @@
 		}
 	};
 
+	// 设为本人
+	const handleSetAsOwner = (item) => {
+		updateIsSelf(item, item.is_self == 1 ? 0 : 1);
+	};
+
 	// checkbox 状态变化时设为本人
-	const handleCheckboxChange = async (isChecked, item) => {
-		try {
-			const id = item.id;
-			if (!id) {
-				uni.showToast({
-					title: "数据异常",
-					icon: "none"
-				});
-				return;
-			}
-
-			await request.post("/booking-api/registration/updateSignerInfo", {
-				id: id,
-				is_self: isChecked ? 1 : 0,
-			});
-
-			uni.showToast({
-				title: "设置成功",
-				icon: "success"
-			});
-			// 刷新列表
-			getRegistrationCardList();
-		} catch (error) {
-			console.error("设置失败:", error);
-			showRequestError(error, "设置失败");
-		}
+	const handleCheckboxChange = (isChecked, item) => {
+		updateIsSelf(item, isChecked ? 1 : 0);
 	};
 
 	// 编辑报名卡
