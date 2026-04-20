@@ -886,9 +886,9 @@ function shareImage() {
     return;
   }
   wx.showShareImageMenu({ path });
-	
+
 	setTimeout(() => {
-		uni.navigateBack()
+		close()
 	}, 300)
 }
 
