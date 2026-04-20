@@ -18,7 +18,7 @@
           <text class="banner-tag-text">{{ clubTypeName }}</text>
         </view>
         <text class="banner-id">团号 {{ detail.group_id || '--' }}</text>
-        <u-icon name="arrow-right" size="14" color="#D1D5DB"></u-icon>
+        <!-- <u-icon name="arrow-right" size="14" color="#D1D5DB"></u-icon> -->
       </view>
     </view>
 
