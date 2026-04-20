@@ -1,9 +1,9 @@
 <template>
   <view class="page-container">
     <u-navbar :title="clubTypeName + '管理'" autoBack placeholder>
-      <template #right>
+      <!-- <template #right>
         <u-icon name="more-dot-fill" size="24" color="#1A1A1A" @click="showMoreMenu"></u-icon>
-      </template>
+      </template> -->
     </u-navbar>
 
     <!-- Team Banner -->
@@ -18,7 +18,7 @@
           <text class="banner-tag-text">{{ clubTypeName }}</text>
         </view>
         <text class="banner-id">团号 {{ detail.group_id || '--' }}</text>
-        <u-icon name="arrow-right" size="14" color="#D1D5DB"></u-icon>
+        <!-- <u-icon name="arrow-right" size="14" color="#D1D5DB"></u-icon> -->
       </view>
     </view>
 
@@ -276,7 +276,7 @@ onShow(() => {
 .banner-info-row {
   display: flex;
   align-items: center;
-  gap: 12rpx;
+  gap: 8rpx;
 }
 
 .banner-tag {
@@ -299,6 +299,7 @@ onShow(() => {
   font-size: 28rpx;
   color: #9CA3AF;
   line-height: 36rpx;
+  gap:0;
 }
 
 .content-area {
