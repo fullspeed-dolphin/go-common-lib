@@ -107,7 +107,7 @@
             <view class="label flex-center" style="background: #FAF5FF;">
               <view class="iconfont icon-shandianshandianfahuotuikuan" style="color:#AF4BFF"></view>
             </view>
-            <view class="value">{{exerciseInfo.pace || 0}}</view>
+            <view class="value">{{ formatPace(exerciseInfo.pace) }}</view>
             <text class="label-text">配速</text>
           </view>
         </view>
@@ -180,7 +180,7 @@
             </view>
             <view class="device-card__meta-item">
               <text class="device-card__meta-label">配速</text>
-              <text class="device-card__meta-value">{{ item.speed }}</text>
+              <text class="device-card__meta-value">{{ formatPace(item.speed) }}</text>
             </view>
           </view>
           <view class="device-card__time">开始于 {{ formatStartTime(item.record_time) }}</view>
@@ -240,6 +240,7 @@ import SharePoster from "@/components/SharePoster/SharePoster.vue";
 import request from "@/utils/request";
 import Tabbar from "@/components/tabBar.vue";
 import { baseLink, uploadToken } from "@/utils/config";
+import { formatPace } from "@/utils/format.js";
 import { useShare } from "@/composables/useShare.js";
 import dayjs from "dayjs";
 import { useStore } from "vuex";
