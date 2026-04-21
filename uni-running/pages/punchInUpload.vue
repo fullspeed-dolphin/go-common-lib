@@ -296,7 +296,7 @@ async function fetchDeviceData(silent = false) {
   try {
     // 1. 检查是否绑定了设备
     const bindRes = await request.get("/sport-api/api/platform/bindings", {}, { showError: false });
-    const bindings = (bindRes?.bindings || []).filter((b) => b.platform !== 'honor');
+    const bindings = (bindRes?.bindings || []).filter((b) => b.bound && b.platform !== 'honor');
     hasDeviceBinding.value = bindings.length > 0;
 
     if (!hasDeviceBinding.value) {
