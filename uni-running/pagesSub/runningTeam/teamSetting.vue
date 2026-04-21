@@ -1,9 +1,9 @@
 <template>
   <view class="page-container">
     <u-navbar :title="clubTypeName + '管理'" autoBack placeholder>
-      <!-- <template #right>
+      <template #right >
         <u-icon name="more-dot-fill" size="24" color="#1A1A1A" @click="showMoreMenu"></u-icon>
-      </template> -->
+      </template>
     </u-navbar>
 
     <!-- Team Banner -->
@@ -470,6 +470,11 @@ onShow(() => {
       flex: 1;
       margin: 0;
     }
+  }
+}
+::v-deep {
+  .u-navbar__content__right{
+    right:150rpx !important;
   }
 }
 </style>
