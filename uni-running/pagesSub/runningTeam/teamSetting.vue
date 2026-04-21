@@ -2,7 +2,7 @@
   <view class="page-container">
     <u-navbar :title="clubTypeName + '管理'" autoBack placeholder>
       <template #right >
-        <u-icon name="more-dot-fill" size="24" color="#1A1A1A" @click="showMoreMenu"></u-icon>
+        <u-icon name="setting" size="20" color="#1A1A1A" @click="showMoreMenu"></u-icon>
       </template>
     </u-navbar>
 
@@ -203,14 +203,15 @@ const deleteGroup = () => {
 };
 
 const showMoreMenu = () => {
-  uni.showActionSheet({
-    itemList: [clubTypeName.value + '地图库'],
-    success: (res) => {
-      if (res.tapIndex === 0) {
-        uni.$u.route(`pagesSub/runningTeam/teamMaps?group_id=${group_id.value}`);
-      }
-    }
-  });
+   uni.$u.route(`pagesSub/runningTeam/teamMaps?group_id=${group_id.value}`);
+  // uni.showActionSheet({
+  //   itemList: [clubTypeName.value + '地图库'],
+  //   success: (res) => {
+  //     if (res.tapIndex === 0) {
+  //       uni.$u.route(`pagesSub/runningTeam/teamMaps?group_id=${group_id.value}`);
+  //     }
+  //   }
+  // });
 };
 
 onLoad((options) => {
@@ -474,7 +475,8 @@ onShow(() => {
 }
 ::v-deep {
   .u-navbar__content__right{
-    right:150rpx !important;
+    // right:150rpx !important;
+    top:110rpx !important;
   }
 }
 </style>
