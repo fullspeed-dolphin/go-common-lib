@@ -196,7 +196,35 @@ export function validateIdCard(rule, value, callback) {
  * @param {string} idCard - 18位身份证号码
  * @returns {boolean} - 成年返回true，未成年或无效返回false
  */
-export function isAdult(idCard) {
+export function isAdult(item) {
+  const idCard = item.cert_number;
+  const certType = item.cert_type;
+  console.log('isAdult called with:', certType);
+  if(certType !== 'CN_ID') { // 港澳台或其他类型证件
+    // return true; // 非身份证类型默认认为是成年人
+    // item.birthday
+    const birthday = item.birthday;
+    console.log('isAdult non-ID card, birthday:', birthday);
+    if (birthday) {
+      const match = String(birthday).substring(0, 10);
+      if (match) {
+        const year = Number(birthday.substring(0, 4));
+        const month = Number(birthday.substring(5, 7));
+        const day = Number(birthday.substring(8, 10));
+        const today = new Date();
+        let age = today.getFullYear() - year;
+        if (
+          today.getMonth() < month - 1 ||
+          (today.getMonth() === month - 1 && today.getDate() < day)
+        ) {
+          age--;
+        }
+        console.log('birthday match:', match,age);
+        return age >= 18;
+      }
+    }
+    return true;
+  }
   // 参数校验
   if (!idCard || typeof idCard !== 'string') return false;
   if (idCard.length !== 18) return false;
