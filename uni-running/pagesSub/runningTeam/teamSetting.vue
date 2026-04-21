@@ -1,9 +1,9 @@
 <template>
   <view class="page-container">
     <u-navbar :title="clubTypeName + '管理'" autoBack placeholder>
-      <template #right >
+      <!-- <template #right >
         <u-icon name="setting" size="20" color="#1A1A1A" @click="showMoreMenu"></u-icon>
-      </template>
+      </template> -->
     </u-navbar>
 
     <!-- Team Banner -->
