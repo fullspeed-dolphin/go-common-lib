@@ -21,7 +21,7 @@
               <image class="section-content-icon" style="width: 53rpx; height: 68rpx" src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/icon-record@2x.png" mode="aspectFill"></image>
             </view>
           </view>
-          <view class="section u-flex-1 u-flex-between-center" @click="userRouteTo('pagesSport/punchInUpload')">
+          <view class="section u-flex-1 u-flex-between-center" @click="goToPunchIn">
             <view class="section-content-left">
               <view class="section-content-title">运动截图打卡</view>
             </view>
@@ -169,6 +169,15 @@ const userRouteTo = (link) => {
   }
 
   uni.$u.route(link);
+};
+
+const goToPunchIn = () => {
+  const jump = () => uni.switchTab({ url: "/pages/punchInUpload" });
+  if (!userInfo.value.id) {
+    pendingAction.value = jump;
+    return refUserLogin.value?.open();
+  }
+  jump();
 };
 
 // 跳转到排行榜页面

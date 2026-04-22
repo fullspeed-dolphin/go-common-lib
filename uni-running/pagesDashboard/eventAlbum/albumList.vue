@@ -12,22 +12,24 @@
 		<mescroll-body @init="mescrollInit" @down="downCallback" @up="getList" top="0" ref="mescroll">
 			<view class="card-list">
 				<view class="card-item" v-for="item in dataList" :key="item.event_id" :style="getCardStyle(item)" @click="viewDetail(item)">
-					<image class="card-cover"
-						:src="item.image_url + '?x-oss-process=image/resize,w_400/quality,q_75/format,webp&t=' + cacheKey"
-						mode="aspectFill" lazy-load />
+					<view class="card-cover">
+						<image class="card-cover-img"
+							:src="item.image_url + '?x-oss-process=image/resize,w_400/quality,q_75/format,webp&t=' + cacheKey"
+							mode="aspectFill" lazy-load />
+					</view>
 					<view class="card-body">
 						<view class="card-title ellipsis2">{{item.name}}</view>
 						<view class="card-meta">
 							<view class="meta-item" v-if="item.event_time">
-								<u-icon name="clock" size="22rpx" color="#999" />
+								<u-icon name="clock" size="24rpx" color="#999" />
 								<text class="meta-text">{{item.event_time}}</text>
 							</view>
 							<view class="meta-item" v-if="item.event_location">
-								<u-icon name="map" size="22rpx" color="#999" />
+								<u-icon name="map" size="24rpx" color="#999" />
 								<text class="meta-text">{{item.event_location}}</text>
 							</view>
 							<view class="meta-item" v-if="item.view_count">
-								<u-icon name="eye" size="22rpx" color="#999" />
+								<u-icon name="eye" size="24rpx" color="#999" />
 								<text class="meta-text">{{item.view_count}}</text>
 							</view>
 						</view>
@@ -50,6 +52,7 @@
 	const cacheKey = Date.now()
 	import request from "@/utils/request.js";
 	import { useShare } from "@/composables/useShare.js";
+	import dayjs from "dayjs";
 
 	// 分享配置
 	// useShare({
@@ -118,7 +121,7 @@
 
 				const list = (res.albums || []).map(item => ({
 					...item,
-					event_time: item.event_time?.slice(0, 10)
+					event_time: item.event_time ? dayjs(item.event_time).format('YYYY-MM-DD') : ''
 				}));
 
 				dataList.value = dataList.value.concat(list)
@@ -158,15 +161,23 @@
 		.card-cover {
 			flex: none;
 			width: 240rpx;
-			height: 200rpx;
+			align-self: stretch;
+			min-height: 200rpx;
+			overflow: hidden;
+
+			.card-cover-img {
+				width: 100%;
+				height: 100%;
+				display: block;
+			}
 		}
 
 		.card-body {
 			flex: 1;
-			padding: 20rpx 24rpx;
+			padding: 24rpx;
 			display: flex;
 			flex-direction: column;
-			justify-content: space-between;
+			gap: 14rpx;
 			overflow: hidden;
 
 			.card-title {
@@ -180,16 +191,20 @@
 			.card-meta {
 				display: flex;
 				flex-direction: column;
-				gap: 8rpx;
+				gap: 14rpx;
 
 				.meta-item {
 					display: flex;
 					align-items: center;
-					gap: 6rpx;
+					gap: 10rpx;
+					min-width: 0;
 
 					.meta-text {
-						font-size: 22rpx;
+						font-size: 24rpx;
 						color: #999;
+						overflow: hidden;
+						text-overflow: ellipsis;
+						white-space: nowrap;
 					}
 				}
 			}
