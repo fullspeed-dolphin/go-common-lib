@@ -40,10 +40,11 @@
 
       <!-- 表单卡片 -->
       <view class="form-card">
-        <view class="form-row" @click="focusInput('name')">
+        <!-- <view class="form-row" @click="focusInput('name')">没有此事件方法，注释 -->
+        <view class="form-row">
           <text class="form-label">活动主题</text>
           <view class="form-value-row">
-            <input class="form-input" v-model="form.name" placeholder="请输入活动主题" placeholder-style="color: #D1D5DB;" />
+            <input class="form-input" v-model="form.name" placeholder="请输入活动主题" placeholder-style="color: #D1D5DB;" maxlength="20" />
           </view>
         </view>
         <view class="form-row">
@@ -82,8 +83,8 @@
       <view class="section">
         <text class="section-label">活动描述</text>
         <view class="desc-box">
-          <textarea class="desc-input" v-model="form.description" placeholder="请输入活动描述" maxlength="150" />
-          <text class="desc-count" v-if="form.description">{{ form.description.length }}/150</text>
+          <textarea class="desc-input" v-model="form.description" placeholder="请输入活动描述" maxlength="800" />
+          <text class="desc-count" v-if="form.description">{{ form.description.length }}/800</text>
         </view>
       </view>
     </view>
@@ -100,6 +101,7 @@
     <u-datetime-picker
       :show="showTimePicker"
       v-model="pickerTime"
+      :minDate="(() => { const now = new Date(); const minutes = now.getMinutes(); const nextHalfHour = minutes <= 30 ? 30 : 0; const nextHour = minutes <= 30 ? now.getHours() : now.getHours() + 1; const minDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), nextHour, nextHalfHour, 0, 0); return minDate.getTime(); })()"
       mode="datetime"
       @confirm="onTimeConfirm"
       @cancel="showTimePicker = false"
@@ -321,10 +323,14 @@ const submitForm = async () => {
     uni.$u.toast("请选择活动时间");
     return;
   }
+  if (!imageList.value.length) {
+    uni.$u.toast("请上传活动图片");
+    return;
+  }
 
   isSubmitting.value = true;
   uni.showLoading({ mask: true });
-
+  // console.log("imageList.value====>", imageList.value);
   const data = {
     fsc_id: Number(group_id.value),
     name: form.value.name,

@@ -116,7 +116,7 @@
               isSignUp ? "取消报名" : (isCourseEvent ? "立即报班" : "活动报名")
             }}</block>
 						<block v-else-if="detail.status === 'PND'">活动暂未开始</block>
-						<block v-else-if="detail.status === 'EXP'">查看报名详情</block>
+						<block v-else-if="detail.status === 'EXP'">授权登录查看报名情况</block>
 					</u-button>
 				</view>
 			</view>
