@@ -5,7 +5,10 @@
     <view class="form-content">
       <!-- 活动图片 -->
       <view class="section">
-        <text class="section-label">活动图片</text>
+        <view class="section-label">
+          <text >活动图片</text>
+          <text style="color:#f00;font-size:24rpx;">*</text>
+        </view>
         <view class="img-row" id="imgRow">
           <view class="img-upload-item"
             v-for="(img, idx) in displaySlots" :key="'slot-' + idx"
@@ -42,13 +45,19 @@
       <view class="form-card">
         <!-- <view class="form-row" @click="focusInput('name')">没有此事件方法，注释 -->
         <view class="form-row">
-          <text class="form-label">活动主题</text>
+          <view class="form-label">
+            <text >活动主题</text>
+            <text style="color:#f00;font-size:24rpx;">*</text>
+          </view>
           <view class="form-value-row">
             <input class="form-input" v-model="form.name" placeholder="请输入活动主题" placeholder-style="color: #D1D5DB;" maxlength="20" />
           </view>
         </view>
         <view class="form-row">
-          <text class="form-label">活动时间</text>
+          <view class="form-label">
+            <text >活动时间</text>
+            <text style="color:#f00;font-size:24rpx;">*</text>
+          </view>
           <view class="form-value-row" @click="showTimePicker = true">
             <text :class="form.event_time ? 'form-value' : 'placeholder'">{{ form.event_time ? formatTime(form.event_time) : '请选择时间' }}</text>
             <u-icon name="arrow-right" size="16" color="#D1D5DB"></u-icon>
@@ -314,7 +323,10 @@ const previewImage = (idx) => {
 
 const submitForm = async () => {
   if (isSubmitting.value) return;
-
+  if (!imageList.value.length) {
+    uni.$u.toast("请上传活动图片");
+    return;
+  }
   if (!form.value.name) {
     uni.$u.toast("请输入活动主题");
     return;
@@ -323,10 +335,7 @@ const submitForm = async () => {
     uni.$u.toast("请选择活动时间");
     return;
   }
-  if (!imageList.value.length) {
-    uni.$u.toast("请上传活动图片");
-    return;
-  }
+  
 
   isSubmitting.value = true;
   uni.showLoading({ mask: true });
