@@ -7,7 +7,7 @@
         <view class="content">
           <up-form-item label="真实姓名" prop="real_name" required>
             <view class="flex-start">
-              <input v-model="form.real_name" @input="validateField('real_name')" maxlength="12" placeholder-style="color: #C8C9CD;" placeholder="请输入您的真实姓名" />
+              <input v-model="form.real_name" style="width:100%" @input="validateField('real_name')" maxlength="50" placeholder-style="color: #C8C9CD;" placeholder="请输入您的真实姓名" />
             </view>
           </up-form-item>
           <up-form-item label="联系电话" prop="contact_number" required>

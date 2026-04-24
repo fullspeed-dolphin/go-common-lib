@@ -6,7 +6,7 @@
 			<view class="panel bgf">
 				<up-form-item label="姓名" :tipsColor="themeColor" tips="用于购买保险，必须实名" prop="name" required>
 					<view class="flex-start">
-						<up-input v-model="form.name" placeholder="请填写您的真实姓名" border="none" inputAlign="right" maxlength="12"/>
+						<up-input v-model="form.name" placeholder="请填写您的真实姓名" border="none" inputAlign="right"/>
 						<view class="owner">
 							<up-checkbox v-model:checked="form.isOwner" :usedAlone="true" shape="circle" :activeColor="themeColor" size="16" />
 							本人

@@ -22,7 +22,7 @@ padding-left: 30rpx;
 border-radius: 16rpx 16rpx 16rpx 16rpx;
 border: 2rpx solid #E2E8F0;">
               <div style="width: 606rpx;">
-								<input v-model="form.name" class="u-input" @input="validateField('name')" maxlength="50" placeholder-style="color: #64748B;" placeholder="给你的战队起个响亮的名字吧~" />
+								<input v-model="form.name" class="u-input" @input="validateField('name')" maxlength="16" placeholder-style="color: #64748B;" placeholder="给你的战队起个响亮的名字吧~" />
 							</div>
             </view>
           </up-form-item>
@@ -105,6 +105,12 @@ const rules = ref({
       message: "必填项",
       trigger: ["blur", "change"],
     },
+    {
+			min: 4,
+			max: 16,
+			trigger: ["blur"],
+      message: "战队名称需为4-16个字符，请重新输入",
+		}
   ],
   description: [
     {
