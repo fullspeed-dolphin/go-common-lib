@@ -33,7 +33,7 @@
           <view class="card-content">
             <view class="card-title-row">
               <text class="card-name">{{ item.name }}</text>
-              <view class="status-tag" :class="getStatusClass(item.status)">
+              <view class="status-tag" :class="getStatusClass(item.status)" @click.stop="viewEvent(item)">
                 <text>{{ getStatusText(item.status) }}</text>
               </view>
             </view>
@@ -60,18 +60,20 @@
               <!-- <u-button v-if="!['EXP', 'ACT'].includes(item.status)" type="primary" size="mini" shape="circle" color="#2979ff"
                 customStyle="margin:0;width:120rpx;height:52rpx;font-size:22rpx;"
                 @click.stop="editEvent(item)">更新</u-button> -->
-                 <u-button v-if="item.is_free == 1" type="primary" size="mini" shape="circle" color="#2979ff"
-                customStyle="margin:0;width:120rpx;height:52rpx;font-size:22rpx;"
-                @click.stop="editEvent(item)">更新</u-button>
-              <u-button type="error" size="mini" shape="circle" color="#f56c6c"
-                customStyle="margin:0;width:120rpx;height:52rpx;font-size:22rpx;"
+                 <u-button v-if="item.is_free == 1" type="primary" shape="circle" color="#2979ff"
+                customStyle="margin:0;width:100rpx;height:52rpx;font-size:22rpx;"
+                @click.stop="editEvent(item)">
+                    更新
+              </u-button>
+              <u-button type="error"  shape="circle" color="#f56c6c"
+                customStyle="margin:0;width:100rpx;height:52rpx;font-size:22rpx;"
                 @click.stop="removeItem(item)">删除</u-button>
-              <u-button v-if="detail.user_role === 'creator'" type="primary" size="mini" plain shape="circle" color="#10B981"
+              <u-button v-if="detail.user_role === 'creator'" type="primary"  plain shape="circle" color="#10B981"
                 customStyle="margin:0;width:160rpx;height:52rpx;font-size:22rpx;"
                 @click.stop="viewRegistrations(item)">报名信息</u-button>
-              <u-button type="primary" size="mini" plain shape="circle" color="#FF8C00"
-                customStyle="margin:0;width:120rpx;height:52rpx;font-size:22rpx;"
-                @click.stop="viewEvent(item)">详情</u-button>
+              <!-- <u-button type="primary"  plain shape="circle" color="#FF8C00"
+                customStyle="margin:0;width:100rpx;height:52rpx;font-size:22rpx;"
+                @click.stop="viewEvent(item)">详情</u-button> -->
             </view>
           </view>
           <!-- Chevron -->
@@ -403,6 +405,7 @@ onShow(() => {
   justify-content: flex-start;
   gap: 12rpx;
   margin-top: 4rpx;
+  flex-shrink: 0;
 }
 
 .card-chevron {

@@ -64,7 +64,10 @@
           </view>
         </view>
         <view class="form-row" @click="chooseLocation">
-          <text class="form-label">活动地点</text>
+          <view class="form-label">
+            <text >活动地点</text>
+            <text style="color:#f00;font-size:24rpx;">*</text>
+          </view>
           <view class="form-value-row">
             <text :class="form.event_location ? 'form-value-location' : 'placeholder'">{{ form.event_location || '请选择活动地点' }}</text>
             <u-icon name="arrow-right" size="16" color="#D1D5DB"></u-icon>
@@ -90,7 +93,11 @@
 
       <!-- 活动描述 -->
       <view class="section">
-        <text class="section-label">活动描述</text>
+        <!-- <text class="section-label">活动描述</text> -->
+         <view class="section-label">
+            <text >活动描述</text>
+            <text style="color:#f00;font-size:24rpx;">*</text>
+          </view>
         <view class="desc-box">
           <textarea class="desc-input" v-model="form.description" placeholder="请输入活动描述" maxlength="800" />
           <text class="desc-count" v-if="form.description">{{ form.description.length }}/800</text>
@@ -335,7 +342,14 @@ const submitForm = async () => {
     uni.$u.toast("请选择活动时间");
     return;
   }
-  
+  if (!form.value.event_location) {
+    uni.$u.toast("请输入活动地点");
+    return;
+  }
+  if (!form.value.description) {
+    uni.$u.toast("请输入活动描述");
+    return;
+  }
 
   isSubmitting.value = true;
   uni.showLoading({ mask: true });
