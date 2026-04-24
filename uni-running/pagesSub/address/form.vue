@@ -133,7 +133,17 @@ const defaultForm = {
 };
 
 const form = reactive({ ...defaultForm, ...props.modelValue });
-
+const validateChineseName = (rule, value, callback) => {
+		const name = (value || '').trim();
+		if (!name) return callback(new Error('请填写姓名'));
+		if (!/^[\u4e00-\u9fff\u3400-\u4dbf\uF900-\uFAFF\u00b7]+$/.test(name)) return callback(new Error('姓名仅支持中文和间隔号·'));
+		if (/^\u00b7|\u00b7$/.test(name)) return callback(new Error('间隔号不能在姓名首尾'));
+		if (/\u00b7{2}/.test(name)) return callback(new Error('间隔号不能连续使用'));
+		const chineseCount = name.replace(/\u00b7/g, '').length;
+		if (chineseCount < 2) return callback(new Error('姓名至少2个中文字'));
+		if (chineseCount > 12) return callback(new Error('姓名不能超过12个中文字'));
+		callback();
+	};
 // 表单验证规则
 const rules = {
   name: [
@@ -142,6 +152,10 @@ const rules = {
       message: "请输入联系人姓名",
       trigger: "blur",
     },
+    {
+			validator: validateChineseName,
+			trigger: ["blur"]
+		}
   ],
   phone: [
     {

@@ -6,7 +6,7 @@
 			<view class="panel bgf">
 				<up-form-item label="姓名" :tipsColor="themeColor" tips="用于购买保险，必须实名" prop="name" required>
 					<view class="flex-start">
-						<up-input v-model="form.name" placeholder="请填写您的真实姓名" border="none" inputAlign="right" />
+						<up-input v-model="form.name" placeholder="请填写您的真实姓名" border="none" inputAlign="right" maxlength="12"/>
 						<view class="owner">
 							<up-checkbox v-model:checked="form.isOwner" :usedAlone="true" shape="circle" :activeColor="themeColor" size="16" />
 							本人
@@ -1338,6 +1338,34 @@
 			}
 		});
 	}
+	/* const handleNameInput = (value) => {
+      // 1. 移除所有非中文字符（包括繁体和简体）
+      // \u4e00-\u9fa5 匹配基本汉字
+      // \u3400-\u4dbf 匹配扩展A区汉字
+      // \u{20000}-\u{2a6df} 匹配扩展B区汉字等（如需更全面支持繁体生僻字，建议保留基本范围即可，大部分繁体在基本区）
+      // 这里使用通用的中文Unicode范围
+      const chineseRegex = /[\u4e00-\u9fa5]/g;
+      
+      // 提取所有中文字符
+      const matched = value.match(chineseRegex);
+      
+      if (matched) {
+        // 拼接回字符串
+        let filteredValue = matched.join('');
+        
+        // 2. 限制长度在 2-12 之间
+        // 如果超过12位，截取前12位
+        if (filteredValue.length > 12) {
+          filteredValue = filteredValue.substring(0, 12);
+        }
+        
+        // 更新模型数据
+        form.value.name = filteredValue;
+      } else {
+        // 如果没有中文字符，清空
+        form.value.name = '';
+      }
+	} */
 </script>
 
 <style lang="scss" scoped>

@@ -7,7 +7,7 @@
         <view class="content">
           <up-form-item label="真实姓名" prop="real_name" required>
             <view class="flex-start">
-              <input v-model="form.real_name" @input="validateField('real_name')" maxlength="50" placeholder-style="color: #C8C9CD;" placeholder="请输入您的真实姓名" />
+              <input v-model="form.real_name" @input="validateField('real_name')" maxlength="12" placeholder-style="color: #C8C9CD;" placeholder="请输入您的真实姓名" />
             </view>
           </up-form-item>
           <up-form-item label="联系电话" prop="contact_number" required>
@@ -186,7 +186,18 @@ const radiolist1 = ref([
     disabled: false,
   },
 ]);
-
+// 姓名校验：2-12个中文，允许间隔号·（新疆等少数民族姓名）
+	const validateChineseName = (rule, value, callback) => {
+		const name = (value || '').trim();
+		if (!name) return callback(new Error('请填写姓名'));
+		if (!/^[\u4e00-\u9fff\u3400-\u4dbf\uF900-\uFAFF\u00b7]+$/.test(name)) return callback(new Error('姓名仅支持中文和间隔号·'));
+		if (/^\u00b7|\u00b7$/.test(name)) return callback(new Error('间隔号不能在姓名首尾'));
+		if (/\u00b7{2}/.test(name)) return callback(new Error('间隔号不能连续使用'));
+		const chineseCount = name.replace(/\u00b7/g, '').length;
+		if (chineseCount < 2) return callback(new Error('姓名至少2个中文字'));
+		if (chineseCount > 12) return callback(new Error('姓名不能超过12个中文字'));
+		callback();
+	};
 const formRules = ref({
   real_name: [
     {
@@ -194,6 +205,10 @@ const formRules = ref({
       message: "必填项",
       trigger: ["blur", "change"],
     },
+    {
+			validator: validateChineseName,
+			trigger: ["blur"]
+		}
   ],
   contact_number: [
     {
