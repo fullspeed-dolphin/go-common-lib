@@ -33,7 +33,7 @@
           <view class="card-content">
             <view class="card-title-row">
               <text class="card-name">{{ item.name }}</text>
-              <view class="status-tag" :class="getStatusClass(item.status)">
+              <view class="status-tag" :class="getStatusClass(item.status)" @click.stop="viewEvent(item)">
                 <text>{{ getStatusText(item.status) }}</text>
               </view>
             </view>
@@ -71,9 +71,9 @@
               <u-button v-if="detail.user_role === 'creator'" type="primary"  plain shape="circle" color="#10B981"
                 customStyle="margin:0;width:160rpx;height:52rpx;font-size:22rpx;"
                 @click.stop="viewRegistrations(item)">报名信息</u-button>
-              <u-button type="primary"  plain shape="circle" color="#FF8C00"
+              <!-- <u-button type="primary"  plain shape="circle" color="#FF8C00"
                 customStyle="margin:0;width:100rpx;height:52rpx;font-size:22rpx;"
-                @click.stop="viewEvent(item)">详情</u-button>
+                @click.stop="viewEvent(item)">详情</u-button> -->
             </view>
           </view>
           <!-- Chevron -->
