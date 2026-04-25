@@ -83,13 +83,23 @@
         <view class="mine-section">
           <text class="section-title">更多</text>
           <view class="section-card">
-            <view class="menu-row" @click="openWeComChat()">
+
+            <!-- <view class="menu-row" @click="openWeComChat()">
               <view class="menu-icon-wrap">
                 <view class="iconfont icon-lianxikefu menu-icon"></view>
               </view>
               <text class="menu-label">联系客服</text>
               <u-icon name="arrow-right" color="#B8C4D0" size="16"></u-icon>
-            </view>
+            </view> -->
+            <!-- 业务调整，使用微信客服比较简化 2026-04-25 -->
+            <button class="u-reset-button menu-row" open-type="contact">
+              <view class="menu-icon-wrap">
+                <view class="iconfont icon-lianxikefu menu-icon"></view>
+              </view>
+              <text class="menu-label">联系客服</text>
+              <u-icon name="arrow-right" color="#B8C4D0" size="16"></u-icon>
+            </button>
+
             <view class="menu-divider"></view>
             <view class="menu-row" @click="routeTo('/pagesMine/PunchEvent')">
               <view class="menu-icon-wrap">
@@ -326,6 +336,32 @@ const openWeComChat = () => {
 </script>
 
 <style lang="scss" scoped>
+.u-reset-button {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  text-align: left;
+  display: flex;
+  flex-direction: row;
+  box-sizing: border-box;
+  align-items: center;
+
+  &::after {
+    border: none;
+  }
+
+  .flex-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    box-sizing: border-box;
+  }
+}
+
 .nav-hero-transition {
   height: 60rpx;
   background: linear-gradient(180deg, #FFFFFF 0%, #FFF0E0 100%);
