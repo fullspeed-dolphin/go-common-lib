@@ -118,7 +118,7 @@
         <text class="cert-popup-title">填写证件信息</text>
         <text class="cert-popup-desc">本活动需要运动保险，请填写证件信息</text>
         <view class="cert-form">
-          <view class="cert-row">
+          <view class="cert-row" v-if="isInsurance">
             <text class="cert-label">证件类型</text>
             <view class="cert-radios">
               <view class="cert-radio" :class="{ active: certForm.cert_type === 'CN_ID' }" @click="certForm.cert_type = 'CN_ID'">
@@ -383,6 +383,7 @@ const isRegistrationOpen = computed(() => {
 });
 
 // 底部按钮点击
+const isInsurance = ref(false);
 const onActionClick = () => {
   if (isRegistered.value) return;
 
@@ -410,7 +411,7 @@ const onActionClick = () => {
   }
 
   // 需要保险 → 弹窗输入证件；20260427需求变更为不管是否需要保险，都弹出报名
-  const isInsurance = ref(false);
+  
   showCertPopup.value = true;
   if (detail.value.need_insurance && Number(detail.value.need_insurance) === 1) {
     // showCertPopup.value = true;
