@@ -1,6 +1,10 @@
 <template>
   <view class="page-container">
-    <u-navbar :title="eventName || '报名信息'" autoBack placeholder></u-navbar>
+    <u-navbar :title="eventName || '报名信息'" autoBack placeholder>
+      <!-- <template #right>
+        <u-icon name="download" size="20" color="#1A1A1A" @click="exportToExcel"></u-icon>
+      </template> -->
+    </u-navbar>
 
     <view v-if="loading" class="loading-wrap">
       <u-loading-icon size="28"></u-loading-icon>
@@ -13,6 +17,7 @@
     <view v-else class="reg-list">
       <view class="summary-bar">
         <text class="summary-text">共 {{ list.length }} 人报名</text>
+        <view @click="exportToExcel">预览报名表<u-icon name="download" size="20" color="#1A1A1A" @click="exportToExcel"></u-icon></view>
       </view>
 
       <view class="reg-card" v-for="item in list" :key="item.id">
@@ -47,11 +52,52 @@ import { ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
+import * as XLSX from 'xlsx';
 
 const eventId = ref("");
 const eventName = ref("");
 const list = ref([]);
 const loading = ref(true);
+
+const exportToExcel = () => {
+  if (list.value.length === 0) {
+    uni.showToast({ title: '无数据可导出', icon: 'none' });
+    return;
+  }
+  const data = list.value.map(item => ({
+    昵称: item.nickname || '未设置昵称',
+    姓名: item.real_name || '',
+    手机: item.contact_number || '',
+    报名时间: formatTime(item.created_at),
+    状态: item.status === 'SUCC' ? '已报名' : '已取消'
+  }));
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '报名列表');
+  const fileName = `${eventName.value || '报名信息'}_${dayjs().format('YYYYMMDD_HHmm')}.xlsx`;
+
+// 设置自定义列宽（可选）
+// ws['!cols'] = [{ wch: 15 }, { wch: 15 }, { wch: 20 }];
+
+const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+const filePath = `${wx.env.USER_DATA_PATH}/导出数据_${Date.now()}.xlsx`;
+
+const fs = wx.getFileSystemManager();
+fs.writeFile({
+  filePath,
+  data: wbout,
+  encoding: 'binary',
+  success: () => {
+    wx.openDocument({
+      filePath,
+      showMenu: true, // 显示右上角菜单（支持转发）
+      success: () => console.log('预览成功'),
+      fail: () => wx.showToast({ title: '预览失败', icon: 'error' })
+    });
+  },
+  fail: err => console.error('写入失败', err)
+});
+};
 
 const getRegistrations = () => {
   loading.value = true;
@@ -91,6 +137,9 @@ onLoad((options) => {
 
 .summary-bar {
   padding: 20rpx 32rpx 8rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .summary-text {

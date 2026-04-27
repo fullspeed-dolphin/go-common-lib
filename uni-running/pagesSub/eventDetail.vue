@@ -110,13 +110,13 @@
 				  {{isSignUp ? '取消' : ''}}报名截止：2025.09.30 9:00
 			  </view> -->
 				<view class="u-border-top1" :class="{ isSignUp: isSignUp }">
-					<u-button type="primary" :color="themeBtnColor" shape="circle" customStyle="height: 80rpx;" @click="routeTo()">
+					<u-button type="primary" :color="themeBtnColor" shape="circle" customStyle="height: 80rpx;" @click="routeTo()" disabled="isOutDated">
 						<block v-if="Number(detail.is_free) === 1">进入活动</block>
 						<block v-else-if="detail.status === 'ACT'">{{
               isSignUp ? "取消报名" : (isCourseEvent ? "立即报班" : "活动报名")
             }}</block>
 						<block v-else-if="detail.status === 'PND'">活动暂未开始</block>
-						<block v-else-if="detail.status === 'EXP'">授权登录查看报名情况</block>
+						<block v-else-if="detail.status === 'EXP'">{{ isOutDated ? '活动已结束' : '授权登录查看报名情况' }}</block>
 					</u-button>
 				</view>
 			</view>
@@ -184,7 +184,11 @@
 	});
 	const themeBtnColor = computed(() => {
 		const g = detail.value?.color_config?.gradient;
-		return g?.length === 2 ? g[0] : '#FF8C00';
+		if(isOutDated) {
+			return '#666';
+		} else {
+			return g?.length === 2 ? g[0] : '#FF8C00';
+		}
 	});
 	// 信息卡片浅色背景（主题色 10% 透明度）
 	const themePanelItemStyle = computed(() => {
@@ -230,6 +234,10 @@
 			}
 		}).catch(() => {});
 	};
+	const isOutDated = computed(() => {
+		const t = dayjs(detail.value.event_time);
+		return t.isBefore(dayjs());
+	});
 	const startStatusPolling = () => {
 		stopStatusPolling();
 		statusTimer = setInterval(pollStatus, 30000);
@@ -627,5 +635,8 @@
 			transform: translateY(0);
 			opacity: 1;
 		}
+	}
+	::v-deep .u-button--disabled {
+		opacity:1 !important;
 	}
 </style>

@@ -1,9 +1,9 @@
 <template>
   <view class="page-container">
     <u-navbar title="活动详情" autoBack placeholder>
-      <template #right>
+      <!-- <template #right>
         <u-icon name="more-dot-fill" size="20" color="#1A1A1A" @click="showMore"></u-icon>
-      </template>
+      </template> -->
     </u-navbar>
 
     <!-- 封面图轮播 -->
@@ -101,7 +101,7 @@
     <view class="section-bottom">
       <view class="btn-action" :class="{ 'btn-disabled': ['REJ','EXP'].includes(detail.status) || isRegistered || isFull || !isRegistrationOpen }" @click="onActionClick()">
         <text class="btn-action-text">
-          <block v-if="isRegistered">已报名</block>
+          <block v-if="isRegistered">{{ isOutDated ? '已过期' : '已报名' }}</block>
           <block v-else-if="isFull">报名已满</block>
           <block v-else-if="!isRegistrationOpen">报名未开放</block>
           <block v-else-if="detail.status === 'ACT'">立即报名</block>
@@ -295,7 +295,10 @@ onShow(() => {
 onUnload(() => {
   uni.removeStorageSync("eventDetail");
 });
-
+const isOutDated = computed(() => {
+  const t = dayjs(detail.value.event_time);
+  return t.isBefore(dayjs());
+});
 const getDetail = () => {
   return request.get(`/event-api/fsc_events/${routerParams.value.id}`)
     .then((res) => {

@@ -21,7 +21,7 @@
     <mescroll-body @init="mescrollInit" @down="downCallback" @up="getList" :top="0">
       <view class="event-list">
         <view class="event-card" :class="{ 'status-expired': item.status === 'EXP' }"
-          v-for="(item, index) in eventList" :key="index">
+          v-for="(item, index) in eventList" :key="index" @click.stop="viewEvent(item)">
           <!-- Cover Image -->
           <image class="cover-img" v-if="getCoverUrl(item)"
             :src="getCoverUrl(item) + '?x-oss-process=image/resize,w_200,h_200,m_fill'"
@@ -33,7 +33,7 @@
           <view class="card-content">
             <view class="card-title-row">
               <text class="card-name">{{ item.name }}</text>
-              <view class="status-tag" :class="getStatusClass(item.status)" @click.stop="viewEvent(item)">
+              <view class="status-tag" :class="getStatusClass(item.status)">
                 <text>{{ getStatusText(item.status) }}</text>
               </view>
             </view>
@@ -237,6 +237,7 @@ const viewRegistrations = (item) => {
 };
 
 const viewEvent = (item) => {
+  console.log('viewEvent', item);
   uni.$u.route(`pagesSub/runningTeam/teamEventDetail?id=${item.id}&status=${item.status}&status_message=${encodeURIComponent(item.status_message || '')}`);
 };
 
