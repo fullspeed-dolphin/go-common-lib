@@ -134,7 +134,7 @@
             <input class="cert-input" :class="{ 'cert-input-error': nameError }" v-model="certForm.real_name" placeholder="请输入真实姓名" @blur="validateName" />
             <text class="cert-error-text" v-if="nameError">{{ nameError }}</text>
           </view>
-          <view class="cert-row">
+          <view class="cert-row" v-if="isInsurance">
             <text class="cert-label">证件号码</text>
             <input class="cert-input" v-model="certForm.cert_number" :placeholder="certForm.cert_type === 'HK_MA_PASS' ? '请输入回乡证号码' : '请输入身份证号码'" />
           </view>
@@ -409,14 +409,18 @@ const onActionClick = () => {
     return;
   }
 
-  // 需要保险 → 弹窗输入证件
+  // 需要保险 → 弹窗输入证件；20260427需求变更为不管是否需要保险，都弹出报名
+  const isInsurance = ref(false);
+  showCertPopup.value = true;
   if (detail.value.need_insurance && Number(detail.value.need_insurance) === 1) {
-    showCertPopup.value = true;
-    return;
+    // showCertPopup.value = true;
+    isInsurance.value = true;
+  } else {
+    isInsurance.value = false;
   }
 
   // 不需要保险 → 直接报名
-  submitRegistration();
+  // submitRegistration();
 };
 
 // 直接报名（不需要证件）
@@ -450,9 +454,11 @@ const submitRegistrationWithCert = () => {
     uni.$u.toast(nameErr);
     return;
   }
-  if (!certForm.value.cert_number) {
-    uni.$u.toast('请输入证件号码');
-    return;
+  if(isInsurance.value) { // 有保险的情况下才需要填写证件号码
+    if (!certForm.value.cert_number) {
+      uni.$u.toast('请输入证件号码');
+      return;
+    }
   }
   if (!certForm.value.contact_number) {
     uni.$u.toast('请输入手机号');
