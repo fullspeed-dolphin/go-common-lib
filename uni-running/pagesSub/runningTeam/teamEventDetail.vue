@@ -1,9 +1,9 @@
 <template>
   <view class="page-container">
     <u-navbar title="活动详情" autoBack placeholder>
-      <template #right>
+      <!-- <template #right>
         <u-icon name="more-dot-fill" size="20" color="#1A1A1A" @click="showMore"></u-icon>
-      </template>
+      </template> -->
     </u-navbar>
 
     <!-- 封面图轮播 -->
@@ -101,7 +101,7 @@
     <view class="section-bottom">
       <view class="btn-action" :class="{ 'btn-disabled': ['REJ','EXP'].includes(detail.status) || isRegistered || isFull || !isRegistrationOpen }" @click="onActionClick()">
         <text class="btn-action-text">
-          <block v-if="isRegistered">已报名</block>
+          <block v-if="isRegistered">{{ isOutDated ? '已过期' : '已报名' }}</block>
           <block v-else-if="isFull">报名已满</block>
           <block v-else-if="!isRegistrationOpen">报名未开放</block>
           <block v-else-if="detail.status === 'ACT'">立即报名</block>
@@ -118,7 +118,7 @@
         <text class="cert-popup-title">填写证件信息</text>
         <text class="cert-popup-desc">本活动需要运动保险，请填写证件信息</text>
         <view class="cert-form">
-          <view class="cert-row">
+          <view class="cert-row" v-if="isInsurance">
             <text class="cert-label">证件类型</text>
             <view class="cert-radios">
               <view class="cert-radio" :class="{ active: certForm.cert_type === 'CN_ID' }" @click="certForm.cert_type = 'CN_ID'">
@@ -134,23 +134,24 @@
             <input class="cert-input" :class="{ 'cert-input-error': nameError }" v-model="certForm.real_name" placeholder="请输入真实姓名" @blur="validateName" />
             <text class="cert-error-text" v-if="nameError">{{ nameError }}</text>
           </view>
-          <view class="cert-row">
+          <view class="cert-row" v-if="isInsurance">
             <text class="cert-label">证件号码</text>
             <input class="cert-input" v-model="certForm.cert_number" :placeholder="certForm.cert_type === 'HK_MA_PASS' ? '请输入回乡证号码' : '请输入身份证号码'" />
           </view>
           <view class="cert-row">
             <text class="cert-label">手机号</text>
-            <text class="cert-hint">{{ certForm.cert_type === 'HK_MA_PASS' ? '请输入港澳手机号码' : '请输入大陆手机号码（不带区号）' }}</text>
+            <!-- <text class="cert-hint">{{ certForm.cert_type === 'HK_MA_PASS' ? '请输入港澳手机号码' : '请输入大陆手机号码（不带区号）' }}</text> -->
+            <text class="cert-hint">请输入手机号码</text>
             <view class="cert-phone-wrap">
-              <text class="cert-phone-prefix">{{ certForm.cert_type === 'HK_MA_PASS' ? '+852' : '+86' }}</text>
+              <text class="cert-phone-prefix">{{ certForm.contact_number.length !== 11 ? '+852' : '+86' }}</text>
               <input
                 class="cert-input cert-phone-input"
                 v-model="certForm.contact_number"
                 type="number"
-                :placeholder="certForm.cert_type === 'HK_MA_PASS' ? '8位港澳手机号' : '11位大陆手机号'"
-                :maxlength="certForm.cert_type === 'HK_MA_PASS' ? 8 : 11"
-              />
-            </view>
+                placeholder="请输入手机号码"
+                />
+                <!-- :placeholder="certForm.contact_number.length !== 11 ? '8位港澳手机号' : '11位大陆手机号'" -->
+              </view>
           </view>
         </view>
         <view class="cert-actions">
@@ -295,7 +296,10 @@ onShow(() => {
 onUnload(() => {
   uni.removeStorageSync("eventDetail");
 });
-
+const isOutDated = computed(() => {
+  const t = dayjs(detail.value.event_time);
+  return t.isBefore(dayjs());
+});
 const getDetail = () => {
   return request.get(`/event-api/fsc_events/${routerParams.value.id}`)
     .then((res) => {
@@ -383,6 +387,7 @@ const isRegistrationOpen = computed(() => {
 });
 
 // 底部按钮点击
+const isInsurance = ref(false);
 const onActionClick = () => {
   if (isRegistered.value) return;
 
@@ -409,14 +414,18 @@ const onActionClick = () => {
     return;
   }
 
-  // 需要保险 → 弹窗输入证件
+  // 需要保险 → 弹窗输入证件；20260427需求变更为不管是否需要保险，都弹出报名
+  
+  showCertPopup.value = true;
   if (detail.value.need_insurance && Number(detail.value.need_insurance) === 1) {
-    showCertPopup.value = true;
-    return;
+    // showCertPopup.value = true;
+    isInsurance.value = true;
+  } else {
+    isInsurance.value = false;
   }
 
   // 不需要保险 → 直接报名
-  submitRegistration();
+  // submitRegistration();
 };
 
 // 直接报名（不需要证件）
@@ -450,23 +459,38 @@ const submitRegistrationWithCert = () => {
     uni.$u.toast(nameErr);
     return;
   }
-  if (!certForm.value.cert_number) {
-    uni.$u.toast('请输入证件号码');
-    return;
+  if(isInsurance.value) { // 有保险的情况下才需要填写证件号码
+    if (!certForm.value.cert_number) {
+      uni.$u.toast('请输入证件号码');
+      return;
+    }
   }
   if (!certForm.value.contact_number) {
     uni.$u.toast('请输入手机号');
     return;
   }
-  if (certForm.value.cert_type === 'CN_ID' && !/^1[3-9]\d{9}$/.test(certForm.value.contact_number)) {
-    uni.$u.toast('请输入正确的大陆手机号');
+  console.log('contact_number', certForm.value.contact_number.length);
+  if(certForm.value.contact_number.length == 8 || certForm.value.contact_number.length == 11) {
+    if(certForm.value.contact_number.length == 8 && !/^[4-9]\d{7}$/.test(certForm.value.contact_number)) {
+      uni.$u.toast('请输入正确的港澳手机号');
+      return;
+    }
+    if(certForm.value.contact_number.length == 11 && !/^1[3-9]\d{9}$/.test(certForm.value.contact_number)) {
+      uni.$u.toast('请输入正确的大陆手机号');
+      return;
+    }
+  } else {
+    uni.$u.toast('请输入正确的手机号');
     return;
   }
-  if (certForm.value.cert_type === 'HK_MA_PASS' && !/^[4-9]\d{7}$/.test(certForm.value.contact_number)) {
-    uni.$u.toast('请输入正确的港澳手机号');
-    return;
-  }
-
+  // if (certForm.value.cert_type === 'CN_ID' && !/^1[3-9]\d{9}$/.test(certForm.value.contact_number)) {
+  //   uni.$u.toast('请输入正确的大陆手机号');
+  //   return;
+  // }
+  // if (certForm.value.cert_type === 'HK_MA_PASS' && !/^[4-9]\d{7}$/.test(certForm.value.contact_number)) {
+  //   uni.$u.toast('请输入正确的港澳手机号');
+  //   return;
+  // }
   uni.showLoading({ mask: true, title: '报名中...' });
   request.post('/booking-api/fsc_events/registration', {
     event_id: routerParams.value.id,

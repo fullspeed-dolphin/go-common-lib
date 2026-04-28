@@ -29,6 +29,7 @@
 
         <div class="u-flex-row u-flex-wrap">
           <view class="event-item" :class="{ 'active': item.checked }" :style="item.checked && item.gradient ? { background: `linear-gradient(90deg, ${item.gradient[0]}, ${item.gradient[1]})`, borderColor: item.gradient[0], color: '#fff' } : item.gradient ? { borderColor: item.gradient[0], color: item.gradient[0] } : {}" @click="selectEvent(item)" v-for="(item,index) in options_events_screenshot" :key="index">
+            <up-icon v-if="item.value === 'default'" name="lock-fill" size="22rpx" color="#fff" customStyle="margin-right: 6rpx;vertical-align: middle;" />
             {{item.label}}
           </view>
         </div>
@@ -137,6 +138,7 @@
           <view class="event-item" :class="{ 'active': item.checked }"
             :style="item.checked && item.gradient ? { background: `linear-gradient(90deg, ${item.gradient[0]}, ${item.gradient[1]})`, borderColor: item.gradient[0], color: '#fff' } : item.gradient ? { borderColor: item.gradient[0], color: item.gradient[0] } : {}"
             @click="toggleDeviceEvent(item)" v-for="(item,index) in options_events_device" :key="index">
+            <up-icon v-if="item.value === 'default'" name="lock-fill" size="22rpx" color="#fff" customStyle="margin-right: 6rpx;vertical-align: middle;" />
             {{item.label}}
           </view>
         </div>
@@ -367,6 +369,7 @@ async function runValidation(records) {
 
 // 切换设备 tab 的活动勾选：翻转 checked + 重跑预检（只对已有 records，不重拉）
 function toggleDeviceEvent(item) {
+  if (item.value === "default") return;
   item.checked = !item.checked;
   runValidation(deviceRecords.value);
 }
@@ -532,6 +535,7 @@ function getMyEvents() {
 }
 
 function selectEvent(item) {
+  if (item.value === "default") return;
   item.checked = !item.checked;
 }
 
