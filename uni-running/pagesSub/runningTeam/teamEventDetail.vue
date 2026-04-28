@@ -140,17 +140,18 @@
           </view>
           <view class="cert-row">
             <text class="cert-label">手机号</text>
-            <text class="cert-hint">{{ certForm.cert_type === 'HK_MA_PASS' ? '请输入港澳手机号码' : '请输入大陆手机号码（不带区号）' }}</text>
+            <!-- <text class="cert-hint">{{ certForm.cert_type === 'HK_MA_PASS' ? '请输入港澳手机号码' : '请输入大陆手机号码（不带区号）' }}</text> -->
+            <text class="cert-hint">请输入手机号码</text>
             <view class="cert-phone-wrap">
-              <text class="cert-phone-prefix">{{ certForm.cert_type === 'HK_MA_PASS' ? '+852' : '+86' }}</text>
+              <text class="cert-phone-prefix">{{ certForm.contact_number.length !== 11 ? '+852' : '+86' }}</text>
               <input
                 class="cert-input cert-phone-input"
                 v-model="certForm.contact_number"
                 type="number"
-                :placeholder="certForm.cert_type === 'HK_MA_PASS' ? '8位港澳手机号' : '11位大陆手机号'"
-                :maxlength="certForm.cert_type === 'HK_MA_PASS' ? 8 : 11"
-              />
-            </view>
+                placeholder="请输入手机号码"
+                />
+                <!-- :placeholder="certForm.contact_number.length !== 11 ? '8位港澳手机号' : '11位大陆手机号'" -->
+              </view>
           </view>
         </view>
         <view class="cert-actions">
@@ -468,14 +469,27 @@ const submitRegistrationWithCert = () => {
     uni.$u.toast('请输入手机号');
     return;
   }
-  if (certForm.value.cert_type === 'CN_ID' && !/^1[3-9]\d{9}$/.test(certForm.value.contact_number)) {
-    uni.$u.toast('请输入正确的大陆手机号');
+  if(certForm.value.contact_number.length != 8 || certForm.value.contact_number.length != 11) {
+    uni.$u.toast('请输入正确的手机号');
     return;
+  } else {
+    if(certForm.value.contact_number.length == 8 && !/^[4-9]\d{7}$/.test(certForm.value.contact_number)) {
+      uni.$u.toast('请输入正确的港澳手机号');
+      return;
+    }
+    if(certForm.value.contact_number.length == 11 && !/^1[3-9]\d{9}$/.test(certForm.value.contact_number)) {
+      uni.$u.toast('请输入正确的大陆手机号');
+      return;
+    }
   }
-  if (certForm.value.cert_type === 'HK_MA_PASS' && !/^[4-9]\d{7}$/.test(certForm.value.contact_number)) {
-    uni.$u.toast('请输入正确的港澳手机号');
-    return;
-  }
+  // if (certForm.value.cert_type === 'CN_ID' && !/^1[3-9]\d{9}$/.test(certForm.value.contact_number)) {
+  //   uni.$u.toast('请输入正确的大陆手机号');
+  //   return;
+  // }
+  // if (certForm.value.cert_type === 'HK_MA_PASS' && !/^[4-9]\d{7}$/.test(certForm.value.contact_number)) {
+  //   uni.$u.toast('请输入正确的港澳手机号');
+  //   return;
+  // }
 
   uni.showLoading({ mask: true, title: '报名中...' });
   request.post('/booking-api/fsc_events/registration', {

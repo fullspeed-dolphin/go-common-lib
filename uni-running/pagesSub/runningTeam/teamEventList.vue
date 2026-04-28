@@ -21,7 +21,7 @@
     <mescroll-body @init="mescrollInit" @down="downCallback" @up="getList" :top="0">
       <view class="event-list">
         <view class="event-card" :class="{ 'status-expired': item.status === 'EXP' }"
-          v-for="(item, index) in eventList" :key="index" @click.stop="viewEvent(item)">
+          v-for="(item, index) in eventList" :key="index" @tap.stop="viewEvent(item)">
           <!-- Cover Image -->
           <image class="cover-img" v-if="getCoverUrl(item)"
             :src="getCoverUrl(item) + '?x-oss-process=image/resize,w_200,h_200,m_fill'"
@@ -62,15 +62,15 @@
                 @click.stop="editEvent(item)">更新</u-button> -->
                  <u-button v-if="item.is_free == 1" type="primary" shape="circle" color="#2979ff"
                 customStyle="margin:0;width:100rpx;height:52rpx;font-size:22rpx;"
-                @click.stop="editEvent(item)">
+                @tap.stop="editEvent(item)">
                     更新
               </u-button>
               <u-button type="error"  shape="circle" color="#f56c6c"
                 customStyle="margin:0;width:100rpx;height:52rpx;font-size:22rpx;"
-                @click.stop="removeItem(item)">删除</u-button>
+                @tap.stop="removeItem(item)">删除</u-button>
               <u-button v-if="detail.user_role === 'creator'" type="primary"  plain shape="circle" color="#10B981"
                 customStyle="margin:0;width:160rpx;height:52rpx;font-size:22rpx;"
-                @click.stop="viewRegistrations(item)">报名信息</u-button>
+                @tap.stop="viewRegistrations(item)">报名信息</u-button>
               <!-- <u-button type="primary"  plain shape="circle" color="#FF8C00"
                 customStyle="margin:0;width:100rpx;height:52rpx;font-size:22rpx;"
                 @click.stop="viewEvent(item)">详情</u-button> -->

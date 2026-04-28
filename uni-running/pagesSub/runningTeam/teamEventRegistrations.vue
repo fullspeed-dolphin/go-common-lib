@@ -17,7 +17,10 @@
     <view v-else class="reg-list">
       <view class="summary-bar">
         <text class="summary-text">共 {{ list.length }} 人报名</text>
-        <view @click="exportToExcel">预览报名表<u-icon name="download" size="20" color="#1A1A1A" @click="exportToExcel"></u-icon></view>
+        <view @click="exportToExcel" style="color:#2979ff;font-size:26rpx;display: flex;align-items: center;">
+          <text>预览报名表</text>
+          <u-icon name="download" size="26" color="#2979ff" @click="exportToExcel"></u-icon>
+        </view>
       </view>
 
       <view class="reg-card" v-for="item in list" :key="item.id">
@@ -64,6 +67,7 @@ const exportToExcel = () => {
     uni.showToast({ title: '无数据可导出', icon: 'none' });
     return;
   }
+  uni.showLoading({ title: '正在生成文件...' });
   const data = list.value.map(item => ({
     昵称: item.nickname || '未设置昵称',
     姓名: item.real_name || '',
@@ -80,7 +84,7 @@ const exportToExcel = () => {
 // ws['!cols'] = [{ wch: 15 }, { wch: 15 }, { wch: 20 }];
 
 const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-const filePath = `${wx.env.USER_DATA_PATH}/导出数据_${Date.now()}.xlsx`;
+const filePath = `${wx.env.USER_DATA_PATH}/报名信息_${Date.now()}.xlsx`;
 
 const fs = wx.getFileSystemManager();
 fs.writeFile({
@@ -95,7 +99,8 @@ fs.writeFile({
       fail: () => wx.showToast({ title: '预览失败', icon: 'error' })
     });
   },
-  fail: err => console.error('写入失败', err)
+  fail: err => console.error('写入失败', err),
+  complete: () => uni.hideLoading()
 });
 };
 
