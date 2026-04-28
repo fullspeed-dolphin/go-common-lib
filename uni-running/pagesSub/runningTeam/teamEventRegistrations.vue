@@ -84,7 +84,7 @@ const exportToExcel = () => {
 // ws['!cols'] = [{ wch: 15 }, { wch: 15 }, { wch: 20 }];
 
 const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-const filePath = `${wx.env.USER_DATA_PATH}/报名信息_${Date.now()}.xlsx`;
+const filePath = `${wx.env.USER_DATA_PATH}/${eventName.value || '报名信息'}_${dayjs().format('YYYYMMDD')}.xlsx`;
 
 const fs = wx.getFileSystemManager();
 fs.writeFile({

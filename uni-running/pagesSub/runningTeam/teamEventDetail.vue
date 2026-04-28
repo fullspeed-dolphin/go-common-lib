@@ -469,10 +469,8 @@ const submitRegistrationWithCert = () => {
     uni.$u.toast('请输入手机号');
     return;
   }
-  if(certForm.value.contact_number.length != 8 || certForm.value.contact_number.length != 11) {
-    uni.$u.toast('请输入正确的手机号');
-    return;
-  } else {
+  console.log('contact_number', certForm.value.contact_number.length);
+  if(certForm.value.contact_number.length == 8 || certForm.value.contact_number.length == 11) {
     if(certForm.value.contact_number.length == 8 && !/^[4-9]\d{7}$/.test(certForm.value.contact_number)) {
       uni.$u.toast('请输入正确的港澳手机号');
       return;
@@ -481,6 +479,9 @@ const submitRegistrationWithCert = () => {
       uni.$u.toast('请输入正确的大陆手机号');
       return;
     }
+  } else {
+    uni.$u.toast('请输入正确的手机号');
+    return;
   }
   // if (certForm.value.cert_type === 'CN_ID' && !/^1[3-9]\d{9}$/.test(certForm.value.contact_number)) {
   //   uni.$u.toast('请输入正确的大陆手机号');
@@ -490,7 +491,6 @@ const submitRegistrationWithCert = () => {
   //   uni.$u.toast('请输入正确的港澳手机号');
   //   return;
   // }
-
   uni.showLoading({ mask: true, title: '报名中...' });
   request.post('/booking-api/fsc_events/registration', {
     event_id: routerParams.value.id,
