@@ -143,7 +143,7 @@
             <!-- <text class="cert-hint">{{ certForm.cert_type === 'HK_MA_PASS' ? '请输入港澳手机号码' : '请输入大陆手机号码（不带区号）' }}</text> -->
             <text class="cert-hint">请输入手机号码</text>
             <view class="cert-phone-wrap">
-              <text class="cert-phone-prefix">{{ certForm.contact_number.length !== 11 ? '+852' : '+86' }}</text>
+              <!-- <text class="cert-phone-prefix">{{ certForm.contact_number.length !== 11 ? '+852' : '+86' }}</text> -->
               <input
                 class="cert-input cert-phone-input"
                 v-model="certForm.contact_number"
@@ -296,8 +296,10 @@ onShow(() => {
 onUnload(() => {
   uni.removeStorageSync("eventDetail");
 });
+const tempEventTime = ref('');
 const isOutDated = computed(() => {
-  const t = dayjs(detail.value.event_time);
+  const t = dayjs(dayjs(tempEventTime.value).format('YYYY.M.DD HH:mm'));
+  // console.log(tempEventTime.value,'event_time', detail.value.event_time,t.isBefore(dayjs()));
   return t.isBefore(dayjs());
 });
 const getDetail = () => {
@@ -313,6 +315,7 @@ const getDetail = () => {
       // 时间格式化
       const time = isNaN(res.event_time) ? res.event_time : Number(res.event_time);
       const t = dayjs(time);
+      tempEventTime.value = time;
       res.event_time = t.year() !== dayjs().year() ? t.format('YYYY.M.DD HH:mm') : t.format('M.DD HH:mm');
 
       // 报名时间
