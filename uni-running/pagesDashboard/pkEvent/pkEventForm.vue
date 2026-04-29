@@ -112,11 +112,12 @@ const activetyId = ref("");
 function backToEventHome() {
   const pages = getCurrentPages();
   const idx = pages.findIndex(p => p.route?.endsWith('pkEvent/pkEvent'));
-  if (idx >= 0) {
-    uni.navigateBack({ delta: pages.length - 1 - idx });
-  } else {
-    uni.redirectTo({ url: `/pagesDashboard/pkEvent/pkEvent?id=${activetyId.value}` });
-  }
+  // if (idx >= 0) {
+  //   uni.navigateBack({ delta: pages.length - 1 - idx });
+  // } else {
+  //   uni.redirectTo({ url: `/pagesDashboard/pkEvent/pkEvent?id=${activetyId.value}` });
+  // }
+  uni.redirectTo({ url: `/pagesDashboard/pkEvent/pkEvent?id=${activetyId.value}` });
 }
 
 const isAgree = ref(false);

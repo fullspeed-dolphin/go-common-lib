@@ -116,7 +116,7 @@
               isSignUp ? "取消报名" : (isCourseEvent ? "立即报班" : "活动报名")
             }}</block>
 						<block v-else-if="detail.status === 'PND'">活动暂未开始</block>
-						<block v-else-if="detail.status === 'EXP'">{{ isOutDated ? '活动已结束' : '授权登录查看报名情况' }}</block>
+						<block v-else-if="detail.status === 'EXP'">{{ isOutDated ? '活动已结束' : (isLogin ? '查看报名情况' :'授权登录查看报名情况') }}</block>
 					</u-button>
 				</view>
 			</view>
@@ -238,6 +238,7 @@
 		const t = dayjs(detail.value.event_time);
 		return t.isBefore(dayjs());
 	});
+	const isLogin = computed(() => !!userInfo.value.id);
 	const startStatusPolling = () => {
 		stopStatusPolling();
 		statusTimer = setInterval(pollStatus, 30000);
