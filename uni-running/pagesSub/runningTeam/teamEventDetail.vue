@@ -99,11 +99,11 @@
 
     <!-- 底部按钮 -->
     <view class="section-bottom">
-      <view class="btn-action" :class="{ 'btn-disabled': ['REJ','EXP'].includes(detail.status) || isOutDated || isRegistered || isFull || !isRegistrationOpen }" @click="onActionClick()">
+      <view class="btn-action" :class="{ 'btn-disabled': ['REJ','EXP'].includes(detail.status) || getIsOutDated() || isRegistered || isFull || !isRegistrationOpen }" @click="onActionClick()">
         <text class="btn-action-text">
-          <block v-if="isOutDated">
+          <text v-if="getIsOutDated()">
             已过期
-          </block>
+          </text>
           <block v-else>
             <block v-if="isRegistered">已报名</block>
             <block v-else-if="isFull">报名已满</block>
@@ -301,12 +301,14 @@ onShow(() => {
 onUnload(() => {
   uni.removeStorageSync("eventDetail");
 });
+
 const tempEventTime = ref('');
-const isOutDated = computed(() => {
-  const t = dayjs(dayjs(tempEventTime.value).format('YYYY.M.DD HH:mm'));
-  // console.log(tempEventTime.value,'event_time', detail.value.event_time,t.isBefore(dayjs()));
+
+function getIsOutDated() {
+  const t = dayjs(tempEventTime.value);
   return t.isBefore(dayjs());
-});
+};
+
 const getDetail = () => {
   return request.get(`/event-api/fsc_events/${routerParams.value.id}`)
     .then((res) => {
@@ -321,12 +323,12 @@ const getDetail = () => {
       const time = isNaN(res.event_time) ? res.event_time : Number(res.event_time);
       const t = dayjs(time);
       tempEventTime.value = time;
-      res.event_time = t.year() !== dayjs().year() ? t.format('YYYY.M.DD HH:mm') : t.format('M.DD HH:mm');
+      res.event_time = t.year() !== dayjs().year() ? t.format('YYYY/M/DD HH:mm') : t.format('M/DD HH:mm');
 
       // 报名时间
       try {
         const list = JSON.parse(res.registration_time);
-        res.registration_time = `${dayjs(list[0]).format('M.DD HH:mm')} - ${dayjs(list[1]).format('M.DD HH:mm')}`;
+        res.registration_time = `${dayjs(list[0]).format('M/DD HH:mm')} - ${dayjs(list[1]).format('M/DD HH:mm')}`;
       } catch (e) {}
 
       detail.value = res;
@@ -368,7 +370,7 @@ const getRegistrationList = () => {
 
 const formatMemberTime = (time) => {
   if (!time) return '';
-  return dayjs(time).format('M.DD HH:mm') + ' 报名';
+  return dayjs(time).format('M/DD HH:mm') + ' 报名';
 };
 
 // 查询我的报名状态
