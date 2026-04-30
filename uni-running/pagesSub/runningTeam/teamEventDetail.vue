@@ -99,7 +99,7 @@
 
     <!-- 底部按钮 -->
     <view class="section-bottom">
-      <view class="btn-action" :class="{ 'btn-disabled': ['REJ','EXP'].includes(detail.status) || isRegistered || isFull || !isRegistrationOpen }" @click="onActionClick()">
+      <view class="btn-action" :class="{ 'btn-disabled': ['REJ','EXP'].includes(detail.status) || isOutDated || isRegistered || isFull || !isRegistrationOpen }" @click="onActionClick()">
         <text class="btn-action-text">
           <block v-if="isOutDated">
             已过期

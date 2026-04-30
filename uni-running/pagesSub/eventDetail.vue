@@ -195,7 +195,7 @@
 	const themeBtnColor = computed(() => {
 		const g = detail.value?.color_config?.gradient;
 		if(isOutDated) {
-			return '#666';
+			return '#999';
 		} else {
 			return g?.length === 2 ? g[0] : '#FF8C00';
 		}
