@@ -187,6 +187,19 @@ const errors = ref({
   drawing: null
 })
 
+// 拉父活动主题色（深链直进 lottery 时 store 为空，需要自己补）
+const getEventTheme = async () => {
+  if (store.state.pkEventTheme) return
+  try {
+    const res = await request.get(`/event-api/online_events/${eventId.value}`, {}, { showError: false })
+    if (res?.color_config) {
+      store.commit('set', { type: 'pkEventTheme', data: res.color_config })
+    }
+  } catch (error) {
+    console.error('获取活动主题色失败:', error)
+  }
+}
+
 // 获取活动信息
 const getLotteryEventInfo = async () => {
   loading.value.eventInfo = true
@@ -575,6 +588,7 @@ onLoad((options) => {
     eventId.value = options.eventId
   }
   // 获取数据
+  getEventTheme()
   getLotteryEventInfo()
   getPrizes()
   getWinners()
