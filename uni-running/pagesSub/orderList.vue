@@ -228,7 +228,7 @@ function refundOrder(item) {
 					"reason": "用户申请退款",
 					"refund_amount": item.amount
 				}
-				request.post(`/pay/wechat/refund `, params).then((res) => {
+				request.post(`/pay/wechat/refund`, params).then((res) => {
 					uni.$u.toast(res.msg || res.message || "退款申请已提交");
 					refreshList();
 				}).catch((err) => {

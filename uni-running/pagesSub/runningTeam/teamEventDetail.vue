@@ -101,13 +101,18 @@
     <view class="section-bottom">
       <view class="btn-action" :class="{ 'btn-disabled': ['REJ','EXP'].includes(detail.status) || isRegistered || isFull || !isRegistrationOpen }" @click="onActionClick()">
         <text class="btn-action-text">
-          <block v-if="isRegistered">{{ isOutDated ? '已过期' : '已报名' }}</block>
-          <block v-else-if="isFull">报名已满</block>
-          <block v-else-if="!isRegistrationOpen">报名未开放</block>
-          <block v-else-if="detail.status === 'ACT'">立即报名</block>
-          <block v-else-if="detail.status === 'PND'">审核中</block>
-          <block v-else-if="detail.status === 'EXP'">已过期</block>
-          <block v-else-if="detail.status === 'REJ'">修改活动信息并重新提交</block>
+          <block v-if="isOutDated">
+            已过期
+          </block>
+          <block v-else>
+            <block v-if="isRegistered">已报名</block>
+            <block v-else-if="isFull">报名已满</block>
+            <block v-else-if="!isRegistrationOpen">报名未开放</block>
+            <block v-else-if="detail.status === 'ACT'">立即报名</block>
+            <block v-else-if="detail.status === 'PND'">审核中</block>
+            <block v-else-if="detail.status === 'EXP'">已过期</block>
+            <block v-else-if="detail.status === 'REJ'">修改活动信息并重新提交</block>
+          </block>
         </text>
       </view>
     </view>

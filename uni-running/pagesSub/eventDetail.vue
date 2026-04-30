@@ -1,6 +1,5 @@
 <template>
 	<u-navbar :title="detail.name || '活动详情'" bgColor="#fff" placeholder></u-navbar>
-	
 	<view class="u-pb-30" style="background: #f5f5f5" :class="{
       isLoadedPage: isLoadedPage,
     }">
@@ -85,6 +84,8 @@
 					</view>
 				</view>
 
+				
+
 				<view class="cell flex-start u-pl-20 customer-phone">
 					<view class="label">联系电话：</view>
 					<view class="value flex-start">
@@ -109,15 +110,24 @@
 				<!-- <view class="txt">
 				  {{isSignUp ? '取消' : ''}}报名截止：2025.09.30 9:00
 			  </view> -->
-				<view class="u-border-top1" :class="{ isSignUp: isSignUp }">
+				<view class="u-flex-between-center" style="width: 100%;">
 					<u-button type="primary" :color="themeBtnColor" shape="circle" customStyle="height: 80rpx;" @click="routeTo()" disabled="isOutDated">
-						<block v-if="Number(detail.is_free) === 1">进入活动</block>
-						<block v-else-if="detail.status === 'ACT'">{{
-              isSignUp ? "取消报名" : (isCourseEvent ? "立即报班" : "活动报名")
-            }}</block>
-						<block v-else-if="detail.status === 'PND'">活动暂未开始</block>
-						<block v-else-if="detail.status === 'EXP'">{{ isOutDated ? '活动已结束' : (isLogin ? '查看报名情况' :'授权登录查看报名情况') }}</block>
+						<block v-if="isOutDated">
+							活动已结束
+						</block>
+						<block v-else>
+							<block v-if="Number(detail.is_free) === 1">进入活动</block>
+							<block v-else-if="detail.status === 'ACT'">{{
+								isSignUp ? "取消报名" : (isCourseEvent ? "立即报班" : "活动报名")
+							}}</block>
+							<block v-else-if="detail.status === 'PND'">活动暂未开始</block>
+							<block v-else-if="detail.status === 'EXP'">{{ isLogin ? '查看报名情况' :'授权登录查看报名情况' }}</block>
+						</block>
 					</u-button>
+
+					<up-button v-if="detail.status === 'EXP'" @click="routeTo()" type="primary" color="#07c160" shape="circle" customStyle="height: 80rpx;margin-left: 20rpx;" disabled="!isLogin">
+						{{ isLogin ? '查看报名情况' :'授权登录查看报名情况' }}
+					</up-button>
 				</view>
 			</view>
 		</view>
