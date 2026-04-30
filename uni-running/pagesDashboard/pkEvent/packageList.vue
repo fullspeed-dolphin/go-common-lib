@@ -26,7 +26,7 @@
       <div class="flex-center b" style="height:90rpx;font-size:32rpx;">{{ comBoDetail.package_name }}</div>
       <view class="container">
         <view class="packHead">
-          <view class="item" :class="currentItemIndex === index ? 'active':''" v-for="(item,index) in tabList" @click="itemClick(item,index)">
+          <view class="item" :key="index" :class="currentItemIndex === index ? 'active':''" v-for="(item,index) in tabList" @click="itemClick(item,index)">
             {{ item.name }}
           </view>
         </view>
@@ -36,7 +36,7 @@
               <view class="nodata" text="暂无详情">暂无详情</view>
             </view>
             <scroll-view scroll-y style="height:686rpx;width:686rpx;" v-else>
-              <image v-for="item in comBoDetail.detail" style="width:686rpx;" :src="item + '?x-oss-process=image/resize,w_750,m_fill'" mode="widthFix"></image>
+              <image v-for="itemImg in comBoDetail.detail" :key="itemImg" style="width:686rpx;" :src="itemImg + '?x-oss-process=image/resize,w_750,m_fill'" mode="widthFix"></image>
             </scroll-view>
           </view>
           <view v-if="currentItemIndex==1">

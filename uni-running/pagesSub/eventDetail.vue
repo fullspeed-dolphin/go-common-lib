@@ -111,7 +111,7 @@
 				  {{isSignUp ? '取消' : ''}}报名截止：2025.09.30 9:00
 			  </view> -->
 				<view class="u-flex-between-center" style="width: 100%;">
-					<u-button type="primary" :color="themeBtnColor" shape="circle" customStyle="height: 80rpx;" @click="routeTo()" disabled="isOutDated">
+					<u-button type="primary" :color="themeBtnColor" shape="circle" customStyle="height: 80rpx;" @click="routeTo()">
 						<block v-if="isOutDated">
 							活动已结束
 						</block>
@@ -125,7 +125,7 @@
 						</block>
 					</u-button>
 
-					<up-button v-if="detail.status === 'EXP'" @click="routeTo()" type="primary" color="#07c160" shape="circle" customStyle="height: 80rpx;margin-left: 20rpx;" disabled="!isLogin">
+					<up-button v-if="detail.status === 'EXP'" @click="routeTo()" type="primary" color="#07c160" shape="circle" customStyle="height: 80rpx;margin-left: 20rpx;">
 						{{ isLogin ? '查看报名情况' :'授权登录查看报名情况' }}
 					</up-button>
 				</view>
@@ -361,6 +361,7 @@
 	// };
 
 	const routeTo = () => {
+		console.log("routeTo", detail.value);
 		if (!userInfo.value.id) {
 			pendingAction.value = () => routeTo();
 			return refUserLogin.value.open();
