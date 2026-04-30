@@ -96,7 +96,8 @@ fs.writeFile({
       filePath,
       showMenu: true, // 显示右上角菜单（支持转发）
       success: () => console.log('预览成功'),
-      fail: () => wx.showToast({ title: '预览失败', icon: 'error' })
+      // fail: () => wx.showToast({ title: '预览失败', icon: 'error' })
+       fail: err => console.error('预览失败', err)
     });
   },
   fail: err => console.error('写入失败', err),

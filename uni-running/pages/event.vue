@@ -26,7 +26,7 @@
 							<!-- 左侧图片 -->
 							<view class="card-image">
 								<image :src="getCoverUrl(item) + '?x-oss-process=image/resize,w_200,h_200,m_fill'" mode="aspectFill" v-if="getCoverUrl(item)" />
-								<view class="card-tag">报名中</view>
+								<view :class="['card-tag', isExpired(item) ? 'tag-expired' : '']">{{ isExpired(item) ? '已过期' : '报名中' }}</view>
 							</view>
 							<!-- 右侧内容 -->
 							<view class="card-info">
@@ -404,6 +404,13 @@ const formatTime = (time) => {
 	return t.format('MM/DD HH:mm');
 };
 
+// 判断活动是否已过期（当前时间晚于 event_time）
+const isExpired = (item) => {
+	if (!item || !item.event_time) return false;
+	const t = isNaN(item.event_time) ? dayjs(item.event_time) : dayjs(Number(item.event_time));
+	return dayjs().isAfter(t);
+};
+
 // 跳转详情
 const goDetail = (item) => {
 	uni.$u.route(`pagesSub/runningTeam/teamEventDetail?id=${item.id}`);
@@ -639,6 +646,11 @@ onShow(() => {
 	font-weight: 600;
 	background: #FF8C00;
 	color: #fff;
+}
+
+.card-tag.tag-expired {
+	background: #999;
+	color: #eee;
 }
 
 // 右侧内容

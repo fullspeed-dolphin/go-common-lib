@@ -1,6 +1,5 @@
 <template>
 	<u-navbar :title="detail.name || '活动详情'" bgColor="#fff" placeholder></u-navbar>
-	
 	<view class="u-pb-30" style="background: #f5f5f5" :class="{
       isLoadedPage: isLoadedPage,
     }">
@@ -85,6 +84,8 @@
 					</view>
 				</view>
 
+				
+
 				<view class="cell flex-start u-pl-20 customer-phone">
 					<view class="label">联系电话：</view>
 					<view class="value flex-start">
@@ -109,15 +110,24 @@
 				<!-- <view class="txt">
 				  {{isSignUp ? '取消' : ''}}报名截止：2025.09.30 9:00
 			  </view> -->
-				<view class="u-border-top1" :class="{ isSignUp: isSignUp }">
-					<u-button type="primary" :color="themeBtnColor" shape="circle" customStyle="height: 80rpx;" @click="routeTo()" disabled="isOutDated">
-						<block v-if="Number(detail.is_free) === 1">进入活动</block>
-						<block v-else-if="detail.status === 'ACT'">{{
-              isSignUp ? "取消报名" : (isCourseEvent ? "立即报班" : "活动报名")
-            }}</block>
-						<block v-else-if="detail.status === 'PND'">活动暂未开始</block>
-						<block v-else-if="detail.status === 'EXP'">{{ isOutDated ? '活动已结束' : '授权登录查看报名情况' }}</block>
+				<view class="u-flex-between-center" style="width: 100%;">
+					<u-button type="primary" :color="themeBtnColor" shape="circle" customStyle="height: 80rpx;" @click="routeTo()">
+						<block v-if="isOutDated">
+							活动已结束
+						</block>
+						<block v-else>
+							<block v-if="Number(detail.is_free) === 1">进入活动</block>
+							<block v-else-if="detail.status === 'ACT'">{{
+								isSignUp ? "取消报名" : (isCourseEvent ? "立即报班" : "活动报名")
+							}}</block>
+							<block v-else-if="detail.status === 'PND'">活动暂未开始</block>
+							<block v-else-if="detail.status === 'EXP'">{{ isLogin ? '查看报名情况' :'授权登录查看报名情况' }}</block>
+						</block>
 					</u-button>
+
+					<up-button v-if="detail.status === 'EXP'" @click="routeTo()" type="primary" color="#07c160" shape="circle" customStyle="height: 80rpx;margin-left: 20rpx;">
+						{{ isLogin ? '查看报名情况' :'授权登录查看报名情况' }}
+					</up-button>
 				</view>
 			</view>
 		</view>
@@ -185,7 +195,7 @@
 	const themeBtnColor = computed(() => {
 		const g = detail.value?.color_config?.gradient;
 		if(isOutDated) {
-			return '#666';
+			return '#999';
 		} else {
 			return g?.length === 2 ? g[0] : '#FF8C00';
 		}
@@ -238,6 +248,7 @@
 		const t = dayjs(detail.value.event_time);
 		return t.isBefore(dayjs());
 	});
+	const isLogin = computed(() => !!userInfo.value.id);
 	const startStatusPolling = () => {
 		stopStatusPolling();
 		statusTimer = setInterval(pollStatus, 30000);
@@ -350,6 +361,7 @@
 	// };
 
 	const routeTo = () => {
+		console.log("routeTo", detail.value);
 		if (!userInfo.value.id) {
 			pendingAction.value = () => routeTo();
 			return refUserLogin.value.open();

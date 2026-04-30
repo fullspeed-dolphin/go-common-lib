@@ -99,15 +99,20 @@
 
     <!-- 底部按钮 -->
     <view class="section-bottom">
-      <view class="btn-action" :class="{ 'btn-disabled': ['REJ','EXP'].includes(detail.status) || isRegistered || isFull || !isRegistrationOpen }" @click="onActionClick()">
+      <view class="btn-action" :class="{ 'btn-disabled': ['REJ','EXP'].includes(detail.status) || getIsOutDated() || isRegistered || isFull || !isRegistrationOpen }" @click="onActionClick()">
         <text class="btn-action-text">
-          <block v-if="isRegistered">{{ isOutDated ? '已过期' : '已报名' }}</block>
-          <block v-else-if="isFull">报名已满</block>
-          <block v-else-if="!isRegistrationOpen">报名未开放</block>
-          <block v-else-if="detail.status === 'ACT'">立即报名</block>
-          <block v-else-if="detail.status === 'PND'">审核中</block>
-          <block v-else-if="detail.status === 'EXP'">已过期</block>
-          <block v-else-if="detail.status === 'REJ'">修改活动信息并重新提交</block>
+          <text v-if="getIsOutDated()">
+            已过期
+          </text>
+          <block v-else>
+            <block v-if="isRegistered">已报名</block>
+            <block v-else-if="isFull">报名已满</block>
+            <block v-else-if="!isRegistrationOpen">报名未开放</block>
+            <block v-else-if="detail.status === 'ACT'">立即报名</block>
+            <block v-else-if="detail.status === 'PND'">审核中</block>
+            <block v-else-if="detail.status === 'EXP'">已过期</block>
+            <block v-else-if="detail.status === 'REJ'">修改活动信息并重新提交</block>
+          </block>
         </text>
       </view>
     </view>
@@ -143,7 +148,7 @@
             <!-- <text class="cert-hint">{{ certForm.cert_type === 'HK_MA_PASS' ? '请输入港澳手机号码' : '请输入大陆手机号码（不带区号）' }}</text> -->
             <text class="cert-hint">请输入手机号码</text>
             <view class="cert-phone-wrap">
-              <text class="cert-phone-prefix">{{ certForm.contact_number.length !== 11 ? '+852' : '+86' }}</text>
+              <!-- <text class="cert-phone-prefix">{{ certForm.contact_number.length !== 11 ? '+852' : '+86' }}</text> -->
               <input
                 class="cert-input cert-phone-input"
                 v-model="certForm.contact_number"
@@ -296,10 +301,14 @@ onShow(() => {
 onUnload(() => {
   uni.removeStorageSync("eventDetail");
 });
-const isOutDated = computed(() => {
-  const t = dayjs(detail.value.event_time);
+
+const tempEventTime = ref('');
+
+function getIsOutDated() {
+  const t = dayjs(tempEventTime.value);
   return t.isBefore(dayjs());
-});
+};
+
 const getDetail = () => {
   return request.get(`/event-api/fsc_events/${routerParams.value.id}`)
     .then((res) => {
@@ -313,12 +322,13 @@ const getDetail = () => {
       // 时间格式化
       const time = isNaN(res.event_time) ? res.event_time : Number(res.event_time);
       const t = dayjs(time);
-      res.event_time = t.year() !== dayjs().year() ? t.format('YYYY.M.DD HH:mm') : t.format('M.DD HH:mm');
+      tempEventTime.value = time;
+      res.event_time = t.year() !== dayjs().year() ? t.format('YYYY/M/DD HH:mm') : t.format('M/DD HH:mm');
 
       // 报名时间
       try {
         const list = JSON.parse(res.registration_time);
-        res.registration_time = `${dayjs(list[0]).format('M.DD HH:mm')} - ${dayjs(list[1]).format('M.DD HH:mm')}`;
+        res.registration_time = `${dayjs(list[0]).format('M/DD HH:mm')} - ${dayjs(list[1]).format('M/DD HH:mm')}`;
       } catch (e) {}
 
       detail.value = res;
@@ -360,7 +370,7 @@ const getRegistrationList = () => {
 
 const formatMemberTime = (time) => {
   if (!time) return '';
-  return dayjs(time).format('M.DD HH:mm') + ' 报名';
+  return dayjs(time).format('M/DD HH:mm') + ' 报名';
 };
 
 // 查询我的报名状态

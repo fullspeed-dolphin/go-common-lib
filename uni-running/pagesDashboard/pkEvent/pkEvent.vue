@@ -1,189 +1,190 @@
 <template>
   <view :style="themeStyle">
-		<mescroll-body ref="mescrollRef" @init="mescrollInit" :down="{ use: false }" @down="downCallback" @up="getList" :top="0">
-    <u-navbar autoBack placeholder :title="detailInfo?.event_name || '活动详情'"></u-navbar>
-    <section class="flex-center" style="height: 512rpx;filter1: blur(10px);">
-      <image class="img" style="width:750rpx;height:512rpx;" :src="
-          (detailInfo?.background_image_url)  + '?x-oss-process=image/resize,w_750,h_500,m_fill'
-        " mode="aspectFill"></image>
-    </section>
+		<mescroll-body ref="mescrollRef" @init="mescrollInit" :down="{ use: false }" @down="downCallback" @up="getList" :top="0" 
+    :up="{toTop:{bottom:'100px'}}">
+      <u-navbar autoBack placeholder :title="detailInfo?.event_name || '活动详情'"></u-navbar>
+      <section class="flex-center" style="height: 512rpx;filter1: blur(10px);">
+        <image class="img" style="width:750rpx;height:512rpx;" :src="
+            (detailInfo?.background_image_url)  + '?x-oss-process=image/resize,w_750,h_500,m_fill'
+          " mode="aspectFill"></image>
+      </section>
 
-    <section class="section-header header-bg" style="margin-top: -372rpx;">
-      <view class="status-bar" style="display:flex;justify-content:flex-end;">
-        <view v-if="hasSignedUp"
-          style="color:#fff;font-size: 32rpx;font-weight: bold;background: rgba(25, 190, 107, .9);padding: 16rpx 32rpx; border-radius: 32rpx 0 0 32rpx;"
-          class="rule-link flex-center">
-          已报名
-        </view>
-      </view>
-
-      <div style="background: rgba(255,255,255,1); box-shadow: 0rpx 8rpx 10rpx 0rpx rgba(0, 0, 0, 0.02);border-radius: 24rpx;margin: 94rpx 30rpx 10rpx;padding: 30rpx;">
-        <view class="title" style="color: #222">{{ detailInfo?.event_name }}</view>
-        <view class="subtitle">{{ detailInfo?.event_subtitle }}</view>
-
-        <view style="display:flex;align-items:center;justify-content:space-between;font-size:24rpx;">
-          <view v-if="detailInfo?.event_description" class="start-time flex-center" :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }" style="margin:0;width:auto;padding: 0 24rpx;">
-            <text style="margin-right:8rpx;">🔥</text>
-            <text class="time-text">{{detailInfo?.event_description}}</text>
-          </view>
-          <view class="start-time flex-center" style="margin:0;" :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }">
-            <view class="iconfont icon-riqi u-mr-10"></view>
-            <text class="time-text">{{detailInfo?.start_time}} 开跑</text>
+      <section class="section-header header-bg" style="margin-top: -372rpx;">
+        <view class="status-bar" style="display:flex;justify-content:flex-end;">
+          <view v-if="hasSignedUp"
+            style="color:#fff;font-size: 32rpx;font-weight: bold;background: rgba(25, 190, 107, .9);padding: 16rpx 32rpx; border-radius: 32rpx 0 0 32rpx;"
+            class="rule-link flex-center">
+            已报名
           </view>
         </view>
-        <section class="section-stats-card" style="margin-top: 30rpx;">
-          <!-- <view class="stat-item u-flex-1 flex-col-center">
-            <text class="label">奖金池</text>
-            <text class="value" style="color:#ff5c5c;">¥{{detailInfo?.total_prize_pool}}</text>
-          </view> -->
-          <view class="stat-item u-flex-1 flex-col-center">
-            <text class="label">已报名</text>
-            <text class="value">{{detailInfo?.total_registrations}}</text>
-          </view>
-          <view class="stat-item u-flex-1 flex-col-center">
-            <text class="label">战队总数</text>
-            <text class="value">{{detailInfo?.total_teams}}</text>
-          </view>
-          <view class="stat-item u-flex-1 flex-col-center">
-            <text class="label">天数</text>
-            <text class="value">{{ detailInfo?.diffDays }}</text>
-          </view>
-        </section>
-      </div>
-    </section>
 
-    <!-- 功能按钮组 -->
-    <section class="section-func-buttons flex-wrap">
-      <view v-if="!userStatusInfo.in_team" class="func-item flex-col-center" @click="createTeam">
-        <view class="iconfont flex-center icon-zhandui1" style="color:#FCD515;background: #FEF9C2;"></view>
-        <text class="func-text">创建战队</text>
-      </view>
-      <view v-if="userStatusInfo.in_team" class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/teamDetail?teamId='+userStatusInfo.team_info?.id)">
-        <view class="iconfont flex-center icon-zhandui1" style="color:#FCD515;background: #FEF9C2;"></view>
-        <text class="func-text">进入战队</text>
-      </view>
-      <view class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/teamList')">
-        <view class="iconfont flex-center icon-list-1-copy" style="color:#155DFC;background: #DBEAFE;"></view>
-        <text class="func-text">战队列表</text>
-      </view>
-      <view class="func-item flex-col-center" @click="$u.route('pagesDashboard/pkEvent/activeRule')">
-        <view class="iconfont flex-center icon-huodongguize" style="color:#FC9C15;background: #FEE8C2;"></view>
-        <text class="func-text">活动规则</text>
-      </view>
-      <view class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/pkRankList')">
-        <view class="iconfont flex-center icon-paihangbang" style="color:#FC9C15;background: #FEE8C2;"></view>
-        <text class="func-text">排行榜</text>
-      </view>
-      <view class="func-item flex-col-center" @click="lotteryIconClick">
-        <view class="kingkong-icon-wrapper" style="background: #d3f5f4;">
-          <image src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/lottery-icon.png" class="kingkong-icon" mode="scaleToFill" />
-        </view>
-        <text class="func-text">抽奖活动</text>
-      </view>
-      <view class="func-item flex-col-center" @click="certIconOnClick">
-        <view class="kingkong-icon-wrapper" style="background: #f4dae5;">
-          <image src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/cert-icon.png" class="kingkong-icon" mode="scaleToFill" />
-        </view>
-        <text class="func-text">完赛证书</text>
-      </view>
-    </section>
+        <div style="background: rgba(255,255,255,1); box-shadow: 0rpx 8rpx 10rpx 0rpx rgba(0, 0, 0, 0.02);border-radius: 24rpx;margin: 94rpx 30rpx 10rpx;padding: 30rpx;">
+          <view class="title" style="color: #222">{{ detailInfo?.event_name }}</view>
+          <view class="subtitle">{{ detailInfo?.event_subtitle }}</view>
 
-    <view v-if="userStatusInfo.in_team && hasSignedUp && !eventIsEnd" class="section-btn flex-center" @click="goToPunchIn">
-    	<view class="iconfont flex-center icon-lijidaka u-mr-10" style="color:#fff;font-size:42rpx;"></view>
-    	立即打卡
-    </view>
+          <view style="display:flex;align-items:center;justify-content:space-between;font-size:24rpx;">
+            <view v-if="detailInfo?.event_description" class="start-time flex-center" :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }" style="margin:0;width:auto;padding: 0 24rpx;">
+              <text style="margin-right:8rpx;">🔥</text>
+              <text class="time-text">{{detailInfo?.event_description}}</text>
+            </view>
+            <view class="start-time flex-center" style="margin:0;" :style="{ background: `linear-gradient(90deg, ${pkEventTheme?.gradient?.[0]}, ${pkEventTheme?.gradient?.[1]})` }">
+              <view class="iconfont icon-riqi u-mr-10"></view>
+              <text class="time-text">{{detailInfo?.start_time}} 开跑</text>
+            </view>
+          </view>
+          <section class="section-stats-card" style="margin-top: 30rpx;">
+            <!-- <view class="stat-item u-flex-1 flex-col-center">
+              <text class="label">奖金池</text>
+              <text class="value" style="color:#ff5c5c;">¥{{detailInfo?.total_prize_pool}}</text>
+            </view> -->
+            <view class="stat-item u-flex-1 flex-col-center">
+              <text class="label">已报名</text>
+              <text class="value">{{detailInfo?.total_registrations}}</text>
+            </view>
+            <view class="stat-item u-flex-1 flex-col-center">
+              <text class="label">战队总数</text>
+              <text class="value">{{detailInfo?.total_teams}}</text>
+            </view>
+            <view class="stat-item u-flex-1 flex-col-center">
+              <text class="label">天数</text>
+              <text class="value">{{ detailInfo?.diffDays }}</text>
+            </view>
+          </section>
+        </div>
+      </section>
 
-    <PersonalRecord v-if="userStatusInfo.in_team" :activetyId="activetyId" />
-		
-    <!-- 排行榜 -->
-    <view class="tab-container">
-      <view class="category-tags">
-        <view class="tags-inner">
-          <view v-for="(item, index) in tabList" :key="item.value" class="tag-item" :class="{ active: tabIndex === index }" @click="changeTab(index)">
-            {{ item.label }}
+      <!-- 功能按钮组 -->
+      <section class="section-func-buttons flex-wrap">
+        <view v-if="!userStatusInfo.in_team" class="func-item flex-col-center" @click="createTeam">
+          <view class="iconfont flex-center icon-zhandui1" style="color:#FCD515;background: #FEF9C2;"></view>
+          <text class="func-text">创建战队</text>
+        </view>
+        <view v-if="userStatusInfo.in_team" class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/teamDetail?teamId='+userStatusInfo.team_info?.id)">
+          <view class="iconfont flex-center icon-zhandui1" style="color:#FCD515;background: #FEF9C2;"></view>
+          <text class="func-text">进入战队</text>
+        </view>
+        <view class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/teamList')">
+          <view class="iconfont flex-center icon-list-1-copy" style="color:#155DFC;background: #DBEAFE;"></view>
+          <text class="func-text">战队列表</text>
+        </view>
+        <view class="func-item flex-col-center" @click="$u.route('pagesDashboard/pkEvent/activeRule')">
+          <view class="iconfont flex-center icon-huodongguize" style="color:#FC9C15;background: #FEE8C2;"></view>
+          <text class="func-text">活动规则</text>
+        </view>
+        <view class="func-item flex-col-center" @click="goto('pagesDashboard/pkEvent/pkRankList')">
+          <view class="iconfont flex-center icon-paihangbang" style="color:#FC9C15;background: #FEE8C2;"></view>
+          <text class="func-text">排行榜</text>
+        </view>
+        <view class="func-item flex-col-center" @click="lotteryIconClick">
+          <view class="kingkong-icon-wrapper" style="background: #d3f5f4;">
+            <image src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/lottery-icon.png" class="kingkong-icon" mode="scaleToFill" />
+          </view>
+          <text class="func-text">抽奖活动</text>
+        </view>
+        <view class="func-item flex-col-center" @click="certIconOnClick">
+          <view class="kingkong-icon-wrapper" style="background: #f4dae5;">
+            <image src="https://ccrun.oss-cn-guangzhou.aliyuncs.com/weapp-static/images/cert-icon.png" class="kingkong-icon" mode="scaleToFill" />
+          </view>
+          <text class="func-text">完赛证书</text>
+        </view>
+      </section>
+
+      <view v-if="userStatusInfo.in_team && hasSignedUp && !eventIsEnd" class="section-btn flex-center" @click="goToPunchIn">
+        <view class="iconfont flex-center icon-lijidaka u-mr-10" style="color:#fff;font-size:42rpx;"></view>
+        立即打卡
+      </view>
+
+      <PersonalRecord v-if="userStatusInfo.in_team" :activetyId="activetyId" />
+      
+      <!-- 排行榜 -->
+      <view class="tab-container">
+        <view class="category-tags">
+          <view class="tags-inner">
+            <view v-for="(item, index) in tabList" :key="item.value" class="tag-item" :class="{ active: tabIndex === index }" @click="changeTab(index)">
+              {{ item.label }}
+            </view>
           </view>
         </view>
+        <!-- 个人排序开关(仅在个人榜时显示) -->
+        <view v-if="tabIndex === 0" class="sort-switch u-mt-20">
+          <view class="sort-btn" :class="{ active: personalSortBy === 'distance' }" @click="switchPersonalSort('distance')">跑量排行</view>
+          <view class="sort-btn" :class="{ active: personalSortBy === 'completion' }" @click="switchPersonalSort('completion')">完成率排行</view>
+        </view>
+        <!-- 战队排序开关(仅在战队榜时显示) -->
+        <view v-if="tabIndex === 1" class="sort-switch u-mt-20">
+          <view class="sort-btn" :class="{ active: teamSortBy === 'members' }" @click="switchTeamSort('members')">人数排行</view>
+          <view class="sort-btn" :class="{ active: teamSortBy === 'distance' }" @click="switchTeamSort('distance')">跑量排行</view>
+          <view class="sort-btn" :class="{ active: teamSortBy === 'completion' }" @click="switchTeamSort('completion')">完成率排行</view>
+        </view>
       </view>
-      <!-- 个人排序开关(仅在个人榜时显示) -->
-      <view v-if="tabIndex === 0" class="sort-switch u-mt-20">
-        <view class="sort-btn" :class="{ active: personalSortBy === 'distance' }" @click="switchPersonalSort('distance')">跑量排行</view>
-        <view class="sort-btn" :class="{ active: personalSortBy === 'completion' }" @click="switchPersonalSort('completion')">完成率排行</view>
-      </view>
-      <!-- 战队排序开关(仅在战队榜时显示) -->
-      <view v-if="tabIndex === 1" class="sort-switch u-mt-20">
-        <view class="sort-btn" :class="{ active: teamSortBy === 'members' }" @click="switchTeamSort('members')">人数排行</view>
-        <view class="sort-btn" :class="{ active: teamSortBy === 'distance' }" @click="switchTeamSort('distance')">跑量排行</view>
-        <view class="sort-btn" :class="{ active: teamSortBy === 'completion' }" @click="switchTeamSort('completion')">完成率排行</view>
-      </view>
-    </view>
-		
-    <view class="rank-list">
-      <!-- 个人排行榜 -->
-      <template v-if="tabIndex === 0">
-        <view v-for="(item, index) in rankList" :key="item.wechat_openid" class="rank-item" @click="viewUserCheckins(item)">
-          <view class="rank-number flex-center">
-            {{ item.rank <= 3 ? 'NO.' + item.rank : item.rank }}
-          </view>
-          <div class="user-avatar">
-            <up-lazy-load height="120" borderRadius="16" :is-effect="false" :image="
-              item.avatar_url ? item.avatar_url + '?x-oss-process=image/resize,w_120,h_120,m_fill' : '/static/images/user.png'
-            " mode="aspectFill" errorImg="/static/images/user.png" />
-          </div>
-          <!-- <view class="user-info">
-            <view style="display:flex;align-items:center;">
+      
+      <view class="rank-list">
+        <!-- 个人排行榜 -->
+        <template v-if="tabIndex === 0">
+          <view v-for="(item, index) in rankList" :key="item.wechat_openid" class="rank-item" @click="viewUserCheckins(item)">
+            <view class="rank-number flex-center">
+              {{ item.rank <= 3 ? 'NO.' + item.rank : item.rank }}
+            </view>
+            <div class="user-avatar">
+              <up-lazy-load height="120" borderRadius="16" :is-effect="false" :image="
+                item.avatar_url ? item.avatar_url + '?x-oss-process=image/resize,w_120,h_120,m_fill' : '/static/images/user.png'
+              " mode="aspectFill" errorImg="/static/images/user.png" />
+            </div>
+            <!-- <view class="user-info">
+              <view style="display:flex;align-items:center;">
+                <view class="user-name">{{ item.real_name }}</view>
+                <view class="group-tag">{{ item.team_name }}</view>
+              </view>
+              <view class="user-time">{{ item.team_goal_km }}KM组</view>
+            </view> -->
+            <view class="user-info">
               <view class="user-name">{{ item.real_name }}</view>
-              <view class="group-tag">{{ item.team_name }}</view>
+              <view class="user-detail">
+                <view style="color:#999;font-size:24rpx;">{{ item.team_goal_km }}KM组</view>
+                <view class="flex-center group-tag u-mb-10 u-mt-10">{{ item.team_name }}</view>
+              </view>
+              <!-- <view class="user-time">{{ item.total_sessions }}次</view> -->
             </view>
-            <view class="user-time">{{ item.team_goal_km }}KM组</view>
-          </view> -->
-          <view class="user-info">
-            <view class="user-name">{{ item.real_name }}</view>
-            <view class="user-detail">
-              <view style="color:#999;font-size:24rpx;">{{ item.team_goal_km }}KM组</view>
-              <view class="flex-center group-tag u-mb-10 u-mt-10">{{ item.team_name }}</view>
+            <view class="progress">
+              <text class="progress-percent">
+                <template v-if="personalSortBy === 'completion'">
+                  <text style="font-size:40rpx;">{{ item.required_checkins ? Math.round(item.total_qualified_sessions / item.required_checkins * 100) : 0 }}%</text>
+                </template>
+                <template v-else>
+                  <text style="font-size:40rpx;">{{ Math.round(item.total_distance_km) }}</text>km
+                </template>
+              </text>
+              <text v-if="personalSortBy === 'completion'" style="font-size:24rpx;color:#999;font-weight:normal;">{{ Math.round(item.total_distance_km) }}km</text>
+              <text style="font-size:24rpx;color:#999;font-weight:normal;">{{ item.total_qualified_sessions }}/{{ item.required_checkins }}次打卡</text>
+              <text v-if="activetyId !== '01KH0WQX4H2C7Q4GJ217P8T922'" class="view-checkin-link">查看打卡记录</text>
             </view>
-            <!-- <view class="user-time">{{ item.total_sessions }}次</view> -->
           </view>
-          <view class="progress">
-            <text class="progress-percent">
-              <template v-if="personalSortBy === 'completion'">
-                <text style="font-size:40rpx;">{{ item.required_checkins ? Math.round(item.total_qualified_sessions / item.required_checkins * 100) : 0 }}%</text>
-              </template>
-              <template v-else>
-                <text style="font-size:40rpx;">{{ Math.round(item.total_distance_km) }}</text>km
-              </template>
-            </text>
-            <text v-if="personalSortBy === 'completion'" style="font-size:24rpx;color:#999;font-weight:normal;">{{ Math.round(item.total_distance_km) }}km</text>
-            <text style="font-size:24rpx;color:#999;font-weight:normal;">{{ item.total_qualified_sessions }}/{{ item.required_checkins }}次打卡</text>
-            <text v-if="activetyId !== '01KH0WQX4H2C7Q4GJ217P8T922'" class="view-checkin-link">查看打卡记录</text>
+        </template>
+        <!-- 战队排行榜 -->
+        <template v-else>
+          <view v-for="(item, index) in rankList" :key="item.id || index" class="rank-item" @click="goto('pagesDashboard/pkEvent/teamDetail?teamId=' + item.id)">
+            <view class="rank-number flex-center">
+              {{ item.rank <= 3 ? 'NO.' + item.rank : item.rank }}
+            </view>
+            <div class="user-avatar">
+              <up-lazy-load height="110" borderRadius="14" :is-effect="false" :image="
+                (item.team_avatar_url)  + '?x-oss-process=image/resize,w_110,h_110,m_fill'
+              " mode="aspectFill" />
+            </div>
+            <view class="user-info">
+              <view class="user-name">{{ item.team_name }}</view>
+              <view class="user-time">组别：{{ item.team_goal_km }}KM</view>
+              <view class="user-time">{{ item.current_members }}人 | 完成率 {{ Number(item.team_completion_rate).toFixed(2) }}%</view>
+            </view>
+            <view class="progress">
+              <text class="progress-percent">
+                <text style="font-size:36rpx;">{{ teamRankValue(item) }}</text>
+              </text>
+            </view>
           </view>
-        </view>
-      </template>
-      <!-- 战队排行榜 -->
-      <template v-else>
-        <view v-for="(item, index) in rankList" :key="item.id || index" class="rank-item" @click="goto('pagesDashboard/pkEvent/teamDetail?teamId=' + item.id)">
-          <view class="rank-number flex-center">
-            {{ item.rank <= 3 ? 'NO.' + item.rank : item.rank }}
-          </view>
-          <div class="user-avatar">
-            <up-lazy-load height="110" borderRadius="14" :is-effect="false" :image="
-              (item.team_avatar_url)  + '?x-oss-process=image/resize,w_110,h_110,m_fill'
-            " mode="aspectFill" />
-          </div>
-          <view class="user-info">
-            <view class="user-name">{{ item.team_name }}</view>
-            <view class="user-time">组别：{{ item.team_goal_km }}KM</view>
-            <view class="user-time">{{ item.current_members }}人 | 完成率 {{ Number(item.team_completion_rate).toFixed(2) }}%</view>
-          </view>
-          <view class="progress">
-            <text class="progress-percent">
-              <text style="font-size:36rpx;">{{ teamRankValue(item) }}</text>
-            </text>
-          </view>
-        </view>
-      </template>
+        </template>
 
-    </view>
+      </view>
 		</mescroll-body>
 		
 		
@@ -460,6 +461,10 @@ const SignUpEvent = () => {
 
 function createTeam() {
   if (detailInfo.value?.status !== 'act') return uni.$u.toast('活动报名时间已过');
+  // 需要判断是否已加入了战队，如果加入了战队提示用户已加入战队，不能重复创建
+  if(userStatusInfo.value.in_team) {
+    return uni.$u.toast('您已加入战队，不能重复创建');
+  }
   goto('pagesDashboard/pkEvent/teamForm');
 }
 

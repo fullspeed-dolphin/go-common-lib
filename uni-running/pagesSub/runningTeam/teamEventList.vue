@@ -20,22 +20,21 @@
 
     <mescroll-body @init="mescrollInit" @down="downCallback" @up="getList" :top="0">
       <view class="event-list">
-        <view class="event-card" :class="{ 'status-expired': item.status === 'EXP' }"
-          v-for="(item, index) in eventList" :key="index" @tap.stop="viewEvent(item)">
+        <view class="event-card" :class="{ 'status-expired': item.status === 'EXP' }" v-for="(item, index) in eventList" :key="index" @tap.stop="viewEvent(item)">
           <!-- Cover Image -->
-          <image class="cover-img" v-if="getCoverUrl(item)"
-            :src="getCoverUrl(item) + '?x-oss-process=image/resize,w_200,h_200,m_fill'"
-            mode="aspectFill" />
-          <view class="cover-placeholder" v-else>
-            <u-icon name="photo" size="24" color="#D1D5DB"></u-icon>
+          <view class="cover-wrap">
+            <image class="cover-img" v-if="getCoverUrl(item)" :src="getCoverUrl(item) + '?x-oss-process=image/resize,w_200,h_200,m_fill'" mode="aspectFill" />
+            <view class="cover-placeholder" v-else>
+              <u-icon name="photo" size="24" color="#D1D5DB"></u-icon>
+            </view>
+            <view class="status-tag" :class="getStatusClass(item)">
+              <text>{{ getStatusText(item) }}</text>
+            </view>
           </view>
           <!-- Content -->
           <view class="card-content">
             <view class="card-title-row">
               <text class="card-name">{{ item.name }}</text>
-              <view class="status-tag" :class="getStatusClass(item.status)">
-                <text>{{ getStatusText(item.status) }}</text>
-              </view>
             </view>
             <view class="card-meta">
               <view class="meta-item">
@@ -60,16 +59,11 @@
               <!-- <u-button v-if="!['EXP', 'ACT'].includes(item.status)" type="primary" size="mini" shape="circle" color="#2979ff"
                 customStyle="margin:0;width:120rpx;height:52rpx;font-size:22rpx;"
                 @click.stop="editEvent(item)">更新</u-button> -->
-                 <u-button v-if="item.is_free == 1" type="primary" shape="circle" color="#2979ff"
-                customStyle="margin:0;width:100rpx;height:52rpx;font-size:22rpx;"
-                @tap.stop="editEvent(item)">
-                    更新
+              <u-button v-if="item.is_free == 1" type="primary" shape="circle" color="#2979ff" customStyle="margin:0;width:100rpx;height:52rpx;font-size:22rpx;" @tap.stop="editEvent(item)">
+                更新
               </u-button>
-              <u-button type="error"  shape="circle" color="#f56c6c"
-                customStyle="margin:0;width:100rpx;height:52rpx;font-size:22rpx;"
-                @tap.stop="removeItem(item)">删除</u-button>
-              <u-button v-if="detail.user_role === 'creator'" type="primary"  plain shape="circle" color="#10B981"
-                customStyle="margin:0;width:160rpx;height:52rpx;font-size:22rpx;"
+              <u-button type="error" shape="circle" color="#f56c6c" customStyle="margin:0;width:100rpx;height:52rpx;font-size:22rpx;" @tap.stop="removeItem(item)">删除</u-button>
+              <u-button v-if="detail.user_role === 'creator'" type="primary" plain shape="circle" color="#10B981" customStyle="margin:0;width:160rpx;height:52rpx;font-size:22rpx;"
                 @tap.stop="viewRegistrations(item)">报名信息</u-button>
               <!-- <u-button type="primary"  plain shape="circle" color="#FF8C00"
                 customStyle="margin:0;width:100rpx;height:52rpx;font-size:22rpx;"
@@ -86,9 +80,7 @@
 
     <!-- Bottom Button -->
     <view class="section-bottom">
-      <u-button type="primary" color="#FF8C00" shape="circle"
-        customStyle="height: 84rpx; width: 100%;"
-        @click="createEvent()">
+      <u-button type="primary" color="#FF8C00" shape="circle" customStyle="height: 84rpx; width: 100%;" @click="createEvent()">
         <view style="display:flex;align-items:center;gap:8rpx;">
           <u-icon name="plus" size="16" color="#FFFFFF"></u-icon>
           <text>创建活动</text>
@@ -100,34 +92,44 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { onLoad, onShow,onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
+import {
+  onLoad,
+  onShow,
+  onShareAppMessage,
+  onShareTimeline,
+} from "@dcloudio/uni-app";
 import request from "@/utils/request.js";
 import dayjs from "dayjs";
 import { onPageScroll, onReachBottom } from "@dcloudio/uni-app";
 import useMescroll from "@/uni_modules/mescroll-uni/hooks/useMescroll.js";
-const { mescrollInit, downCallback, getMescroll } = useMescroll(onPageScroll, onReachBottom);
+const { mescrollInit, downCallback, getMescroll } = useMescroll(
+  onPageScroll,
+  onReachBottom
+);
 import { useShare, buildPath } from "@/composables/useShare.js";
 
 const group_id = ref("");
 const eventList = ref([]);
 const loading = ref(false);
 const detail = ref({});
-const activeTab = ref('all');
+const activeTab = ref("all");
 
 // 分享配置
 useShare(() => ({
-  title: '跑团活动列表',
-  path: buildPath('/pagesSub/runningTeam/teamEventList', { group_id: group_id.value })
+  title: "跑团活动列表",
+  path: buildPath("/pagesSub/runningTeam/teamEventList", {
+    group_id: group_id.value,
+  }),
 }));
 
 const clubTypeName = computed(() => {
-  return detail.value.club_type === 'cycling' ? '车队' : '跑团';
+  return detail.value.club_type === "cycling" ? "车队" : "跑团";
 });
-
 
 // 获取俱乐部详情
 const getDetail = () => {
-  request.get(`/running-group/api/v1/groups/info?group_id=${group_id.value}`)
+  request
+    .get(`/running-group/api/v1/groups/info?group_id=${group_id.value}`)
     .then((res) => {
       detail.value = res;
     });
@@ -144,30 +146,34 @@ const getList = async (mescroll) => {
   };
   // 非"全部"和"审核中"tab时，向后端传status过滤
   // "审核中"tab包含PND和REJ两种状态，不传status拉全部后前端过滤
-  if (activeTab.value !== 'all' && activeTab.value !== 'PND') {
+  if (activeTab.value !== "all" && activeTab.value !== "PND") {
     data.status = activeTab.value;
   }
 
-  request.get(`/event-api/fsc_events?fsc_id=${group_id.value}`, data).then(res => {
-    loading.value = false;
-    let list = (res.fsc_events || []).filter(i => i.status !== 'DELETED');
-    // "审核中"tab前端过滤PND+REJ
-    if (activeTab.value === 'PND') {
-      list = list.filter(i => i.status === 'PND' || i.status === 'REJ');
-    }
-    res = list.map(item => ({
-      ...item,
-      event_time: isNaN(item.event_time) ? dayjs(item.event_time).format('YYYY-MM-DD') : dayjs(Number(item.event_time)).format('YYYY-MM-DD')
-    }));
+  request
+    .get(`/event-api/fsc_events?fsc_id=${group_id.value}`, data)
+    .then((res) => {
+      loading.value = false;
+      let list = (res.fsc_events || []).filter((i) => i.status !== "DELETED");
+      // "审核中"tab前端过滤PND+REJ
+      if (activeTab.value === "PND") {
+        list = list.filter((i) => i.status === "PND" || i.status === "REJ");
+      }
+      res = list.map((item) => ({
+        ...item,
+        event_time: isNaN(item.event_time)
+          ? dayjs(item.event_time).format("YYYY-MM-DD")
+          : dayjs(Number(item.event_time)).format("YYYY-MM-DD"),
+      }));
 
-    mescroll.endSuccess(res.length);
+      mescroll.endSuccess(res.length);
 
-    if (mescroll.num == 1) {
-      eventList.value = [];
-    }
+      if (mescroll.num == 1) {
+        eventList.value = [];
+      }
 
-    eventList.value = eventList.value.concat(res);
-  });
+      eventList.value = eventList.value.concat(res);
+    });
 };
 
 const refreshList = () => {
@@ -183,11 +189,11 @@ const switchTab = (tab) => {
 // 获取封面图URL（兼容单URL和JSON数组）
 const getCoverUrl = (item) => {
   const url = item.background_image_url;
-  if (!url) return '';
-  if (url.startsWith('[')) {
+  if (!url) return "";
+  if (url.startsWith("[")) {
     try {
       const arr = JSON.parse(url);
-      return arr[0] || '';
+      return arr[0] || "";
     } catch (e) {
       return url;
     }
@@ -195,16 +201,37 @@ const getCoverUrl = (item) => {
   return url;
 };
 
+// 判断活动是否已过期（当前时间晚于 event_time）
+const isExpired = (item) => {
+  if (!item || !item.event_time) return false;
+  const t = dayjs(item.event_time);
+  return dayjs().isAfter(t);
+};
+
 // 状态样式类
-const getStatusClass = (status) => {
-  const map = { PND: 'status-pending', ACT: 'status-active', EXP: 'status-exp', REJ: 'status-rejected' };
-  return map[status];
+const getStatusClass = (item) => {
+  if (isExpired(item)) return "status-expired-custom";
+  const status = item.status;
+  const map = {
+    PND: "status-pending",
+    ACT: "status-active",
+    EXP: "status-exp",
+    REJ: "status-rejected",
+  };
+  return map[status] || "";
 };
 
 // 状态文本
-const getStatusText = (status) => {
-  const map = { PND: '审核中', ACT: '进行中', EXP: '已结束', REJ: '审核未通过' };
-  return map[status];
+const getStatusText = (item) => {
+  if (isExpired(item)) return "已过期";
+  const status = item.status;
+  const map = {
+    PND: "审核中",
+    ACT: "进行中",
+    EXP: "已过期",
+    REJ: "审核未通过",
+  };
+  return map[status] || "";
 };
 
 const removeItem = (item) => {
@@ -213,9 +240,9 @@ const removeItem = (item) => {
     content: "确定删除该活动吗？",
     success: (res) => {
       if (res.confirm) {
-        const data = { event_id: item.id, status: 'DELETED' };
+        const data = { event_id: item.id, status: "DELETED" };
         request.post(`/event-api/fsc_events/update`, data).then(() => {
-          uni.$u.toast('操作成功');
+          uni.$u.toast("操作成功");
           refreshList();
         });
       }
@@ -224,21 +251,33 @@ const removeItem = (item) => {
 };
 
 const createEvent = () => {
-  uni.$u.route(`pagesSub/runningTeam/teamEventTypeSelect?group_id=${group_id.value}`);
+  uni.$u.route(
+    `pagesSub/runningTeam/teamEventTypeSelect?group_id=${group_id.value}`
+  );
 };
 
 const editEvent = (item) => {
   // uni.$u.route(`pagesSub/runningTeam/teamEventForm?id=${item.id}&group_id=${group_id.value}`);
-  uni.$u.route(`pagesSub/runningTeam/teamEventFreeForm?id=${item.id}&group_id=${group_id.value}`);
+  uni.$u.route(
+    `pagesSub/runningTeam/teamEventFreeForm?id=${item.id}&group_id=${group_id.value}`
+  );
 };
 
 const viewRegistrations = (item) => {
-  uni.$u.route(`pagesSub/runningTeam/teamEventRegistrations?event_id=${item.id}&event_name=${encodeURIComponent(item.name)}`);
+  uni.$u.route(
+    `pagesSub/runningTeam/teamEventRegistrations?event_id=${
+      item.id
+    }&event_name=${encodeURIComponent(item.name)}`
+  );
 };
 
 const viewEvent = (item) => {
-  console.log('viewEvent', item);
-  uni.$u.route(`pagesSub/runningTeam/teamEventDetail?id=${item.id}&status=${item.status}&status_message=${encodeURIComponent(item.status_message || '')}`);
+  console.log("viewEvent", item);
+  uni.$u.route(
+    `pagesSub/runningTeam/teamEventDetail?id=${item.id}&status=${
+      item.status
+    }&status_message=${encodeURIComponent(item.status_message || "")}`
+  );
 };
 
 onLoad((options) => {
@@ -259,7 +298,7 @@ onShow(() => {
 <style lang="scss" scoped>
 .page-container {
   min-height: 100vh;
-  background: #FAFAFA;
+  background: #fafafa;
   padding-bottom: 160rpx;
 }
 
@@ -267,7 +306,7 @@ onShow(() => {
   display: flex;
   gap: 16rpx;
   padding: 16rpx 32rpx;
-  background: #FAFAFA;
+  background: #fafafa;
 }
 
 .tab-item {
@@ -275,15 +314,15 @@ onShow(() => {
   border-radius: 32rpx;
   font-size: 26rpx;
   white-space: nowrap;
-  background: #FFFFFF;
-  color: #6B7280;
-  border: 1rpx solid #E5E7EB;
+  background: #ffffff;
+  color: #6b7280;
+  border: 1rpx solid #e5e7eb;
   font-weight: 500;
 
   &.active {
-    background: #FF8C00;
-    color: #FFFFFF;
-    border-color: #FF8C00;
+    background: #ff8c00;
+    color: #ffffff;
+    border-color: #ff8c00;
     font-weight: 600;
   }
 }
@@ -292,15 +331,14 @@ onShow(() => {
   padding: 16rpx 32rpx;
 }
 
-
 .event-card {
-  background: #FFFFFF;
+  background: #ffffff;
   border-radius: 24rpx;
   padding: 28rpx;
   display: flex;
   gap: 28rpx;
   margin-bottom: 20rpx;
-  border: 1rpx solid #F3F4F6;
+  border: 1rpx solid #f3f4f6;
   position: relative;
 
   &.status-expired {
@@ -315,11 +353,26 @@ onShow(() => {
   flex-shrink: 0;
 }
 
+.cover-wrap {
+  position: relative;
+  width: 200rpx;
+  height: 200rpx;
+  flex-shrink: 0;
+}
+
+.cover-wrap .status-tag {
+  position: absolute;
+  top: 0rpx;
+  left: 0rpx;
+  z-index: 2;
+  margin-right: 0;
+}
+
 .cover-placeholder {
   width: 200rpx;
   height: 200rpx;
   border-radius: 24rpx;
-  background: #F6F7F8;
+  background: #f6f7f8;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -343,7 +396,7 @@ onShow(() => {
 .card-name {
   font-size: 30rpx;
   font-weight: 600;
-  color: #1A1A1A;
+  color: #1a1a1a;
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -353,25 +406,31 @@ onShow(() => {
 .status-tag {
   flex-shrink: 0;
   padding: 4rpx 20rpx;
+  margin-right: 20rpx;
   border-radius: 8rpx;
-  font-size: 20rpx;
+  font-size: 24rpx;
   font-weight: 500;
 
   &.status-pending {
     background: rgba(217, 119, 6, 0.1);
-    color: #D97706;
+    color: #d97706;
   }
   &.status-active {
     background: rgba(34, 197, 94, 0.1);
-    color: #22C55E;
+    color: #22c55e;
   }
   &.status-exp {
     background: rgba(156, 163, 175, 0.15);
-    color: #9CA3AF;
+    color: #9ca3af;
   }
   &.status-rejected {
     background: rgba(239, 68, 68, 0.1);
-    color: #EF4444;
+    color: #ef4444;
+  }
+
+  &.status-expired-custom {
+    background: #999;
+    color: #eee;
   }
 }
 
@@ -389,12 +448,12 @@ onShow(() => {
 
 .meta-text {
   font-size: 24rpx;
-  color: #9CA3AF;
+  color: #9ca3af;
 }
 
 .reject-note {
-  background: #FEF2F2;
-  color: #EF4444;
+  background: #fef2f2;
+  color: #ef4444;
   font-size: 22rpx;
   padding: 12rpx 16rpx;
   border-radius: 12rpx;
