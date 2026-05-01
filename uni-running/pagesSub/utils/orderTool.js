@@ -50,7 +50,11 @@ export const wxPay = (respay) => {
         }
 				setTimeout(() => {
 					// uni.navigateBack()
-					uni.$u.route("pagesSub/orderSuccess?order_no=" + respay.order_no);
+					// uni.$u.route("pagesSub/orderSuccess?order_no=" + respay.order_no);
+					
+					uni.navigateTo({
+					  url: "/pagesSub/orderSuccess?order_no=" + respay.order_no
+					});
 				}, 300);
 			},
 			fail: (res) => {
@@ -63,7 +67,11 @@ export const wxPay = (respay) => {
 				uni.$u.toast("支付未完成");
 				setTimeout(() => {
 					// uni.navigateBack()
-					uni.$u.route("pagesSub/orderFail?order_no=" + respay.order_no);
+					// uni.$u.route("pagesSub/orderFail?order_no=" + respay.order_no);
+					
+					uni.navigateTo({
+					  url: "/pagesSub/orderFail?order_no=" + respay.order_no
+					});
 				}, 300);
 			},
 		});

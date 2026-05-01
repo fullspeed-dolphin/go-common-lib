@@ -746,7 +746,10 @@ const payOrder = async (reg_no) => {
     const res = await request.post(`/pay/wechat/payment`, data);
     if (res.free) {
       uni.hideLoading();
-      uni.$u.route("pagesSub/orderSuccess?order_no=" + res.order_no);
+      // uni.$u.route("pagesSub/orderSuccess?order_no=" + res.order_no);
+			uni.navigateTo({
+			  url: "/pagesSub/orderSuccess?order_no=" + res.order_no
+			});
     } else {
       wxPay(res);
     }
