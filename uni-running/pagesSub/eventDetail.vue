@@ -110,8 +110,8 @@
 				<!-- <view class="txt">
 				  {{isSignUp ? '取消' : ''}}报名截止：2025.09.30 9:00
 			  </view> -->
-				<view class="u-flex-between-center" style="width: 100%;">
-					<u-button type="primary" :color="themeBtnColor" shape="circle" customStyle="height: 80rpx;" @click="routeTo()">
+				<view class="u-flex-between-center signup-btn" :class="detail.status" style="width: 100%;">
+					<u-button type="primary" :color="isOutDated ? '#999' : themeBtnColor" shape="circle" customStyle="height: 80rpx;" @click="routeTo()">
 						<block v-if="isOutDated">
 							活动已结束
 						</block>
@@ -194,11 +194,7 @@
 	});
 	const themeBtnColor = computed(() => {
 		const g = detail.value?.color_config?.gradient;
-		if(isOutDated) {
-			return '#999';
-		} else {
-			return g?.length === 2 ? g[0] : '#FF8C00';
-		}
+		return g?.length === 2 ? g[0] : '#FF8C00';
 	});
 	// 信息卡片浅色背景（主题色 10% 透明度）
 	const themePanelItemStyle = computed(() => {
@@ -613,7 +609,7 @@
 	}
 
 	::v-deep {
-		.isSignUp {
+		.signup-btn{
 			.u-button {
 				color: #ff8c00;
 				background: #f2f2f2;

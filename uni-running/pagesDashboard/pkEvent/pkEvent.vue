@@ -284,24 +284,31 @@ const detailInfo = ref(null);
 // 授权登录后的回调，用户授权后的跳转
 const loginCallBack = ref(null)
 const loginCallAction = ref('')
-function onLoginSuccess () {
+const onLoginSuccess = async () => {
 	if (loginCallAction.value === 'SignUpEvent') {
 		uni.$u.toast('前往选择战队')
 		setTimeout(() => {
-			console.log("loginCallBack?.value=====>", loginCallBack.value)
+			console.log("loginCallBack?.value=====>1111", loginCallBack.value)
 			loginCallBack?.value?.()
 		}, 500)
-		
 		return;
 	}
 	
 	if (loginCallAction.value === 'goToPunchIn') {
-		loginCallBack?.value?.()
+    loginCallBack?.value?.()
+    console.log(2222)
 		return;
 	}
-
+  await getUserStatus()
 	if (loginCallAction.value.includes('routeTo')) {
-		loginCallBack?.value?.(loginCallAction.value.replace('routeTo', ''))
+    // 需要判断是否已加入了战队，如果加入了战队提示用户已加入战队，不能重复创建
+    if(loginCallAction.value.includes("teamForm")) {
+      console.log("userStatusInfo.value====>", userStatusInfo.value)
+      if(userStatusInfo.value.in_team) {
+        return uni.$u.toast('您已加入战队，不能重复创建');
+      }
+    }
+    loginCallBack?.value?.(loginCallAction.value.replace('routeTo', ''))
 		return;
 	}
 }
@@ -369,9 +376,12 @@ const getEventData = () => {
 
 const userStatusInfo = ref({});
 function getUserStatus() {
-  request.get("/event-api/online_events_team/user_status?event_id=" + activetyId.value, {}, { showError: false }).then((res) => {
+  return request.get("/event-api/online_events_team/user_status?event_id=" + activetyId.value, {}, { showError: false }).then((res) => {
     userStatusInfo.value = res;
-  }).catch(() => {});
+    return res;
+  }).catch(() => {
+    return null;
+  });
 }
 
 const userCheckedInfo = ref({});
@@ -462,9 +472,9 @@ const SignUpEvent = () => {
 function createTeam() {
   if (detailInfo.value?.status !== 'act') return uni.$u.toast('活动报名时间已过');
   // 需要判断是否已加入了战队，如果加入了战队提示用户已加入战队，不能重复创建
-  if(userStatusInfo.value.in_team) {
-    return uni.$u.toast('您已加入战队，不能重复创建');
-  }
+  // if(userStatusInfo.value.in_team) {
+  //   return uni.$u.toast('您已加入战队，不能重复创建');
+  // }
   goto('pagesDashboard/pkEvent/teamForm');
 }
 

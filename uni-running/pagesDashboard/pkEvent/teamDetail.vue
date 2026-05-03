@@ -1,7 +1,7 @@
 <template>
   <view :style="themeStyle">
    <u-navbar title="战队详情" placeholder></u-navbar>
-	<mescroll-body ref="mescrollRef" @init="mescrollInit" :down="{ use: false }" @down="downCallback" @up="getList" :top="0">
+	<mescroll-body ref="mescrollRef" @init="mescrollInit" :down="{ use: false }" @down="downCallback" @up="getList" :top="0" :up="{toTop:{bottom:'100px'}}">
   <view class="">
     <section class="team-header">
       <!-- 毛玻璃背景：绝对定位，自动跟随 header 高度 -->
