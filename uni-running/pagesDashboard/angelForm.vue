@@ -87,6 +87,7 @@
 	import {
 		ref
 	} from "vue";
+	import { validateNameRule } from '@/utils/validateName.js';
 	import { onLoad} from "@dcloudio/uni-app";
 	import { useStore } from "vuex";
 	import PickerCell from "@/components/common/PickerCell.vue";
@@ -127,17 +128,6 @@
 	}
 	
 	const options_events = ref([]);
-	const validateChineseName = (rule, value, callback) => {
-		const name = (value || '').trim();
-		if (!name) return callback(new Error('请填写姓名'));
-		if (!/^[\u4e00-\u9fff\u3400-\u4dbf\uF900-\uFAFF\u00b7]+$/.test(name)) return callback(new Error('姓名仅支持中文和间隔号·'));
-		if (/^\u00b7|\u00b7$/.test(name)) return callback(new Error('间隔号不能在姓名首尾'));
-		if (/\u00b7{2}/.test(name)) return callback(new Error('间隔号不能连续使用'));
-		const chineseCount = name.replace(/\u00b7/g, '').length;
-		if (chineseCount < 2) return callback(new Error('姓名至少2个中文字'));
-		if (chineseCount > 12) return callback(new Error('姓名不能超过12个中文字'));
-		callback();
-	};
 	const form = ref({
 		gender: "",
 		event_id: "",
@@ -163,7 +153,7 @@
 			trigger: ['change', 'blur']
 		},
 		{
-			validator: validateChineseName,
+			validator: validateNameRule,
 			trigger: ["blur"]
 		}
 	],

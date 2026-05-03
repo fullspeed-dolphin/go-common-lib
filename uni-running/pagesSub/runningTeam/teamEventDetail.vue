@@ -198,6 +198,7 @@
 
 <script setup>
 import { ref, computed, watch } from "vue";
+import { validateName as validateChineseName } from '@/utils/validateName.js';
 import { onLoad, onUnload, onShow,onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
 import { useShare, buildPath } from "@/composables/useShare.js";
 import { useStore } from "vuex";
@@ -218,17 +219,6 @@ const isFull = ref(false);
 const showCertPopup = ref(false);
 const certForm = ref({ real_name: '', cert_type: 'CN_ID', cert_number: '', contact_number: '' });
 const nameError = ref('');
-// 姓名校验：2-12个中文，允许间隔号·（新疆等少数民族姓名）
-const validateChineseName = (name) => {
-  if (!name) return '请输入真实姓名';
-  if (!/^[\u4e00-\u9fff\u3400-\u4dbf\uF900-\uFAFF\u00b7]+$/.test(name)) return '姓名仅支持中文和间隔号·';
-  if (/^\u00b7|\u00b7$/.test(name)) return '间隔号不能在姓名首尾';
-  if (/\u00b7{2}/.test(name)) return '间隔号不能连续使用';
-  const chineseCount = name.replace(/\u00b7/g, '').length;
-  if (chineseCount < 2) return '姓名至少2个中文字';
-  if (chineseCount > 12) return '姓名不能超过12个中文字';
-  return '';
-};
 const validateName = () => {
   const name = certForm.value.real_name.trim();
   if (!name) { nameError.value = ''; return; }
