@@ -41,7 +41,8 @@ function formToApi(formData) {
     "身份证": "CN_ID",
     "香港居民身份证": "HK_ID",
     "澳门居民身份证": "MA_ID",
-    "港澳居民往来大陆通行证(回乡证)": "HK_MA_PASS"
+    "港澳居民往来大陆通行证(回乡证)": "HK_MA_PASS",
+    "护照": "PASSPORT",
   };
   const cert_type = certTypeMap[formData.idType] || "CN_ID";
 

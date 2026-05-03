@@ -323,6 +323,12 @@ function isValidExitPermit(id) {
   return /^[HM]\d{8}$/.test(str) || /^\d{11}$/.test(str);
 }
 
+function isValidPassport(id) {
+    console.log('护照校验', id);
+  const str = id.trim().toUpperCase();
+  return true
+}
+
 export default {
     email,
     mobile,
@@ -332,6 +338,7 @@ export default {
     number,
     digits,
     isValidExitPermit,
+    isValidPassport,
     isValidMacauId,
     isValidHKId,
     idCard,

@@ -173,6 +173,10 @@ const cert_typeOptions = [
     label: "港澳居民往来大陆通行证(回乡证)",
     value: "HK_MA_PASS",
   },
+	{
+	  label: "护照",
+	  value: "PASSPORT",
+	},
 ];
 const imageSrc = ref("https://uviewui.com/album/1.jpg");
 const radiovalue1 = ref("3.14公里");
@@ -279,6 +283,7 @@ watch(
             HK_ID: "isValidHKId",
             MA_ID: "isValidMacauId",
             HK_MA_PASS: "isValidExitPermit",
+            PASSPORT: "isValidPassport",
           };
           const validatorFuncName = typeMapping[type];
           if (!validatorFuncName) {

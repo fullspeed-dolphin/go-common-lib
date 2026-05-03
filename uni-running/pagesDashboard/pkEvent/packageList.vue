@@ -154,7 +154,7 @@ const goSign = (item) => {
       packageId: item.id,
       eventId: routerParams.value.eventId || routerParams.value.id,
       teamId: routerParams.value.teamId || "",
-      requireCert: item.require_cert || 0,
+      requireCert: item.require_cert || 0, // 1 强制要求上传证件
     })
 };
 const isShowModal = ref(false);
