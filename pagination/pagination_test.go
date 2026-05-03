@@ -4,7 +4,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/fullspeed-dolphin/ccrun/pagination"
+	"github.com/fullspeed-dolphin/go-common-lib/pagination"
 	"github.com/gin-gonic/gin"
 )
 

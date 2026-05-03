@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/fullspeed-dolphin/ccrun/httpresponse"
+	"github.com/fullspeed-dolphin/go-common-lib/httpresponse"
 	"github.com/gin-gonic/gin"
 )
 

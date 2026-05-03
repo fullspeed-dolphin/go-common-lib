@@ -1,4 +1,4 @@
-module github.com/fullspeed-dolphin/ccrun
+module github.com/fullspeed-dolphin/go-common-lib
 
 go 1.25.0
 

@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/fullspeed-dolphin/ccrun/envconfig"
+	"github.com/fullspeed-dolphin/go-common-lib/envconfig"
 )
 
 func TestGetEnv(t *testing.T) {

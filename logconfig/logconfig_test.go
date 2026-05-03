@@ -3,7 +3,7 @@ package logconfig_test
 import (
 	"testing"
 
-	"github.com/fullspeed-dolphin/ccrun/logconfig"
+	"github.com/fullspeed-dolphin/go-common-lib/logconfig"
 )
 
 func TestToLoggerConfig(t *testing.T) {
