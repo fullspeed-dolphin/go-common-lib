@@ -17,6 +17,9 @@ type DBConfig struct {
 	User     string
 	Password string
 	Name     string
+	// DSNExtra 附加 DSN 参数（以 & 开头），用于服务特定需求。
+	// 例如："&collation=utf8mb4_unicode_ci&interpolateParams=true"
+	DSNExtra string
 }
 
 // GORMOptions GORM 初始化可选参数。
@@ -43,8 +46,8 @@ func InitGORM(cfg DBConfig, opts ...GORMOptions) (*gorm.DB, error) {
 		o = opts[0]
 	}
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=true&loc=Local",
-		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Name)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=true&loc=Local%s",
+		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Name, cfg.DSNExtra)
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(o.LogLevel),

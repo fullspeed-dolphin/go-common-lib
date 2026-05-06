@@ -13,6 +13,7 @@ type SQLOptions struct {
 	MaxOpenConns    int
 	MaxIdleConns    int
 	ConnMaxLifetime time.Duration
+	ConnMaxIdleTime time.Duration
 }
 
 func defaultSQLOptions() SQLOptions {
@@ -20,6 +21,7 @@ func defaultSQLOptions() SQLOptions {
 		MaxOpenConns:    25,
 		MaxIdleConns:    5,
 		ConnMaxLifetime: 5 * time.Minute,
+		ConnMaxIdleTime: 3 * time.Minute,
 	}
 }
 
@@ -30,8 +32,8 @@ func InitSQLDB(cfg DBConfig, opts ...SQLOptions) (*sql.DB, error) {
 		o = opts[0]
 	}
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=true",
-		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Name)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=true&loc=Local%s",
+		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Name, cfg.DSNExtra)
 
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
@@ -41,6 +43,9 @@ func InitSQLDB(cfg DBConfig, opts ...SQLOptions) (*sql.DB, error) {
 	db.SetMaxOpenConns(o.MaxOpenConns)
 	db.SetMaxIdleConns(o.MaxIdleConns)
 	db.SetConnMaxLifetime(o.ConnMaxLifetime)
+	if o.ConnMaxIdleTime > 0 {
+		db.SetConnMaxIdleTime(o.ConnMaxIdleTime)
+	}
 
 	if err := db.Ping(); err != nil {
 		db.Close()
