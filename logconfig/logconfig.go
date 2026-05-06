@@ -4,7 +4,7 @@
 package logconfig
 
 import (
-	logger "github.com/fullspeed-dolphin/go-logger"
+	"github.com/fullspeed-dolphin/go-common-lib/logger"
 )
 
 // LogConfig 日志配置，与 go-logger.Config 字段保持对齐。
